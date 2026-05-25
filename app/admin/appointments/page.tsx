@@ -1,0 +1,169 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Calendar, Search } from "lucide-react";
+import { toast } from "sonner";
+import type { Appointment } from "@/lib/notion-types";
+
+const TYPE_LABEL: Record<string, string> = {
+  test_drive: "ทดลองขับ",
+  service: "บริการหลังการขาย",
+  body_paint: "ซ่อมสีตัวถัง",
+  insurance_quote: "ประกันภัย",
+};
+
+const STATUS_OPTIONS = [
+  { value: "pending",   label: "รอดำเนินการ" },
+  { value: "confirmed", label: "ยืนยันแล้ว" },
+  { value: "completed", label: "เสร็จสิ้น" },
+  { value: "cancelled", label: "ยกเลิก" },
+];
+
+function statusClass(status: string) {
+  const map: Record<string, string> = {
+    pending:   "bg-amber-50 border-amber-200 text-amber-700",
+    confirmed: "bg-blue-50 border-blue-200 text-blue-700",
+    completed: "bg-emerald-50 border-emerald-200 text-emerald-700",
+    cancelled: "bg-red-50 border-red-200 text-red-600",
+  };
+  return map[status] ?? "bg-gray-50 border-gray-200 text-gray-600";
+}
+
+export default function AdminAppointments() {
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [search, setSearch] = useState("");
+
+  const fetchData = () => {
+    setLoading(true);
+    fetch("/api/admin/appointments")
+      .then(r => r.json())
+      .then(data => setAppointments(Array.isArray(data) ? data : []))
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => { fetchData(); }, []);
+
+  const handleStatusChange = async (id: string, status: Appointment["status"]) => {
+    setUpdating(id);
+    try {
+      const res = await fetch("/api/admin/appointments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      if (!res.ok) throw new Error();
+      setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
+      toast.success("อัปเดตสถานะสำเร็จ");
+    } catch {
+      toast.error("เกิดข้อผิดพลาด กรุณาลองใหม่");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
+  const filtered = appointments.filter(a => {
+    if (statusFilter !== "all" && a.status !== statusFilter) return false;
+    if (typeFilter !== "all" && a.type !== typeFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return a.customerName.toLowerCase().includes(q) || a.customerPhone.includes(search);
+    }
+    return true;
+  });
+
+  return (
+    <div className="p-6 space-y-5">
+      <div>
+        <h1 className="text-2xl font-bold text-[#131F3C]">นัดหมาย</h1>
+        <p className="text-sm text-gray-500 mt-0.5">จัดการนัดหมายทดลองขับและบริการ</p>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-3 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="ค้นหาชื่อ / เบอร์โทร..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
+          />
+        </div>
+        <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none">
+          <option value="all">ทุกประเภท</option>
+          {Object.entries(TYPE_LABEL).map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+        </select>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2.5 text-sm bg-white focus:outline-none">
+          <option value="all">ทุกสถานะ</option>
+          {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+        </select>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        {loading ? (
+          <div className="py-16 flex justify-center">
+            <div className="w-6 h-6 border-2 border-[#131F3C] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="py-16 flex flex-col items-center gap-3 text-gray-400">
+            <Calendar className="w-10 h-10" />
+            <p className="text-sm">ไม่มีนัดหมาย</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/50">
+                <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">ลูกค้า</th>
+                <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-32">ประเภท</th>
+                <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">รถยนต์ / สาขา</th>
+                <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-32">วันที่นัด</th>
+                <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-36">สถานะ</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {filtered.map(apt => (
+                <tr key={apt.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-5 py-4">
+                    <p className="text-sm font-medium text-[#131F3C]">{apt.customerName}</p>
+                    <p className="text-xs text-gray-400">{apt.customerPhone}</p>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                      {TYPE_LABEL[apt.type] ?? apt.type}
+                    </span>
+                  </td>
+                  <td className="px-5 py-4">
+                    <p className="text-sm text-gray-600">{apt.carModel || "—"}</p>
+                    {apt.branch && <p className="text-xs text-gray-400">{apt.branch}</p>}
+                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-600">
+                    {apt.preferredDate
+                      ? new Date(apt.preferredDate).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "2-digit" })
+                      : "—"}
+                    {apt.preferredTime && <span className="text-xs text-gray-400 ml-1">{apt.preferredTime}</span>}
+                  </td>
+                  <td className="px-5 py-4">
+                    <select
+                      value={apt.status}
+                      disabled={updating === apt.id}
+                      onChange={e => handleStatusChange(apt.id, e.target.value as Appointment["status"])}
+                      className={`text-xs font-medium px-2 py-1 rounded-lg border focus:outline-none cursor-pointer disabled:opacity-60 ${statusClass(apt.status)}`}
+                    >
+                      {STATUS_OPTIONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}

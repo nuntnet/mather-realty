@@ -1,0 +1,35 @@
+import { Suspense } from "react";
+import { getActiveCars } from "@/lib/notion";
+import CarsFilter from "./CarsFilter";
+
+export const dynamic = "force-dynamic";
+
+export const metadata = {
+  title: "ค้นหารถยนต์",
+  description: "รถยนต์ใหม่และรถมือสองคุณภาพจาก 6 แบรนด์ชั้นนำ — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
+};
+
+export default async function CarsPage() {
+  const cars = await getActiveCars();
+
+  return (
+    <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
+      {/* Header */}
+      <div className="bg-[#0F172A] text-white py-16 lg:py-20">
+        <div className="container">
+          <div className="max-w-2xl">
+            <p className="text-white/40 text-sm font-medium tracking-wider uppercase mb-3">Vehicle Lineup</p>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">ค้นหารถยนต์</h1>
+            <p className="text-white/50 text-base lg:text-lg leading-relaxed">
+              รถยนต์ใหม่และรถมือสองคุณภาพจาก 6 แบรนด์ชั้นนำ — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <Suspense fallback={<div className="container py-12 text-center text-gray-400">กำลังโหลด...</div>}>
+        <CarsFilter cars={cars} />
+      </Suspense>
+    </div>
+  );
+}

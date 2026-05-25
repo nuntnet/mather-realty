@@ -1,0 +1,114 @@
+# Environment Variables
+
+Copy `.env.local.example` → `.env.local` แล้วกรอกค่าต่อไปนี้
+
+## Notion CMS
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `NOTION_API_KEY` | ✅ | Internal Integration Secret จาก notion.so/my-integrations |
+| `NOTION_CARS_DB_ID` | ✅ | Database ID ของ Cars database |
+| `NOTION_BLOG_DB_ID` | ✅ | Database ID ของ Blog database |
+| `NOTION_STORIES_DB_ID` | ✅ | Database ID ของ Stories database |
+| `NOTION_APPOINTMENTS_DB_ID` | ✅ | Database ID ของ Appointments database |
+| `NOTION_CONTACTS_DB_ID` | ✅ | Database ID ของ Contacts database |
+
+**วิธีหา Database ID:** เปิด database ใน Notion → Copy link → URL มีรูปแบบ:
+```
+https://www.notion.so/workspace/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX?v=...
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                นี่คือ Database ID (32 ตัวอักษร)
+```
+
+## Better Auth + Turso
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `BETTER_AUTH_SECRET` | ✅ | Random secret สำหรับ sign sessions (generate: `openssl rand -base64 32`) |
+| `BETTER_AUTH_URL` | ✅ prod | URL ของเว็บ เช่น `https://ch-erawan.com` (ใช้ `http://localhost:3000` ใน dev) |
+| `TURSO_DATABASE_URL` | ✅ | รูปแบบ: `libsql://[db-name].aws-[region].turso.io` |
+| `TURSO_AUTH_TOKEN` | ✅ | Auth token จาก Turso dashboard |
+
+**สร้าง Turso DB:**
+```bash
+# Install Turso CLI
+brew install tursodatabase/tap/turso
+
+# Login
+turso auth login
+
+# Create database
+turso db create ch-erawan
+
+# Get URL
+turso db show ch-erawan
+
+# Create token
+turso db tokens create ch-erawan
+```
+
+## Cloudinary
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | ✅ | Cloud name (public — ใช้ใน client) |
+| `CLOUDINARY_API_KEY` | ✅ | API Key (server-side only) |
+| `CLOUDINARY_API_SECRET` | ✅ | API Secret (server-side only) |
+
+สร้างได้ที่ https://cloudinary.com → Settings → Access Keys
+
+> ⚠️ ปัจจุบัน upload widget ยังไม่ถูก implement — รูปอัปโหลดผ่าน Cloudinary dashboard แล้ว paste URL ลง Notion
+
+## Google Maps
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` | ✅ | Maps JavaScript API key (public — ใช้ใน client) |
+
+**ขั้นตอน:**
+1. ไป https://console.cloud.google.com
+2. สร้าง project หรือเลือก project ที่มี
+3. Enable **Maps JavaScript API**
+4. สร้าง API Key → จำกัด HTTP referrers ให้เป็น domain ของเว็บ
+
+## Revalidation
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `REVALIDATE_SECRET` | ✅ | Secret token สำหรับ trigger ISR revalidation (generate: `openssl rand -base64 32`) |
+
+## ตัวอย่าง `.env.local`
+
+```bash
+# Notion CMS
+NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_CARS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_BLOG_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_STORIES_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_APPOINTMENTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_CONTACTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+# Better Auth + Turso
+BETTER_AUTH_SECRET=your-random-secret-here
+BETTER_AUTH_URL=http://localhost:3000
+TURSO_DATABASE_URL=libsql://ch-erawan-nunt.aws-ap-northeast-1.turso.io
+TURSO_AUTH_TOKEN=your-turso-token
+
+# Revalidation
+REVALIDATE_SECRET=your-random-revalidate-secret
+
+# Cloudinary
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# Google Maps
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSy...
+```
+
+## Vercel Environment Variables
+
+ใน Vercel dashboard → Project → Settings → Environment Variables:
+- ใส่ทุกตัวข้างบน
+- `BETTER_AUTH_URL` ต้องเป็น production URL: `https://ch-erawan.com`
+- `NEXT_PUBLIC_*` จะถูก expose ไปยัง browser — ไม่ควรใส่ secret
