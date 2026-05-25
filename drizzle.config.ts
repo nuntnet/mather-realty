@@ -1,13 +1,9 @@
-import { defineConfig } from "drizzle-kit";
+import type { Config } from "drizzle-kit";
 
-if (!process.env.TURSO_DATABASE_URL) {
-  throw new Error("TURSO_DATABASE_URL is required");
-}
-
-export default defineConfig({
+export default {
   dialect: "turso",
   dbCredentials: {
-    url: process.env.TURSO_DATABASE_URL,
+    url: process.env.TURSO_DATABASE_URL!,
     authToken: process.env.TURSO_AUTH_TOKEN,
   },
   // better-auth manages its own schema — no schema file needed for normal use
@@ -15,4 +11,4 @@ export default defineConfig({
   // schema: "./lib/db/schema.ts",
   out: "./drizzle",
   verbose: true,
-});
+} satisfies Config;
