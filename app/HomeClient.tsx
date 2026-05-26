@@ -18,35 +18,33 @@ import { th } from "date-fns/locale";
 
 const heroSlides = [
   {
-    bg: "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=1920&q=80&auto=format&fit=crop",
-    brand: "GWM", tagline: "DEFINE YOUR OWN WORLD",
-    thaiTitle: "โลกที่คุณนิยามเป็นแบบไหน",
-    desc: "Trendy Off-Road SUV ที่หลอมรวมความต้องการของนักผจญภัยที่แท้จริง ดีไซน์แบบผู้นำเทรนด์ที่สะดุดทุกสายตา",
+    bg: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1920&q=80&auto=format&fit=crop",
+    brand: "ORA", tagline: "FUTURE IS NOW",
+    thaiTitle: "อนาคตของการขับขี่เริ่มต้นวันนี้",
+    desc: "ORA Good Cat รถยนต์ไฟฟ้าสไตล์ Retro-Futuristic ดีไซน์โดดเด่น วิ่งได้ไกล 500 กม./ชาร์จ ขับง่าย ประหยัดค่าใช้จ่าย",
   },
   {
-    bg: "https://images.unsplash.com/photo-1609521263047-f8f205293f24?w=1920&q=80&auto=format&fit=crop",
-    brand: "Mazda", tagline: "FEEL ALIVE",
-    thaiTitle: "ขับขี่ที่มีชีวิตชีวา",
-    desc: "Mazda CX-5 ยกระดับประสบการณ์ทุกเส้นทาง ด้วยเทคโนโลยี SKYACTIV และดีไซน์ KODO",
+    bg: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1920&q=80&auto=format&fit=crop",
+    brand: "HAVAL", tagline: "DESIGNED FOR SUCCESS",
+    thaiTitle: "ออกแบบมาเพื่อความสำเร็จ",
+    desc: "HAVAL H6 SUV ยอดนิยมอันดับ 1 ในจีน พร้อมเทคโนโลยี Hybrid ประหยัดน้ำมัน ออพชั่นครบ ราคาคุ้มค่า",
   },
   {
-    bg: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1920&q=80&auto=format&fit=crop",
-    brand: "Ford", tagline: "BUILT FOR THE BOLD",
-    thaiTitle: "แกร่งเพื่อคนกล้า",
-    desc: "Ford Ranger พิชิตทุกพื้นที่ ทั้งในเมืองและออฟโรด ด้วยพลังขับเคลื่อนที่แข็งแกร่ง",
+    bg: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1920&q=80&auto=format&fit=crop",
+    brand: "TANK", tagline: "BORN TO EXPLORE",
+    thaiTitle: "เกิดมาเพื่อผจญภัย",
+    desc: "TANK 300 SUV ออฟโรดสไตล์ Classic พร้อมระบบขับเคลื่อน 4 ล้อ ลุยได้ทุกเส้นทาง ดีไซน์เท่ไม่เหมือนใคร",
   },
 ];
 
 const brandData = [
   { name: "GWM", slug: "GWM", logo: "GWM", brandImage: BRAND_IMAGES.GWM },
-  { name: "Ford", slug: "Ford", logo: "FORD", brandImage: BRAND_IMAGES.Ford },
-  { name: "Mitsubishi", slug: "Mitsubishi", logo: "MITSUBISHI", brandImage: BRAND_IMAGES.Mitsubishi },
-  { name: "Mazda", slug: "Mazda", logo: "MAZDA", brandImage: BRAND_IMAGES.Mazda },
-  { name: "Deepal", slug: "Deepal", logo: "DEEPAL", brandImage: BRAND_IMAGES.Deepal },
-  { name: "Kia", slug: "Kia", logo: "KIA", brandImage: BRAND_IMAGES.Kia },
+  { name: "HAVAL", slug: "HAVAL", logo: "HAVAL", brandImage: BRAND_IMAGES.HAVAL },
+  { name: "ORA", slug: "ORA", logo: "ORA", brandImage: BRAND_IMAGES.ORA },
+  { name: "TANK", slug: "TANK", logo: "TANK", brandImage: BRAND_IMAGES.TANK },
 ];
 
-const brandTabs = ["ทั้งหมด", "MAZDA", "FORD", "MITSUBISHI", "GWM", "DEEPAL", "KIA"];
+const brandTabs = ["ทั้งหมด", "GWM", "HAVAL", "ORA", "TANK"];
 
 interface Props {
   featuredCars: Car[];

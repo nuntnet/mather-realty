@@ -19,7 +19,7 @@ const serviceLinks = [
   { label: "ร่วมงานกับเรา", href: "/career" },
 ];
 
-const brands = ["Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"];
+const brands = ["GWM", "HAVAL", "ORA", "TANK"];
 
 export default function Footer() {
   return (
