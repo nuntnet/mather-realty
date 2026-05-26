@@ -7,12 +7,10 @@ import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const brands = [
-  { name: "Mazda", slug: "Mazda" },
-  { name: "Ford", slug: "Ford" },
-  { name: "Mitsubishi", slug: "Mitsubishi" },
   { name: "GWM", slug: "GWM" },
-  { name: "Deepal", slug: "Deepal" },
-  { name: "Kia", slug: "Kia" },
+  { name: "HAVAL", slug: "HAVAL" },
+  { name: "ORA", slug: "ORA" },
+  { name: "TANK", slug: "TANK" },
 ];
 
 const navItems = [
@@ -142,7 +140,7 @@ export default function Navbar() {
                         <h3 className="text-lg font-bold text-[#131F3C]">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h3>
                         <p className="text-sm text-gray-400 mt-1">เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด</p>
                       </div>
-                      <div className="grid grid-cols-6 gap-5">
+                      <div className="grid grid-cols-4 gap-5">
                         {brands.map((brand) => (
                           <Link key={brand.name} href={`/cars?brand=${brand.slug}`}
                             className="group p-5 rounded-xl border border-gray-100 hover:border-[#DD5259]/30 hover:shadow-lg transition-all text-center bg-white"
