@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BranchesMap from "@/components/BranchesMap";
@@ -73,7 +74,14 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
       <section className="relative overflow-hidden bg-black" style={{ height: "calc(100vh - 68px)" }}>
         {heroSlides.map((slide, i) => (
           <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === heroSlide ? "opacity-100" : "opacity-0"}`}>
-            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${slide.bg}')` }} />
+            <Image
+              src={slide.bg}
+              alt={slide.brand}
+              fill
+              priority={i === 0}
+              className="object-cover object-center"
+              sizes="100vw"
+            />
           </div>
         ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
@@ -106,7 +114,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
                 <div className="flex items-center justify-center transition-all cursor-pointer group">
                   {brandLogoBase64[brand.name] ? (
-                    <img src={brandLogoBase64[brand.name]} alt={brand.name} className="h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" />
+                    <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={32} className="h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" />
                   ) : (
                     <span className="text-sm md:text-base font-bold tracking-[0.2em] text-[#0F172A] opacity-40 group-hover:opacity-100">{brand.logo}</span>
                   )}
@@ -129,11 +137,17 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
                 <div className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
                   <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
-                    <img src={brand.brandImage} alt={brand.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <Image
+                      src={brand.brandImage}
+                      alt={brand.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      sizes="(max-width: 768px) 50vw, 33vw"
+                    />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       {brandLogoBase64[brand.name] ? (
-                        <img src={brandLogoBase64[brand.name]} alt={brand.name} className="h-6 w-auto object-contain brightness-0 invert opacity-90" />
+                        <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={24} className="h-6 w-auto object-contain brightness-0 invert opacity-90" />
                       ) : (
                         <span className="text-white font-bold tracking-widest text-sm">{brand.logo}</span>
                       )}
@@ -174,9 +188,9 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <div key={car.id} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
                 <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
                   {car.imageUrls[0] ? (
-                    <img src={car.imageUrls[0]} alt={car.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <Image src={car.imageUrls[0]} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
-                    <img src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} className="w-full h-full object-cover opacity-80" />
+                    <Image src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} fill className="object-cover opacity-80" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   )}
                   {car.isFeatured && (
                     <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">แนะนำ</Badge>
@@ -387,7 +401,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 <div className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
                   <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
                     {post.coverImageUrl ? (
-                      <img src={post.coverImageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      <Image src={post.coverImageUrl} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <Calendar className="w-10 h-10 text-gray-300" />
