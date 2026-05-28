@@ -24,6 +24,34 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
     --radius: 0.5rem;
+
+    /* CH.ERAWAN Brand Colors */
+    --brand-navy: 220 50% 16%;
+    --brand-red: 357 70% 55%;
+    --brand-red-light: 357 85% 65%;
+    --brand-gold: 45 85% 55%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -43,5 +71,74 @@
   /* Thai text line-height optimization */
   :lang(th) {
     line-height: 1.7;
+  }
+}
+
+/* Glassmorphism Effects */
+@layer components {
+  .glass {
+    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/20 dark:border-gray-700/30;
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-gray-100/50 dark:border-gray-700/30 shadow-lg shadow-gray-200/20 dark:shadow-black/20;
+  }
+
+  .glass-hover {
+    @apply transition-all duration-300 hover:bg-white/90 dark:hover:bg-gray-800/90 hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30;
+  }
+
+  /* Gradient Buttons */
+  .btn-gradient {
+    @apply bg-gradient-to-r from-[#DD5259] to-[#FF7A6B] text-white font-semibold;
+    @apply hover:from-[#c94850] hover:to-[#f06d5f] transition-all duration-300;
+    @apply shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/35;
+  }
+
+  .btn-gradient-navy {
+    @apply bg-gradient-to-r from-[#131F3C] to-[#2E5EA8] text-white font-semibold;
+    @apply hover:from-[#0f1830] hover:to-[#264d8c] transition-all duration-300;
+    @apply shadow-lg shadow-blue-900/25 hover:shadow-xl hover:shadow-blue-900/35;
+  }
+
+  /* Card Hover Effects */
+  .card-lift {
+    @apply transition-all duration-300 ease-out;
+    @apply hover:-translate-y-1 hover:shadow-2xl hover:shadow-gray-300/30 dark:hover:shadow-black/40;
+  }
+
+  /* Subtle gradient backgrounds */
+  .bg-gradient-subtle {
+    @apply bg-gradient-to-br from-gray-50 via-white to-gray-100/50 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800/50;
+  }
+}
+
+/* Micro-interactions */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.3s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
   }
 }
