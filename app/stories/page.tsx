@@ -1,7 +1,7 @@
 import { getPublicStories } from "@/lib/notion";
 import StoriesClient from "./StoriesClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "เรื่องราวลูกค้า",

@@ -1,7 +1,7 @@
 import { getPublishedBlogPosts } from "@/lib/notion";
 import BlogList from "./BlogList";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "บทความและข่าวสาร",

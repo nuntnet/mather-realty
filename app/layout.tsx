@@ -48,6 +48,30 @@ export const metadata: Metadata = {
   },
 };
 
+const autoDealerJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "AutoDealer",
+  name: "ช.เอราวัณ ออโต้ กรุ๊ป",
+  url: BASE_URL,
+  logo: `${BASE_URL}/logo.png`,
+  description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม Mazda, Ford, Mitsubishi, GWM, Deepal, Kia — 7 สาขา",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "นครปฐม",
+    addressCountry: "TH",
+  },
+  telephone: "094-413-3555",
+  areaServed: { "@type": "City", name: "นครปฐม" },
+  brand: [
+    { "@type": "Brand", name: "Mazda" },
+    { "@type": "Brand", name: "Ford" },
+    { "@type": "Brand", name: "Mitsubishi" },
+    { "@type": "Brand", name: "GWM" },
+    { "@type": "Brand", name: "Deepal" },
+    { "@type": "Brand", name: "Kia" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -56,6 +80,10 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body className={`${inter.variable} ${ibmPlexSansThai.variable} font-sans antialiased`}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(autoDealerJsonLd) }}
+        />
         <PublicLayout>
           {children}
         </PublicLayout>

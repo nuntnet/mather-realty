@@ -42,5 +42,42 @@ export default async function CarDetailPage({
   const car = await getCarById(id);
   if (!car) notFound();
 
-  return <CarDetailClient car={car} />;
+  const carJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    name: `${car.brand} ${car.model} ${car.year}`,
+    brand: { "@type": "Brand", name: car.brand },
+    model: car.model,
+    vehicleModelDate: String(car.year),
+    bodyType: car.type,
+    fuelType: car.fuelType,
+    vehicleTransmission: car.transmission === "auto" ? "AutomaticTransmission" : "ManualTransmission",
+    ...(car.engineSize && { engineDisplacement: { "@type": "QuantitativeValue", value: car.engineSize } }),
+    ...(car.description && { description: car.description }),
+    ...(car.imageUrls[0] && { image: car.imageUrls[0] }),
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "THB",
+      price: car.priceMin,
+      ...(car.priceMax > car.priceMin && { highPrice: car.priceMax }),
+      availability: "https://schema.org/InStock",
+      itemCondition: car.condition === "new"
+        ? "https://schema.org/NewCondition"
+        : "https://schema.org/UsedCondition",
+      seller: {
+        "@type": "AutoDealer",
+        name: "ช.เอราวัณ ออโต้ กรุ๊ป",
+      },
+    },
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd) }}
+      />
+      <CarDetailClient car={car} />
+    </>
+  );
 }

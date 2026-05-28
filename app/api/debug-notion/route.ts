@@ -13,6 +13,8 @@ export async function GET() {
       carsDb: process.env.NOTION_CARS_DB_ID?.slice(0, 8) + "...",
       blogDb: process.env.NOTION_BLOG_DB_ID?.slice(0, 8) + "...",
       storiesDb: process.env.NOTION_STORIES_DB_ID?.slice(0, 8) + "...",
+      contactsDb: process.env.NOTION_CONTACTS_DB_ID?.slice(0, 8) + "..." || "NOT SET",
+      appointmentsDb: process.env.NOTION_APPOINTMENTS_DB_ID?.slice(0, 8) + "..." || "NOT SET",
     },
   };
 
@@ -21,6 +23,8 @@ export async function GET() {
     { name: "cars", id: process.env.NOTION_CARS_DB_ID! },
     { name: "blog", id: process.env.NOTION_BLOG_DB_ID! },
     { name: "stories", id: process.env.NOTION_STORIES_DB_ID! },
+    { name: "contacts", id: process.env.NOTION_CONTACTS_DB_ID! },
+    { name: "appointments", id: process.env.NOTION_APPOINTMENTS_DB_ID! },
   ];
 
   for (const db of dbTests) {

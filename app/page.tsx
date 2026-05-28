@@ -1,7 +1,7 @@
 import { getFeaturedCars, getPublishedBlogPosts, getPublicStories } from "@/lib/notion";
 import HomeClient from "./HomeClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function HomePage() {
   // Parallel fetch with error handling to identify which call fails

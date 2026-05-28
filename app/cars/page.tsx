@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { getActiveCars } from "@/lib/notion";
 import CarsFilter from "./CarsFilter";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export const metadata = {
   title: "ค้นหารถยนต์",
