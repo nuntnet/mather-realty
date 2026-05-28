@@ -35,12 +35,11 @@ export async function POST(req: NextRequest) {
     await notion.pages.create({
       parent: { database_id: process.env.NOTION_APPOINTMENTS_DB_ID! },
       properties: {
-        Name: { title: [{ text: { content: `${typeLabels[data.type]} - ${data.customerName}` } }] },
-        "Customer Name": { rich_text: [{ text: { content: data.customerName } }] },
+        "Customer Name": { title: [{ text: { content: data.customerName } }] },
         Type: { select: { name: data.type } },
         Status: { select: { name: "pending" } },
-        Phone: { phone_number: data.customerPhone },
-        ...(data.customerEmail ? { Email: { email: data.customerEmail } } : {}),
+        "Customer Phone": { phone_number: data.customerPhone },
+        ...(data.customerEmail ? { "Customer Email": { email: data.customerEmail } } : {}),
         ...(data.carModel ? { "Car Model": { rich_text: [{ text: { content: data.carModel } }] } } : {}),
         ...(data.branch ? { Branch: { rich_text: [{ text: { content: data.branch } }] } } : {}),
         ...(data.preferredDate ? { "Preferred Date": { date: { start: data.preferredDate } } } : {}),
