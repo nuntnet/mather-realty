@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { admin } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
+import * as schema from "@/lib/db/schema";
 
 function createAuth() {
   const url = process.env.TURSO_DATABASE_URL;
@@ -14,11 +15,12 @@ function createAuth() {
   }
 
   const client = createClient({ url, authToken });
-  const db = drizzle(client);
+  const db = drizzle(client, { schema });
 
   return betterAuth({
     database: drizzleAdapter(db, {
       provider: "sqlite",
+      schema,
     }),
     secret: process.env.BETTER_AUTH_SECRET!,
     baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
