@@ -276,22 +276,31 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
             onChange={(urls) => set("imageUrls", urls)}
           />
 
-          <div className="flex items-center gap-6 pt-1">
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+          <div className="flex flex-wrap items-start gap-4 pt-1">
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดง/ซ่อนรถบนเว็บไซต์">
               <Switch checked={form.isActive} onCheckedChange={(v) => set("isActive", v)} />
-              เปิดการแสดงผล
+              <span>เผยแพร่</span>
             </label>
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดง badge ขายดี บนหน้า /cars">
               <Switch checked={form.isFeatured} onCheckedChange={(v) => set("isFeatured", v)} />
-              รถแนะนำ (หน้าแรก)
+              <span className="flex flex-col leading-tight">
+                <span>ขายดี</span>
+                <span className="text-[10px] text-gray-400">/cars badge</span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดงใน Mega Nav + badge แนะนำ">
               <Switch checked={form.navFeatured} onCheckedChange={(v) => set("navFeatured", v)} />
-              เมนูแนะนำ
+              <span className="flex flex-col leading-tight">
+                <span>แนะนำ</span>
+                <span className="text-[10px] text-blue-400">mega nav</span>
+              </span>
             </label>
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดงใน Mega Nav + badge ใหม่">
               <Switch checked={form.navNew} onCheckedChange={(v) => set("navNew", v)} />
-              เมนูใหม่
+              <span className="flex flex-col leading-tight">
+                <span>ใหม่</span>
+                <span className="text-[10px] text-blue-400">mega nav</span>
+              </span>
             </label>
           </div>
         </div>
