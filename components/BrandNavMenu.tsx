@@ -64,25 +64,96 @@ export function BrandNavTile({
   );
 }
 
-export function BrandMegaMenuGrid() {
+function GwmSubLineLinks({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      {BRANDS.map((brand) => (
-        <BrandNavTile
-          key={brand.slug}
-          href={brand.hubPath}
-          logoSrc={brand.logoPath}
-          name={brand.displayNameTh}
-          sublabel="ดูรุ่นรถ →"
-        />
+    <div className={cn("flex flex-wrap gap-1.5", compact ? "mt-2" : "mt-3 justify-center")}>
+      {GWM_SUB_LINES.map((line) => (
+        <Link
+          key={line.slug}
+          href={getGwmLineHref(line.slug)}
+          className="inline-flex items-center gap-1.5 rounded-md border border-gray-100 hover:border-[#DD5259]/30 px-2 py-1 min-h-[32px] bg-gray-50/80 hover:bg-white transition-all text-xs font-medium text-gray-600 hover:text-[#131F3C]"
+        >
+          <BrandLogo
+            src={line.logoPath}
+            alt={line.displayName}
+            width={48}
+            height={16}
+            className="h-3.5 w-auto opacity-70"
+          />
+          {line.displayName}
+        </Link>
       ))}
     </div>
   );
 }
 
+export function BrandMegaMenuGrid() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      {BRANDS.map((brand) =>
+        brand.slug === "gwm" ? (
+          <div key={brand.slug} className="flex flex-col">
+            <BrandNavTile
+              href={brand.hubPath}
+              logoSrc={brand.logoPath}
+              name={brand.displayNameTh}
+              sublabel="ดูรุ่นรถ →"
+              className="flex-1"
+            />
+            <GwmSubLineLinks />
+          </div>
+        ) : (
+          <BrandNavTile
+            key={brand.slug}
+            href={brand.hubPath}
+            logoSrc={brand.logoPath}
+            name={brand.displayNameTh}
+            sublabel="ดูรุ่นรถ →"
+          />
+        )
+      )}
+    </div>
+  );
+}
+
+/** Full desktop mega menu panel — rendered only when dropdown is open */
+export function BrandMegaMenuPanel() {
+  return (
+    <div className="container py-8">
+      <div className="mb-6">
+        <h3 className="text-lg font-bold text-[#131F3C]">
+          แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป
+        </h3>
+        <p className="text-sm text-gray-400 mt-1">เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด</p>
+      </div>
+      <BrandMegaMenuGrid />
+      <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
+        <Link
+          href="/cars"
+          className="text-sm text-[#131F3C] font-semibold hover:underline"
+        >
+          ดูรถยนต์ทั้งหมด →
+        </Link>
+        <Link
+          href="/cars?condition=used"
+          className="text-sm text-gray-400 hover:text-[#131F3C] transition-colors"
+        >
+          รถยนต์มือสอง →
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+/** @deprecated Use nested GWM links in BrandMegaMenuGrid instead */
 export function GwmSubLineRow({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={cn("flex flex-wrap gap-2", compact ? "mt-2" : "mt-4 pt-4 border-t border-gray-100")}>
+    <div
+      className={cn(
+        "flex flex-wrap gap-2",
+        compact ? "mt-2" : "mt-4 pt-4 border-t border-gray-100"
+      )}
+    >
       {!compact && (
         <span className="w-full text-xs text-gray-400 mb-1">สายย่อย GWM</span>
       )}
@@ -99,7 +170,9 @@ export function GwmSubLineRow({ compact = false }: { compact?: boolean }) {
             height={20}
             className="h-4 w-auto opacity-70"
           />
-          <span className="text-xs font-medium text-gray-600">{line.displayName}</span>
+          <span className="text-xs font-medium text-gray-600">
+            {line.displayName}
+          </span>
         </Link>
       ))}
       <Link
@@ -134,6 +207,12 @@ export function MobileBrandLinks() {
         ))}
       </div>
       <GwmSubLineRow compact />
+      <Link
+        href="/cars"
+        className="block px-3 py-2.5 text-sm font-semibold text-[#131F3C] hover:text-[#DD5259]"
+      >
+        ดูรถยนต์ทั้งหมด →
+      </Link>
     </div>
   );
 }
