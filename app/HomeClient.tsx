@@ -211,7 +211,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                       <Button size="sm" className="text-xs bg-[#0F172A] hover:bg-[#1E293B] text-white flex-1">ทดลองขับ</Button>
                     </Link>
                   </div>
-                  <Link href={`/cars/${car.id}`}>
+                  <Link href={`/cars/${car.slug || car.id}`}>
                     <p className="text-xs text-gray-400 hover:text-[#0F172A] mt-3 text-center cursor-pointer transition-colors font-medium">รายละเอียด →</p>
                   </Link>
                 </div>

@@ -1,12 +1,12 @@
 import type { MetadataRoute } from "next";
-import { getAllBlogSlugs, getAllCarIds } from "@/lib/notion";
+import { getAllBlogSlugs, getAllCarSlugs } from "@/lib/notion";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ch-erawan.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [blogSlugs, carIds] = await Promise.all([
+  const [blogSlugs, carSlugs] = await Promise.all([
     getAllBlogSlugs().catch(() => [] as string[]),
-    getAllCarIds().catch(() => [] as string[]),
+    getAllCarSlugs().catch(() => [] as string[]),
   ]);
 
   const staticPages: MetadataRoute.Sitemap = [
@@ -31,8 +31,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  const carPages: MetadataRoute.Sitemap = carIds.map((id) => ({
-    url: `${BASE_URL}/cars/${id}`,
+  const carPages: MetadataRoute.Sitemap = carSlugs.map((slug) => ({
+    url: `${BASE_URL}/cars/${slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.8,
