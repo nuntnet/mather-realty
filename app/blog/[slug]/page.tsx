@@ -7,6 +7,7 @@ import { th } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
 import type { Metadata } from "next";
 import { breadcrumbJsonLd, canonicalUrl } from "@/lib/site";
+import { JsonLd, articleJsonLd } from "@/lib/seo";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -56,29 +57,8 @@ export default async function BlogPostPage({
   const recentPosts = await getPublishedBlogPosts(4);
   const related = recentPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
-  const BASE_URL = canonicalUrl("/").replace(/\/$/, "");
   const postPath = `/blog/${post.slug || slug}`;
-  const articleJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: post.seoTitle || post.title,
-    ...(post.excerpt && { description: post.seoDescription || post.excerpt }),
-    ...(post.coverImageUrl && { image: post.coverImageUrl }),
-    ...(post.publishedAt && { datePublished: post.publishedAt }),
-    author: {
-      "@type": "Organization",
-      name: "ช.เอราวัณ ออโต้ กรุ๊ป",
-      url: BASE_URL,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "ช.เอราวัณ ออโต้ กรุ๊ป",
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/logo.png` },
-    },
-    url: canonicalUrl(postPath),
-    inLanguage: "th",
-  };
-
+  const articleSchema = articleJsonLd(post, slug);
   const breadcrumbs = breadcrumbJsonLd([
     { name: "หน้าแรก", path: "/" },
     { name: "บทความ", path: "/blog" },
@@ -87,14 +67,8 @@ export default async function BlogPostPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
-      />
+      <JsonLd data={articleSchema} />
+      <JsonLd data={breadcrumbs} />
     <div className="min-h-screen bg-white pt-[68px]">
       {/* Hero Banner */}
       <div className="relative h-[400px] lg:h-[500px]">

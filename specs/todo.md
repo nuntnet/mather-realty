@@ -1,6 +1,6 @@
 # TODO List
 
-อัปเดตล่าสุด: 2026-05-30 (branch `cursor/p1-seo-ops`)
+อัปเดตล่าสุด: 2026-05-30 (branch `cursor/aeo-geo-phase1`)
 
 ---
 
@@ -40,6 +40,17 @@
 - [x] **ตรวจสอบ Notion API reachable จาก Vercel sin1** — docs ใน `specs/deployment.md` + `GET /api/health`
 - [x] **Configure ESLint** — `eslint.config.mjs` (Next 15 flat config)
 - [x] **Archive `docs/IMPLEMENTATION_PLAN.md`** → `docs/archive/IMPLEMENTATION_PLAN.md` + SUPERSEDED banner
+
+---
+
+### AEO / GEO Phase 1 (2026-05-30, branch `cursor/aeo-geo-phase1`)
+
+- [x] **`lib/seo/` module** — Organization, AutoDealer, WebSite, Product/Car, Article, FAQ helper, ItemList, JsonLd component
+- [x] **Root layout JSON-LD** — `organizationGraph()` + `websiteJsonLd()` via `<JsonLd />`
+- [x] **Homepage** — AEO metadata + ItemList for featured cars
+- [x] **`public/llms.txt`** — GEO crawler summary (brands, URLs, branches)
+- [x] **`docs/AEO-GEO.md`** — schema map, data sources, Phase 2–3 roadmap
+- [x] **Branch data unification** — `branches` + `contact` import `lib/branchData.ts`; removed phantom Ford นครปฐม
 
 ---
 

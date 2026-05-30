@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import { getCarBySlug, getCarSlugsForPrerender } from "@/lib/notion";
 import CarDetailClient from "./CarDetailClient";
 import type { Metadata } from "next";
-import { breadcrumbJsonLd, canonicalUrl, SITE_NAME } from "@/lib/site";
+import { JsonLd, productVehicleJsonLd, carBreadcrumbJsonLd } from "@/lib/seo";
+import { canonicalUrl } from "@/lib/site";
 
 export const revalidate = 86400;
 export const dynamicParams = true;
@@ -50,59 +51,13 @@ export default async function CarDetailPage({
   const car = await getCarBySlug(slug);
   if (!car) notFound();
 
-  const carPath = `/cars/${car.slug || slug}`;
-  const carJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: `${car.brand} ${car.model} ${car.year}`,
-    brand: { "@type": "Brand", name: car.brand },
-    model: car.model,
-    category: "Automotive",
-    ...(car.description && { description: car.description }),
-    ...(car.imageUrls.length > 0 ? { image: car.imageUrls } : {}),
-    offers: {
-      "@type": "Offer",
-      priceCurrency: "THB",
-      price: car.priceMin,
-      ...(car.priceMax > car.priceMin && { highPrice: car.priceMax }),
-      availability: "https://schema.org/InStock",
-      itemCondition:
-        car.condition === "new"
-          ? "https://schema.org/NewCondition"
-          : "https://schema.org/UsedCondition",
-      seller: {
-        "@type": "AutoDealer",
-        name: SITE_NAME,
-      },
-    },
-    additionalProperty: [
-      { "@type": "PropertyValue", name: "year", value: String(car.year) },
-      { "@type": "PropertyValue", name: "bodyType", value: car.type },
-      { "@type": "PropertyValue", name: "fuelType", value: car.fuelType },
-      {
-        "@type": "PropertyValue",
-        name: "transmission",
-        value: car.transmission === "auto" ? "Automatic" : "Manual",
-      },
-    ],
-  };
-
-  const breadcrumbs = breadcrumbJsonLd([
-    { name: "หน้าแรก", path: "/" },
-    { name: "ค้นหารถยนต์", path: "/cars" },
-    { name: `${car.brand} ${car.model}`, path: carPath },
-  ]);
+  const vehicleSchema = productVehicleJsonLd({ car, slug });
+  const breadcrumbs = carBreadcrumbJsonLd(car, slug);
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }}
-      />
+      <JsonLd data={vehicleSchema} />
+      <JsonLd data={breadcrumbs} />
       <CarDetailClient car={car} />
     </>
   );
