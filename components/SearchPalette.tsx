@@ -157,7 +157,7 @@ export default function SearchPalette({ open, onOpenChange }: SearchPaletteProps
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.97, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="fixed top-[10vh] left-1/2 -translate-x-1/2 z-[61] w-full max-w-xl px-4"
+            className="fixed top-[8vh] inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-[61] w-auto sm:w-full sm:max-w-xl"
           >
             <Command
               className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
