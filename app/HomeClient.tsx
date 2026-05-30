@@ -18,33 +18,35 @@ import { th } from "date-fns/locale";
 
 const heroSlides = [
   {
-    bg: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1920&q=80&auto=format&fit=crop",
-    brand: "ORA", tagline: "FUTURE IS NOW",
-    thaiTitle: "อนาคตของการขับขี่เริ่มต้นวันนี้",
-    desc: "ORA Good Cat รถยนต์ไฟฟ้าสไตล์ Retro-Futuristic ดีไซน์โดดเด่น วิ่งได้ไกล 500 กม./ชาร์จ ขับง่าย ประหยัดค่าใช้จ่าย",
+    bg: "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    brand: "Mazda", tagline: "FEEL ALIVE",
+    thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
+    desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
   },
   {
-    bg: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1920&q=80&auto=format&fit=crop",
-    brand: "HAVAL", tagline: "DESIGNED FOR SUCCESS",
-    thaiTitle: "ออกแบบมาเพื่อความสำเร็จ",
-    desc: "HAVAL H6 SUV ยอดนิยมอันดับ 1 ในจีน พร้อมเทคโนโลยี Hybrid ประหยัดน้ำมัน ออพชั่นครบ ราคาคุ้มค่า",
+    bg: "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/haval-h6-hev/h6-kv-pc-1-2.jpg",
+    brand: "GWM", tagline: "HAVAL H6 HEV",
+    thaiTitle: "SUV ไฮบริดยอดนิยม",
+    desc: "GWM HAVAL H6 HEV ประหยัดน้ำมัน ออพชั่นครบ ราคาเริ่มต้น 969,000 บาท จาก gwm.co.th",
   },
   {
-    bg: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1920&q=80&auto=format&fit=crop",
-    brand: "TANK", tagline: "BORN TO EXPLORE",
-    thaiTitle: "เกิดมาเพื่อผจญภัย",
-    desc: "TANK 300 SUV ออฟโรดสไตล์ Classic พร้อมระบบขับเคลื่อน 4 ล้อ ลุยได้ทุกเส้นทาง ดีไซน์เท่ไม่เหมือนใคร",
+    bg: "https://www.kia.com/content/dam/kwcms/gt/en/images/showroom/EV5-ovc-25my/Gallery/ext/ev5-25my-wide-exterior-01.jpg",
+    brand: "Kia", tagline: "INSPIRATION DRIVEN",
+    thaiTitle: "SUV ไฟฟ้าแห่งอนาคต",
+    desc: "Kia EV5 ดีไซน์ Opposites United ห้องโดยสารกว้าง ราคาเริ่มต้น 1,399,000 บาท",
   },
 ];
 
 const brandData = [
+  { name: "Mazda", slug: "Mazda", logo: "Mazda", brandImage: BRAND_IMAGES.Mazda },
+  { name: "Ford", slug: "Ford", logo: "Ford", brandImage: null as string | null },
+  { name: "Mitsubishi", slug: "Mitsubishi", logo: "Mitsubishi", brandImage: BRAND_IMAGES.Mitsubishi },
   { name: "GWM", slug: "GWM", logo: "GWM", brandImage: BRAND_IMAGES.GWM },
-  { name: "HAVAL", slug: "HAVAL", logo: "HAVAL", brandImage: BRAND_IMAGES.HAVAL },
-  { name: "ORA", slug: "ORA", logo: "ORA", brandImage: BRAND_IMAGES.ORA },
-  { name: "TANK", slug: "TANK", logo: "TANK", brandImage: BRAND_IMAGES.TANK },
+  { name: "Deepal", slug: "Deepal", logo: "Deepal", brandImage: BRAND_IMAGES.Deepal },
+  { name: "Kia", slug: "Kia", logo: "Kia", brandImage: BRAND_IMAGES.Kia },
 ];
 
-const brandTabs = ["ทั้งหมด", "GWM", "HAVAL", "ORA", "TANK"];
+const brandTabs = ["ทั้งหมด", "Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"];
 
 interface Props {
   featuredCars: Car[];
@@ -63,7 +65,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
   const filteredCars = useMemo(() => {
     if (activeBrandTab === "ทั้งหมด") return featuredCars.slice(0, 6);
-    return featuredCars.filter((c) => c.brand.toUpperCase() === activeBrandTab).slice(0, 6);
+    return featuredCars.filter((c) => c.brand === activeBrandTab).slice(0, 6);
   }, [featuredCars, activeBrandTab]);
 
   return (
@@ -130,11 +132,12 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h2>
             <p className="text-gray-500 max-w-lg mx-auto">ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ชั้นนำ พร้อมศูนย์บริการมาตรฐานครบวงจร</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 lg:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 lg:gap-6">
             {brandData.map((brand) => (
               <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
                 <div className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
                   <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
+                    {brand.brandImage ? (
                     <Image
                       src={brand.brandImage}
                       alt={brand.name}
@@ -142,6 +145,13 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       sizes="(max-width: 768px) 50vw, 33vw"
                     />
+                    ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1e3a5f] to-[#0F172A] flex items-center justify-center">
+                      {brandLogoBase64[brand.logo] && (
+                        <Image src={brandLogoBase64[brand.logo]} alt={brand.name} width={120} height={48} className="h-10 w-auto object-contain brightness-0 invert opacity-90" />
+                      )}
+                    </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
                       {brandLogoBase64[brand.name] ? (
