@@ -25,6 +25,9 @@ bun lint         # ESLint (config TBD)
 bun run test     # Vitest (unit + integration + component)
 bun run test:watch
 bun run test:e2e # Playwright e2e
+bun run seed:cars       # seed Notion cars + Cloudinary hero/gallery images
+bun run sync:galleries  # push gallery URLs from seed data into Notion
+bun run audit:galleries # report cars missing gallery images in Notion
 ```
 
 ## Key Files

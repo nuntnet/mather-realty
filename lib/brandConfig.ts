@@ -28,6 +28,10 @@ export interface BrandConfig {
   logoPath: string;
   /** Per-brand visual scale inside the uniform logo box (default 1) */
   logoScale?: number;
+  /** Optional light wordmark for dark backgrounds (skips CSS invert) */
+  logoLightPath?: string;
+  /** How to render on dark backgrounds when `white` is set (default: invert) */
+  logoOnDark?: "invert" | "native";
   /** Brand accent for hero tagline / CTA tint */
   accentColor?: string;
   /** Full-width hero background — falls back to navBgImage then BRAND_IMAGES */
@@ -73,7 +77,7 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายมาสด้าอย่างเป็นทางการ รถยนต์ดีไซน์ Kodo สมรรถนะสมดุล พร้อมศูนย์บริการมาตรฐาน",
     logoPath: "/brands/mazda.svg",
-    logoScale: 1.1,
+    logoScale: 1.2,
     accentColor: "#910023",
     navBgImage: BRAND_IMAGES.Mazda,
     hubPath: "/mazda",
@@ -91,8 +95,11 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายฟอร์ดอย่างเป็นทางการ รถกระบะและ SUV ที่แข็งแกร่ง พร้อมบริการหลังการขายครบวงจร",
     logoPath: "/brands/ford.svg",
-    logoScale: 0.85,
+    logoOnDark: "native",
+    logoScale: 1.05,
     accentColor: "#003478",
+    navBgImage: BRAND_IMAGES.Ford,
+    heroBgImage: BRAND_IMAGES.Ford,
     hubPath: "/ford",
     featuredModels: [
       { name: "Ranger Wildtrak", slug: "ford-ranger-wildtrak-2026" },
@@ -102,13 +109,13 @@ export const BRANDS: BrandConfig[] = [
   {
     slug: "mitsubishi",
     notionBrand: "Mitsubishi",
-    displayName: "Mitsubishi",
-    displayNameTh: "มิตซูบิชิ",
+    displayName: "Mitsubishi Motors",
+    displayNameTh: "มิตซูบิชิ มอเตอร์ส",
     tagline: "Drive Your Ambition",
     descriptionTh:
       "ตัวแทนจำหน่ายมิตซูบิชิ มอเตอร์ส รถ SUV และกระบะที่ทนทาน เหมาะกับทุกเส้นทาง",
     logoPath: "/brands/mitsubishi.svg",
-    logoScale: 0.9,
+    logoScale: 0.88,
     accentColor: "#E60012",
     navBgImage: BRAND_IMAGES.Mitsubishi,
     hubPath: "/mitsubishi",
@@ -122,11 +129,11 @@ export const BRANDS: BrandConfig[] = [
     notionBrand: "GWM",
     displayName: "GWM",
     displayNameTh: "จีดับเบิลยูเอ็ม",
-    tagline: "Great Wall Motors",
+    tagline: "Great Wall Motor",
     descriptionTh:
       "ตัวแทนจำหน่าย GWM อย่างเป็นทางการ ครบทั้ง HAVAL, ORA และ TANK — SUV ไฮบริดและรถไฟฟ้า",
     logoPath: "/brands/gwm.png",
-    logoScale: 1,
+    logoScale: 1.15,
     accentColor: "#C8102E",
     navBgImage: BRAND_IMAGES.GWM,
     hubPath: "/gwm",
@@ -145,7 +152,7 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Deepal รถยนต์ไฟฟ้าและไฮบริดพลังงานใหม่ ดีไซน์ทันสมัย เทคโนโลยีล้ำสมัย",
     logoPath: "/brands/deepal.png",
-    logoScale: 1.5,
+    logoScale: 1.08,
     accentColor: "#0066FF",
     navBgImage: BRAND_IMAGES.Deepal,
     hubPath: "/deepal",
@@ -163,7 +170,7 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Kia อย่างเป็นทางการ รถ SUV และ MPV ดีไซน์ Opposites United",
     logoPath: "/brands/kia.svg",
-    logoScale: 0.65,
+    logoScale: 0.9,
     accentColor: "#BB162B",
     navBgImage: BRAND_IMAGES.Kia,
     hubPath: "/kia",

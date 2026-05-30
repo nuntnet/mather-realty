@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
 import { Calendar, Wrench, ArrowLeft, ChevronLeft, ChevronRight, Calculator, Share2 } from "lucide-react";
 import type { Car } from "@/lib/notion-types";
+import { BRAND_BY_NOTION } from "@/lib/brandConfig";
 
 const fuelLabel: Record<string, string> = {
   petrol: "เบนซิน", diesel: "ดีเซล", hybrid: "ไฮบริด", electric: "ไฟฟ้า",
@@ -28,6 +29,7 @@ export default function CarDetailClient({ car }: { car: Car }) {
   );
 
   const images = car.imageUrls;
+  const brandMeta = BRAND_BY_NOTION[car.brand as keyof typeof BRAND_BY_NOTION];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
@@ -132,7 +134,16 @@ export default function CarDetailClient({ car }: { car: Car }) {
           <div className="space-y-5">
             {/* Price Card */}
             <div className="bg-white rounded-2xl border border-[#E2E8F0] p-6">
-              <div className="text-xs text-[#64748B] mb-1">{car.brand}</div>
+              <div className="text-xs text-[#64748B] mb-1">
+                {brandMeta ? (
+                  <>
+                    {brandMeta.displayNameTh}
+                    <span className="text-[#94A3B8]"> · {brandMeta.displayName}</span>
+                  </>
+                ) : (
+                  car.brand
+                )}
+              </div>
               <h1 className="text-2xl font-bold text-[#0F172A] mb-3">{car.model}</h1>
               <div className="text-[#0F172A] font-bold text-2xl mb-1">
                 ฿{car.priceMin.toLocaleString()}

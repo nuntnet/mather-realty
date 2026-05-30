@@ -3,11 +3,11 @@ import { BRAND_BY_SLUG, type BrandSlug } from "@/lib/brandConfig";
 import { cn } from "@/lib/utils";
 
 const SIZE_CLASSES = {
-  xs: { box: "h-8 w-[72px]", pad: "p-1", maxH: "max-h-7" },
-  sm: { box: "h-10 w-[88px]", pad: "p-1.5", maxH: "max-h-8" },
-  md: { box: "h-12 w-[104px]", pad: "p-2", maxH: "max-h-9" },
-  lg: { box: "h-14 w-[120px]", pad: "p-2", maxH: "max-h-10" },
-  xl: { box: "h-[72px] w-[200px]", pad: "p-1", maxH: "max-h-16 md:max-h-[4.5rem]" },
+  xs: { box: "h-9 w-[80px]", pad: "p-1", maxH: "max-h-8" },
+  sm: { box: "h-11 w-[96px]", pad: "p-1.5", maxH: "max-h-9" },
+  md: { box: "h-14 w-[120px]", pad: "p-2", maxH: "max-h-11" },
+  lg: { box: "h-16 w-[140px]", pad: "p-2", maxH: "max-h-12" },
+  xl: { box: "h-20 w-[220px]", pad: "p-1", maxH: "max-h-[4.5rem] md:max-h-20" },
 } as const;
 
 export type BrandLogoSize = keyof typeof SIZE_CLASSES;
@@ -23,6 +23,8 @@ interface BrandLogoProps {
   bare?: boolean;
   /** White wordmark on dark backgrounds */
   white?: boolean;
+  /** Skip CSS invert — show colored/native logo (e.g. Ford oval on dark hero) */
+  nativeOnDark?: boolean;
   className?: string;
   containerClassName?: string;
   width?: number;
@@ -39,6 +41,7 @@ export default function BrandLogo({
   size = "md",
   bare = false,
   white = false,
+  nativeOnDark = false,
   className,
   containerClassName,
   width = 120,
@@ -59,7 +62,7 @@ export default function BrandLogo({
       className={cn(
         "max-w-full object-contain",
         bare ? maxH : "max-h-full",
-        white && "brightness-0 invert",
+        white && !nativeOnDark && "brightness-0 invert",
         className
       )}
       style={{ transform: logoScale !== 1 ? `scale(${logoScale})` : undefined }}

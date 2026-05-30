@@ -44,7 +44,17 @@ async function uploadOfficialImage(
     return url;
   }
   try {
-    const result = await cloudinary.uploader.upload(url, {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "ch-erawan/1.0 (dealer site image sync)" },
+    });
+    if (!res.ok) {
+      console.warn(`  ⚠ Fetch failed for ${publicId}: HTTP ${res.status}`);
+      return url;
+    }
+    const contentType = res.headers.get("content-type") ?? "image/jpeg";
+    const buf = Buffer.from(await res.arrayBuffer());
+    const dataUri = `data:${contentType};base64,${buf.toString("base64")}`;
+    const result = await cloudinary.uploader.upload(dataUri, {
       folder: "ch-erawan/cars",
       public_id: publicId,
       overwrite: true,
@@ -60,7 +70,12 @@ async function uploadOfficialImage(
 
 /** Official Thailand-market catalog — imageSource is for the deliverable report only. */
 const REAL_CARS: Array<
-  CarInput & { imageSource: string; cloudinaryId: string; sourceImageUrl: string | null }
+  CarInput & {
+    imageSource: string;
+    cloudinaryId: string;
+    sourceImageUrl: string | null;
+    gallerySourceUrls?: string[];
+  }
 > = [
   {
     name: "Mazda CX-5",
@@ -133,9 +148,14 @@ const REAL_CARS: Array<
     isFeatured: true,
     slug: "ford-ranger-wildtrak-2026",
     cloudinaryId: "ford-ranger-wildtrak",
-    sourceImageUrl: null,
-    imageSource:
-      "ford.co.th (Akamai blocks hotlink — upload hero via Admin → /api/upload)",
+    sourceImageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/c/cd/Ford_Ranger_4x2_Wildtrak_2024.jpg",
+    gallerySourceUrls: [
+      "https://upload.wikimedia.org/wikipedia/commons/f/f0/Ford_Ranger_4x2_Wildtrak_2024_%281%29.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/0/0c/Ford_Ranger_4x2_Wildtrak_2024_%282%29.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/a/a2/PIMS_2024_-_Ford_Ranger_2.0_Turbo_Wildtrak_4x2.jpg",
+    ],
+    imageSource: "Wikimedia Commons (Ford Ranger Wildtrak 2024, CC BY-SA)",
   },
   {
     name: "Ford Everest Platinum",
@@ -158,9 +178,13 @@ const REAL_CARS: Array<
     isFeatured: false,
     slug: "ford-everest-platinum-2025",
     cloudinaryId: "ford-everest-platinum",
-    sourceImageUrl: null,
-    imageSource:
-      "ford.co.th (Akamai blocks hotlink — upload hero via Admin → /api/upload)",
+    sourceImageUrl:
+      "https://upload.wikimedia.org/wikipedia/commons/c/c6/Ford_Everest_III_01_--_Bangkok_Motor_Show_--_2022-03-23.jpg",
+    gallerySourceUrls: [
+      "https://upload.wikimedia.org/wikipedia/commons/0/00/Ford_Everest_III_02_--_Bangkok_Motor_Show_--_2022-03-23.jpg",
+      "https://upload.wikimedia.org/wikipedia/commons/b/b1/Ford_Everest_Titanium_29082022.jpg",
+    ],
+    imageSource: "Wikimedia Commons (Bangkok Motor Show 2022, CC BY-SA)",
   },
   {
     name: "Mitsubishi Triton",
@@ -381,26 +405,43 @@ async function seedRealCars() {
     [];
 
   for (const entry of REAL_CARS) {
-    const { imageSource, cloudinaryId, sourceImageUrl, ...carData } = entry;
+    const { imageSource, cloudinaryId, sourceImageUrl, gallerySourceUrls, ...carData } = entry;
     console.log(`\n🚗 ${carData.brand} ${carData.model}`);
 
-    let imageUrl: string | null = null;
+    const uploadedUrls: string[] = [];
     if (sourceImageUrl) {
-      imageUrl = dryRun
+      const hero = dryRun
         ? `[dry-run] ${sourceImageUrl}`
         : await uploadOfficialImage(sourceImageUrl, cloudinaryId);
+      if (hero) uploadedUrls.push(hero);
     } else {
       console.warn("  ⚠ No automated image source — upload via Admin panel");
     }
 
+    if (gallerySourceUrls?.length) {
+      for (let i = 0; i < gallerySourceUrls.length; i++) {
+        const url = gallerySourceUrls[i]!;
+        const id = `${cloudinaryId}-${i + 2}`;
+        const uploaded = dryRun ? `[dry-run] ${url}` : await uploadOfficialImage(url, id);
+        if (uploaded) uploadedUrls.push(uploaded);
+      }
+    }
+
     const payload: CarInput = {
       ...carData,
-      imageUrls: imageUrl && !imageUrl.startsWith("[dry-run]") ? [imageUrl] : [],
+      imageUrls: uploadedUrls.filter((u) => !u.startsWith("[dry-run]")),
     };
 
     if (dryRun) {
-      console.log(`  [dry-run] would create slug=${payload.slug} image=${imageUrl ?? "none"}`);
-      created.push({ id: "dry-run", slug: payload.slug, imageUrl, imageSource });
+      console.log(
+        `  [dry-run] would create slug=${payload.slug} images=${uploadedUrls.length}`
+      );
+      created.push({
+        id: "dry-run",
+        slug: payload.slug,
+        imageUrl: uploadedUrls[0] ?? null,
+        imageSource,
+      });
       continue;
     }
 

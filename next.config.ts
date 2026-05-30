@@ -41,7 +41,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "api.www.changan.co.th",
+        hostname: "upload.wikimedia.org",
       },
     ],
   },

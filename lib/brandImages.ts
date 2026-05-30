@@ -1,10 +1,12 @@
 /**
  * Brand card / fallback images — official manufacturer press assets.
- * Ford omitted: ford.co.th CDN blocks hotlinking; homepage shows logo on gradient.
  */
+const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "n5llrdnq";
+
 export const BRAND_IMAGES: Record<string, string> = {
   Mazda:
     "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+  Ford: `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/ch-erawan/cars/ford-ranger-wildtrak-2026-1.jpg`,
   Mitsubishi:
     "https://www.mitsubishi-motors.co.th/content/dam/mitsubishi-motors-th/images/cars/l200/2024/primary/hero/all-new-triton-2024-edit-jun.png",
   GWM:

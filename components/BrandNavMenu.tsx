@@ -109,19 +109,34 @@ export function BrandNavTile({
 }: BrandNavTileProps) {
   const [hovered, setHovered] = useState(false);
   const tileRef = useRef<HTMLAnchorElement>(null);
-  const [spot, setSpot] = useState({ x: 50, y: 50 });
+  const [pointer, setPointer] = useState({
+    x: 50,
+    y: 50,
+    tiltX: 0,
+    tiltY: 0,
+  });
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
     const el = tileRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
-    setSpot({
-      x: ((e.clientX - rect.left) / rect.width) * 100,
-      y: ((e.clientY - rect.top) / rect.height) * 100,
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setPointer({
+      x,
+      y,
+      tiltX: ((y - 50) / 50) * -5,
+      tiltY: ((x - 50) / 50) * 5,
     });
   }, []);
 
+  const resetPointer = useCallback(() => {
+    setPointer({ x: 50, y: 50, tiltX: 0, tiltY: 0 });
+  }, []);
+
   const active = hovered || showFeatured || showGwmSubLines;
+  const parallaxX = (pointer.x - 50) * 0.12;
+  const parallaxY = (pointer.y - 50) * 0.12;
 
   return (
     <Link
@@ -130,14 +145,21 @@ export function BrandNavTile({
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => {
         setHovered(false);
-        setSpot({ x: 50, y: 50 });
+        resetPointer();
       }}
       onMouseMove={handleMove}
+      style={{
+        transform: active
+          ? `perspective(900px) rotateX(${pointer.tiltX}deg) rotateY(${pointer.tiltY}deg) scale(1.02)`
+          : "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)",
+      }}
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border bg-white text-center min-h-[44px] transition-[border-color,box-shadow,transform] duration-300",
+        "group relative flex flex-col overflow-hidden rounded-xl border bg-white text-center min-h-[44px]",
+        "shadow-[0_1px_2px_rgba(15,23,42,0.05),0_4px_16px_rgba(15,23,42,0.07)]",
+        "transition-[border-color,box-shadow,transform] duration-300 ease-out will-change-transform",
         active
-          ? "border-[#DD5259]/35 shadow-lg shadow-[#131F3C]/8 scale-[1.02]"
-          : "border-gray-100 hover:border-[#DD5259]/20",
+          ? "border-[#DD5259]/35 shadow-[0_2px_6px_rgba(15,23,42,0.06),0_16px_36px_rgba(19,31,60,0.14),0_0_0_1px_rgba(221,82,89,0.08)]"
+          : "border-gray-100 hover:border-[#DD5259]/20 hover:shadow-[0_2px_4px_rgba(15,23,42,0.05),0_10px_24px_rgba(15,23,42,0.1)]",
         compact ? "p-3" : "p-5",
         className
       )}
@@ -168,7 +190,21 @@ export function BrandNavTile({
         className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
         style={{
           opacity: active ? 1 : 0,
-          background: `radial-gradient(circle at ${spot.x}% ${spot.y}%, rgba(221,82,89,0.12) 0%, rgba(19,31,60,0.04) 45%, transparent 70%)`,
+          background: `
+            radial-gradient(circle at ${pointer.x}% ${pointer.y}%, rgba(255,255,255,0.45) 0%, transparent 38%),
+            radial-gradient(circle at ${pointer.x}% ${pointer.y}%, rgba(221,82,89,0.16) 0%, rgba(19,31,60,0.05) 42%, transparent 72%),
+            radial-gradient(circle at ${100 - pointer.x}% ${100 - pointer.y}%, rgba(19,31,60,0.07) 0%, transparent 55%)
+          `,
+        }}
+        aria-hidden
+      />
+
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        style={{
+          boxShadow: active
+            ? "inset 0 1px 0 rgba(255,255,255,0.85), inset 0 -12px 24px rgba(19,31,60,0.04)"
+            : undefined,
         }}
         aria-hidden
       />
@@ -176,11 +212,15 @@ export function BrandNavTile({
       <div className="relative z-10 flex flex-col flex-1">
         <motion.div
           className={cn(
-            "mx-auto flex items-center justify-center rounded-lg bg-gray-50/90 mb-2",
-            compact ? "w-12 h-12" : "w-16 h-16"
+            "mx-auto flex items-center justify-center mb-2",
+            compact ? "w-14 h-14" : "w-[4.5rem] h-[4.5rem]"
           )}
-          animate={{ scale: active ? 1.05 : 1, y: active ? -2 : 0 }}
-          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          animate={{
+            scale: active ? 1.05 : 1,
+            x: active ? parallaxX : 0,
+            y: active ? parallaxY - 2 : 0,
+          }}
+          transition={{ type: "spring", stiffness: 320, damping: 28 }}
         >
           <BrandLogo
             src={brand.logoPath}
@@ -188,8 +228,8 @@ export function BrandNavTile({
             brandSlug={brand.slug}
             size={compact ? "sm" : "md"}
             containerClassName="h-full w-full bg-transparent p-1"
-            width={compact ? 64 : 100}
-            height={compact ? 24 : 36}
+            width={compact ? 72 : 110}
+            height={compact ? 28 : 40}
             className={cn(
               "transition-opacity duration-300",
               active ? "opacity-100" : "opacity-75"
@@ -199,6 +239,9 @@ export function BrandNavTile({
 
         <div className="font-semibold text-sm text-[#131F3C]">
           {brand.displayNameTh}
+        </div>
+        <div className="text-[11px] text-gray-400 font-medium tracking-wide">
+          {brand.displayName}
         </div>
         <div
           className={cn(

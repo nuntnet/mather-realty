@@ -88,14 +88,15 @@ export default function BrandHero({
             <div className="max-w-2xl">
               <div className="mb-6 flex flex-wrap items-center gap-4">
                 <BrandLogo
-                  src={brand.logoPath}
+                  src={brand.logoLightPath ?? brand.logoPath}
                   alt={brand.displayName}
                   brandSlug={brand.slug}
                   size="xl"
                   bare
-                  white
-                  width={200}
-                  height={64}
+                  white={brand.logoOnDark !== "native"}
+                  nativeOnDark={brand.logoOnDark === "native"}
+                  width={220}
+                  height={72}
                   priority
                 />
                 {secondaryLogo ? (

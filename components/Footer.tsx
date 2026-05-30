@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
-import BrandLogo from "@/components/BrandLogo";
 import CompanyLogo from "@/components/CompanyLogo";
-import { BRANDS, GWM_SUB_LINES, getGwmLineHref } from "@/lib/brandConfig";
+import { branches } from "@/lib/branchData";
 
 const quickLinks = [
   { label: "หน้าแรก", href: "/" },
@@ -85,40 +84,27 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Brands + Social */}
+          {/* Column 4: Branches + Social */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-5 tracking-wide uppercase">แบรนด์รถยนต์</h3>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {BRANDS.map((brand) => (
-                <Link
-                  key={brand.slug}
-                  href={brand.hubPath}
-                  className="inline-flex items-center gap-2 text-xs text-white/50 border border-white/15 px-3 py-2 rounded-md hover:border-white/40 hover:text-white transition-all min-h-[44px]"
-                >
-                  <BrandLogo
-                    src={brand.logoPath}
-                    alt={brand.displayName}
-                    brandSlug={brand.slug}
-                    size="xs"
-                    width={48}
-                    height={16}
-                    className="brightness-0 invert opacity-70"
-                  />
-                  <span>{brand.displayNameTh}</span>
-                </Link>
+            <h3 className="text-white font-semibold text-sm mb-5 tracking-wide uppercase">สาขาของเรา</h3>
+            <ul className="space-y-3 mb-6">
+              {branches.map((branch) => (
+                <li key={branch.id}>
+                  <Link
+                    href="/branches"
+                    className="text-sm text-white/50 hover:text-white transition-colors leading-snug block"
+                  >
+                    {branch.name}
+                  </Link>
+                </li>
               ))}
-            </div>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {GWM_SUB_LINES.map((line) => (
-                <Link
-                  key={line.slug}
-                  href={getGwmLineHref(line.slug)}
-                  className="text-xs text-white/40 border border-white/10 px-2.5 py-1.5 rounded-md hover:border-white/30 hover:text-white/70 transition-all"
-                >
-                  {line.displayName}
-                </Link>
-              ))}
-            </div>
+            </ul>
+            <Link
+              href="/branches"
+              className="inline-flex items-center text-xs text-white/40 hover:text-white/70 transition-colors mb-8"
+            >
+              ดูสาขาทั้งหมดและแผนที่ →
+            </Link>
 
             <h3 className="text-white font-semibold text-sm mb-4 tracking-wide uppercase">ติดตามเรา</h3>
             <div className="flex items-center gap-2">
@@ -148,7 +134,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-white/30 text-center md:text-left">
-            © {new Date().getFullYear()} บริษัท ช.เอราวัณ จำกัด · สงวนลิขสิทธิ์ทั้งหมด
+            © {new Date().getFullYear()} กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุ๊ป · สงวนลิขสิทธิ์ทั้งหมด
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-white/30">
             <Link href="/privacy" className="hover:text-white/70 transition-colors">นโยบายคุ้มครองข้อมูลส่วนบุคคล</Link>
