@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Tag, Plus, Pencil, Trash2, Search, ExternalLink, Calendar, X } from "lucide-react";
+import { Tag, Plus, Pencil, Trash2, Search, ExternalLink, Calendar, X, Filter } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -40,6 +41,10 @@ export default function AdminPromotionsPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [brandFilter, setBrandFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
+  const resetPage = () => setPage(1);
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(EMPTY_FORM);
@@ -140,9 +145,12 @@ export default function AdminPromotionsPage() {
     const q = search.toLowerCase();
     const matchSearch = !q || p.title.toLowerCase().includes(q);
     const matchBrand = brandFilter === "all" || p.brand === brandFilter;
-    return matchSearch && matchBrand;
+    const matchActive = activeFilter === "all" || (activeFilter === "active" ? p.isActive : !p.isActive);
+    return matchSearch && matchBrand && matchActive;
   });
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const activeCount = promos.filter((p) => p.isActive).length;
 
   return (
@@ -172,18 +180,36 @@ export default function AdminPromotionsPage() {
             type="text"
             placeholder="ค้นหาโปรโมชั่น..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); resetPage(); }}
             className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20 w-64"
           />
         </div>
         <select
           value={brandFilter}
-          onChange={(e) => setBrandFilter(e.target.value)}
+          onChange={(e) => { setBrandFilter(e.target.value); resetPage(); }}
           className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
         >
           <option value="all">ทุกแบรนด์</option>
           {BRANDS.map((b) => <option key={b} value={b}>{b}</option>)}
         </select>
+        <select
+          value={activeFilter}
+          onChange={(e) => { setActiveFilter(e.target.value); resetPage(); }}
+          className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
+        >
+          <option value="all">ทั้งใช้งานและปิด</option>
+          <option value="active">ใช้งานอยู่</option>
+          <option value="inactive">ปิดใช้งาน</option>
+        </select>
+        {(search || brandFilter !== "all" || activeFilter !== "all") && (
+          <button
+            onClick={() => { setSearch(""); setBrandFilter("all"); setActiveFilter("all"); resetPage(); }}
+            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          >
+            <Filter className="w-3.5 h-3.5" /> ล้าง filter
+          </button>
+        )}
+        <span className="ml-auto text-xs text-gray-400">{filtered.length} รายการ</span>
       </div>
 
       {/* Table */}
@@ -209,7 +235,7 @@ export default function AdminPromotionsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((p) => (
+              {paginated.map((p) => (
                 <tr key={p.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-3.5">
                     <div className="flex items-center gap-2">
@@ -259,6 +285,15 @@ export default function AdminPromotionsPage() {
             </tbody>
           </table>
         )}
+        <div className="px-5 pb-4">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
 
       {/* Form Modal */}
