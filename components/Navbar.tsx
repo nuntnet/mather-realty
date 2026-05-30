@@ -34,7 +34,6 @@ const navItems = [
   { label: "การประกันรถยนต์", href: "/insurance" },
   { label: "ข่าวสารและกิจกรรม", href: "/blog" },
   { label: "ติดต่อเรา", href: "/contact" },
-  { label: "แนะนำ–ติชม", href: "/feedback" },
 ];
 
 export default function Navbar({

@@ -141,6 +141,22 @@ export default function ContactPage() {
           </div>
         </div>
       </div>
+
+      {/* Feedback CTA */}
+      <div className="bg-[#0F172A] py-10">
+        <div className="container flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <p className="text-white font-semibold">มีปัญหาหรืออยากแนะนำบริการ?</p>
+            <p className="text-white/50 text-sm mt-0.5">ส่ง Feedback ถึงเราได้โดยตรง — ทีมงานตอบกลับใน 24 ชม.</p>
+          </div>
+          <Link
+            href="/feedback"
+            className="shrink-0 inline-flex items-center gap-2 bg-[#DD5259] hover:bg-[#c0404a] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
+          >
+            แนะนำ–ติชม →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

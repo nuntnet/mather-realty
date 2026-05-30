@@ -18,8 +18,7 @@ function getSubNavItems(brand: BrandConfig): SubNavItem[] {
     { label: "ศูนย์บริการ", href: `${brand.hubPath}/service`, section: "service" },
     { label: "ซ่อมสี/ตัวถัง", href: `${brand.hubPath}/body-repair`, section: "body-repair" },
     { label: "โปรโมชั่น", href: `${brand.hubPath}/promotions`, section: "promotions" },
-    { label: "รีวิว", href: `${brand.hubPath}/reviews`, section: "reviews" },
-    { label: "One Stop", href: `${brand.hubPath}/one-stop`, section: "one-stop" },
+    { label: "รีวิวรถ", href: `${brand.hubPath}/reviews`, section: "reviews" },
   ];
 }
 

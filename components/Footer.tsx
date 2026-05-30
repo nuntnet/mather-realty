@@ -34,6 +34,7 @@ const serviceLinks = [
   { label: "ซื้อขายรถมือสอง", href: "/secondhand" },
   { label: "เรื่องราวลูกค้า", href: "/stories" },
   { label: "ร่วมงานกับเรา", href: "/career" },
+  { label: "แนะนำ–ติชม", href: "/feedback" },
 ];
 
 export default function Footer() {
