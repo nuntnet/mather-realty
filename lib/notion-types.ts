@@ -86,6 +86,20 @@ export interface ContactSubmission {
   submittedAt: string;
 }
 
+// ─── Admin write inputs ─────────────────────────────────────────────────────
+
+/** Payload for creating a car (all fields). Update uses Partial of this. */
+export type CarInput = Omit<Car, "id">;
+
+/** Blog post metadata payload (content body is handled separately as markdown). */
+export type BlogMetaInput = Omit<
+  BlogPost,
+  "id" | "isPublished" | "publishedAt"
+> & {
+  isPublished?: boolean;
+  publishedAt?: string | null;
+};
+
 // Form submission types (what the API routes receive)
 export interface BookingFormData {
   customerName: string;

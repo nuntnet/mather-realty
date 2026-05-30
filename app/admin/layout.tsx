@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, MessageSquare } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare } from "lucide-react";
 import {
   Avatar, AvatarFallback,
 } from "@/components/ui/avatar";
@@ -17,6 +17,7 @@ const menuItems = [
   { icon: Car, label: "รถยนต์", href: "/admin/cars" },
   { icon: Calendar, label: "นัดหมาย", href: "/admin/appointments" },
   { icon: MessageSquare, label: "รีวิวลูกค้า", href: "/admin/stories" },
+  { icon: Mail, label: "ข้อความติดต่อ", href: "/admin/contacts" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

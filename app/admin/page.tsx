@@ -2,8 +2,43 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Calendar, Car, MessageSquare, TrendingUp } from "lucide-react";
-import type { Appointment, CustomerStory } from "@/lib/notion-types";
+import { toast } from "sonner";
+import { BookOpen, Calendar, Car, Mail, MessageSquare, RefreshCw, TrendingUp } from "lucide-react";
+import type { Appointment, BlogPost, Car as CarType, ContactSubmission, CustomerStory } from "@/lib/notion-types";
+
+function RevalidateButton() {
+  const [loading, setLoading] = useState(false);
+
+  async function handleRevalidate() {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/admin/revalidate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "all" }),
+      });
+      if (!res.ok) throw new Error(String(res.status));
+      toast.success("รีเฟรชเว็บไซต์แล้ว", {
+        description: "หน้าเว็บสาธารณะจะดึงข้อมูลล่าสุดจาก Notion ในการเข้าชมครั้งถัดไป",
+      });
+    } catch {
+      toast.error("รีเฟรชไม่สำเร็จ", { description: "กรุณาลองใหม่อีกครั้ง" });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <button
+      onClick={handleRevalidate}
+      disabled={loading}
+      className="inline-flex items-center gap-2 rounded-lg bg-[#131F3C] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#1f2d52] disabled:cursor-not-allowed disabled:opacity-60"
+    >
+      <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+      {loading ? "กำลังรีเฟรช..." : "รีเฟรชเว็บไซต์"}
+    </button>
+  );
+}
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; className: string }> = {
@@ -19,36 +54,48 @@ function StatusBadge({ status }: { status: string }) {
 export default function AdminDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [stories, setStories] = useState<CustomerStory[]>([]);
+  const [cars, setCars] = useState<CarType[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       fetch("/api/admin/appointments").then(r => r.json()),
       fetch("/api/admin/stories").then(r => r.json()),
-    ]).then(([apts, strs]) => {
+      fetch("/api/admin/cars").then(r => r.json()),
+      fetch("/api/admin/blog").then(r => r.json()),
+      fetch("/api/admin/contacts").then(r => r.json()),
+    ]).then(([apts, strs, crs, pts, cts]) => {
       setAppointments(Array.isArray(apts) ? apts : []);
       setStories(Array.isArray(strs) ? strs : []);
+      setCars(Array.isArray(crs) ? crs : []);
+      setPosts(Array.isArray(pts) ? pts : []);
+      setContacts(Array.isArray(cts) ? cts : []);
     }).finally(() => setLoading(false));
   }, []);
 
   const pendingAppointments = appointments.filter(a => a.status === "pending").length;
   const pendingStories = stories.filter(s => s.status === "pending").length;
+  const activeCars = cars.filter(c => c.isActive).length;
+  const publishedPosts = posts.filter(p => p.isPublished).length;
 
   const stats = [
+    { label: "รถยนต์ทั้งหมด", value: cars.length, sub: `${activeCars} กำลังแสดงผล`, icon: Car, color: "bg-emerald-50 text-emerald-600", href: "/admin/cars" },
+    { label: "บทความเผยแพร่", value: publishedPosts, sub: `${posts.length} บทความทั้งหมด`, icon: BookOpen, color: "bg-blue-50 text-blue-600", href: "/admin/blog" },
     { label: "นัดหมาย", value: appointments.length, sub: `${pendingAppointments} รอดำเนินการ`, icon: Calendar, color: "bg-orange-50 text-orange-600", href: "/admin/appointments" },
     { label: "รีวิวลูกค้า", value: stories.length, sub: `${pendingStories} รอตรวจสอบ`, icon: MessageSquare, color: "bg-purple-50 text-purple-600", href: "/admin/stories" },
-  ];
-
-  const notionLinks = [
-    { label: "จัดการบทความ", sub: "Blog DB ใน Notion", icon: BookOpen, color: "bg-blue-50 text-blue-600", href: "#" },
-    { label: "จัดการรถยนต์", sub: "Cars DB ใน Notion", icon: Car, color: "bg-emerald-50 text-emerald-600", href: "#" },
+    { label: "ข้อความติดต่อ", value: contacts.length, sub: "จากฟอร์มติดต่อเรา", icon: Mail, color: "bg-rose-50 text-rose-600", href: "/admin/contacts" },
   ];
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#131F3C]">ภาพรวม</h1>
-        <p className="text-sm text-gray-500 mt-1">สรุปข้อมูลทั้งหมดของระบบ</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-[#131F3C]">ภาพรวม</h1>
+          <p className="text-sm text-gray-500 mt-1">สรุปข้อมูลทั้งหมดของระบบ</p>
+        </div>
+        <RevalidateButton />
       </div>
 
       {/* Stats Grid */}
@@ -70,21 +117,6 @@ export default function AdminDashboard() {
               </div>
             </div>
           </Link>
-        ))}
-
-        {/* Notion-managed cards */}
-        {notionLinks.map((item) => (
-          <div key={item.label} className="bg-white rounded-xl border border-gray-100 p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-500">{item.label}</p>
-                <p className="text-xs text-blue-500 mt-2 font-medium">{item.sub}</p>
-              </div>
-              <div className={`p-3 rounded-xl ${item.color}`}>
-                <item.icon className="w-5 h-5" />
-              </div>
-            </div>
-          </div>
         ))}
       </div>
 

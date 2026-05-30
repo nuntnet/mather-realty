@@ -11,7 +11,6 @@ export default function AppleIcon() {
     (
       <div
         style={{
-          fontSize: 96,
           background: "linear-gradient(135deg, #2563EB 0%, #1B3A6B 100%)",
           width: "100%",
           height: "100%",
@@ -19,6 +18,7 @@ export default function AppleIcon() {
           alignItems: "center",
           justifyContent: "center",
           borderRadius: "24px",
+          position: "relative",
         }}
       >
         <svg
@@ -27,6 +27,7 @@ export default function AppleIcon() {
           viewBox="0 0 36 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
+          style={{ position: "absolute" }}
         >
           <path
             d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z"
@@ -37,17 +38,6 @@ export default function AppleIcon() {
             fill="#2E5EA8"
             fillOpacity="0.5"
           />
-          <text
-            x="18"
-            y="22"
-            textAnchor="middle"
-            fill="white"
-            fontSize="12"
-            fontWeight="bold"
-            fontFamily="serif"
-          >
-            ช
-          </text>
           <defs>
             <linearGradient
               id="grad"
@@ -62,6 +52,18 @@ export default function AppleIcon() {
             </linearGradient>
           </defs>
         </svg>
+        <div
+          style={{
+            position: "relative",
+            display: "flex",
+            color: "white",
+            fontSize: 64,
+            fontWeight: 700,
+            paddingTop: 8,
+          }}
+        >
+          ช
+        </div>
       </div>
     ),
     {
