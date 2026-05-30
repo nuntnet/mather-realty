@@ -312,12 +312,7 @@ function SectionsTab() {
 
 // ── FAQ Tab ─────────────────────────────────────────────────────────
 
-const PAGE_LABELS: Record<string, string> = {
-  "body-repair": "ซ่อมสี/ตัวถัง",
-  "service": "ศูนย์บริการ",
-  "one-stop": "One Stop",
-  "general": "ทั่วไป",
-};
+// PAGE_LABELS defined at line 21 — reused here
 const BRANDS_FAQ = ["GWM", "Mazda", "Ford", "Mitsubishi", "Deepal", "Kia", "ทุกแบรนด์"] as const;
 const PAGES_FAQ = ["body-repair", "service", "one-stop", "general"] as const;
 
