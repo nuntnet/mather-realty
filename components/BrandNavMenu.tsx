@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import BrandLogo from "@/components/BrandLogo";
 import {
@@ -86,9 +87,10 @@ function GwmSubLineLinks({
             <BrandLogo
               src={line.logoPath}
               alt={line.displayName}
+              size="xs"
               width={48}
               height={16}
-              className="h-3.5 w-auto opacity-80"
+              className="opacity-80"
             />
             {line.displayName}
           </Link>
@@ -140,10 +142,32 @@ export function BrandNavTile({
         className
       )}
     >
+      {brand.navBgImage ? (
+        <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-xl">
+          <Image
+            src={brand.navBgImage}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 33vw, 200px"
+            className={cn(
+              "object-cover object-center transition-opacity duration-500",
+              active ? "opacity-[0.22]" : "opacity-0"
+            )}
+          />
+          <div
+            className={cn(
+              "absolute inset-0 bg-white transition-opacity duration-500",
+              active ? "opacity-70" : "opacity-95"
+            )}
+            aria-hidden
+          />
+        </div>
+      ) : null}
+
       <motion.div
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute inset-0 z-[1] transition-opacity duration-300"
         style={{
-          opacity: active ? 1 : undefined,
+          opacity: active ? 1 : 0,
           background: `radial-gradient(circle at ${spot.x}% ${spot.y}%, rgba(221,82,89,0.12) 0%, rgba(19,31,60,0.04) 45%, transparent 70%)`,
         }}
         aria-hidden
@@ -152,7 +176,7 @@ export function BrandNavTile({
       <div className="relative z-10 flex flex-col flex-1">
         <motion.div
           className={cn(
-            "mx-auto flex items-center justify-center rounded-lg bg-gray-50 mb-2",
+            "mx-auto flex items-center justify-center rounded-lg bg-gray-50/90 mb-2",
             compact ? "w-12 h-12" : "w-16 h-16"
           )}
           animate={{ scale: active ? 1.05 : 1, y: active ? -2 : 0 }}
@@ -161,11 +185,13 @@ export function BrandNavTile({
           <BrandLogo
             src={brand.logoPath}
             alt={brand.displayName}
+            brandSlug={brand.slug}
+            size={compact ? "sm" : "md"}
+            containerClassName="h-full w-full bg-transparent p-1"
             width={compact ? 64 : 100}
             height={compact ? 24 : 36}
             className={cn(
-              "object-contain transition-opacity duration-300",
-              compact ? "h-5 max-w-[64px]" : "h-7 max-w-[88px]",
+              "transition-opacity duration-300",
               active ? "opacity-100" : "opacity-75"
             )}
           />
@@ -311,9 +337,10 @@ export function GwmSubLineRow({ compact = false }: { compact?: boolean }) {
           <BrandLogo
             src={line.logoPath}
             alt={line.displayName}
+            size="xs"
             width={56}
             height={20}
-            className="h-4 w-auto opacity-70"
+            className="opacity-70"
           />
           <span className="text-xs font-medium text-gray-600">
             {line.displayName}
@@ -345,9 +372,11 @@ function MobileBrandTile({ brand }: { brand: BrandConfig }) {
           <BrandLogo
             src={brand.logoPath}
             alt={brand.displayName}
+            brandSlug={brand.slug}
+            size="sm"
             width={56}
             height={20}
-            className="h-4 w-auto shrink-0 opacity-80"
+            className="opacity-80"
           />
           <span className="font-medium truncate">{brand.displayNameTh}</span>
         </Link>

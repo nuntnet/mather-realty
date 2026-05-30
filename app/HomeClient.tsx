@@ -111,9 +111,11 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 <BrandLogo
                   src={brand.logoPath}
                   alt={brand.displayName}
+                  brandSlug={brand.slug}
+                  size="md"
                   width={88}
                   height={32}
-                  className="h-7 md:h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                  className="grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
                 />
               </Link>
             ))}
@@ -151,9 +153,11 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                       <BrandLogo
                         src={brand.logoPath}
                         alt={brand.displayName}
+                        brandSlug={brand.slug}
+                        size="md"
                         width={120}
                         height={48}
-                        className="h-10 w-auto brightness-0 invert opacity-90"
+                        className="brightness-0 invert opacity-90"
                       />
                     </div>
                     )}
@@ -162,9 +166,11 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                       <BrandLogo
                         src={brand.logoPath}
                         alt={brand.displayName}
+                        brandSlug={brand.slug}
+                        size="sm"
                         width={80}
                         height={24}
-                        className="h-6 w-auto object-contain brightness-0 invert opacity-90"
+                        className="brightness-0 invert opacity-90"
                       />
                     </div>
                   </div>
@@ -188,9 +194,9 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                             <BrandLogo
                               src={line.logoPath}
                               alt={line.displayName}
+                              size="xs"
                               width={40}
                               height={14}
-                              className="h-3 w-auto"
                             />
                           </Link>
                         ))}

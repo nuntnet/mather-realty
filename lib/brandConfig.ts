@@ -1,4 +1,5 @@
 import type { Car } from "@/lib/notion-types";
+import { BRAND_IMAGES } from "@/lib/brandImages";
 
 export type BrandSlug = "mazda" | "ford" | "mitsubishi" | "gwm" | "deepal" | "kia";
 export type GwmLineSlug = "haval" | "ora" | "tank";
@@ -25,6 +26,10 @@ export interface BrandConfig {
   tagline?: string;
   descriptionTh: string;
   logoPath: string;
+  /** Per-brand visual scale inside the uniform logo box (default 1) */
+  logoScale?: number;
+  /** Faint background image for nav mega menu tiles on hover */
+  navBgImage?: string;
   hubPath: string;
   featuredModels?: FeaturedModel[];
   subLines?: GwmSubLine[];
@@ -64,6 +69,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายมาสด้าอย่างเป็นทางการ รถยนต์ดีไซน์ Kodo สมรรถนะสมดุล พร้อมศูนย์บริการมาตรฐาน",
     logoPath: "/brands/mazda.svg",
+    logoScale: 1,
+    navBgImage: BRAND_IMAGES.Mazda,
     hubPath: "/mazda",
     featuredModels: [
       { name: "CX-5", slug: "mazda-cx-5-2025" },
@@ -79,6 +86,7 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายฟอร์ดอย่างเป็นทางการ รถกระบะและ SUV ที่แข็งแกร่ง พร้อมบริการหลังการขายครบวงจร",
     logoPath: "/brands/ford.svg",
+    logoScale: 0.9,
     hubPath: "/ford",
     featuredModels: [
       { name: "Ranger Wildtrak", slug: "ford-ranger-wildtrak-2026" },
@@ -94,6 +102,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายมิตซูบิชิ มอเตอร์ส รถ SUV และกระบะที่ทนทาน เหมาะกับทุกเส้นทาง",
     logoPath: "/brands/mitsubishi.svg",
+    logoScale: 0.95,
+    navBgImage: BRAND_IMAGES.Mitsubishi,
     hubPath: "/mitsubishi",
     featuredModels: [
       { name: "Triton", slug: "mitsubishi-triton-2024" },
@@ -109,6 +119,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย GWM อย่างเป็นทางการ ครบทั้ง HAVAL, ORA และ TANK — SUV ไฮบริดและรถไฟฟ้า",
     logoPath: "/brands/gwm.png",
+    logoScale: 1.05,
+    navBgImage: BRAND_IMAGES.GWM,
     hubPath: "/gwm",
     featuredModels: [
       { name: "HAVAL H6 HEV", slug: "gwm-haval-h6-hev-2025" },
@@ -125,6 +137,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Deepal รถยนต์ไฟฟ้าและไฮบริดพลังงานใหม่ ดีไซน์ทันสมัย เทคโนโลยีล้ำสมัย",
     logoPath: "/brands/deepal.png",
+    logoScale: 1.4,
+    navBgImage: BRAND_IMAGES.Deepal,
     hubPath: "/deepal",
     featuredModels: [
       { name: "S07 BEV", slug: "deepal-s07-bev-2025" },
@@ -140,6 +154,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Kia อย่างเป็นทางการ รถ SUV และ MPV ดีไซน์ Opposites United",
     logoPath: "/brands/kia.svg",
+    logoScale: 0.75,
+    navBgImage: BRAND_IMAGES.Kia,
     hubPath: "/kia",
     featuredModels: [
       { name: "EV5 Air", slug: "kia-ev5-air-2025" },

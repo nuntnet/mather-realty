@@ -98,9 +98,11 @@ export default function Footer() {
                   <BrandLogo
                     src={brand.logoPath}
                     alt={brand.displayName}
+                    brandSlug={brand.slug}
+                    size="xs"
                     width={48}
                     height={16}
-                    className="h-3.5 w-auto brightness-0 invert opacity-70"
+                    className="brightness-0 invert opacity-70"
                   />
                   <span>{brand.displayNameTh}</span>
                 </Link>
