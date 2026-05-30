@@ -43,6 +43,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "upload.wikimedia.org",
       },
+      {
+        protocol: "https",
+        hostname: "files.manuscdn.com",
+      },
+      {
+        protocol: "https",
+        hostname: "d2xsxph8kpxj0f.cloudfront.net",
+      },
     ],
   },
 };
