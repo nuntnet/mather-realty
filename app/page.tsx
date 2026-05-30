@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getFeaturedCars, getPublishedBlogPosts, getPublicStories } from "@/lib/notion";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, SITE_NAME } from "@/lib/site";
 import { JsonLd, itemListJsonLd } from "@/lib/seo";
 import HomeClient from "./HomeClient";
 
@@ -10,7 +10,7 @@ const HOME_DESCRIPTION =
   "ช.เอราวัณ ออโต้ กรุ๊ป — ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ในนครปฐม 7 สาขา ทดลองขับ นัดบริการ ประกันภัย และรถมือสอง";
 
 export const metadata: Metadata = pageMetadata({
-  title: "ตัวแทนจำหน่ายรถยนต์ นครปฐม",
+  title: `ตัวแทนจำหน่ายรถยนต์ นครปฐม | ${SITE_NAME}`,
   description: HOME_DESCRIPTION,
   path: "/",
 });

@@ -1,40 +1,6 @@
 import type { NextConfig } from "next";
-import { BRANDS, GWM_SUB_LINES } from "./lib/brandConfig";
-
-const brandRedirects = BRANDS.flatMap((brand) => [
-  {
-    source: "/cars",
-    has: [{ type: "query" as const, key: "brand", value: brand.notionBrand }],
-    destination: brand.hubPath,
-    permanent: true,
-  },
-  {
-    source: "/cars",
-    has: [{ type: "query" as const, key: "brand", value: brand.slug }],
-    destination: brand.hubPath,
-    permanent: true,
-  },
-]);
-
-const gwmLineRedirects = GWM_SUB_LINES.flatMap((line) => [
-  {
-    source: "/cars",
-    has: [{ type: "query" as const, key: "brand", value: line.displayName }],
-    destination: `/gwm/${line.slug}`,
-    permanent: true,
-  },
-  {
-    source: "/cars",
-    has: [{ type: "query" as const, key: "brand", value: line.slug }],
-    destination: `/gwm/${line.slug}`,
-    permanent: true,
-  },
-]);
 
 const nextConfig: NextConfig = {
-  async redirects() {
-    return [...brandRedirects, ...gwmLineRedirects];
-  },
   images: {
     remotePatterns: [
       {

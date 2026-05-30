@@ -9,7 +9,9 @@ test.describe("Public pages", () => {
 
   test("brand hub /mazda loads with logo and breadcrumb", async ({ page }) => {
     await page.goto("/mazda");
-    await expect(page.getByRole("heading", { name: /มาสด้า/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: /มาสด้า/i })
+    ).toBeVisible();
     await expect(page.getByRole("navigation", { name: "breadcrumb" })).toBeVisible();
   });
 
@@ -37,7 +39,7 @@ test.describe("Public pages", () => {
     const href = await carLinks.first().getAttribute("href");
     expect(href).toMatch(/^\/cars\/[^/]+$/);
     await carLinks.first().click();
-    await expect(page).toHaveURL(new RegExp(`^${escapeRegex(href!)}`));
+    await expect(page).toHaveURL(href!);
   });
 
   test("/blog page loads", async ({ page }) => {
@@ -61,7 +63,3 @@ test.describe("Public pages", () => {
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 });
-
-function escapeRegex(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
