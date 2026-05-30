@@ -1,98 +1,105 @@
 # TODO List
 
-## 🔴 Critical — Security / Infra
+อัปเดตล่าสุด: 2026-05-30 (branch `cursor/admin-cms-crud-notion-hardening`)
 
-- [ ] **Rate limiting บน `/api/auth/*`** — ป้องกัน brute force attack  
-  ใช้ `@upstash/ratelimit` + Vercel Edge Middleware หรือ `next-rate-limit`
+---
 
-- [ ] **ตั้ง `BETTER_AUTH_URL` ใน Vercel** ให้เป็น production domain  
+## P0 — แก้ก่อน merge / deploy prod
+
+- [ ] **Fix `revalidatePath` หน้ารถใช้ slug ไม่ใช่ Notion id**  
+  `app/api/admin/cars/route.ts` → `revalidateCars(id)` เรียก `/cars/${id}` แต่ route จริงคือ `/cars/[slug]` — หลังแก้รถ หน้า detail อาจไม่ refresh ทันที
+
+- [ ] **ตั้ง Upstash env บน Vercel** — `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`  
+  Rate limit `/api/auth/*` implement แล้ว แต่ปิดถ้าไม่มี env (prod เสี่ยง brute force)
+
+- [ ] **ตั้ง `BETTER_AUTH_URL` ใน Vercel** เป็น production domain  
   ถ้าไม่ตั้ง session cookies จะ scope ผิด domain
 
 - [ ] **สร้าง admin account แรกใน Turso** หลัง deploy  
-  ดูวิธีที่ [deployment.md](deployment.md#step-5-สร้าง-admin-account)
+  ใช้ sign-up API + `UPDATE role` — ดู [`docs/ADMIN.md`](../docs/ADMIN.md) และ [`deployment.md`](deployment.md#step-5-สร้าง-admin-account)  
+  ⚠️ `scripts/seed-admin.ts` อาจ hash ไม่ตรง Better Auth — อย่า rely ใน prod จนกว่าจะแก้สคริปต์
 
-- [ ] **ตรวจสอบ Notion API reachable จาก Vercel sin1**  
-  Notion ไม่ได้ block Vercel แต่ควรเช็ค latency และ rate limits
+- [ ] **Split PR เป็น 5 PRs ตามที่วางแผน** (ยังไม่ทำ) — security/CMS, slug+tests, SEO, ops, docs
 
 ---
 
-## 🟡 Important — Features
+## P1 — สำคัญถัดไป
+
+### SEO
+
+- [ ] **Vehicle/Product JSON-LD** บนหน้ารถ `/cars/[slug]`
+- [ ] **Canonical URLs** ทุกหน้าหลัก
+- [ ] **Default OG image** เมื่อไม่มีรูปจาก Notion
+- [ ] **Sitemap `lastModified`** จาก Notion dates
+- [ ] **BreadcrumbList** JSON-LD
+
+### Features / Ops
 
 - [ ] **File upload — damage photos (body_paint booking)**  
-  UI แสดง file input อยู่แล้วแต่ backend ไม่ได้รับไฟล์จริง  
-  ต้องเพิ่ม: upload ไป Cloudinary → เก็บ URL ใน Notion
+  UI มี file input แต่ backend ยังไม่รับไฟล์ → Cloudinary + Notion
 
 - [ ] **File upload — insurance documents (body_paint booking)**  
-  เหมือนกัน — upload ไม่ได้ implement จริง
-
-- [ ] **Cloudinary upload wired up**  
-  `CLOUDINARY_API_KEY` และ `CLOUDINARY_API_SECRET` อยู่ใน env แต่ยังไม่มี upload endpoint  
-  สร้าง `POST /api/upload` สำหรับ presigned upload หรือ server-side upload
+  เหมือนกัน
 
 - [ ] **Email notifications สำหรับนัดหมายใหม่**  
-  ปัจจุบัน admin ต้องเข้าไปดูใน Notion เอง  
-  แนะนำ: Resend หรือ Nodemailer + Gmail SMTP
+  Resend หรือ Nodemailer + Gmail SMTP
 
-- [ ] **AI Chat Widget**  
-  มีอยู่ใน ch-erawanwebsite (worktree) แต่ยังไม่ได้ port มา  
-  detect intent → route ไป LINE OA ของแต่ละแบรนด์
+- [ ] **ตรวจสอบ Notion API reachable จาก Vercel sin1**  
+  latency และ rate limits
 
-- [ ] **Car comparison tool**  
-  เปรียบเทียบรถ 2-3 คันแบบ side-by-side
+- [ ] **Configure ESLint** — `eslint` + `eslint-config-next` มีใน devDeps แต่ยังไม่มี config ใช้งาน (`bun lint` อาจ fail)
 
-- [ ] **Awards page brand filter**  
-  หน้า `/awards` มีรูป 32 รางวัล แต่ยังไม่มี filter ตาม brand
+- [ ] **อัปเดตหรือ archive `docs/IMPLEMENTATION_PLAN.md`** — แผน Phase 2 เก่า (pre-Admin CMS) ไม่สะท้อน codebase ปัจจุบัน
 
 ---
 
-## 🟢 Nice to Have — Ops / DX
+## P2 — Nice to have
 
-- [ ] **Health check endpoint `/api/health`**  
-  เช็ค connectivity: Turso ping + Notion API ping  
-  ใช้สำหรับ monitoring และ uptime check
-
-- [ ] **Error tracking (Sentry)**  
-  ```bash
-  bun add @sentry/nextjs
-  ```
-  ตั้ง `SENTRY_DSN` ใน Vercel env
-
-- [ ] **Analytics**  
-  Vercel Analytics (ฟรีใน hobby plan) หรือ GA4  
-  เพิ่มแค่ `<Analytics />` component จาก `@vercel/analytics`
-
-- [ ] **Turso backup schedule**  
-  ตั้งใน Turso dashboard → Backups → Enable automatic backups
-
-- [ ] **`drizzle.config.ts` สำหรับ manual migrations**  
-  ปัจจุบัน better-auth จัดการ schema เอง แต่ถ้าต้อง migrate หรือ inspect DB จะทำยาก
-
-- [ ] **E2E tests (Playwright)**  
-  critical paths: booking form, blog browsing, admin login + approve story
-
-- [ ] **`CLAUDE.md`** สำหรับ AI agent context  
-  ช่วยให้ Claude เข้าใจ project เร็วขึ้นเมื่อเปิด session ใหม่
-
-- [ ] **Notion webhook → auto revalidate**  
-  เมื่อแก้ Notion → trigger `/api/revalidate` อัตโนมัติ  
-  ดู Notion Automations หรือใช้ Zapier/Make
+- [ ] **Health check `/api/health`** — Turso + Notion ping
+- [ ] **Error tracking (Sentry)**
+- [ ] **Analytics** — Vercel Analytics หรือ GA4
+- [ ] **Turso backup schedule**
+- [ ] **Notion webhook → auto revalidate**
+- [ ] **AI Chat Widget** — port จาก ch-erawanwebsite
+- [ ] **Car comparison tool**
+- [ ] **Awards page brand filter**
 
 ---
 
-## ✅ Done
+## ✅ Done (shipped บน branch นี้)
 
-- [x] Next.js 15 App Router setup
+### Admin CMS + Security
+
+- [x] `requireAdmin()` บนทุก `/api/admin/*` + middleware `/api/admin/:path*`
+- [x] Rate limiting `/api/auth/*` (`@upstash/ratelimit` — graceful skip ถ้าไม่มี env)
+- [x] Cars CRUD (`/admin/cars`, `/api/admin/cars`)
+- [x] Blog CRUD + TipTap WYSIWYG (`/admin/blog`, `/api/admin/blog`)
+- [x] Contacts admin read-only (`/admin/contacts`)
+- [x] Cloudinary upload (`POST /api/upload`, `ImageUploader`)
+- [x] Admin dashboard stats + ปุ่ม revalidate (`POST /api/admin/revalidate`)
+- [x] Notion write helpers + retry/backoff 429/5xx ใน `lib/notion.ts`
+
+### URLs + Performance
+
+- [x] Car detail URLs: `/cars/[slug]` (แทน `[id]`)
+- [x] `React cache()` dedupe Notion reads
+- [x] Bounded prerender 40 slugs (`generateStaticParams`)
+
+### Testing + Docs
+
+- [x] Vitest unit/integration/component (~123 tests)
+- [x] Playwright e2e (9 specs)
+- [x] `docs/TESTING.md`
+- [x] `docs/ADMIN.md` (operator how-to)
+
+### ที่มีอยู่ก่อนหน้า (baseline)
+
+- [x] Next.js 15 App Router + React 19 + TypeScript
 - [x] Tailwind CSS + Radix UI + shadcn/ui
-- [x] Notion API integration (Cars, Blog, Stories, Appointments, Contacts)
+- [x] Notion API (Cars, Blog, Stories, Appointments, Contacts)
 - [x] Better Auth + Turso (email/password + admin role)
-- [x] Admin dashboard (appointments, stories)
-- [x] Booking form (4 types: test drive, service, body paint, insurance)
-- [x] Blog with Notion-to-Markdown rendering
-- [x] Customer stories submission + admin approval flow
-- [x] Google Maps integration (7 branches)
-- [x] Vercel deployment config (Singapore region)
-- [x] ISR revalidation endpoint
-- [x] SEO metadata (sitemap, robots, OG tags)
-- [x] Mobile responsive design
-- [x] Thai language UI
-- [x] Brand logos (base64 embedded)
+- [x] Admin: appointments, stories approval
+- [x] Booking form (4 types), blog, stories submission
+- [x] Google Maps (7 branches), Vercel sin1
+- [x] ISR `/api/revalidate`, SEO metadata (sitemap, robots, OG)
+- [x] Mobile responsive, Thai UI
