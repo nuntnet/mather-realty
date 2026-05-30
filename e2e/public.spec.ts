@@ -7,6 +7,17 @@ test.describe("Public pages", () => {
     await expect(page.getByRole("link", { name: /แบรนด์รถยนต์|รถยนต์/i }).first()).toBeVisible();
   });
 
+  test("brand hub /mazda loads with logo and breadcrumb", async ({ page }) => {
+    await page.goto("/mazda");
+    await expect(page.getByRole("heading", { name: /มาสด้า/i })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "breadcrumb" })).toBeVisible();
+  });
+
+  test("legacy /cars?brand=Mazda redirects to /mazda", async ({ page }) => {
+    await page.goto("/cars?brand=Mazda");
+    await expect(page).toHaveURL(/\/mazda$/);
+  });
+
   test("/cars page shows listing header", async ({ page }) => {
     await page.goto("/cars");
     await expect(page.getByRole("heading", { name: "ค้นหารถยนต์" })).toBeVisible();

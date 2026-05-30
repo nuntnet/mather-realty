@@ -6,10 +6,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BranchesMap from "@/components/BranchesMap";
-import { brandLogoBase64 } from "@/lib/brandLogos";
+import BrandLogo from "@/components/BrandLogo";
 import { BRAND_IMAGES } from "@/lib/brandImages";
+import { BRANDS, getGwmLineHref } from "@/lib/brandConfig";
 import {
-  ChevronRight, ArrowRight, Phone, MapPin, Calendar, Star,
+  ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award,
 } from "lucide-react";
 import type { Car, BlogPost, CustomerStory } from "@/lib/notion-types";
@@ -37,16 +38,7 @@ const heroSlides = [
   },
 ];
 
-const brandData = [
-  { name: "Mazda", slug: "Mazda", logo: "Mazda", brandImage: BRAND_IMAGES.Mazda },
-  { name: "Ford", slug: "Ford", logo: "Ford", brandImage: null as string | null },
-  { name: "Mitsubishi", slug: "Mitsubishi", logo: "Mitsubishi", brandImage: BRAND_IMAGES.Mitsubishi },
-  { name: "GWM", slug: "GWM", logo: "GWM", brandImage: BRAND_IMAGES.GWM },
-  { name: "Deepal", slug: "Deepal", logo: "Deepal", brandImage: BRAND_IMAGES.Deepal },
-  { name: "Kia", slug: "Kia", logo: "Kia", brandImage: BRAND_IMAGES.Kia },
-];
-
-const brandTabs = ["ทั้งหมด", "Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"];
+const brandTabs = ["ทั้งหมด", ...BRANDS.map((b) => b.notionBrand)];
 
 interface Props {
   featuredCars: Car[];
@@ -109,16 +101,20 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
       {/* BRAND LOGOS BAR */}
       <section className="bg-white border-b border-gray-100">
         <div className="container py-6">
-          <div className="flex items-center justify-center gap-8 md:gap-14 flex-wrap">
-            {brandData.map((brand) => (
-              <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
-                <div className="flex items-center justify-center transition-all cursor-pointer group">
-                  {brandLogoBase64[brand.name] ? (
-                    <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={32} className="h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" />
-                  ) : (
-                    <span className="text-sm md:text-base font-bold tracking-[0.2em] text-[#0F172A] opacity-40 group-hover:opacity-100">{brand.logo}</span>
-                  )}
-                </div>
+          <div className="flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+            {BRANDS.map((brand) => (
+              <Link
+                key={brand.slug}
+                href={brand.hubPath}
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-2 transition-all group"
+              >
+                <BrandLogo
+                  src={brand.logoPath}
+                  alt={brand.displayName}
+                  width={88}
+                  height={32}
+                  className="h-7 md:h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                />
               </Link>
             ))}
           </div>
@@ -133,44 +129,81 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             <p className="text-gray-500 max-w-lg mx-auto">ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ชั้นนำ พร้อมศูนย์บริการมาตรฐานครบวงจร</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 lg:gap-6">
-            {brandData.map((brand) => (
-              <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
-                <div className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
+            {BRANDS.map((brand) => {
+              const brandImage = BRAND_IMAGES[brand.notionBrand] ?? null;
+              return (
+              <div
+                key={brand.slug}
+                className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden h-full"
+              >
+                <Link href={brand.hubPath} className="block cursor-pointer">
                   <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
-                    {brand.brandImage ? (
+                    {brandImage ? (
                     <Image
-                      src={brand.brandImage}
-                      alt={brand.name}
+                      src={brandImage}
+                      alt={brand.displayName}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       sizes="(max-width: 768px) 50vw, 33vw"
                     />
                     ) : (
                     <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1e3a5f] to-[#0F172A] flex items-center justify-center">
-                      {brandLogoBase64[brand.logo] && (
-                        <Image src={brandLogoBase64[brand.logo]} alt={brand.name} width={120} height={48} className="h-10 w-auto object-contain brightness-0 invert opacity-90" />
-                      )}
+                      <BrandLogo
+                        src={brand.logoPath}
+                        alt={brand.displayName}
+                        width={120}
+                        height={48}
+                        className="h-10 w-auto brightness-0 invert opacity-90"
+                      />
                     </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      {brandLogoBase64[brand.name] ? (
-                        <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={24} className="h-6 w-auto object-contain brightness-0 invert opacity-90" />
-                      ) : (
-                        <span className="text-white font-bold tracking-widest text-sm">{brand.logo}</span>
-                      )}
+                      <BrandLogo
+                        src={brand.logoPath}
+                        alt={brand.displayName}
+                        width={80}
+                        height={24}
+                        className="h-6 w-auto object-contain brightness-0 invert opacity-90"
+                      />
                     </div>
                   </div>
-                  <div className="p-5 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-[#0F172A] text-base">{brand.name}</h3>
+                </Link>
+                <div className="p-5 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={brand.hubPath} className="block">
+                      <h3 className="font-semibold text-[#0F172A] text-base group-hover:text-[#DD5259] transition-colors">
+                        {brand.displayNameTh}
+                      </h3>
                       <p className="text-xs text-gray-400 mt-0.5">ดูรุ่นรถทั้งหมด</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
+                    </Link>
+                    {brand.subLines && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {brand.subLines.map((line) => (
+                          <Link
+                            key={line.slug}
+                            href={getGwmLineHref(line.slug)}
+                            className="inline-flex items-center rounded-md bg-gray-100 hover:bg-gray-200 px-2 py-1 min-h-[28px] text-[10px] font-medium text-gray-600"
+                          >
+                            <BrandLogo
+                              src={line.logoPath}
+                              alt={line.displayName}
+                              width={40}
+                              height={14}
+                              className="h-3 w-auto"
+                            />
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
+                  <Link href={brand.hubPath} aria-label={`ดู ${brand.displayNameTh}`} className="shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
+                  </Link>
                 </div>
-              </Link>
-            ))}
+              </div>
+            );
+            })}
           </div>
         </div>
       </section>

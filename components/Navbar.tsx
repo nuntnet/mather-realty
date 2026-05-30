@@ -5,13 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const brands = [
-  { name: "GWM", slug: "GWM" },
-  { name: "HAVAL", slug: "HAVAL" },
-  { name: "ORA", slug: "ORA" },
-  { name: "TANK", slug: "TANK" },
-];
+import {
+  BrandMegaMenuGrid,
+  GwmSubLineRow,
+  MobileBrandLinks,
+} from "@/components/BrandNavMenu";
 
 const navItems = [
   { label: "หน้าแรก", href: "/" },
@@ -140,19 +138,8 @@ export default function Navbar() {
                         <h3 className="text-lg font-bold text-[#131F3C]">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h3>
                         <p className="text-sm text-gray-400 mt-1">เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด</p>
                       </div>
-                      <div className="grid grid-cols-4 gap-5">
-                        {brands.map((brand) => (
-                          <Link key={brand.name} href={`/cars?brand=${brand.slug}`}
-                            className="group p-5 rounded-xl border border-gray-100 hover:border-[#DD5259]/30 hover:shadow-lg transition-all text-center bg-white"
-                          >
-                            <div className="w-14 h-14 mx-auto mb-3 rounded-xl bg-gray-50 flex items-center justify-center">
-                              <span className="text-lg font-bold text-[#131F3C]">{brand.name.charAt(0)}</span>
-                            </div>
-                            <div className="font-semibold text-sm text-[#131F3C]">{brand.name}</div>
-                            <div className="text-xs text-gray-400 mt-1 group-hover:text-[#DD5259] transition-colors">ดูรายละเอียด →</div>
-                          </Link>
-                        ))}
-                      </div>
+                      <BrandMegaMenuGrid />
+                      <GwmSubLineRow />
                       <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
                         <Link href="/cars" className="text-sm text-[#131F3C] font-semibold hover:underline">ดูรถยนต์ทั้งหมด →</Link>
                         <Link href="/cars?condition=used" className="text-sm text-gray-400 hover:text-[#131F3C] transition-colors">รถยนต์มือสอง →</Link>
@@ -208,17 +195,7 @@ export default function Navbar() {
                     ))}
                   </div>
                 )}
-                {item.megaMenu && (
-                  <div className="ml-4 mt-0.5 grid grid-cols-2 gap-1">
-                    {brands.map((brand) => (
-                      <Link key={brand.name} href={`/cars?brand=${brand.slug}`}
-                        className="px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:bg-gray-50 hover:text-[#131F3C] font-medium"
-                      >
-                        {brand.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                {item.megaMenu && <MobileBrandLinks />}
               </div>
             ))}
             <div className="pt-4 border-t border-gray-100">

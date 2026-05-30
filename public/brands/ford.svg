@@ -1,0 +1,4 @@
+<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ford">
+  <ellipse cx="60" cy="20" rx="56" ry="16" fill="none" stroke="currentColor" stroke-width="3"/>
+  <text x="60" y="26" fill="currentColor" text-anchor="middle" font-family="Georgia, serif" font-size="20" font-style="italic" font-weight="700">Ford</text>
+</svg>
