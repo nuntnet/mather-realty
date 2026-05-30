@@ -31,7 +31,7 @@ cp .env.local.example .env.local
 bun dev
 ```
 
-เปิด [http://localhost:3000](http://localhost:3000)
+เปิด [http://localhost:3002](http://localhost:3002)
 
 > ⚠️ ถ้า `TURSO_DATABASE_URL` ไม่ถูกตั้ง — auth จะถูก disable (warning ใน console)  
 > ⚠️ ถ้า `NOTION_API_KEY` ไม่ถูกตั้ง — หน้าที่ดึงข้อมูล Notion จะ error

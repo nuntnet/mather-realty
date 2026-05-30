@@ -25,7 +25,7 @@ https://www.notion.so/workspace/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX?v=...
 | Variable | Required | คำอธิบาย |
 |----------|----------|----------|
 | `BETTER_AUTH_SECRET` | ✅ | Random secret สำหรับ sign sessions (generate: `openssl rand -base64 32`) |
-| `BETTER_AUTH_URL` | ✅ prod | URL ของเว็บ เช่น `https://ch-erawan.com` (ใช้ `http://localhost:3000` ใน dev) |
+| `BETTER_AUTH_URL` | ✅ prod | URL ของเว็บ เช่น `https://ch-erawan.com` (ใช้ `http://localhost:3002` ใน dev — port 3002 แยกจากแอปอื่นที่ใช้ 3000) |
 | `TURSO_DATABASE_URL` | ✅ | รูปแบบ: `libsql://[db-name].aws-[region].turso.io` |
 | `TURSO_AUTH_TOKEN` | ✅ | Auth token จาก Turso dashboard |
 
@@ -110,9 +110,9 @@ NOTION_STORIES_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NOTION_APPOINTMENTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NOTION_CONTACTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Better Auth + Turso
+# Better Auth + Turso (dev uses port 3002 — see package.json "dev"/"start")
 BETTER_AUTH_SECRET=your-random-secret-here
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3002
 TURSO_DATABASE_URL=libsql://ch-erawan-nunt.aws-ap-northeast-1.turso.io
 TURSO_AUTH_TOKEN=your-turso-token
 

@@ -27,10 +27,10 @@ Browser ส่ง cookie ทุก request → middleware validate
 betterAuth({
   database: drizzleAdapter(db, { provider: "sqlite" }),  // Turso
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3002",
   emailAndPassword: { enabled: true, minPasswordLength: 8 },
   plugins: [admin()],  // เปิด role-based admin
-  trustedOrigins: ["http://localhost:3000", process.env.BETTER_AUTH_URL],
+  trustedOrigins: ["http://localhost:3002", process.env.BETTER_AUTH_URL],
 })
 ```
 
