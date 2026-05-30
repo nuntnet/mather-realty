@@ -142,6 +142,15 @@ export interface StoryFormData {
   imageUrl?: string;
 }
 
+export interface BrandSocialLink {
+  id: string;
+  label: string;
+  brand: string;
+  platform: "Facebook" | "TikTok" | "YouTube" | "LINE" | "Instagram";
+  url: string;
+  isActive: boolean;
+}
+
 export interface InsurancePartner {
   id: string;
   name: string;

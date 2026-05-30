@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, Palette, MessageSquareWarning } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, Palette, MessageSquareWarning, Share2 } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import {
   Avatar, AvatarFallback,
@@ -19,6 +19,7 @@ const menuItems = [
   { icon: Tag,                  label: "โปรโมชั่น",    href: "/admin/promotions" },
   { icon: MessageSquareWarning, label: "Feedback",      href: "/admin/feedback" },
   { icon: Wrench,               label: "Brand Content", href: "/admin/service-content" },
+  { icon: Share2,               label: "Social Links",  href: "/admin/social-links" },
   { icon: Calendar,     label: "นัดหมาย",      href: "/admin/appointments" },
   { icon: MessageSquare,label: "รีวิวลูกค้า",  href: "/admin/stories" },
   { icon: Mail,         label: "ข้อความติดต่อ",href: "/admin/contacts" },

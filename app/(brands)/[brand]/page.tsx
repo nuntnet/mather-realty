@@ -11,7 +11,7 @@ import {
   isBrandSlug,
   type BrandSlug,
 } from "@/lib/brandConfig";
-import { getCarsByBrandLine } from "@/lib/notion";
+import { getCarsByBrandLine, getSocialLinksByBrand } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
 import BrandSocialLinks from "@/components/BrandSocialLinks";
@@ -45,7 +45,10 @@ export default async function BrandHubPage({ params }: PageProps) {
   if (!isBrandSlug(slug)) notFound();
 
   const brand = BRAND_BY_SLUG[slug as BrandSlug];
-  const cars = await getCarsByBrandLine(brand.notionBrand);
+  const [cars, socialLinks] = await Promise.all([
+    getCarsByBrandLine(brand.notionBrand),
+    getSocialLinksByBrand(brand.notionBrand),
+  ]);
 
   const breadcrumbs = [
     { name: "หน้าแรก", path: "/" },
@@ -96,14 +99,14 @@ export default async function BrandHubPage({ params }: PageProps) {
 
           <BrandCarGrid cars={cars} />
 
-          {/* Social links */}
-          {brand.social && (
+          {/* Social links — from Notion CMS */}
+          {(socialLinks.length > 0 || brand.social) && (
             <div className="mt-10 flex items-center justify-between bg-gray-50 rounded-2xl px-6 py-4 border border-gray-100">
               <div>
                 <p className="text-sm font-semibold text-[#0F172A]">ติดตาม {brand.displayNameTh}</p>
                 <p className="text-xs text-gray-400 mt-0.5">ข่าวสาร โปรโมชั่น และ content ล่าสุด</p>
               </div>
-              <BrandSocialLinks brand={brand} variant="light" />
+              <BrandSocialLinks links={socialLinks} brand={brand} variant="light" />
             </div>
           )}
 

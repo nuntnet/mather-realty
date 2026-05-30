@@ -15,6 +15,7 @@ import type {
   FeedbackFormData,
   InsurancePartner,
   ServicePageSection,
+  BrandSocialLink,
 } from "./notion-types";
 import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
 
@@ -76,6 +77,7 @@ const DB = {
   searchAnalytics: process.env.NOTION_SEARCH_ANALYTICS_DB_ID!,
   feedback: process.env.NOTION_FEEDBACK_DB_ID!,
   insurancePartners: process.env.NOTION_INSURANCE_PARTNERS_DB_ID!,
+  socialLinks: process.env.NOTION_SOCIAL_LINKS_DB_ID!,
   serviceContent: process.env.NOTION_SERVICE_CONTENT_DB_ID!,
 };
 
@@ -1100,4 +1102,80 @@ export async function updateServiceSection(
 export async function getServiceSectionContent(pageId: string): Promise<string> {
   const mdBlocks = await n2m.pageToMarkdown(pageId);
   return n2m.toMarkdownString(mdBlocks).parent ?? "";
+}
+
+// ─── Brand Social Links ───────────────────────────────────────────────────────
+
+function pageToSocialLink(page: NotionPage): BrandSocialLink {
+  return {
+    id: page.id,
+    label: propTitle(page, "Label"),
+    brand: propSelect(page, "Brand"),
+    platform: propSelect(page, "Platform") as BrandSocialLink["platform"],
+    url: propUrl(page, "URL") ?? "",
+    isActive: propCheckbox(page, "IsActive"),
+  };
+}
+
+export async function getSocialLinksByBrand(brand: string): Promise<BrandSocialLink[]> {
+  if (!DB.socialLinks) return [];
+  const response = await notion.databases.query({
+    database_id: DB.socialLinks,
+    filter: {
+      and: [
+        { property: "Brand", select: { equals: brand } },
+        { property: "IsActive", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ property: "Platform", direction: "ascending" }],
+    page_size: 20,
+  });
+  return response.results.map(pageToSocialLink);
+}
+
+export async function getAllSocialLinksAdmin(): Promise<BrandSocialLink[]> {
+  if (!DB.socialLinks) return [];
+  const response = await notion.databases.query({
+    database_id: DB.socialLinks,
+    sorts: [
+      { property: "Brand", direction: "ascending" },
+      { property: "Platform", direction: "ascending" },
+    ],
+    page_size: 100,
+  });
+  return response.results.map(pageToSocialLink);
+}
+
+export async function createSocialLink(
+  data: Omit<BrandSocialLink, "id">
+): Promise<BrandSocialLink> {
+  const page = await notion.pages.create({
+    parent: { database_id: DB.socialLinks },
+    properties: {
+      Label: { title: [{ text: { content: data.label || `${data.brand} ${data.platform}` } }] },
+      Brand: { select: { name: data.brand } },
+      Platform: { select: { name: data.platform } },
+      URL: { url: data.url },
+      IsActive: { checkbox: data.isActive },
+    },
+  });
+  return pageToSocialLink(page);
+}
+
+export async function updateSocialLink(
+  id: string,
+  data: Partial<Omit<BrandSocialLink, "id">>
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.label !== undefined) props.Label = { title: [{ text: { content: data.label } }] };
+  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
+  if (data.platform !== undefined) props.Platform = { select: { name: data.platform } };
+  if (data.url !== undefined) props.URL = { url: data.url || null };
+  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+export async function archiveSocialLink(id: string): Promise<void> {
+  await notion.pages.update({ page_id: id, in_trash: true });
 }
