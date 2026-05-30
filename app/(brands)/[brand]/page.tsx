@@ -67,6 +67,7 @@ export default async function BrandHubPage({ params }: PageProps) {
         <BrandHero
           brand={brand}
           breadcrumbs={breadcrumbs}
+          socialLinks={socialLinks}
           footer={
             brand.subLines?.length ? (
               <BrandHeroSubLineLinks brand={brand} />
