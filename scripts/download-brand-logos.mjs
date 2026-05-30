@@ -2,7 +2,7 @@
  * Download official brand logos into public/brands/.
  *
  * Sources (dealer/trademark use):
- * - Wikimedia Commons: Mazda, Ford, Mitsubishi, Kia, ORA (Ora_logo.svg)
+ * - Wikimedia Commons: Mazda 2024, Ford, Mitsubishi, Kia 2021 wordmark, ORA
  * - GWM Global (gwm-global.com): GWM wordmark PNG, HAVAL/OR A/TANK SVGs
  * - Deepal (staticre.deepal.com.cn): brand share_logo PNG
  *
@@ -16,7 +16,7 @@ const OUT = path.join(import.meta.dirname, "../public/brands");
 const ASSETS = [
   {
     name: "mazda.svg",
-    url: "https://upload.wikimedia.org/wikipedia/commons/3/3f/Mazda_logo.svg",
+    url: "https://commons.wikimedia.org/wiki/Special:FilePath/Mazda_logo_2024.svg",
   },
   {
     name: "ford.svg",
@@ -28,7 +28,7 @@ const ASSETS = [
   },
   {
     name: "kia.svg",
-    url: "https://upload.wikimedia.org/wikipedia/commons/2/2f/KIA_logo.svg",
+    url: "https://commons.wikimedia.org/wiki/Special:FilePath/KIA_logo3.svg",
   },
   {
     name: "gwm.png",
