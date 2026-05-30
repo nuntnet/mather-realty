@@ -90,7 +90,7 @@ To **run** (not just `--list`) against a live server:
 | `PW_NO_SERVER=1` | Skip Playwright `webServer` when using `E2E_BASE_URL` |
 | `E2E_USE_DEV=1` | Use `bun dev` instead of build+start in webServer |
 
-Default Playwright config runs `bun run build && bun run start` unless a server is already up (`reuseExistingServer` locally).
+Default Playwright config targets **`http://localhost:3002`** (same as `bun dev` / `bun start`) so e2e does not collide with other apps on port 3000. It runs `bun run build && bun run start` unless a server is already up on 3002 (`reuseExistingServer` locally).
 
 Turso/Better Auth/Cloudinary are **not** required for public e2e specs. Admin e2e only checks redirect-to-login (no credential login).
 

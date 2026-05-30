@@ -18,7 +18,7 @@
 ## Commands
 
 ```bash
-bun dev          # dev server :3000
+bun dev          # dev server :3002 (avoids conflict with other apps on :3000)
 bun build        # production build
 bun start        # start prod server
 bun lint         # ESLint (config TBD)
@@ -62,7 +62,7 @@ bun run test:e2e # Playwright e2e
 Content แก้ที่ Notion หรือผ่าน Admin Panel — หลังแก้ trigger revalidation:
 ```bash
 # จาก dashboard admin (session) หรือ
-curl -X POST "http://localhost:3000/api/revalidate?secret=YOUR_SECRET"
+curl -X POST "http://localhost:3002/api/revalidate?secret=YOUR_SECRET"
 ```
 
 ## Auth

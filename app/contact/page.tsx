@@ -9,17 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle, MapPin, Phone, Clock, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import Link from "next/link";
-
-const branches = [
-  { name: "มาสด้า ช.เอราวัณ นครปฐม", phone: "034-305-500", hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00" },
-  { name: "มาสด้า ช.เอราวัณ ศาลายา", phone: "02-482-2000", hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00" },
-  { name: "Deepal ช.เอราวัณ ศาลายา", phone: "02-482-2000", hours: "ทุกวัน 10:00–20:00" },
-  { name: "ฟอร์ด ช.เอราวัณ อ้อมใหญ่", phone: "02-431-1000", hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00" },
-  { name: "ฟอร์ด ช.เอราวัณ นครปฐม", phone: "034-980-700", hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00" },
-  { name: "มิตซูบิชิ ช.เอราวัณ นครปฐม", phone: "034-340-000", hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00" },
-  { name: "GWM ช.เอราวัณ นครปฐม", phone: "034-340-001", hours: "จ–ศ 09:00–18:00 | ส–อา 09:00–18:00" },
-  { name: "Kia ช.เอราวัณ นครปฐม", phone: "034-340-002", hours: "จ–ศ 09:00–18:00 | ส–อา 09:00–18:00" },
-];
+import { branches as branchList } from "@/lib/branchData";
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -105,7 +95,7 @@ export default function ContactPage() {
                     <Label className="text-gray-600 text-sm">สาขาที่ต้องการติดต่อ</Label>
                     <Select value={form.branch} onValueChange={v => setForm(f => ({ ...f, branch: v }))}>
                       <SelectTrigger className="mt-1.5 border-gray-200"><SelectValue placeholder="เลือกสาขา (ไม่บังคับ)" /></SelectTrigger>
-                      <SelectContent>{branches.map(b => <SelectItem key={b.name} value={b.name}>{b.name}</SelectItem>)}</SelectContent>
+                      <SelectContent>{branchList.map((b) => <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>)}</SelectContent>
                     </Select>
                   </div>
 
@@ -130,8 +120,8 @@ export default function ContactPage() {
           {/* Branch Info */}
           <div className="lg:col-span-2 space-y-4">
             <h3 className="font-bold text-[#0F172A] text-lg mb-2">สาขาของเรา</h3>
-            {branches.slice(0, 4).map((branch) => (
-              <div key={branch.name} className="bg-white rounded-xl border border-gray-100 p-4">
+            {branchList.slice(0, 4).map((branch) => (
+              <div key={branch.id} className="bg-white rounded-xl border border-gray-100 p-4">
                 <p className="font-semibold text-[#0F172A] text-sm mb-2">{branch.name}</p>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 text-xs text-gray-500">
@@ -140,7 +130,7 @@ export default function ContactPage() {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <Clock className="w-3.5 h-3.5 shrink-0" />
-                    <span>{branch.hours}</span>
+                    <span>{branch.hours.replace(/·/g, "|")}</span>
                   </div>
                 </div>
               </div>

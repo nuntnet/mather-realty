@@ -23,14 +23,14 @@ function createAuth() {
       schema,
     }),
     secret: process.env.BETTER_AUTH_SECRET!,
-    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3002",
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
     },
     plugins: [admin()],
     trustedOrigins: [
-      "http://localhost:3000",
+      "http://localhost:3002",
       process.env.BETTER_AUTH_URL ?? "",
     ].filter(Boolean),
   });

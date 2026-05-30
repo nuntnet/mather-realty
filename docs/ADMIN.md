@@ -28,7 +28,7 @@
 2. สมัครผู้ใช้ผ่าน API หรือหน้า login (ถ้ามี sign-up เปิดอยู่):
 
 ```bash
-curl -X POST http://localhost:3000/api/auth/sign-up/email \
+curl -X POST http://localhost:3002/api/auth/sign-up/email \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@ch-erawan.com","password":"StrongPassword123","name":"Admin"}'
 ```
@@ -63,7 +63,7 @@ bunx tsx scripts/seed-admin.ts
 | `TURSO_DATABASE_URL` | ✅ | SQLite บน Turso — sessions + users |
 | `TURSO_AUTH_TOKEN` | ✅ | Token เชื่อม Turso |
 | `BETTER_AUTH_SECRET` | ✅ | Sign session cookies |
-| `BETTER_AUTH_URL` | ✅ prod | Base URL (`http://localhost:3000` dev, `https://ch-erawan.com` prod) |
+| `BETTER_AUTH_URL` | ✅ prod | Base URL (`http://localhost:3002` dev, `https://ch-erawan.com` prod) |
 | `NOTION_API_KEY` + DB IDs | ✅ | อ่าน/เขียน CMS |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | ✅ upload | Cloud name |
 | `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | ✅ upload | Server-side upload |

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { requireAdmin } from "@/lib/admin-auth";
 import {
   getAllCarsAdmin,
+  getCarById,
   createCar,
   updateCar,
   setCarFlags,
@@ -32,10 +33,17 @@ const carSchema = z.object({
   slug: z.string(),
 });
 
-function revalidateCars(id?: string) {
+function revalidateCars(slug?: string) {
   revalidatePath("/cars");
   revalidatePath("/");
-  if (id) revalidatePath(`/cars/${id}`);
+  if (slug) revalidatePath(`/cars/${slug}`);
+}
+
+async function revalidateCarsByNotionId(notionId: string) {
+  revalidatePath("/cars");
+  revalidatePath("/");
+  const car = await getCarById(notionId);
+  if (car?.slug) revalidatePath(`/cars/${car.slug}`);
 }
 
 // GET — list all cars (admin, includes inactive)
@@ -62,7 +70,7 @@ export async function POST(req: NextRequest) {
       ...data,
       videoUrl: data.videoUrl || null,
     } as CarInput);
-    revalidateCars(car.id);
+    revalidateCars(car.slug);
     return NextResponse.json(car);
   } catch (err) {
     if (err instanceof z.ZodError) {
@@ -91,7 +99,7 @@ export async function PATCH(req: NextRequest) {
 
     if (flags && !data) {
       await setCarFlags(id, flags);
-      revalidateCars(id);
+      await revalidateCarsByNotionId(id);
       return NextResponse.json({ success: true });
     }
 
@@ -101,7 +109,7 @@ export async function PATCH(req: NextRequest) {
         ...(data.videoUrl !== undefined ? { videoUrl: data.videoUrl || null } : {}),
       };
       const car = await updateCar(id, payload);
-      revalidateCars(id);
+      revalidateCars(car.slug);
       return NextResponse.json(car);
     }
 
@@ -123,7 +131,7 @@ export async function DELETE(req: NextRequest) {
     const id = req.nextUrl.searchParams.get("id");
     if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
     await archiveCar(id);
-    revalidateCars(id);
+    await revalidateCarsByNotionId(id);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Admin cars DELETE error:", err);

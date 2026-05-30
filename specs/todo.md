@@ -1,13 +1,12 @@
 # TODO List
 
-อัปเดตล่าสุด: 2026-05-30 (branch `cursor/admin-cms-crud-notion-hardening`)
+อัปเดตล่าสุด: 2026-05-30 (branch `cursor/aeo-geo-phase1`)
 
 ---
 
 ## P0 — แก้ก่อน merge / deploy prod
 
-- [ ] **Fix `revalidatePath` หน้ารถใช้ slug ไม่ใช่ Notion id**  
-  `app/api/admin/cars/route.ts` → `revalidateCars(id)` เรียก `/cars/${id}` แต่ route จริงคือ `/cars/[slug]` — หลังแก้รถ หน้า detail อาจไม่ refresh ทันที
+- [x] **Fix `revalidatePath` หน้ารถใช้ slug ไม่ใช่ Notion id** — `revalidateCars(slug)` + lookup slug เมื่อ toggle flags/archive
 
 - [ ] **ตั้ง Upstash env บน Vercel** — `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`  
   Rate limit `/api/auth/*` implement แล้ว แต่ปิดถ้าไม่มี env (prod เสี่ยง brute force)
@@ -27,35 +26,37 @@
 
 ### SEO
 
-- [ ] **Vehicle/Product JSON-LD** บนหน้ารถ `/cars/[slug]`
-- [ ] **Canonical URLs** ทุกหน้าหลัก
-- [ ] **Default OG image** เมื่อไม่มีรูปจาก Notion
-- [ ] **Sitemap `lastModified`** จาก Notion dates
-- [ ] **BreadcrumbList** JSON-LD
+- [x] **Vehicle/Product JSON-LD** บนหน้ารถ `/cars/[slug]` — Product + Offer (THB)
+- [x] **Canonical URLs** ทุกหน้าหลัก — car/blog detail, list pages, static layouts
+- [x] **Default OG image** — `app/opengraph-image.tsx` + layout fallback
+- [x] **Sitemap `lastModified`** จาก Notion `last_edited_time` / `publishedAt`
+- [x] **BreadcrumbList** JSON-LD — car detail + blog post
 
 ### Features / Ops
 
-- [ ] **File upload — damage photos (body_paint booking)**  
-  UI มี file input แต่ backend ยังไม่รับไฟล์ → Cloudinary + Notion
+- [x] **File upload — damage photos (body_paint booking)** — `/api/upload/booking` → Cloudinary → Notion `Damage Photo URLs`
+- [x] **File upload — insurance documents (body_paint booking)** — Notion `Insurance Doc URLs`
+- [x] **Email notifications สำหรับนัดหมายใหม่** — Resend → SMTP fallback → log-only (`lib/email.ts`)
+- [x] **ตรวจสอบ Notion API reachable จาก Vercel sin1** — docs ใน `specs/deployment.md` + `GET /api/health`
+- [x] **Configure ESLint** — `eslint.config.mjs` (Next 15 flat config)
+- [x] **Archive `docs/IMPLEMENTATION_PLAN.md`** → `docs/archive/IMPLEMENTATION_PLAN.md` + SUPERSEDED banner
 
-- [ ] **File upload — insurance documents (body_paint booking)**  
-  เหมือนกัน
+---
 
-- [ ] **Email notifications สำหรับนัดหมายใหม่**  
-  Resend หรือ Nodemailer + Gmail SMTP
+### AEO / GEO Phase 1 (2026-05-30, branch `cursor/aeo-geo-phase1`)
 
-- [ ] **ตรวจสอบ Notion API reachable จาก Vercel sin1**  
-  latency และ rate limits
-
-- [ ] **Configure ESLint** — `eslint` + `eslint-config-next` มีใน devDeps แต่ยังไม่มี config ใช้งาน (`bun lint` อาจ fail)
-
-- [ ] **อัปเดตหรือ archive `docs/IMPLEMENTATION_PLAN.md`** — แผน Phase 2 เก่า (pre-Admin CMS) ไม่สะท้อน codebase ปัจจุบัน
+- [x] **`lib/seo/` module** — Organization, AutoDealer, WebSite, Product/Car, Article, FAQ helper, ItemList, JsonLd component
+- [x] **Root layout JSON-LD** — `organizationGraph()` + `websiteJsonLd()` via `<JsonLd />`
+- [x] **Homepage** — AEO metadata + ItemList for featured cars
+- [x] **`public/llms.txt`** — GEO crawler summary (brands, URLs, branches)
+- [x] **`docs/AEO-GEO.md`** — schema map, data sources, Phase 2–3 roadmap
+- [x] **Branch data unification** — `branches` + `contact` import `lib/branchData.ts`; removed phantom Ford นครปฐม
 
 ---
 
 ## P2 — Nice to have
 
-- [ ] **Health check `/api/health`** — Turso + Notion ping
+- [x] **Health check `/api/health`** — Turso + Notion ping (shipped ใน P1 batch)
 - [ ] **Error tracking (Sentry)**
 - [ ] **Analytics** — Vercel Analytics หรือ GA4
 - [ ] **Turso backup schedule**
@@ -67,6 +68,14 @@
 ---
 
 ## ✅ Done (shipped บน branch นี้)
+
+### P1 SEO + Ops (2026-05-30)
+
+- [x] Product JSON-LD, BreadcrumbList, canonical URLs, default OG, sitemap dates
+- [x] Booking file upload (damage + insurance docs)
+- [x] Appointment email notifications (Resend/SMTP/log-only)
+- [x] `/api/health`, ESLint config, archived IMPLEMENTATION_PLAN
+- [x] `revalidatePath` ใช้ car slug
 
 ### Admin CMS + Security
 

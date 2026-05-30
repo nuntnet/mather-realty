@@ -3,7 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Playwright e2e config.
  *
- * The base URL defaults to the local dev server. Override with E2E_BASE_URL to
+ * The base URL defaults to http://localhost:3002 (see package.json dev/start).
+ * Override with E2E_BASE_URL to
  * point at a deployed/preview environment (in which case the webServer block is
  * skipped via PW_NO_SERVER=1).
  *
@@ -13,7 +14,9 @@ import { defineConfig, devices } from "@playwright/test";
  *
  * See docs/TESTING.md for full details.
  */
-const baseURL = process.env.E2E_BASE_URL || "http://localhost:3000";
+/** Local dev/e2e port — separate from default 3000 to avoid conflicts with other apps. */
+const LOCAL_PORT = process.env.PORT || "3002";
+const baseURL = process.env.E2E_BASE_URL || `http://localhost:${LOCAL_PORT}`;
 const useExternalServer = !!process.env.E2E_BASE_URL || process.env.PW_NO_SERVER === "1";
 
 export default defineConfig({

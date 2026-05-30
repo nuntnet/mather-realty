@@ -1,0 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata: Metadata = pageMetadata({
+  title: "สาขาของเรา",
+  description: "7 สาขา ช.เอราวัณ ออโต้ กรุ๊ป ในนครปฐมและปริมณฑล — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
+  path: "/branches",
+});
+
+export default function BranchesLayout({ children }: { children: React.ReactNode }) {
+  return children;
+}

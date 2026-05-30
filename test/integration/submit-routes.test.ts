@@ -10,10 +10,18 @@ const notionMock = vi.hoisted(() => ({
   pages: { create: vi.fn(async () => ({ id: "new-page" })) },
 }));
 
+const emailMock = vi.hoisted(() => ({
+  sendAppointmentNotification: vi.fn(async () => ({ sent: false, channel: "none" as const })),
+}));
+
 vi.mock("@notionhq/client", () => ({
   Client: vi.fn(function () {
     return notionMock;
   }),
+}));
+
+vi.mock("@/lib/email", () => ({
+  sendAppointmentNotification: emailMock.sendAppointmentNotification,
 }));
 
 import { POST as bookingPOST } from "@/app/api/submit/booking/route";
@@ -28,6 +36,8 @@ beforeEach(() => {
   vi.stubEnv("NOTION_STORIES_DB_ID", "story-db");
   notionMock.pages.create.mockReset();
   notionMock.pages.create.mockResolvedValue({ id: "new-page" });
+  emailMock.sendAppointmentNotification.mockReset();
+  emailMock.sendAppointmentNotification.mockResolvedValue({ sent: false, channel: "none" });
 });
 
 afterEach(() => {
@@ -49,6 +59,34 @@ describe("POST /api/submit/booking", () => {
           "Customer Name": expect.any(Object),
           Type: { select: { name: "test_drive" } },
           Status: { select: { name: "pending" } },
+        }),
+      })
+    );
+    expect(emailMock.sendAppointmentNotification).toHaveBeenCalled();
+  });
+
+  it("stores uploaded file URLs for body_paint bookings", async () => {
+    const res = await bookingPOST(
+      makeRequest("/api/submit/booking", {
+        method: "POST",
+        body: {
+          ...validBookingBody,
+          type: "body_paint",
+          damagePhotoUrls: ["https://cdn.example/damage.jpg"],
+          insuranceDocUrls: ["https://cdn.example/policy.pdf"],
+        },
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(notionMock.pages.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        properties: expect.objectContaining({
+          "Damage Photo URLs": {
+            rich_text: [{ text: { content: "https://cdn.example/damage.jpg" } }],
+          },
+          "Insurance Doc URLs": {
+            rich_text: [{ text: { content: "https://cdn.example/policy.pdf" } }],
+          },
         }),
       })
     );

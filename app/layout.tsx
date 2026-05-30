@@ -3,6 +3,8 @@ import { IBM_Plex_Sans_Thai, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import PublicLayout from "@/components/PublicLayout";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
+import { JsonLd, organizationGraph, websiteJsonLd } from "@/lib/seo";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -17,59 +19,38 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ch-erawan.com";
+const BASE_URL = SITE_URL;
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    template: "%s | ช.เอราวัณ กรุ๊ป",
-    default: "ช.เอราวัณ กรุ๊ป | ตัวแทนจำหน่ายรถยนต์ Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
+    template: `%s | ${SITE_NAME}`,
+    default: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์ Mazda, Ford, Mitsubishi, GWM, Deepal, Kia`,
   },
   description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม บริการซื้อ-ขาย ทดลองขับ และบริการหลังการขายครบวงจร Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
   keywords: ["ช.เอราวัณ", "มาสด้า", "ฟอร์ด", "มิตซูบิชิ", "GWM", "Deepal", "Kia", "รถยนต์นครปฐม", "ตัวแทนจำหน่าย"],
-  authors: [{ name: "ช.เอราวัณ กรุ๊ป" }],
-  creator: "ช.เอราวัณ กรุ๊ป",
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  alternates: { canonical: BASE_URL },
   openGraph: {
     type: "website",
     locale: "th_TH",
     url: BASE_URL,
-    siteName: "ช.เอราวัณ กรุ๊ป",
-    title: "ช.เอราวัณ กรุ๊ป | ตัวแทนจำหน่ายรถยนต์",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์`,
     description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม บริการซื้อ-ขาย ทดลองขับ และบริการหลังการขายครบวงจร",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: SITE_NAME }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ช.เอราวัณ กรุ๊ป | ตัวแทนจำหน่ายรถยนต์",
+    title: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์`,
     description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม",
+    images: ["/opengraph-image"],
   },
   robots: {
     index: true,
     follow: true,
   },
-};
-
-const autoDealerJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "AutoDealer",
-  name: "ช.เอราวัณ ออโต้ กรุ๊ป",
-  url: BASE_URL,
-  logo: `${BASE_URL}/logo.png`,
-  description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม Mazda, Ford, Mitsubishi, GWM, Deepal, Kia — 7 สาขา",
-  address: {
-    "@type": "PostalAddress",
-    addressLocality: "นครปฐม",
-    addressCountry: "TH",
-  },
-  telephone: "094-413-3555",
-  areaServed: { "@type": "City", name: "นครปฐม" },
-  brand: [
-    { "@type": "Brand", name: "Mazda" },
-    { "@type": "Brand", name: "Ford" },
-    { "@type": "Brand", name: "Mitsubishi" },
-    { "@type": "Brand", name: "GWM" },
-    { "@type": "Brand", name: "Deepal" },
-    { "@type": "Brand", name: "Kia" },
-  ],
 };
 
 export default function RootLayout({
@@ -80,10 +61,8 @@ export default function RootLayout({
   return (
     <html lang="th">
       <body className={`${inter.variable} ${ibmPlexSansThai.variable} font-sans antialiased`}>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(autoDealerJsonLd) }}
-        />
+        <JsonLd data={organizationGraph()} />
+        <JsonLd data={websiteJsonLd()} />
         <PublicLayout>
           {children}
         </PublicLayout>

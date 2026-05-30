@@ -25,7 +25,7 @@ https://www.notion.so/workspace/XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX?v=...
 | Variable | Required | คำอธิบาย |
 |----------|----------|----------|
 | `BETTER_AUTH_SECRET` | ✅ | Random secret สำหรับ sign sessions (generate: `openssl rand -base64 32`) |
-| `BETTER_AUTH_URL` | ✅ prod | URL ของเว็บ เช่น `https://ch-erawan.com` (ใช้ `http://localhost:3000` ใน dev) |
+| `BETTER_AUTH_URL` | ✅ prod | URL ของเว็บ เช่น `https://ch-erawan.com` (ใช้ `http://localhost:3002` ใน dev — port 3002 แยกจากแอปอื่นที่ใช้ 3000) |
 | `TURSO_DATABASE_URL` | ✅ | รูปแบบ: `libsql://[db-name].aws-[region].turso.io` |
 | `TURSO_AUTH_TOKEN` | ✅ | Auth token จาก Turso dashboard |
 
@@ -71,6 +71,28 @@ turso db tokens create ch-erawan
 3. Enable **Maps JavaScript API**
 4. สร้าง API Key → จำกัด HTTP referrers ให้เป็น domain ของเว็บ
 
+## Email Notifications (Appointments)
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `APPOINTMENT_NOTIFY_EMAIL` | แนะนำ prod | อีเมลผู้รับแจ้งเตือนนัดหมายใหม่ |
+| `RESEND_API_KEY` | optional | ใช้ Resend ส่งอีเมล (แนะนำ prod) |
+| `RESEND_FROM_EMAIL` | optional | From address ที่ verify แล้วใน Resend |
+| `SMTP_HOST` | optional | SMTP fallback ถ้าไม่มี Resend |
+| `SMTP_PORT` | optional | default `587` |
+| `SMTP_USER` | optional | SMTP username |
+| `SMTP_PASS` | optional | SMTP password |
+| `SMTP_FROM` | optional | From header (default: `SMTP_USER`) |
+| `SMTP_SECURE` | optional | `"true"` สำหรับ port 465 |
+
+ถ้าไม่ตั้ง email vars — booking ยังทำงาน แต่ระบบจะ log-only (ไม่ส่งอีเมล)
+
+## Site URL
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `NEXT_PUBLIC_SITE_URL` | แนะนำ prod | Canonical/OG base URL (default: `https://ch-erawan.com`) |
+
 ## Revalidation
 
 | Variable | Required | คำอธิบาย |
@@ -88,9 +110,9 @@ NOTION_STORIES_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NOTION_APPOINTMENTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 NOTION_CONTACTS_DB_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-# Better Auth + Turso
+# Better Auth + Turso (dev uses port 3002 — see package.json "dev"/"start")
 BETTER_AUTH_SECRET=your-random-secret-here
-BETTER_AUTH_URL=http://localhost:3000
+BETTER_AUTH_URL=http://localhost:3002
 TURSO_DATABASE_URL=libsql://ch-erawan-nunt.aws-ap-northeast-1.turso.io
 TURSO_AUTH_TOKEN=your-turso-token
 
@@ -104,6 +126,19 @@ CLOUDINARY_API_SECRET=your-api-secret
 
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSy...
+
+# Site URL (canonical / OG)
+NEXT_PUBLIC_SITE_URL=https://ch-erawan.com
+
+# Appointment email (optional — log-only if unset)
+APPOINTMENT_NOTIFY_EMAIL=service@ch-erawan.com
+RESEND_API_KEY=re_xxxxxxxx
+RESEND_FROM_EMAIL=notifications@ch-erawan.com
+# SMTP fallback (optional)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=...
+# SMTP_PASS=...
 ```
 
 ## Vercel Environment Variables

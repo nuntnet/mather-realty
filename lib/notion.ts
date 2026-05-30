@@ -255,11 +255,32 @@ export async function getAllCarIds(): Promise<string[]> {
 
 /** Slugs of all active cars (empty slugs filtered out). */
 export async function getAllCarSlugs(): Promise<string[]> {
+  const entries = await getCarSitemapEntries();
+  return entries.map((e) => e.slug);
+}
+
+export interface SitemapEntry {
+  slug: string;
+  lastModified: Date;
+}
+
+/** Active cars with slug + last edited time for sitemap. */
+export async function getCarSitemapEntries(): Promise<SitemapEntry[]> {
   const response = await notion.databases.query({
     database_id: DB.cars,
     filter: { property: "Is Active", checkbox: { equals: true } },
   });
-  return response.results.map(pageToCar).map((c) => c.slug).filter(Boolean);
+  return response.results
+    .map((page) => {
+      const car = pageToCar(page);
+      const p = page as NotionPage;
+      const edited = p.last_edited_time ?? p.created_time;
+      return {
+        slug: car.slug,
+        lastModified: edited ? new Date(edited) : new Date(),
+      };
+    })
+    .filter((e) => Boolean(e.slug));
 }
 
 /**
@@ -408,13 +429,28 @@ export const getBlogPostWithContent = cache(
 );
 
 export async function getAllBlogSlugs(): Promise<string[]> {
+  const entries = await getBlogSitemapEntries();
+  return entries.map((e) => e.slug);
+}
+
+/** Published blog posts with slug + last modified for sitemap. */
+export async function getBlogSitemapEntries(): Promise<SitemapEntry[]> {
   const response = await notion.databases.query({
     database_id: DB.blog,
     filter: { property: "Is Published", checkbox: { equals: true } },
   });
   return response.results
-    .map((p) => pageToBlogPost(p).slug)
-    .filter(Boolean);
+    .map((page) => {
+      const post = pageToBlogPost(page);
+      const p = page as NotionPage;
+      const published = post.publishedAt ? new Date(post.publishedAt) : null;
+      const edited = p.last_edited_time ? new Date(p.last_edited_time) : null;
+      return {
+        slug: post.slug,
+        lastModified: published ?? edited ?? new Date(),
+      };
+    })
+    .filter((e) => Boolean(e.slug));
 }
 
 // ─── Blog (admin write) ─────────────────────────────────────────────────────

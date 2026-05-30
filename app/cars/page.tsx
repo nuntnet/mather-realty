@@ -1,13 +1,16 @@
 import { Suspense } from "react";
 import { getActiveCars } from "@/lib/notion";
 import CarsFilter from "./CarsFilter";
+import { pageMetadata } from "@/lib/site";
 
 export const revalidate = 3600;
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "ค้นหารถยนต์",
-  description: "รถยนต์ใหม่และรถมือสองคุณภาพจาก 6 แบรนด์ชั้นนำ — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
-};
+  description:
+    "รถยนต์ใหม่และรถมือสองคุณภาพจาก 6 แบรนด์ชั้นนำ — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
+  path: "/cars",
+});
 
 export default async function CarsPage() {
   const cars = await getActiveCars();

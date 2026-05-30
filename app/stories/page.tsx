@@ -1,12 +1,14 @@
 import { getPublicStories } from "@/lib/notion";
 import StoriesClient from "./StoriesClient";
+import { pageMetadata } from "@/lib/site";
 
 export const revalidate = 3600;
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "เรื่องราวลูกค้า",
   description: "ความประทับใจจากลูกค้าจริงที่ไว้วางใจ ช.เอราวัณ กรุ๊ป มากว่า 57 ปี",
-};
+  path: "/stories",
+});
 
 export default async function StoriesPage() {
   const stories = await getPublicStories();

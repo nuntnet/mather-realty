@@ -34,6 +34,16 @@ const timeSlots = ["08:00", "09:00", "10:00", "11:00", "13:00", "14:00", "15:00"
 
 interface UploadedFile { name: string; size: number; type: string; url?: string; uploading?: boolean; }
 
+async function uploadBookingFile(file: File, kind: "damage" | "insurance"): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("kind", kind);
+  const res = await fetch("/api/upload/booking", { method: "POST", body: fd });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error || "อัปโหลดไม่สำเร็จ");
+  return json.url as string;
+}
+
 const emptyForm = {
   customerName: "", customerPhone: "", customerEmail: "", carModel: "",
   branch: "", preferredDate: "", preferredTime: "", notes: "",
@@ -54,25 +64,51 @@ function BookingForm() {
 
   useEffect(() => { if (typeParam) setSelectedType(typeParam); }, [typeParam]);
 
-  const handleFileUpload = (files: FileList | null, type: "damage" | "insurance") => {
+  const handleFileUpload = async (files: FileList | null, type: "damage" | "insurance") => {
     if (!files) return;
-    const newFiles: UploadedFile[] = Array.from(files).map(f => ({ name: f.name, size: f.size, type: f.type, uploading: true }));
+    const fileArr = Array.from(files);
     const setter = type === "damage" ? setDamagePhotos : setInsuranceDocs;
-    setter(prev => [...prev, ...newFiles]);
-    setTimeout(() => {
-      setter(prev => prev.map(f => newFiles.find(nf => nf.name === f.name) ? { ...f, uploading: false, url: "#" } : f));
-    }, 1200);
+    const placeholders: UploadedFile[] = fileArr.map((f) => ({
+      name: f.name,
+      size: f.size,
+      type: f.type,
+      uploading: true,
+    }));
+    setter((prev) => [...prev, ...placeholders]);
+
+    for (const file of fileArr) {
+      try {
+        const url = await uploadBookingFile(file, type);
+        setter((prev) =>
+          prev.map((f) =>
+            f.name === file.name && f.uploading ? { ...f, uploading: false, url } : f
+          )
+        );
+      } catch (err) {
+        setter((prev) => prev.filter((f) => !(f.name === file.name && f.uploading)));
+        toast.error(err instanceof Error ? err.message : "อัปโหลดไม่สำเร็จ");
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.customerName || !form.customerPhone) { toast.error("กรุณากรอกชื่อและเบอร์โทรศัพท์"); return; }
+    if (damagePhotos.some((f) => f.uploading) || insuranceDocs.some((f) => f.uploading)) {
+      toast.error("กรุณารอการอัปโหลดไฟล์ให้เสร็จ");
+      return;
+    }
     setLoading(true);
     try {
       const res = await fetch("/api/submit/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, type: selectedType }),
+        body: JSON.stringify({
+          ...form,
+          type: selectedType,
+          damagePhotoUrls: damagePhotos.map((f) => f.url).filter(Boolean),
+          insuranceDocUrls: insuranceDocs.map((f) => f.url).filter(Boolean),
+        }),
       });
       if (!res.ok) throw new Error("ส่งไม่สำเร็จ");
       setSubmitted(true);

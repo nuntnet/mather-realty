@@ -5,144 +5,26 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Phone, Clock, Car, Wrench, ChevronRight, ExternalLink } from "lucide-react";
+import { branches as branchData, type Branch } from "@/lib/branchData";
 
-const branches = [
-  {
-    id: 1,
-    name: "มาสด้า ช.เอราวัณ นครปฐม",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/YHvrOvpFHvKAIeEG.png",
-    nameEn: "Mazda Ch.Erawan Nakhon Pathom",
-    brand: "Mazda",
-    isHQ: true,
-    address: "75/2 ม.1 ถ.เพชรเกษม ต.ธรรมศาลา อ.เมือง จ.นครปฐม 73000",
-    phone: "034-305-500",
-    fax: "034-305-499",
-    lineId: "@mazdach.erawan",
-    lineUrl: "https://line.me/R/ti/p/@mazdach.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/dTCGV1ZZCsK9Ddu88",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.0!3d13.8!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ4JzAwLjAiTiAxMDDCsDAwJzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ใหม่ Mazda", "ศูนย์บริการมาตรฐาน Mazda", "ศูนย์ Body & Paint (Mazda, GWM)", "ศูนย์ล้อและยาง", "อะไหล่แท้ Mazda", "ประกันภัยรถยนต์"],
-    bodyPaintBrands: ["Mazda", "GWM"],
-    nearby: ["ถนนเพชรเกษม (Route 4)", "ชุมชน ต.ธรรมศาลา", "Central Nakhon Pathom (11 กม.)"],
-  },
-  {
-    id: 2,
-    name: "มาสด้า ช.เอราวัณ ศาลายา",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/SLBeYItuxiwOgQbb.png",
-    nameEn: "Mazda Ch.Erawan Salaya",
-    brand: "Mazda",
-    isHQ: false,
-    address: "200 ม.1 ต.บางเตย อ.สามพราน จ.นครปฐม 73210",
-    phone: "02-482-2000",
-    fax: "02-482-1912",
-    lineId: "@mazdach.erawan",
-    lineUrl: "https://line.me/R/ti/p/@mazdach.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/8L4AKtWmi8kUAgUb7",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.3!3d13.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ2JzQ4LjAiTiAxMDDCsDIwJzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ใหม่ Mazda", "ศูนย์บริการมาตรฐาน Mazda", "ศูนย์ Body & Paint (Mazda, Deepal)", "ศูนย์ล้อและยาง (Full Center)", "อะไหล่แท้ Mazda", "ประกันภัยรถยนต์"],
-    bodyPaintBrands: ["Mazda", "Deepal"],
-    nearby: ["Lotus's Salaya (0.3 กม.)", "Central Salaya (3.4 กม.)", "ม.มหิดล ศาลายา (5 กม.)"],
-  },
-  {
-    id: 3,
-    name: "Deepal ช.เอราวัณ ศาลายา",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/rTydICpCShmtxqYF.png",
-    nameEn: "Deepal Ch.Erawan Salaya",
-    brand: "Deepal",
-    isHQ: false,
-    address: "200 ม.1 ถ.พุทธมณฑลสาย 5 ต.บางเตย อ.สามพราน จ.นครปฐม 73210",
-    phone: "02-482-2000",
-    fax: "-",
-    lineId: "@mazdach.erawan",
-    lineUrl: "https://line.me/R/ti/p/@mazdach.erawan",
-    hours: "ทุกวัน 10:00–20:00",
-    mapUrl: "https://maps.app.goo.gl/8L4AKtWmi8kUAgUb7",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.3!3d13.78!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ2JzQ4LjAiTiAxMDDCsDIwJzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ไฟฟ้า Deepal", "EV Service Center", "ศูนย์ Body & Paint (ใช้ร่วมกับ Mazda ศาลายา)", "EV Charging Station", "อะไหล่แท้ Deepal"],
-    bodyPaintBrands: ["Deepal"],
-    nearby: ["ติดกับ Mazda ศาลายา", "Lotus's Salaya (0.3 กม.)", "ถ.พุทธมณฑลสาย 5"],
+/** UI-only extras not stored in canonical branch data */
+const branchUiExtras: Record<string, { nearby?: string[]; note?: string }> = {
+  "deepal-salaya": {
     note: "ตั้งอยู่ติดกับ Mazda ช.เอราวัณ ศาลายา บนที่ดินเดียวกัน",
+    nearby: ["ติดกับ Mazda ศาลายา", "Lotus's Salaya (0.3 กม.)", "ถ.พุทธมณฑลสาย 5"],
   },
-  {
-    id: 4,
-    name: "ฟอร์ด ช.เอราวัณ อ้อมใหญ่",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/OACqNvYyTKopUBMQ.png",
-    nameEn: "Ford Ch.Erawan Omyai",
-    brand: "Ford",
-    isHQ: false,
-    address: "1/2 หมู่ 8 ต.อ้อมใหญ่ อ.สามพราน จ.นครปฐม 73160",
-    phone: "02-431-1000",
-    fax: "02-431-1565",
-    lineId: "@fordch.erawan",
-    lineUrl: "https://line.me/R/ti/p/@fordch.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/6ivfUSsLFMpF3TAd8",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.27!3d13.73!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQzJzQ4LjAiTiAxMDDCsDIwJzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ใหม่ Ford", "Ford Pro (Commercial)", "ศูนย์บริการมาตรฐาน Ford", "ศูนย์ Body & Paint (Ford, Kia)", "ศูนย์ล้อและยาง", "อะไหล่แท้ Ford", "ประกันภัยรถยนต์"],
-    bodyPaintBrands: ["Ford", "Kia"],
-    nearby: ["ถ.เพชรเกษม อ.สามพราน", "ตลาดอ้อมใหญ่", "Big C อ้อมใหญ่"],
-  },
-  {
-    id: 5,
-    name: "มิตซูบิชิ ช.เอราวัณ นครปฐม",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/MzmZmGYusSysqPqs.png",
-    nameEn: "Mitsubishi Ch.Erawan Nakhon Pathom",
-    brand: "Mitsubishi",
-    isHQ: false,
-    address: "155 หมู่ 5 ต.ลำพยา อ.เมือง จ.นครปฐม 73000",
-    phone: "034-300-333",
-    fax: "034-300-390",
-    lineId: "@mitsuch.erawan",
-    lineUrl: "https://line.me/R/ti/p/@mitsuch.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/6VPaJr7KqBQvegB79",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.05!3d13.82!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ5JzEyLjAiTiAxMDDCsDAzJzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ใหม่ Mitsubishi", "ศูนย์บริการมาตรฐาน Mitsubishi", "ศูนย์ Body & Paint (Mitsubishi)", "ศูนย์ล้อและยาง", "อะไหล่แท้ Mitsubishi", "ประกันภัยรถยนต์", "Mitsubishi PHEV Service"],
-    bodyPaintBrands: ["Mitsubishi"],
-    nearby: ["ต.ลำพยา อ.เมือง นครปฐม", "ถ.นครปฐม–บางเลน"],
-  },
-  {
-    id: 6,
-    name: "GWM ช.เอราวัณ นครปฐม",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/PVkFEcgPpPbZuAXx.png",
-    nameEn: "GWM Ch.Erawan Nakhon Pathom",
-    brand: "GWM",
-    isHQ: false,
-    address: "333 ม.1 ต.ธรรมศาลา อ.เมือง จ.นครปฐม 73000",
-    phone: "034-219-000",
-    fax: "-",
-    lineId: "@gwmch.erawan",
-    lineUrl: "https://line.me/R/ti/p/@gwmch.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/h5e3T3ebtnDRCNgu5",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.02!3d13.80!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ4JzAwLjAiTiAxMDDCsDAyJzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ GWM (Haval, ORA, Tank)", "EV & Hybrid Service", "ศูนย์บริการมาตรฐาน GWM", "ศูนย์ Body & Paint (ใช้ร่วมกับ Mazda นครปฐม)", "EV Charging Station", "อะไหล่แท้ GWM"],
-    bodyPaintBrands: ["GWM"],
-    nearby: ["ถ.เพชรเกษม ต.ธรรมศาลา", "ติดกับ Mazda ช.เอราวัณ นครปฐม"],
+  "gwm-nakhonpathom": {
     note: "ตั้งอยู่บนถนนเพชรเกษม ใกล้กับ Mazda ช.เอราวัณ นครปฐม",
+    nearby: ["ถ.เพชรเกษม ต.ธรรมศาลา", "ติดกับ Mazda ช.เอราวัณ นครปฐม"],
   },
-  {
-    id: 7,
-    name: "KIA ช.เอราวัณ นครปฐม",
-    graphicMap: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/moqhKFCzmPuGsdVD.png",
-    nameEn: "Kia Ch.Erawan Nakhon Pathom",
-    brand: "Kia",
-    isHQ: false,
-    address: "339 ต.ยายชา อ.สามพราน จ.นครปฐม 73110",
-    phone: "02-431-1565",
-    fax: "-",
-    lineId: "@kiach.erawan",
-    lineUrl: "https://line.me/R/ti/p/@kiach.erawan",
-    hours: "จ–ศ 08:00–18:00 | ส–อา 08:00–17:00",
-    mapUrl: "https://maps.app.goo.gl/WHYEGfr2gQHQbv9X9",
-    embedMapSrc: "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3878.0!2d100.28!3d13.72!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQzJzEyLjAiTiAxMDDCsDI0JzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
-    services: ["ขายรถยนต์ Kia (Sorento, Carnival, EV5, EV9)", "EV Service Center", "ศูนย์บริการมาตรฐาน Kia", "ศูนย์ Body & Paint (ใช้ร่วมกับ Ford อ้อมใหญ่)", "ศูนย์ล้อและยาง", "อะไหล่แท้ Kia", "Kia Warranty 7 ปี"],
-    bodyPaintBrands: ["Kia"],
-    nearby: ["ต.ยายชา อ.สามพราน", "ใกล้ Ford ช.เอราวัณ อ้อมใหญ่"],
-  },
-];
+};
+
+type BranchDisplay = Branch & { nearby?: string[]; note?: string };
+
+const branches: BranchDisplay[] = branchData.map((branch) => ({
+  ...branch,
+  ...branchUiExtras[branch.id],
+}));
 
 const brandColors: Record<string, { bg: string; text: string; dot: string }> = {
   "Mazda":      { bg: "bg-red-50",     text: "text-red-700",    dot: "bg-red-500" },
@@ -192,13 +74,13 @@ const serviceMenuByBrand: Record<string, { category: string; items: string[] }[]
 };
 
 export default function ServiceLocator() {
-  const [selectedBranch, setSelectedBranch] = useState<number | null>(null);
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [filterBrand, setFilterBrand] = useState("ทั้งหมด");
   const [activeTab, setActiveTab] = useState<"map" | "info" | "services">("map");
 
   const brands = ["ทั้งหมด", "Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"];
   const filtered = filterBrand === "ทั้งหมด" ? branches : branches.filter(b => b.brand === filterBrand);
-  const selected = branches.find(b => b.id === selectedBranch) as typeof branches[0] & { graphicMap?: string } | undefined;
+  const selected = branches.find((b) => b.id === selectedBranch);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
@@ -299,10 +181,10 @@ export default function ServiceLocator() {
                 <div className="max-h-[520px] overflow-y-auto">
                   {activeTab === "map" ? (
                     <div className="relative bg-[#F8FAFC]">
-                      {selected.graphicMap ? (
+                      {selected.graphicMapUrl ? (
                         <>
                           <img
-                            src={selected.graphicMap}
+                            src={selected.graphicMapUrl}
                             alt={`แผนที่กราฟฟิค ${selected.name}`}
                             className="w-full object-contain"
                           />
@@ -333,8 +215,8 @@ export default function ServiceLocator() {
                             {selected.isHQ && <span className="px-2 py-0.5 bg-amber-50 text-amber-700 text-xs rounded-full font-medium">สำนักงานใหญ่</span>}
                           </div>
                           <h2 className="text-lg font-bold text-[#0F172A]">{selected.name}</h2>
-                          {(selected as { note?: string }).note && (
-                            <p className="text-xs text-[#64748B] mt-0.5 italic">{(selected as { note?: string }).note}</p>
+                          {selected.note && (
+                            <p className="text-xs text-[#64748B] mt-0.5 italic">{selected.note}</p>
                           )}
                         </div>
                       </div>
