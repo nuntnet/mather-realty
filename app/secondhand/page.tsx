@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { CheckCircle, Phone, Mail, MapPin, Car, Gauge, Palette, Settings, CreditCard, Wrench, ArrowRight, Clock, DollarSign, Shield } from "lucide-react";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "รับซื้อรถมือสอง",
+  description: "บริการรับซื้อรถมือสอง ประเมินราคายุติธรรม จาก ช.เอราวัณ ออโต้ กรุ๊ป",
+  path: "/secondhand",
+});
 
 const requiredInfo = [
   { icon: Car, title: "ยี่ห้อ/รุ่น/ออปชั่น/ค่าตัวราคา", desc: "ยี่ห้อและรุ่น ออปชั่นเสริม ค่าตัวราคาตอนซื้อ" },

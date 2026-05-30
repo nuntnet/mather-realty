@@ -1,4 +1,8 @@
 # ch-erawan-next Implementation Plan
+
+> **SUPERSEDED (2026-05-30)** — แผน Phase 2 เก่านี้ไม่สะท้อน codebase ปัจจุบันแล้ว  
+> ดู [`docs/ADMIN_CMS_PLAN.md`](../ADMIN_CMS_PLAN.md) และ [`specs/todo.md`](../../specs/todo.md) แทน
+
 ## 4 Major Feature Sets (Phase 2)
 
 **Date**: May 29, 2026  

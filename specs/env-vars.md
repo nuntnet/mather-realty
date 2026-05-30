@@ -71,6 +71,28 @@ turso db tokens create ch-erawan
 3. Enable **Maps JavaScript API**
 4. สร้าง API Key → จำกัด HTTP referrers ให้เป็น domain ของเว็บ
 
+## Email Notifications (Appointments)
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `APPOINTMENT_NOTIFY_EMAIL` | แนะนำ prod | อีเมลผู้รับแจ้งเตือนนัดหมายใหม่ |
+| `RESEND_API_KEY` | optional | ใช้ Resend ส่งอีเมล (แนะนำ prod) |
+| `RESEND_FROM_EMAIL` | optional | From address ที่ verify แล้วใน Resend |
+| `SMTP_HOST` | optional | SMTP fallback ถ้าไม่มี Resend |
+| `SMTP_PORT` | optional | default `587` |
+| `SMTP_USER` | optional | SMTP username |
+| `SMTP_PASS` | optional | SMTP password |
+| `SMTP_FROM` | optional | From header (default: `SMTP_USER`) |
+| `SMTP_SECURE` | optional | `"true"` สำหรับ port 465 |
+
+ถ้าไม่ตั้ง email vars — booking ยังทำงาน แต่ระบบจะ log-only (ไม่ส่งอีเมล)
+
+## Site URL
+
+| Variable | Required | คำอธิบาย |
+|----------|----------|----------|
+| `NEXT_PUBLIC_SITE_URL` | แนะนำ prod | Canonical/OG base URL (default: `https://ch-erawan.com`) |
+
 ## Revalidation
 
 | Variable | Required | คำอธิบาย |
@@ -104,6 +126,19 @@ CLOUDINARY_API_SECRET=your-api-secret
 
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSy...
+
+# Site URL (canonical / OG)
+NEXT_PUBLIC_SITE_URL=https://ch-erawan.com
+
+# Appointment email (optional — log-only if unset)
+APPOINTMENT_NOTIFY_EMAIL=service@ch-erawan.com
+RESEND_API_KEY=re_xxxxxxxx
+RESEND_FROM_EMAIL=notifications@ch-erawan.com
+# SMTP fallback (optional)
+# SMTP_HOST=smtp.gmail.com
+# SMTP_PORT=587
+# SMTP_USER=...
+# SMTP_PASS=...
 ```
 
 ## Vercel Environment Variables

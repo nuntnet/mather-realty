@@ -1,12 +1,14 @@
 import { getPublishedBlogPosts } from "@/lib/notion";
 import BlogList from "./BlogList";
+import { pageMetadata } from "@/lib/site";
 
 export const revalidate = 3600;
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "บทความและข่าวสาร",
   description: "ความรู้ด้านยานยนต์ เคล็ดลับการดูแลรถ และข่าวสารล่าสุดจาก ช.เอราวัณ",
-};
+  path: "/blog",
+});
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();

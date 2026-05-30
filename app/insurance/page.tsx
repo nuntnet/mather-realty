@@ -1,5 +1,12 @@
 import Link from "next/link";
 import { CheckCircle, Phone, MessageCircle, Shield, Clock, Gift, Users, Heart, CreditCard, Home, Truck } from "lucide-react";
+import { pageMetadata } from "@/lib/site";
+
+export const metadata = pageMetadata({
+  title: "ประกันภัยรถยนต์",
+  description: "บริการประกันภัยรถยนต์ครบวงจรจาก ช.เอราวัณ ออโต้ กรุ๊ป",
+  path: "/insurance",
+});
 
 const benefits = [
   {

@@ -118,6 +118,9 @@ turso db shell ch-erawan \
 ```bash
 BASE_URL="https://ch-erawan.com"
 
+# ✅ Health: Notion + Turso reachable
+curl $BASE_URL/api/health
+
 # ✅ Health: หน้าแรกโหลดได้
 curl -I $BASE_URL
 
@@ -160,6 +163,20 @@ curl -X POST $BASE_URL/api/submit/contact \
 ```
 
 Deploy ไปที่ Singapore (sin1) — ใกล้ user ในไทย latency ต่ำ
+
+### Notion API จาก Vercel (sin1)
+
+Notion API ไม่มี region lock — Vercel sin1 เรียก `api.notion.com` ได้ตามปกติ แต่ควรระวัง:
+
+- **Latency**: cold start + round-trip ไป Notion US อาจใช้ ~200–800ms ต่อ query
+- **Rate limits**: Integration ~3 req/s — ใช้ `notionFetchWithRetry` ใน `lib/notion.ts` แล้ว (429 backoff)
+- **Connectivity check**: หลัง deploy เรียก `GET /api/health` ควรได้ `{ notion: "ok", turso: "ok", ok: true }`
+
+```bash
+curl https://ch-erawan.com/api/health
+```
+
+ถ้า `notion: "error"` — ตรวจ `NOTION_API_KEY`, database IDs, และว่า Integration ถูกเชื่อมกับทุก database ใน Notion workspace
 
 ---
 

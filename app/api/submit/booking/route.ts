@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Client } from "@notionhq/client";
+import { sendAppointmentNotification } from "@/lib/email";
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -18,19 +19,19 @@ const schema = z.object({
   insuranceCompany: z.string().optional(),
   vehicleRegistration: z.string().optional(),
   coverageType: z.string().optional(),
+  damagePhotoUrls: z.array(z.string().url()).optional(),
+  insuranceDocUrls: z.array(z.string().url()).optional(),
 });
+
+function urlsToNotionText(urls?: string[]) {
+  if (!urls?.length) return undefined;
+  return urls.join("\n");
+}
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const data = schema.parse(body);
-
-    const typeLabels: Record<string, string> = {
-      test_drive: "ทดลองขับ",
-      service: "เข้าศูนย์บริการ",
-      body_paint: "แจ้งซ่อมตัวถัง/สี",
-      insurance_quote: "ขอใบเสนอราคาประกัน",
-    };
 
     await notion.pages.create({
       parent: { database_id: process.env.NOTION_APPOINTMENTS_DB_ID! },
@@ -49,8 +50,26 @@ export async function POST(req: NextRequest) {
         ...(data.insuranceCompany ? { "Insurance Company": { rich_text: [{ text: { content: data.insuranceCompany } }] } } : {}),
         ...(data.vehicleRegistration ? { "Vehicle Registration": { rich_text: [{ text: { content: data.vehicleRegistration } }] } } : {}),
         ...(data.coverageType ? { "Coverage Type": { rich_text: [{ text: { content: data.coverageType } }] } } : {}),
+        ...(urlsToNotionText(data.damagePhotoUrls)
+          ? { "Damage Photo URLs": { rich_text: [{ text: { content: urlsToNotionText(data.damagePhotoUrls)! } }] } }
+          : {}),
+        ...(urlsToNotionText(data.insuranceDocUrls)
+          ? { "Insurance Doc URLs": { rich_text: [{ text: { content: urlsToNotionText(data.insuranceDocUrls)! } }] } }
+          : {}),
         "Submitted At": { date: { start: new Date().toISOString() } },
       },
+    });
+
+    await sendAppointmentNotification({
+      customerName: data.customerName,
+      customerPhone: data.customerPhone,
+      customerEmail: data.customerEmail || undefined,
+      type: data.type,
+      carModel: data.carModel,
+      branch: data.branch,
+      preferredDate: data.preferredDate,
+      preferredTime: data.preferredTime,
+      notes: data.notes,
     });
 
     return NextResponse.json({ success: true });

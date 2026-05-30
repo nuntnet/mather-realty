@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   requireAdmin: vi.fn(),
   revalidatePath: vi.fn(),
   getAllCarsAdmin: vi.fn(),
+  getCarById: vi.fn(),
   createCar: vi.fn(),
   updateCar: vi.fn(),
   setCarFlags: vi.fn(),
@@ -21,6 +22,7 @@ vi.mock("@/lib/admin-auth", () => ({ requireAdmin: mocks.requireAdmin }));
 vi.mock("next/cache", () => ({ revalidatePath: mocks.revalidatePath }));
 vi.mock("@/lib/notion", () => ({
   getAllCarsAdmin: mocks.getAllCarsAdmin,
+  getCarById: mocks.getCarById,
   createCar: mocks.createCar,
   updateCar: mocks.updateCar,
   setCarFlags: mocks.setCarFlags,
@@ -33,6 +35,7 @@ beforeEach(() => {
   vi.spyOn(console, "error").mockImplementation(() => {});
   allowAdmin(mocks.requireAdmin);
   mocks.getAllCarsAdmin.mockResolvedValue([mockCar]);
+  mocks.getCarById.mockResolvedValue(mockCar);
   mocks.createCar.mockResolvedValue(mockCar);
   mocks.updateCar.mockResolvedValue(mockCar);
   mocks.setCarFlags.mockResolvedValue(undefined);
@@ -91,7 +94,7 @@ describe("POST /api/admin/cars", () => {
     expect(mocks.createCar).toHaveBeenCalled();
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/cars");
     expect(mocks.revalidatePath).toHaveBeenCalledWith("/");
-    expect(mocks.revalidatePath).toHaveBeenCalledWith(`/cars/${mockCar.id}`);
+    expect(mocks.revalidatePath).toHaveBeenCalledWith(`/cars/${mockCar.slug}`);
   });
 
   it("returns 400 for invalid zod payload", async () => {
