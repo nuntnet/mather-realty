@@ -5,7 +5,7 @@ import BrandServiceContent from "@/components/brands/BrandServiceContent";
 import BrandSubNav from "@/components/brands/BrandSubNav";
 import { BRAND_BY_SLUG } from "@/lib/brandConfig";
 import { getBranchesByBrand } from "@/lib/branchData";
-import { getInsurancePartners } from "@/lib/notion";
+import { getInsurancePartners, getFAQItems } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { CheckCircle2, ChevronRight, FileText, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,18 +48,16 @@ const priceTable = [
   { item: "ค่าประเมินความเสียหาย", insurance: true, selfPay: false },
 ];
 
-const faqItems = [
-  { q: "ซ่อมสีรถ GWM ต้องใช้เวลานานแค่ไหน?", a: "ขึ้นอยู่กับความเสียหาย โดยทั่วไป 2–5 วันทำการ งานเฉพาะจุด 1 วัน" },
-  { q: "ใช้สีตรงรุ่นของ GWM หรือไม่?", a: "ใช้สีตรงรหัสโรงงาน GWM ทุกสี ทุกปี ทุกรุ่น — เข้ากันสมบูรณ์แบบ" },
-  { q: "มีประกันงานซ่อมไหม?", a: "รับประกันงานซ่อม 1 ปี นับจากวันรับรถ — ครอบคลุมสีและงานตัวถัง" },
-  { q: "เคลมประกันได้ไหม?", a: "ได้ — เรามีทีมช่วยดำเนินการเคลมกับบริษัทประกันภัยทุกราย" },
-];
+// FAQ ดึงจาก Notion (จัดการที่ /admin/service-content → tab FAQ)
 
 export default async function GwmBodyRepairPage() {
   const brand = BRAND_BY_SLUG.gwm;
   const gwmBranches = getBranchesByBrand("GWM");
   const bodyRepairBranch = gwmBranches[0];
-  const insuranceList = await getInsurancePartners(true);
+  const [insuranceList, faqItems] = await Promise.all([
+    getInsurancePartners(true),
+    getFAQItems("GWM", "body-repair"),
+  ]);
 
   const breadcrumbs = [
     { name: "หน้าแรก", path: "/" },
@@ -277,9 +275,9 @@ export default async function GwmBodyRepairPage() {
             </div>
             <div className="space-y-4">
               {faqItems.map((item) => (
-                <div key={item.q} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-                  <h3 className="font-semibold text-[#0F172A] mb-2">{item.q}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{item.a}</p>
+                <div key={item.id} className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+                  <h3 className="font-semibold text-[#0F172A] mb-2">{item.question}</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">{item.answer}</p>
                 </div>
               ))}
             </div>

@@ -17,6 +17,7 @@ import type {
   ServicePageSection,
   BrandSocialLink,
   VideoReview,
+  FAQItem,
 } from "./notion-types";
 import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
 
@@ -80,6 +81,7 @@ const DB = {
   insurancePartners: process.env.NOTION_INSURANCE_PARTNERS_DB_ID!,
   socialLinks: process.env.NOTION_SOCIAL_LINKS_DB_ID!,
   videoReviews: process.env.NOTION_VIDEO_REVIEWS_DB_ID!,
+  faq: process.env.NOTION_FAQ_DB_ID!,
   serviceContent: process.env.NOTION_SERVICE_CONTENT_DB_ID!,
 };
 
@@ -1260,5 +1262,81 @@ export async function updateVideoReview(id: string, data: Partial<Omit<VideoRevi
 }
 
 export async function archiveVideoReview(id: string): Promise<void> {
+  await notion.pages.update({ page_id: id, in_trash: true });
+}
+
+// ─── FAQ Items ────────────────────────────────────────────────────────────────
+
+function pageToFAQ(page: NotionPage): FAQItem {
+  return {
+    id: page.id,
+    question: propTitle(page, "Question"),
+    answer: propText(page, "Answer"),
+    page: propSelect(page, "Page"),
+    brand: propSelect(page, "Brand"),
+    isActive: propCheckbox(page, "IsActive"),
+    sortOrder: propNumber(page, "SortOrder"),
+  };
+}
+
+export async function getFAQItems(brand: string, page: string): Promise<FAQItem[]> {
+  if (!DB.faq) return [];
+  const response = await notion.databases.query({
+    database_id: DB.faq,
+    filter: {
+      and: [
+        { property: "Brand", select: { equals: brand } },
+        { property: "Page", select: { equals: page } },
+        { property: "IsActive", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ property: "SortOrder", direction: "ascending" }],
+    page_size: 50,
+  });
+  return response.results.map(pageToFAQ);
+}
+
+export async function getAllFAQAdmin(): Promise<FAQItem[]> {
+  if (!DB.faq) return [];
+  const response = await notion.databases.query({
+    database_id: DB.faq,
+    sorts: [
+      { property: "Brand", direction: "ascending" },
+      { property: "Page", direction: "ascending" },
+      { property: "SortOrder", direction: "ascending" },
+    ],
+    page_size: 100,
+  });
+  return response.results.map(pageToFAQ);
+}
+
+export async function createFAQItem(data: Omit<FAQItem, "id">): Promise<FAQItem> {
+  const page = await notion.pages.create({
+    parent: { database_id: DB.faq },
+    properties: {
+      Question: { title: [{ text: { content: data.question } }] },
+      Answer: { rich_text: [{ text: { content: data.answer } }] },
+      Page: { select: { name: data.page } },
+      Brand: { select: { name: data.brand } },
+      IsActive: { checkbox: data.isActive },
+      SortOrder: { number: data.sortOrder },
+    },
+  });
+  return pageToFAQ(page);
+}
+
+export async function updateFAQItem(id: string, data: Partial<Omit<FAQItem, "id">>): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.question !== undefined) props.Question = { title: [{ text: { content: data.question } }] };
+  if (data.answer !== undefined) props.Answer = { rich_text: [{ text: { content: data.answer } }] };
+  if (data.page !== undefined) props.Page = { select: { name: data.page } };
+  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
+  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
+  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+export async function archiveFAQItem(id: string): Promise<void> {
   await notion.pages.update({ page_id: id, in_trash: true });
 }

@@ -142,6 +142,16 @@ export interface StoryFormData {
   imageUrl?: string;
 }
 
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  page: string;
+  brand: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 export interface VideoReview {
   id: string;
   title: string;
