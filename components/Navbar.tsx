@@ -10,6 +10,7 @@ import {
   GwmSubLineRow,
   MobileBrandLinks,
 } from "@/components/BrandNavMenu";
+import CompanyLogo from "@/components/CompanyLogo";
 
 const navItems = [
   { label: "หน้าแรก", href: "/" },
@@ -66,24 +67,8 @@ export default function Navbar() {
       <div className="container">
         <div className="flex items-center justify-between h-[68px]">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="w-9 h-9 shrink-0">
-              <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="#1B3A6B"/>
-                <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="url(#sg)"/>
-                <path d="M18 7L8 11.5V18C8 23.4 12.48 28.52 18 30.5C23.52 28.52 28 23.4 28 18V11.5L18 7Z" fill="#2E5EA8" opacity="0.5"/>
-                <text x="18" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="serif">ช</text>
-                <defs>
-                  <linearGradient id="sg" x1="18" y1="2" x2="18" y2="35" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#2563EB"/><stop offset="1" stopColor="#1B3A6B"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <div>
-              <div className="font-bold text-[#131F3C] text-[15px] leading-tight tracking-tight">CH.ERAWAN</div>
-              <div className="text-[9px] text-gray-400 leading-tight tracking-[0.12em] uppercase font-medium">Auto Group</div>
-            </div>
+          <Link href="/" className="flex items-center shrink-0" aria-label="ช.เอราวัณ ออโต้ กรุ๊ป — หน้าแรก">
+            <CompanyLogo height={44} priority className="h-11 w-auto" />
           </Link>
 
           {/* Desktop nav */}

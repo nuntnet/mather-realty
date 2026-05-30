@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import BrandLogo from "@/components/BrandLogo";
+import CompanyLogo from "@/components/CompanyLogo";
 import { BRANDS, GWM_SUB_LINES, getGwmLineHref } from "@/lib/brandConfig";
 
 const quickLinks = [
@@ -31,23 +32,8 @@ export default function Footer() {
           {/* Column 1: Logo + About + Contact */}
           <div className="lg:col-span-1">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 shrink-0">
-                  <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                    <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="url(#footer-shield)"/>
-                    <text x="18" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="serif">ช</text>
-                    <defs>
-                      <linearGradient id="footer-shield" x1="18" y1="2" x2="18" y2="35" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#3B82F6"/>
-                        <stop offset="1" stopColor="#1B3A6B"/>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-white text-[15px] leading-tight">CH.ERAWAN</div>
-                  <div className="text-[9px] text-white/40 tracking-[0.12em] uppercase">Auto Group</div>
-                </div>
+            <Link href="/" className="inline-flex mb-5" aria-label="ช.เอราวัณ ออโต้ กรุ๊ป — หน้าแรก">
+              <CompanyLogo height={56} className="h-14 w-auto" />
             </Link>
 
             <p className="text-white/50 text-sm leading-relaxed mb-6">
