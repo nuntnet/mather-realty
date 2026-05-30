@@ -16,6 +16,7 @@ import type {
   InsurancePartner,
   ServicePageSection,
   BrandSocialLink,
+  VideoReview,
 } from "./notion-types";
 import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
 
@@ -78,6 +79,7 @@ const DB = {
   feedback: process.env.NOTION_FEEDBACK_DB_ID!,
   insurancePartners: process.env.NOTION_INSURANCE_PARTNERS_DB_ID!,
   socialLinks: process.env.NOTION_SOCIAL_LINKS_DB_ID!,
+  videoReviews: process.env.NOTION_VIDEO_REVIEWS_DB_ID!,
   serviceContent: process.env.NOTION_SERVICE_CONTENT_DB_ID!,
 };
 
@@ -1177,5 +1179,86 @@ export async function updateSocialLink(
 }
 
 export async function archiveSocialLink(id: string): Promise<void> {
+  await notion.pages.update({ page_id: id, in_trash: true });
+}
+
+
+// ─── Video Reviews ────────────────────────────────────────────────────────────
+
+function pageToVideoReview(page: NotionPage): VideoReview {
+  return {
+    id: page.id,
+    title: propTitle(page, "Title"),
+    brand: propSelect(page, "Brand"),
+    platform: propSelect(page, "Platform") as VideoReview["platform"],
+    videoUrl: propUrl(page, "VideoURL") ?? "",
+    thumbnailUrl: propUrl(page, "ThumbnailURL"),
+    description: propText(page, "Description"),
+    isActive: propCheckbox(page, "IsActive"),
+    sortOrder: propNumber(page, "SortOrder"),
+  };
+}
+
+export async function getVideoReviewsByBrand(brand: string): Promise<VideoReview[]> {
+  if (!DB.videoReviews) return [];
+  const response = await notion.databases.query({
+    database_id: DB.videoReviews,
+    filter: {
+      and: [
+        { property: "Brand", select: { equals: brand } },
+        { property: "IsActive", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ property: "SortOrder", direction: "ascending" }],
+    page_size: 20,
+  });
+  return response.results.map(pageToVideoReview);
+}
+
+export async function getAllVideoReviewsAdmin(): Promise<VideoReview[]> {
+  if (!DB.videoReviews) return [];
+  const response = await notion.databases.query({
+    database_id: DB.videoReviews,
+    sorts: [
+      { property: "Brand", direction: "ascending" },
+      { property: "SortOrder", direction: "ascending" },
+    ],
+    page_size: 100,
+  });
+  return response.results.map(pageToVideoReview);
+}
+
+export async function createVideoReview(data: Omit<VideoReview, "id">): Promise<VideoReview> {
+  const page = await notion.pages.create({
+    parent: { database_id: DB.videoReviews },
+    properties: {
+      Title: { title: [{ text: { content: data.title } }] },
+      Brand: { select: { name: data.brand } },
+      Platform: { select: { name: data.platform } },
+      VideoURL: { url: data.videoUrl || null },
+      ThumbnailURL: { url: data.thumbnailUrl || null },
+      Description: { rich_text: data.description ? [{ text: { content: data.description } }] : [] },
+      IsActive: { checkbox: data.isActive },
+      SortOrder: { number: data.sortOrder },
+    },
+  });
+  return pageToVideoReview(page);
+}
+
+export async function updateVideoReview(id: string, data: Partial<Omit<VideoReview, "id">>): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
+  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
+  if (data.platform !== undefined) props.Platform = { select: { name: data.platform } };
+  if (data.videoUrl !== undefined) props.VideoURL = { url: data.videoUrl || null };
+  if (data.thumbnailUrl !== undefined) props.ThumbnailURL = { url: data.thumbnailUrl || null };
+  if (data.description !== undefined) props.Description = { rich_text: data.description ? [{ text: { content: data.description } }] : [] };
+  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
+  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+export async function archiveVideoReview(id: string): Promise<void> {
   await notion.pages.update({ page_id: id, in_trash: true });
 }

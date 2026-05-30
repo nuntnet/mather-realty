@@ -142,6 +142,18 @@ export interface StoryFormData {
   imageUrl?: string;
 }
 
+export interface VideoReview {
+  id: string;
+  title: string;
+  brand: string;
+  platform: "YouTube" | "TikTok";
+  videoUrl: string;
+  thumbnailUrl: string | null;
+  description: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
 export interface BrandSocialLink {
   id: string;
   label: string;

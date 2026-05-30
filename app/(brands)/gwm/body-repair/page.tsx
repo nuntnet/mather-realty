@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import BrandHero from "@/components/BrandHero";
+import BrandServiceContent from "@/components/brands/BrandServiceContent";
 import BrandSubNav from "@/components/brands/BrandSubNav";
 import { BRAND_BY_SLUG } from "@/lib/brandConfig";
 import { getBranchesByBrand } from "@/lib/branchData";
@@ -283,6 +285,11 @@ export default async function GwmBodyRepairPage() {
             </div>
           </div>
         </section>
+
+        {/* Notion CMS content — admin adds sections via /admin/service-content */}
+        <Suspense fallback={null}>
+          <BrandServiceContent brand="GWM" page="body-repair" />
+        </Suspense>
 
         {/* CTA */}
         <section className="bg-[#0C1C3E] py-12">

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import BrandServiceContent from "@/components/brands/BrandServiceContent";
 import BrandHero from "@/components/BrandHero";
 import BrandSubNav from "@/components/brands/BrandSubNav";
 import { BRAND_BY_SLUG } from "@/lib/brandConfig";
@@ -259,6 +261,11 @@ export default function GwmServicePage() {
             </div>
           </div>
         </section>
+
+        {/* Notion CMS content */}
+        <Suspense fallback={null}>
+          <BrandServiceContent brand="GWM" page="service" />
+        </Suspense>
 
         {/* ── CTA ── */}
         <section className="container py-14 text-center">
