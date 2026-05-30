@@ -174,7 +174,7 @@ function pageToCar(page: NotionPage): Car {
     imageUrls: propImageUrls(page, "Image URLs"),
     videoUrl: propUrl(page, "Video URL"),
     isActive: propCheckbox(page, "Is Active"),
-    isFeatured: propCheckbox(page, "Is Featured"),
+    isBestSeller: propCheckbox(page, "Is Best Seller"),
     navFeatured: propCheckbox(page, "Nav Featured"),
     navNew: propCheckbox(page, "Nav New"),
     slug: propText(page, "Slug"),
@@ -235,7 +235,7 @@ export async function getFeaturedCars(): Promise<Car[]> {
     filter: {
       and: [
         { property: "Is Active", checkbox: { equals: true } },
-        { property: "Is Featured", checkbox: { equals: true } },
+        { property: "Is Best Seller", checkbox: { equals: true } },
       ],
     },
     page_size: 6,
@@ -357,7 +357,7 @@ function carToProperties(data: Partial<CarInput>): Record<string, unknown> {
   if (data.imageUrls !== undefined) p["Image URLs"] = { rich_text: [{ text: { content: data.imageUrls.join("\n") } }] };
   if (data.videoUrl !== undefined) p["Video URL"] = { url: data.videoUrl || null };
   if (data.isActive !== undefined) p["Is Active"] = { checkbox: data.isActive };
-  if (data.isFeatured !== undefined) p["Is Featured"] = { checkbox: data.isFeatured };
+  if (data.isBestSeller !== undefined) p["Is Best Seller"] = { checkbox: data.isBestSeller };
   if (data.navFeatured !== undefined) p["Nav Featured"] = { checkbox: data.navFeatured };
   if (data.navNew !== undefined) p["Nav New"] = { checkbox: data.navNew };
   if (data.slug !== undefined) p["Slug"] = { rich_text: [{ text: { content: data.slug } }] };
@@ -387,7 +387,7 @@ export async function setCarFlags(
   id: string,
   flags: {
     isActive?: boolean;
-    isFeatured?: boolean;
+    isBestSeller?: boolean;
     navFeatured?: boolean;
     navNew?: boolean;
   }
@@ -395,7 +395,7 @@ export async function setCarFlags(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const props: Record<string, any> = {};
   if (flags.isActive !== undefined) props["Is Active"] = { checkbox: flags.isActive };
-  if (flags.isFeatured !== undefined) props["Is Featured"] = { checkbox: flags.isFeatured };
+  if (flags.isBestSeller !== undefined) props["Is Best Seller"] = { checkbox: flags.isBestSeller };
   if (flags.navFeatured !== undefined) props["Nav Featured"] = { checkbox: flags.navFeatured };
   if (flags.navNew !== undefined) props["Nav New"] = { checkbox: flags.navNew };
   await notion.pages.update({ page_id: id, properties: props });

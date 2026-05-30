@@ -128,7 +128,7 @@ export default function CarsFilter({ cars }: { cars: Car[] }) {
                       แนะนำ
                     </span>
                   )}
-                  {car.isFeatured && !car.navFeatured && (
+                  {car.isBestSeller && !car.navFeatured && (
                     <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
                       ขายดี
                     </span>

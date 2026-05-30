@@ -19,7 +19,7 @@ export interface Car {
   imageUrls: string[]; // Cloudinary URLs parsed from newline-separated text
   videoUrl: string | null;
   isActive: boolean;
-  isFeatured: boolean;
+  isBestSeller: boolean;
   /** Notion checkbox "Nav Featured" — mega menu highlight (แนะนำ) */
   navFeatured: boolean;
   /** Notion checkbox "Nav New" — mega menu highlight (ใหม่) */

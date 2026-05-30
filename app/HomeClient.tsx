@@ -180,7 +180,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   ) : (
                     <Image src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} fill className="object-cover opacity-80" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   )}
-                  {car.isFeatured && (
+                  {car.isBestSeller && (
                     <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">แนะนำ</Badge>
                   )}
                 </div>

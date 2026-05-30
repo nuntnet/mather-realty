@@ -41,7 +41,7 @@ export default function AdminCarsPage() {
 
   const toggleFlag = async (
     car: Car,
-    flag: "isActive" | "isFeatured" | "navFeatured" | "navNew",
+    flag: "isActive" | "isBestSeller" | "navFeatured" | "navNew",
     value: boolean
   ) => {
     setBusyId(car.id);
@@ -134,7 +134,12 @@ export default function AdminCarsPage() {
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-24">แบรนด์</th>
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-36">ราคา (เริ่มต้น)</th>
                 <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20" title="แสดง/ซ่อนรถบนเว็บไซต์">เผยแพร่</th>
-                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20" title="แสดง badge ขายดี บนหน้า /cars">ขายดี</th>
+                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20" title="แสดงหน้า Home + badge ขายดี บนหน้า /cars">
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>ขายดี</span>
+                    <span className="text-[9px] text-orange-400 font-normal normal-case">Home</span>
+                  </span>
+                </th>
                 <th className="text-center text-xs font-semibold text-gray-500 px-2 py-3 uppercase tracking-wider w-20" title="แสดงใน Mega Nav + badge แนะนำ บนหน้า /cars">
                   <span className="flex flex-col items-center gap-0.5">
                     <span>แนะนำ</span>
@@ -184,9 +189,9 @@ export default function AdminCarsPage() {
                   </td>
                   <td className="px-3 py-4 text-center">
                     <Switch
-                      checked={car.isFeatured}
+                      checked={car.isBestSeller}
                       disabled={busyId === car.id}
-                      onCheckedChange={(v) => toggleFlag(car, "isFeatured", v)}
+                      onCheckedChange={(v) => toggleFlag(car, "isBestSeller", v)}
                     />
                   </td>
                   <td className="px-2 py-4 text-center">

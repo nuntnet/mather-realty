@@ -55,7 +55,7 @@ const emptyCar: CarInput = {
   imageUrls: [],
   videoUrl: null,
   isActive: true,
-  isFeatured: false,
+  isBestSeller: false,
   navFeatured: false,
   navNew: false,
   slug: "",
@@ -281,11 +281,11 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
               <Switch checked={form.isActive} onCheckedChange={(v) => set("isActive", v)} />
               <span>เผยแพร่</span>
             </label>
-            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดง badge ขายดี บนหน้า /cars">
-              <Switch checked={form.isFeatured} onCheckedChange={(v) => set("isFeatured", v)} />
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดงในหน้าแรก section รถแนะนำ + badge ขายดี">
+              <Switch checked={form.isBestSeller} onCheckedChange={(v) => set("isBestSeller", v)} />
               <span className="flex flex-col leading-tight">
                 <span>ขายดี</span>
-                <span className="text-[10px] text-gray-400">/cars badge</span>
+                <span className="text-[10px] text-gray-400">แสดงหน้า Home</span>
               </span>
             </label>
             <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer" title="แสดงใน Mega Nav + badge แนะนำ">
