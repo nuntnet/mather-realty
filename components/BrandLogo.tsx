@@ -3,10 +3,11 @@ import { BRAND_BY_SLUG, type BrandSlug } from "@/lib/brandConfig";
 import { cn } from "@/lib/utils";
 
 const SIZE_CLASSES = {
-  xs: { box: "h-8 w-[72px]", pad: "p-1" },
-  sm: { box: "h-10 w-[88px]", pad: "p-1.5" },
-  md: { box: "h-12 w-[104px]", pad: "p-2" },
-  lg: { box: "h-14 w-[120px]", pad: "p-2" },
+  xs: { box: "h-8 w-[72px]", pad: "p-1", maxH: "max-h-7" },
+  sm: { box: "h-10 w-[88px]", pad: "p-1.5", maxH: "max-h-8" },
+  md: { box: "h-12 w-[104px]", pad: "p-2", maxH: "max-h-9" },
+  lg: { box: "h-14 w-[120px]", pad: "p-2", maxH: "max-h-10" },
+  xl: { box: "h-[72px] w-[200px]", pad: "p-1", maxH: "max-h-16 md:max-h-[4.5rem]" },
 } as const;
 
 export type BrandLogoSize = keyof typeof SIZE_CLASSES;
@@ -18,6 +19,10 @@ interface BrandLogoProps {
   /** Overrides brandConfig.logoScale when set */
   scale?: number;
   size?: BrandLogoSize;
+  /** Skip the uniform grey box — for hero / dark backgrounds */
+  bare?: boolean;
+  /** White wordmark on dark backgrounds */
+  white?: boolean;
   className?: string;
   containerClassName?: string;
   width?: number;
@@ -32,6 +37,8 @@ export default function BrandLogo({
   brandSlug,
   scale,
   size = "md",
+  bare = false,
+  white = false,
   className,
   containerClassName,
   width = 120,
@@ -40,7 +47,38 @@ export default function BrandLogo({
 }: BrandLogoProps) {
   const logoScale =
     scale ?? (brandSlug ? BRAND_BY_SLUG[brandSlug].logoScale : undefined) ?? 1;
-  const { box, pad } = SIZE_CLASSES[size];
+  const { box, pad, maxH } = SIZE_CLASSES[size];
+
+  const image = (
+    <Image
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      priority={priority}
+      className={cn(
+        "max-w-full object-contain",
+        bare ? maxH : "max-h-full",
+        white && "brightness-0 invert",
+        className
+      )}
+      style={{ transform: logoScale !== 1 ? `scale(${logoScale})` : undefined }}
+    />
+  );
+
+  if (bare) {
+    return (
+      <div
+        className={cn(
+          "flex shrink-0 items-center justify-center",
+          box,
+          containerClassName
+        )}
+      >
+        {image}
+      </div>
+    );
+  }
 
   return (
     <div
@@ -51,15 +89,7 @@ export default function BrandLogo({
         containerClassName
       )}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        priority={priority}
-        className={cn("max-h-full max-w-full object-contain", className)}
-        style={{ transform: logoScale !== 1 ? `scale(${logoScale})` : undefined }}
-      />
+      {image}
     </div>
   );
 }

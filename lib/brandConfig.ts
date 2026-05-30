@@ -28,6 +28,10 @@ export interface BrandConfig {
   logoPath: string;
   /** Per-brand visual scale inside the uniform logo box (default 1) */
   logoScale?: number;
+  /** Brand accent for hero tagline / CTA tint */
+  accentColor?: string;
+  /** Full-width hero background — falls back to navBgImage then BRAND_IMAGES */
+  heroBgImage?: string;
   /** Faint background image for nav mega menu tiles on hover */
   navBgImage?: string;
   hubPath: string;
@@ -69,7 +73,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายมาสด้าอย่างเป็นทางการ รถยนต์ดีไซน์ Kodo สมรรถนะสมดุล พร้อมศูนย์บริการมาตรฐาน",
     logoPath: "/brands/mazda.svg",
-    logoScale: 1,
+    logoScale: 1.1,
+    accentColor: "#910023",
     navBgImage: BRAND_IMAGES.Mazda,
     hubPath: "/mazda",
     featuredModels: [
@@ -86,7 +91,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายฟอร์ดอย่างเป็นทางการ รถกระบะและ SUV ที่แข็งแกร่ง พร้อมบริการหลังการขายครบวงจร",
     logoPath: "/brands/ford.svg",
-    logoScale: 0.9,
+    logoScale: 0.85,
+    accentColor: "#003478",
     hubPath: "/ford",
     featuredModels: [
       { name: "Ranger Wildtrak", slug: "ford-ranger-wildtrak-2026" },
@@ -102,7 +108,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่ายมิตซูบิชิ มอเตอร์ส รถ SUV และกระบะที่ทนทาน เหมาะกับทุกเส้นทาง",
     logoPath: "/brands/mitsubishi.svg",
-    logoScale: 0.95,
+    logoScale: 0.9,
+    accentColor: "#E60012",
     navBgImage: BRAND_IMAGES.Mitsubishi,
     hubPath: "/mitsubishi",
     featuredModels: [
@@ -119,7 +126,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย GWM อย่างเป็นทางการ ครบทั้ง HAVAL, ORA และ TANK — SUV ไฮบริดและรถไฟฟ้า",
     logoPath: "/brands/gwm.png",
-    logoScale: 1.05,
+    logoScale: 1,
+    accentColor: "#C8102E",
     navBgImage: BRAND_IMAGES.GWM,
     hubPath: "/gwm",
     featuredModels: [
@@ -137,7 +145,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Deepal รถยนต์ไฟฟ้าและไฮบริดพลังงานใหม่ ดีไซน์ทันสมัย เทคโนโลยีล้ำสมัย",
     logoPath: "/brands/deepal.png",
-    logoScale: 1.4,
+    logoScale: 1.5,
+    accentColor: "#0066FF",
     navBgImage: BRAND_IMAGES.Deepal,
     hubPath: "/deepal",
     featuredModels: [
@@ -154,7 +163,8 @@ export const BRANDS: BrandConfig[] = [
     descriptionTh:
       "ตัวแทนจำหน่าย Kia อย่างเป็นทางการ รถ SUV และ MPV ดีไซน์ Opposites United",
     logoPath: "/brands/kia.svg",
-    logoScale: 0.75,
+    logoScale: 0.65,
+    accentColor: "#BB162B",
     navBgImage: BRAND_IMAGES.Kia,
     hubPath: "/kia",
     featuredModels: [

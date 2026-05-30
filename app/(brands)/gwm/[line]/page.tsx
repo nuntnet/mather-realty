@@ -2,8 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import BrandLogo from "@/components/BrandLogo";
 import BrandCarGrid from "@/components/BrandCarGrid";
-import BrandBreadcrumb from "@/components/BrandBreadcrumb";
-import { Button } from "@/components/ui/button";
+import BrandHero from "@/components/BrandHero";
 import {
   BRAND_BY_SLUG,
   GWM_LINE_BY_SLUG,
@@ -61,81 +60,48 @@ export default async function GwmLinePage({ params }: PageProps) {
         }}
       />
       <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
-        <div className="bg-[#0F172A] text-white py-14 lg:py-20">
-          <div className="container">
-            <BrandBreadcrumb items={breadcrumbs} />
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
-              <div className="max-w-2xl">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="inline-flex items-center justify-center rounded-xl bg-white/10 px-4 py-3 min-h-[44px]">
-                    <BrandLogo
-                      src={line.logoPath}
-                      alt={line.displayName}
-                      width={120}
-                      height={40}
-                      className="h-9 md:h-10 w-auto brightness-0 invert"
-                    />
-                  </div>
-                  <span className="text-white/30 text-sm">by</span>
-                  <BrandLogo
-                    src={gwm.logoPath}
-                    alt="GWM"
-                    width={80}
-                    height={32}
-                    className="h-7 w-auto brightness-0 invert opacity-60"
-                  />
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-4">
-                  {line.displayName}
-                  <span className="text-white/40 font-normal text-xl md:text-2xl ml-2">
-                    {line.displayNameTh}
-                  </span>
-                </h1>
-                <p className="text-white/60 leading-relaxed">
-                  รุ่นรถ {line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุ๊ป
-                  พร้อมทดลองขับและบริการหลังการขายครบวงจร
-                </p>
-              </div>
-              <div className="flex flex-wrap gap-3">
-                <Link href={`/booking?type=test_drive&brand=GWM`}>
-                  <Button className="bg-[#DD5259] hover:bg-[#c94850] text-white font-semibold min-h-[44px]">
-                    นัดทดลองขับ
-                  </Button>
-                </Link>
-                <Link href="/gwm">
-                  <Button
-                    variant="outline"
-                    className="border-white/30 text-white hover:bg-white/10 min-h-[44px]"
-                  >
-                    ดู GWM ทั้งหมด
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
+        <BrandHero
+          brand={{
+            ...gwm,
+            displayName: line.displayName,
+            displayNameTh: line.displayNameTh,
+            tagline: line.displayName,
+            descriptionTh: `รุ่นรถ ${line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุ๊ป พร้อมทดลองขับและบริการหลังการขายครบวงจร`,
+            logoPath: line.logoPath,
+          }}
+          breadcrumbs={breadcrumbs}
+          bgImage={gwm.navBgImage}
+          primaryCta={{ label: "นัดทดลองขับ", href: "/booking?type=test_drive&brand=GWM" }}
+          secondaryCta={{ label: "ดู GWM ทั้งหมด", href: "/gwm" }}
+          secondaryLogo={{ src: gwm.logoPath, alt: "GWM", label: "by" }}
+          footer={
+            <div className="flex flex-wrap gap-2">
               {gwm.subLines?.map((sub) => (
                 <Link
                   key={sub.slug}
                   href={`/gwm/${sub.slug}`}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 min-h-[44px] text-sm font-medium transition-colors ${
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2 min-h-[44px] text-sm font-medium transition-colors backdrop-blur-sm ${
                     sub.slug === slug
                       ? "bg-white text-[#0F172A]"
-                      : "bg-white/10 text-white/70 hover:bg-white/20"
+                      : "bg-white/10 text-white/75 hover:bg-white/20 border border-white/15"
                   }`}
                 >
                   <BrandLogo
                     src={sub.logoPath}
                     alt={sub.displayName}
+                    size="xs"
+                    bare
+                    white={sub.slug !== slug}
                     width={56}
                     height={20}
-                    className={`h-4 w-auto ${sub.slug === slug ? "" : "brightness-0 invert opacity-80"}`}
+                    className={sub.slug === slug ? "" : "opacity-90"}
                   />
+                  {sub.displayName}
                 </Link>
               ))}
             </div>
-          </div>
-        </div>
+          }
+        />
 
         <div className="container py-10 lg:py-14">
           <div className="flex items-center justify-between mb-8">
