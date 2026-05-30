@@ -14,6 +14,7 @@ import {
 import { getCarsByBrandLine } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
+import BrandSocialLinks from "@/components/BrandSocialLinks";
 
 const HAS_SUB_PAGES = new Set<BrandSlug>(["gwm"]);
 
@@ -94,6 +95,17 @@ export default async function BrandHubPage({ params }: PageProps) {
           </div>
 
           <BrandCarGrid cars={cars} />
+
+          {/* Social links */}
+          {brand.social && (
+            <div className="mt-10 flex items-center justify-between bg-gray-50 rounded-2xl px-6 py-4 border border-gray-100">
+              <div>
+                <p className="text-sm font-semibold text-[#0F172A]">ติดตาม {brand.displayNameTh}</p>
+                <p className="text-xs text-gray-400 mt-0.5">ข่าวสาร โปรโมชั่น และ content ล่าสุด</p>
+              </div>
+              <BrandSocialLinks brand={brand} variant="light" />
+            </div>
+          )}
 
           <div className="mt-10 flex flex-wrap gap-4 justify-center">
             <p className="w-full text-center text-sm text-gray-400 mb-2">

@@ -41,6 +41,14 @@ export interface BrandConfig {
   hubPath: string;
   featuredModels?: FeaturedModel[];
   subLines?: GwmSubLine[];
+  /** Social media links for this brand */
+  social?: {
+    facebook?: string;
+    tiktok?: string;
+    youtube?: string;
+    line?: string;      // LINE OA URL (falls back to branch lineUrl)
+    instagram?: string;
+  };
 }
 
 export const GWM_SUB_LINES: GwmSubLine[] = [
@@ -85,6 +93,10 @@ export const BRANDS: BrandConfig[] = [
       { name: "CX-5", slug: "mazda-cx-5-2025" },
       { name: "CX-30", slug: "mazda-cx-30-2025" },
     ],
+    social: {
+      facebook: "https://www.facebook.com/mazdacherawannakhonpathom",
+      line: "https://line.me/R/ti/p/@mazdach.erawan",
+    },
   },
   {
     slug: "ford",
@@ -105,6 +117,10 @@ export const BRANDS: BrandConfig[] = [
       { name: "Ranger Wildtrak", slug: "ford-ranger-wildtrak-2026" },
       { name: "Everest Platinum", slug: "ford-everest-platinum-2025" },
     ],
+    social: {
+      facebook: "https://www.facebook.com/fordcherawan",
+      line: "https://line.me/R/ti/p/@fordch.erawan",
+    },
   },
   {
     slug: "mitsubishi",
@@ -123,6 +139,10 @@ export const BRANDS: BrandConfig[] = [
       { name: "Triton", slug: "mitsubishi-triton-2024" },
       { name: "Xpander Cross HEV", slug: "mitsubishi-xpander-cross-hev-2026" },
     ],
+    social: {
+      facebook: "https://www.facebook.com/mitsucherawan",
+      line: "https://line.me/R/ti/p/@mitsuch.erawan",
+    },
   },
   {
     slug: "gwm",
@@ -142,6 +162,11 @@ export const BRANDS: BrandConfig[] = [
       { name: "ORA 05 BEV", slug: "gwm-ora-05-bev-2025" },
     ],
     subLines: GWM_SUB_LINES,
+    social: {
+      facebook: "https://www.facebook.com/gwmcherawan",
+      tiktok: "https://www.tiktok.com/@gwmcherawan",
+      line: "https://line.me/R/ti/p/@gwmch.erawan",
+    },
   },
   {
     slug: "deepal",
@@ -159,6 +184,10 @@ export const BRANDS: BrandConfig[] = [
     heroBgImage: BRAND_IMAGES.Deepal,
     navBgImage: BRAND_IMAGES.Deepal,
     hubPath: "/deepal",
+    social: {
+      facebook: "https://www.facebook.com/deepalcherawan",
+      line: "https://line.me/R/ti/p/@deepalch.erawan",
+    },
     featuredModels: [
       { name: "Lumin", slug: "deepal-lumin-2026" },
       { name: "Nevo Q05", slug: "deepal-nevo-q05-2026" },
@@ -187,6 +216,10 @@ export const BRANDS: BrandConfig[] = [
       { name: "EV5 Air", slug: "kia-ev5-air-2025" },
       { name: "Carnival HEV", slug: "kia-carnival-hev-2025" },
     ],
+    social: {
+      facebook: "https://www.facebook.com/kiacherawan",
+      line: "https://line.me/R/ti/p/@kiach.erawan",
+    },
   },
 ];
 

@@ -50,10 +50,10 @@ export default function BranchesMap() {
     </clipPath>
   </defs>
   <g filter="url(#pin-shadow)">
-    <!-- Red teardrop pin body -->
-    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="#DD2233"/>
-    <!-- Dark bottom stroke -->
-    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="none" stroke="#B01A2A" stroke-width="1.5"/>
+    <!-- Blue teardrop pin body (ch.erawan brand color) -->
+    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="#1B4FCB"/>
+    <!-- Dark stroke -->
+    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="none" stroke="#1238A0" stroke-width="1.5"/>
     <!-- White circle for logo -->
     <circle cx="26" cy="24" r="16" fill="white"/>
     <!-- Brand logo -->
