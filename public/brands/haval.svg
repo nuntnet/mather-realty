@@ -1,3 +1,24 @@
-<svg viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="HAVAL">
-  <text x="8" y="28" fill="currentColor" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="800" letter-spacing="0.14em">HAVAL</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_图层_1" data-name="图层 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 267.94 32.69">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: currentColor;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="240.83 20.1 240.83 0 225.85 0 225.85 32.69 267.94 32.69 267.94 20.1 240.83 20.1"/>
+  <polygon class="cls-1" points="32.41 9.66 14.97 9.66 14.97 0 0 0 0 32.69 14.97 32.69 14.97 22.24 32.41 22.24 32.41 32.69 47.38 32.69 47.38 0 32.41 0 32.41 9.66"/>
+  <g>
+    <polygon class="cls-1" points="93.58 0 92.71 0 75.38 0 84.04 15.01 94.25 32.69 112.46 32.69 112.47 32.69 93.6 0 93.58 0"/>
+    <polygon class="cls-1" points="56.37 32.69 73.83 32.69 83.13 16.58 74.4 1.46 56.37 32.69"/>
+  </g>
+  <g>
+    <polygon class="cls-1" points="197.98 0 197.1 0 179.77 0 188.44 15.01 198.65 32.69 216.85 32.69 216.87 32.69 198 0 197.98 0"/>
+    <polygon class="cls-1" points="160.76 32.69 178.23 32.69 187.53 16.58 178.79 1.46 160.76 32.69"/>
+  </g>
+  <g>
+    <polygon class="cls-1" points="164.66 0 146.46 0 136.25 17.68 127.58 32.69 144.91 32.69 145.79 32.69 145.81 32.69 164.68 0 164.66 0"/>
+    <polygon class="cls-1" points="126.04 0 108.57 0 126.6 31.23 135.34 16.11 126.04 0"/>
+  </g>
 </svg>

@@ -61,4 +61,14 @@ describe("brandConfig", () => {
     expect(BRAND_BY_SLUG.mazda.hubPath).toBe("/mazda");
     expect(BRAND_BY_SLUG.gwm.subLines).toHaveLength(3);
   });
+
+  it("lists featured models with car detail slugs", () => {
+    for (const brand of Object.values(BRAND_BY_SLUG)) {
+      expect(brand.featuredModels?.length).toBeGreaterThanOrEqual(2);
+      for (const model of brand.featuredModels ?? []) {
+        expect(model.slug).toMatch(/^[\w-]+$/);
+        expect(model.name.length).toBeGreaterThan(0);
+      }
+    }
+  });
 });

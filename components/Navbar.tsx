@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { BrandMegaMenuPanel, MobileBrandLinks } from "@/components/BrandNavMenu";
@@ -217,15 +218,22 @@ export default function Navbar() {
       </div>
 
       {/* Mega menu — full-width panel anchored to nav, not nested in narrow item */}
-      {megaMenuOpen && (
-        <div
-          className="hidden lg:block absolute left-0 right-0 top-full bg-white shadow-2xl border-t border-gray-100 z-50"
-          onMouseEnter={() => handleMouseEnter(MEGA_MENU_LABEL)}
-          onMouseLeave={handleMouseLeave}
-        >
-          <BrandMegaMenuPanel />
-        </div>
-      )}
+      <AnimatePresence>
+        {megaMenuOpen && (
+          <motion.div
+            key="brand-mega-menu"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="hidden lg:block absolute left-0 right-0 top-full bg-white shadow-2xl border-t border-gray-100 z-50"
+            onMouseEnter={() => handleMouseEnter(MEGA_MENU_LABEL)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <BrandMegaMenuPanel />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {isOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 shadow-xl max-h-[80vh] overflow-y-auto">
