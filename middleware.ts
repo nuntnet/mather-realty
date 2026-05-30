@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { legacyBrandQueryToPath } from "@/lib/brandConfig";
 import { checkAuthRateLimit } from "@/lib/ratelimit";
 
 function getClientIp(req: NextRequest): string {
@@ -20,6 +21,17 @@ async function validateAdminSession(req: NextRequest) {
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // Legacy /cars?brand=Mazda → /mazda (strip query; next.config redirects preserve it)
+  if (pathname === "/cars") {
+    const brand = req.nextUrl.searchParams.get("brand");
+    if (brand) {
+      const dest = legacyBrandQueryToPath(brand);
+      if (dest) {
+        return NextResponse.redirect(new URL(dest, req.url), 301);
+      }
+    }
+  }
 
   // ── Rate limit auth endpoints (sign-in / sign-up) ──────────────────────────
   if (pathname.startsWith("/api/auth")) {
@@ -76,5 +88,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*", "/api/auth/:path*"],
+  matcher: ["/cars", "/admin/:path*", "/api/admin/:path*", "/api/auth/:path*"],
 };

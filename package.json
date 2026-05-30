@@ -9,7 +9,10 @@
     "lint": "next lint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "seed:cars": "bun run scripts/seed-real-cars.ts",
+    "sync:galleries": "bun run scripts/sync-car-galleries.ts",
+    "audit:galleries": "bun run scripts/sync-car-galleries.ts --audit"
   },
   "dependencies": {
     "@libsql/client": "^0.14.0",

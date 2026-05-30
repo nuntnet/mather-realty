@@ -12,6 +12,7 @@ import type {
   Appointment,
   ContactSubmission,
 } from "./notion-types";
+import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
 
 // ─── Rate-limit aware fetch (429 + transient 5xx retry w/ backoff) ────────────
 
@@ -199,6 +200,16 @@ export async function getActiveCars(filters?: {
   });
 
   return response.results.map(pageToCar);
+}
+
+export async function getCarsByBrandLine(
+  brand: Car["brand"],
+  line?: string
+): Promise<Car[]> {
+  const cars = await getActiveCars({ brand });
+  if (!line || brand !== "GWM") return cars;
+  if (!isGwmLineSlug(line)) return cars;
+  return cars.filter((car) => matchCarToGwmLine(car, line));
 }
 
 export async function getFeaturedCars(): Promise<Car[]> {

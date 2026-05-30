@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
+import CompanyLogo from "@/components/CompanyLogo";
+import { branches } from "@/lib/branchData";
 
 const quickLinks = [
   { label: "หน้าแรก", href: "/" },
@@ -19,8 +21,6 @@ const serviceLinks = [
   { label: "ร่วมงานกับเรา", href: "/career" },
 ];
 
-const brands = ["GWM", "HAVAL", "ORA", "TANK"];
-
 export default function Footer() {
   return (
     <footer className="bg-[#131F3C] text-white">
@@ -31,23 +31,8 @@ export default function Footer() {
           {/* Column 1: Logo + About + Contact */}
           <div className="lg:col-span-1">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 mb-5">
-                <div className="w-9 h-9 shrink-0">
-                  <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-                    <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="url(#footer-shield)"/>
-                    <text x="18" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="serif">ช</text>
-                    <defs>
-                      <linearGradient id="footer-shield" x1="18" y1="2" x2="18" y2="35" gradientUnits="userSpaceOnUse">
-                        <stop stopColor="#3B82F6"/>
-                        <stop offset="1" stopColor="#1B3A6B"/>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                </div>
-                <div>
-                  <div className="font-bold text-white text-[15px] leading-tight">CH.ERAWAN</div>
-                  <div className="text-[9px] text-white/40 tracking-[0.12em] uppercase">Auto Group</div>
-                </div>
+            <Link href="/" className="inline-flex mb-5" aria-label="ช.เอราวัณ ออโต้ กรุ๊ป — หน้าแรก">
+              <CompanyLogo height={56} className="h-14 w-auto" />
             </Link>
 
             <p className="text-white/50 text-sm leading-relaxed mb-6">
@@ -99,16 +84,27 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Brands + Social */}
+          {/* Column 4: Branches + Social */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-5 tracking-wide uppercase">แบรนด์รถยนต์</h3>
-            <div className="flex flex-wrap gap-2 mb-8">
-              {brands.map((brand) => (
-                <Link key={brand} href={`/cars?brand=${brand}`} className="text-xs text-white/50 border border-white/15 px-3 py-1.5 rounded-md hover:border-white/40 hover:text-white transition-all">
-                  {brand}
-                </Link>
+            <h3 className="text-white font-semibold text-sm mb-5 tracking-wide uppercase">สาขาของเรา</h3>
+            <ul className="space-y-3 mb-6">
+              {branches.map((branch) => (
+                <li key={branch.id}>
+                  <Link
+                    href="/branches"
+                    className="text-sm text-white/50 hover:text-white transition-colors leading-snug block"
+                  >
+                    {branch.name}
+                  </Link>
+                </li>
               ))}
-            </div>
+            </ul>
+            <Link
+              href="/branches"
+              className="inline-flex items-center text-xs text-white/40 hover:text-white/70 transition-colors mb-8"
+            >
+              ดูสาขาทั้งหมดและแผนที่ →
+            </Link>
 
             <h3 className="text-white font-semibold text-sm mb-4 tracking-wide uppercase">ติดตามเรา</h3>
             <div className="flex items-center gap-2">
@@ -138,7 +134,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container py-5 flex flex-col md:flex-row items-center justify-between gap-3">
           <p className="text-xs text-white/30 text-center md:text-left">
-            © {new Date().getFullYear()} บริษัท ช.เอราวัณ จำกัด · สงวนลิขสิทธิ์ทั้งหมด
+            © {new Date().getFullYear()} กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุ๊ป · สงวนลิขสิทธิ์ทั้งหมด
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-xs text-white/30">
             <Link href="/privacy" className="hover:text-white/70 transition-colors">นโยบายคุ้มครองข้อมูลส่วนบุคคล</Link>

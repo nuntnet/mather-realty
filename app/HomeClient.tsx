@@ -6,10 +6,11 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BranchesMap from "@/components/BranchesMap";
-import { brandLogoBase64 } from "@/lib/brandLogos";
+import BrandLogo from "@/components/BrandLogo";
 import { BRAND_IMAGES } from "@/lib/brandImages";
+import { BRANDS, getGwmLineHref } from "@/lib/brandConfig";
 import {
-  ChevronRight, ArrowRight, Phone, MapPin, Calendar, Star,
+  ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award,
 } from "lucide-react";
 import type { Car, BlogPost, CustomerStory } from "@/lib/notion-types";
@@ -18,33 +19,26 @@ import { th } from "date-fns/locale";
 
 const heroSlides = [
   {
-    bg: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=1920&q=80&auto=format&fit=crop",
-    brand: "ORA", tagline: "FUTURE IS NOW",
-    thaiTitle: "อนาคตของการขับขี่เริ่มต้นวันนี้",
-    desc: "ORA Good Cat รถยนต์ไฟฟ้าสไตล์ Retro-Futuristic ดีไซน์โดดเด่น วิ่งได้ไกล 500 กม./ชาร์จ ขับง่าย ประหยัดค่าใช้จ่าย",
+    bg: "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    brand: "Mazda", tagline: "FEEL ALIVE",
+    thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
+    desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
   },
   {
-    bg: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=1920&q=80&auto=format&fit=crop",
-    brand: "HAVAL", tagline: "DESIGNED FOR SUCCESS",
-    thaiTitle: "ออกแบบมาเพื่อความสำเร็จ",
-    desc: "HAVAL H6 SUV ยอดนิยมอันดับ 1 ในจีน พร้อมเทคโนโลยี Hybrid ประหยัดน้ำมัน ออพชั่นครบ ราคาคุ้มค่า",
+    bg: "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/haval-h6-hev/h6-kv-pc-1-2.jpg",
+    brand: "GWM", tagline: "HAVAL H6 HEV",
+    thaiTitle: "SUV ไฮบริดยอดนิยม",
+    desc: "GWM HAVAL H6 HEV ประหยัดน้ำมัน ออพชั่นครบ ราคาเริ่มต้น 969,000 บาท จาก gwm.co.th",
   },
   {
-    bg: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=1920&q=80&auto=format&fit=crop",
-    brand: "TANK", tagline: "BORN TO EXPLORE",
-    thaiTitle: "เกิดมาเพื่อผจญภัย",
-    desc: "TANK 300 SUV ออฟโรดสไตล์ Classic พร้อมระบบขับเคลื่อน 4 ล้อ ลุยได้ทุกเส้นทาง ดีไซน์เท่ไม่เหมือนใคร",
+    bg: "https://www.kia.com/content/dam/kwcms/gt/en/images/showroom/EV5-ovc-25my/Gallery/ext/ev5-25my-wide-exterior-01.jpg",
+    brand: "Kia", tagline: "INSPIRATION DRIVEN",
+    thaiTitle: "SUV ไฟฟ้าแห่งอนาคต",
+    desc: "Kia EV5 ดีไซน์ Opposites United ห้องโดยสารกว้าง ราคาเริ่มต้น 1,399,000 บาท",
   },
 ];
 
-const brandData = [
-  { name: "GWM", slug: "GWM", logo: "GWM", brandImage: BRAND_IMAGES.GWM },
-  { name: "HAVAL", slug: "HAVAL", logo: "HAVAL", brandImage: BRAND_IMAGES.HAVAL },
-  { name: "ORA", slug: "ORA", logo: "ORA", brandImage: BRAND_IMAGES.ORA },
-  { name: "TANK", slug: "TANK", logo: "TANK", brandImage: BRAND_IMAGES.TANK },
-];
-
-const brandTabs = ["ทั้งหมด", "GWM", "HAVAL", "ORA", "TANK"];
+const brandTabs = ["ทั้งหมด", ...BRANDS.map((b) => b.notionBrand)];
 
 interface Props {
   featuredCars: Car[];
@@ -63,7 +57,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
   const filteredCars = useMemo(() => {
     if (activeBrandTab === "ทั้งหมด") return featuredCars.slice(0, 6);
-    return featuredCars.filter((c) => c.brand.toUpperCase() === activeBrandTab).slice(0, 6);
+    return featuredCars.filter((c) => c.brand === activeBrandTab).slice(0, 6);
   }, [featuredCars, activeBrandTab]);
 
   return (
@@ -107,16 +101,22 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
       {/* BRAND LOGOS BAR */}
       <section className="bg-white border-b border-gray-100">
         <div className="container py-6">
-          <div className="flex items-center justify-center gap-8 md:gap-14 flex-wrap">
-            {brandData.map((brand) => (
-              <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
-                <div className="flex items-center justify-center transition-all cursor-pointer group">
-                  {brandLogoBase64[brand.name] ? (
-                    <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={32} className="h-8 w-auto object-contain grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300" />
-                  ) : (
-                    <span className="text-sm md:text-base font-bold tracking-[0.2em] text-[#0F172A] opacity-40 group-hover:opacity-100">{brand.logo}</span>
-                  )}
-                </div>
+          <div className="flex items-center justify-center gap-6 md:gap-10 flex-wrap">
+            {BRANDS.map((brand) => (
+              <Link
+                key={brand.slug}
+                href={brand.hubPath}
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-2 transition-all group"
+              >
+                <BrandLogo
+                  src={brand.logoPath}
+                  alt={brand.displayName}
+                  brandSlug={brand.slug}
+                  size="md"
+                  width={88}
+                  height={32}
+                  className="grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                />
               </Link>
             ))}
           </div>
@@ -130,37 +130,86 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h2>
             <p className="text-gray-500 max-w-lg mx-auto">ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ชั้นนำ พร้อมศูนย์บริการมาตรฐานครบวงจร</p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-5 lg:gap-6">
-            {brandData.map((brand) => (
-              <Link key={brand.name} href={`/cars?brand=${brand.slug}`}>
-                <div className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 lg:gap-6">
+            {BRANDS.map((brand) => {
+              const brandImage = BRAND_IMAGES[brand.notionBrand] ?? null;
+              return (
+              <div
+                key={brand.slug}
+                className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden h-full"
+              >
+                <Link href={brand.hubPath} className="block cursor-pointer">
                   <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
+                    {brandImage ? (
                     <Image
-                      src={brand.brandImage}
-                      alt={brand.name}
+                      src={brandImage}
+                      alt={brand.displayName}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-700"
                       sizes="(max-width: 768px) 50vw, 33vw"
                     />
+                    ) : (
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1e3a5f] to-[#0F172A] flex items-center justify-center">
+                      <BrandLogo
+                        src={brand.logoPath}
+                        alt={brand.displayName}
+                        brandSlug={brand.slug}
+                        size="md"
+                        width={120}
+                        height={48}
+                        className="brightness-0 invert opacity-90"
+                      />
+                    </div>
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-4">
-                      {brandLogoBase64[brand.name] ? (
-                        <Image src={brandLogoBase64[brand.name]} alt={brand.name} width={80} height={24} className="h-6 w-auto object-contain brightness-0 invert opacity-90" />
-                      ) : (
-                        <span className="text-white font-bold tracking-widest text-sm">{brand.logo}</span>
-                      )}
+                      <BrandLogo
+                        src={brand.logoPath}
+                        alt={brand.displayName}
+                        brandSlug={brand.slug}
+                        size="sm"
+                        width={80}
+                        height={24}
+                        className="brightness-0 invert opacity-90"
+                      />
                     </div>
                   </div>
-                  <div className="p-5 flex items-center justify-between">
-                    <div>
-                      <h3 className="font-semibold text-[#0F172A] text-base">{brand.name}</h3>
+                </Link>
+                <div className="p-5 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={brand.hubPath} className="block">
+                      <h3 className="font-semibold text-[#0F172A] text-base group-hover:text-[#DD5259] transition-colors">
+                        {brand.displayNameTh}
+                      </h3>
                       <p className="text-xs text-gray-400 mt-0.5">ดูรุ่นรถทั้งหมด</p>
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
+                    </Link>
+                    {brand.subLines && (
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {brand.subLines.map((line) => (
+                          <Link
+                            key={line.slug}
+                            href={getGwmLineHref(line.slug)}
+                            className="inline-flex items-center rounded-md bg-gray-100 hover:bg-gray-200 px-2 py-1 min-h-[28px] text-[10px] font-medium text-gray-600"
+                          >
+                            <BrandLogo
+                              src={line.logoPath}
+                              alt={line.displayName}
+                              size="xs"
+                              width={40}
+                              height={14}
+                            />
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
+                  <Link href={brand.hubPath} aria-label={`ดู ${brand.displayNameTh}`} className="shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
+                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
+                  </Link>
                 </div>
-              </Link>
-            ))}
+              </div>
+            );
+            })}
           </div>
         </div>
       </section>
@@ -305,7 +354,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             <div>
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ช.เอราวัณ ออโต้ กรุ๊ป</h2>
               <p className="text-gray-500 leading-relaxed mb-6">
-                กลุ่มบริษัท ช.เอราวัณ ก่อตั้งขึ้นเมื่อปี พ.ศ. 2510 โดยคุณชวลิต ธรรมานุรักษ์กุล
+                กลุ่มบริษัท ช.เอราวัณ ก่อตั้งขึ้นเมื่อปี พ.ศ. 2510 โดยคุณวิชัย จันทร์วาววาม
                 เริ่มต้นจากอู่ซ่อมรถเล็กๆ ในจังหวัดนครปฐม จนเติบโตเป็นกลุ่มธุรกิจยานยนต์ครบวงจร
                 ที่มีโชว์รูมและศูนย์บริการมากกว่า 15 แห่ง ครอบคลุม 6 แบรนด์ชั้นนำ
               </p>

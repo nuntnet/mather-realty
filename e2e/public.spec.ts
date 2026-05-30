@@ -7,6 +7,19 @@ test.describe("Public pages", () => {
     await expect(page.getByRole("link", { name: /แบรนด์รถยนต์|รถยนต์/i }).first()).toBeVisible();
   });
 
+  test("brand hub /mazda loads with logo and breadcrumb", async ({ page }) => {
+    await page.goto("/mazda");
+    await expect(
+      page.getByRole("heading", { level: 1, name: /มาสด้า/i })
+    ).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "breadcrumb" })).toBeVisible();
+  });
+
+  test("legacy /cars?brand=Mazda redirects to /mazda", async ({ page }) => {
+    await page.goto("/cars?brand=Mazda");
+    await expect(page).toHaveURL(/\/mazda$/);
+  });
+
   test("/cars page shows listing header", async ({ page }) => {
     await page.goto("/cars");
     await expect(page.getByRole("heading", { name: "ค้นหารถยนต์" })).toBeVisible();
@@ -26,7 +39,7 @@ test.describe("Public pages", () => {
     const href = await carLinks.first().getAttribute("href");
     expect(href).toMatch(/^\/cars\/[^/]+$/);
     await carLinks.first().click();
-    await expect(page).toHaveURL(new RegExp(`^${escapeRegex(href!)}`));
+    await expect(page).toHaveURL(href!);
   });
 
   test("/blog page loads", async ({ page }) => {
@@ -50,7 +63,3 @@ test.describe("Public pages", () => {
     await expect(page.getByRole("heading").first()).toBeVisible();
   });
 });
-
-function escapeRegex(s: string) {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
