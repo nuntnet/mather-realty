@@ -28,6 +28,8 @@ const gwmCar = (model: string): Car =>
     videoUrl: null,
     isActive: true,
     isFeatured: false,
+    navFeatured: false,
+    navNew: false,
     slug: "test",
   }) as Car;
 
@@ -62,7 +64,13 @@ describe("brandConfig", () => {
     expect(BRAND_BY_SLUG.gwm.subLines).toHaveLength(3);
   });
 
-  it("lists featured models with car detail slugs", () => {
+  it("uses correct Thai spelling for Deepal", () => {
+    expect(BRAND_BY_SLUG.deepal.displayNameTh).toBe("ดีพอล");
+    expect(BRAND_BY_SLUG.deepal.heroBgImage).toBeTruthy();
+    expect(BRAND_BY_SLUG.deepal.logoLightPath).toBe("/brands/deepal-light.svg");
+  });
+
+  it("keeps static featuredModels as nav fallback with valid slugs", () => {
     for (const brand of Object.values(BRAND_BY_SLUG)) {
       expect(brand.featuredModels?.length).toBeGreaterThanOrEqual(2);
       for (const model of brand.featuredModels ?? []) {

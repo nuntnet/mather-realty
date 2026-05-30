@@ -11,6 +11,10 @@ import type {
   CustomerStory,
   Appointment,
   ContactSubmission,
+  Promotion,
+  FeedbackFormData,
+  InsurancePartner,
+  ServicePageSection,
 } from "./notion-types";
 import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
 
@@ -68,6 +72,11 @@ const DB = {
   stories: process.env.NOTION_STORIES_DB_ID!,
   appointments: process.env.NOTION_APPOINTMENTS_DB_ID!,
   contacts: process.env.NOTION_CONTACTS_DB_ID!,
+  promotions: process.env.NOTION_PROMOTIONS_DB_ID!,
+  searchAnalytics: process.env.NOTION_SEARCH_ANALYTICS_DB_ID!,
+  feedback: process.env.NOTION_FEEDBACK_DB_ID!,
+  insurancePartners: process.env.NOTION_INSURANCE_PARTNERS_DB_ID!,
+  serviceContent: process.env.NOTION_SERVICE_CONTENT_DB_ID!,
 };
 
 // ─── Property Helpers ─────────────────────────────────────────────────────────
@@ -160,6 +169,8 @@ function pageToCar(page: NotionPage): Car {
     videoUrl: propUrl(page, "Video URL"),
     isActive: propCheckbox(page, "Is Active"),
     isFeatured: propCheckbox(page, "Is Featured"),
+    navFeatured: propCheckbox(page, "Nav Featured"),
+    navNew: propCheckbox(page, "Nav New"),
     slug: propText(page, "Slug"),
   };
 }
@@ -341,6 +352,8 @@ function carToProperties(data: Partial<CarInput>): Record<string, unknown> {
   if (data.videoUrl !== undefined) p["Video URL"] = { url: data.videoUrl || null };
   if (data.isActive !== undefined) p["Is Active"] = { checkbox: data.isActive };
   if (data.isFeatured !== undefined) p["Is Featured"] = { checkbox: data.isFeatured };
+  if (data.navFeatured !== undefined) p["Nav Featured"] = { checkbox: data.navFeatured };
+  if (data.navNew !== undefined) p["Nav New"] = { checkbox: data.navNew };
   if (data.slug !== undefined) p["Slug"] = { rich_text: [{ text: { content: data.slug } }] };
   return p;
 }
@@ -366,12 +379,19 @@ export async function updateCar(id: string, data: Partial<CarInput>): Promise<Ca
 /** Toggle featured / active flags. */
 export async function setCarFlags(
   id: string,
-  flags: { isActive?: boolean; isFeatured?: boolean }
+  flags: {
+    isActive?: boolean;
+    isFeatured?: boolean;
+    navFeatured?: boolean;
+    navNew?: boolean;
+  }
 ): Promise<void> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const props: Record<string, any> = {};
   if (flags.isActive !== undefined) props["Is Active"] = { checkbox: flags.isActive };
   if (flags.isFeatured !== undefined) props["Is Featured"] = { checkbox: flags.isFeatured };
+  if (flags.navFeatured !== undefined) props["Nav Featured"] = { checkbox: flags.navFeatured };
+  if (flags.navNew !== undefined) props["Nav New"] = { checkbox: flags.navNew };
   await notion.pages.update({ page_id: id, properties: props });
 }
 
@@ -717,4 +737,367 @@ export async function updateStoryStatus(
     props["Is Public"] = { checkbox: isPublic };
   }
   await notion.pages.update({ page_id: id, properties: props });
+}
+
+// ─── Promotions ───────────────────────────────────────────────────────────────
+
+function pageToPromotion(page: NotionPage): Promotion {
+  return {
+    id: page.id,
+    title: propTitle(page, "Title"),
+    brand: propSelect(page, "Brand") as Promotion["brand"],
+    coverImageUrl: propText(page, "Cover Image URL") || null,
+    linkUrl: propUrl(page, "Link URL"),
+    startDate: propDate(page, "Start Date"),
+    endDate: propDate(page, "End Date"),
+    isActive: propCheckbox(page, "Is Active"),
+  };
+}
+
+export async function getPromotionsByBrand(brand: Promotion["brand"]): Promise<Promotion[]> {
+  if (!DB.promotions) return [];
+  const response = await notion.databases.query({
+    database_id: DB.promotions,
+    filter: {
+      and: [
+        { property: "Brand", select: { equals: brand } },
+        { property: "Is Active", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    page_size: 50,
+  });
+  return response.results.map(pageToPromotion);
+}
+
+/** Admin: all promotions (active + inactive). */
+export async function getAllPromotionsAdmin(): Promise<Promotion[]> {
+  if (!DB.promotions) return [];
+  const response = await notion.databases.query({
+    database_id: DB.promotions,
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    page_size: 100,
+  });
+  return response.results.map(pageToPromotion);
+}
+
+/** Create a new promotion. */
+export async function createPromotion(data: Omit<Promotion, "id">): Promise<Promotion> {
+  const page = await notion.pages.create({
+    parent: { database_id: DB.promotions },
+    properties: {
+      Title: { title: [{ text: { content: data.title } }] },
+      Brand: { select: { name: data.brand } },
+      "Cover Image URL": data.coverImageUrl ? { rich_text: [{ text: { content: data.coverImageUrl } }] } : { rich_text: [] },
+      "Link URL": data.linkUrl ? { url: data.linkUrl } : { url: null },
+      "Start Date": data.startDate ? { date: { start: data.startDate } } : { date: null },
+      "End Date": data.endDate ? { date: { start: data.endDate } } : { date: null },
+      "Is Active": { checkbox: data.isActive },
+    },
+  });
+  return pageToPromotion(page);
+}
+
+/** Update a promotion's fields. */
+export async function updatePromotion(id: string, data: Partial<Omit<Promotion, "id">>): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
+  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
+  if (data.coverImageUrl !== undefined) props["Cover Image URL"] = data.coverImageUrl ? { rich_text: [{ text: { content: data.coverImageUrl } }] } : { rich_text: [] };
+  if (data.linkUrl !== undefined) props["Link URL"] = data.linkUrl ? { url: data.linkUrl } : { url: null };
+  if (data.startDate !== undefined) props["Start Date"] = data.startDate ? { date: { start: data.startDate } } : { date: null };
+  if (data.endDate !== undefined) props["End Date"] = data.endDate ? { date: { start: data.endDate } } : { date: null };
+  if (data.isActive !== undefined) props["Is Active"] = { checkbox: data.isActive };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+/** Soft-delete (archive) a promotion. */
+export async function archivePromotion(id: string): Promise<void> {
+  await notion.pages.update({ page_id: id, in_trash: true });
+}
+
+// ─── Blog filtered by brand tag ───────────────────────────────────────────────
+
+/** Published blog posts filtered by brand tag and optional category. */
+export async function getBlogPostsByBrand(
+  brand: string,
+  category?: BlogPost["category"],
+  limit = 12
+): Promise<BlogPost[]> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filterConditions: any[] = [
+    { property: "Is Published", checkbox: { equals: true } },
+    { property: "Tags", multi_select: { contains: brand } },
+  ];
+  if (category) {
+    filterConditions.push({ property: "Category", select: { equals: category } });
+  }
+  const response = await notion.databases.query({
+    database_id: DB.blog,
+    filter: { and: filterConditions },
+    sorts: [{ property: "Published At", direction: "descending" }],
+    page_size: limit,
+  });
+  return response.results.map(pageToBlogPost);
+}
+
+// ─── Search Analytics ──────────────────────────────────────────────────────────
+
+/**
+ * Log a search query that returned no results.
+ * Upserts by query: increments Count if exists, creates if not.
+ */
+export async function logFailedSearch(query: string, page?: string): Promise<void> {
+  if (!DB.searchAnalytics || !query.trim()) return;
+  try {
+    // Check if this query already exists
+    const existing = await notion.databases.query({
+      database_id: DB.searchAnalytics,
+      filter: { property: "Query", title: { equals: query.trim() } },
+      page_size: 1,
+    });
+
+    const now = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+
+    if (existing.results.length > 0) {
+      // Increment count + update last searched
+      const existingPage = existing.results[0] as NotionPage;
+      const currentCount = existingPage.properties["Count"]?.number ?? 0;
+      await notion.pages.update({
+        page_id: existingPage.id,
+        properties: {
+          Count: { number: currentCount + 1 },
+          "Last Searched At": { date: { start: now } },
+        },
+      });
+    } else {
+      // Create new entry
+      await notion.pages.create({
+        parent: { database_id: DB.searchAnalytics },
+        properties: {
+          Query: { title: [{ text: { content: query.trim() } }] },
+          Count: { number: 1 },
+          "Last Searched At": { date: { start: now } },
+          ...(page ? { Page: { rich_text: [{ text: { content: page } }] } } : {}),
+        },
+      });
+    }
+  } catch (err) {
+    // Non-critical — don't throw, just log
+    console.warn("[search-analytics] failed to log:", err);
+  }
+}
+
+// ─── Customer Feedback ────────────────────────────────────────────────────────
+
+export async function createFeedback(data: FeedbackFormData): Promise<void> {
+  const now = new Date().toISOString().split("T")[0];
+  await notion.pages.create({
+    parent: { database_id: DB.feedback },
+    properties: {
+      Name: { title: [{ text: { content: data.name } }] },
+      Type: { select: { name: data.type } },
+      Brand: { select: { name: data.brand } },
+      Branch: { rich_text: [{ text: { content: data.branch } }] },
+      Department: { select: { name: data.department } },
+      Phone: { phone_number: data.phone },
+      Email: { email: data.email || null },
+      LicensePlate: { rich_text: [{ text: { content: data.licensePlate } }] },
+      ServiceDate: data.serviceDate ? { date: { start: data.serviceDate } } : { date: null },
+      Message: { rich_text: [{ text: { content: data.message } }] },
+      Status: { select: { name: "ใหม่" } },
+      SubmittedAt: { date: { start: now } },
+    },
+  });
+}
+
+/** Admin: list all feedback, newest first. */
+export async function getAllFeedbackAdmin(): Promise<import("./notion-types").CustomerFeedback[]> {
+  const response = await notion.databases.query({
+    database_id: DB.feedback,
+    sorts: [{ timestamp: "created_time", direction: "descending" }],
+    page_size: 100,
+  });
+  return response.results.map((page) => {
+    const p = page as NotionPage;
+    return {
+      id: p.id,
+      name: propTitle(p, "Name"),
+      type: propSelect(p, "Type") as import("./notion-types").CustomerFeedback["type"],
+      brand: propSelect(p, "Brand"),
+      branch: propText(p, "Branch"),
+      department: propSelect(p, "Department"),
+      phone: propPhone(p, "Phone"),
+      email: propEmail(p, "Email"),
+      licensePlate: propText(p, "LicensePlate"),
+      serviceDate: propDate(p, "ServiceDate"),
+      message: propText(p, "Message"),
+      status: propSelect(p, "Status") as import("./notion-types").CustomerFeedback["status"],
+      submittedAt: propDate(p, "SubmittedAt") ?? propCreatedTime(p),
+    };
+  });
+}
+
+/** Update feedback status. */
+export async function updateFeedbackStatus(
+  id: string,
+  status: import("./notion-types").CustomerFeedback["status"]
+): Promise<void> {
+  await notion.pages.update({
+    page_id: id,
+    properties: { Status: { select: { name: status } } },
+  });
+}
+
+// ─── Insurance Partners ───────────────────────────────────────────────────────
+
+function pageToInsurancePartner(page: NotionPage): InsurancePartner {
+  return {
+    id: page.id,
+    name: propTitle(page, "Name"),
+    brand: propSelect(page, "Brand"),
+    isActive: propCheckbox(page, "IsActive"),
+    sortOrder: propNumber(page, "SortOrder"),
+  };
+}
+
+/** All insurance partners sorted by order. */
+export async function getInsurancePartners(onlyActive = true): Promise<InsurancePartner[]> {
+  if (!DB.insurancePartners) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filters: any[] = [];
+  if (onlyActive) filters.push({ property: "IsActive", checkbox: { equals: true } });
+  const response = await notion.databases.query({
+    database_id: DB.insurancePartners,
+    filter: filters.length ? { and: filters } : undefined,
+    sorts: [{ property: "SortOrder", direction: "ascending" }],
+    page_size: 100,
+  });
+  return response.results.map(pageToInsurancePartner);
+}
+
+export async function getAllInsurancePartnersAdmin(): Promise<InsurancePartner[]> {
+  return getInsurancePartners(false);
+}
+
+export async function createInsurancePartner(name: string, brand: string): Promise<InsurancePartner> {
+  // Get max sort order
+  const all = await getAllInsurancePartnersAdmin();
+  const maxSort = all.reduce((m, p) => Math.max(m, p.sortOrder), 0);
+  const page = await notion.pages.create({
+    parent: { database_id: DB.insurancePartners },
+    properties: {
+      Name: { title: [{ text: { content: name } }] },
+      Brand: { select: { name: brand } },
+      IsActive: { checkbox: true },
+      SortOrder: { number: maxSort + 1 },
+    },
+  });
+  return pageToInsurancePartner(page);
+}
+
+export async function updateInsurancePartner(
+  id: string,
+  data: Partial<Pick<InsurancePartner, "name" | "brand" | "isActive" | "sortOrder">>
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.name !== undefined) props.Name = { title: [{ text: { content: data.name } }] };
+  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
+  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
+  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+export async function archiveInsurancePartner(id: string): Promise<void> {
+  await notion.pages.update({ page_id: id, in_trash: true });
+}
+
+// ─── Service Page Sections ────────────────────────────────────────────────────
+
+function pageToServiceSection(page: NotionPage): ServicePageSection {
+  return {
+    id: page.id,
+    title: propTitle(page, "Title"),
+    page: propSelect(page, "Page") as ServicePageSection["page"],
+    brand: propSelect(page, "Brand"),
+    sectionKey: propText(page, "SectionKey"),
+    sortOrder: propNumber(page, "SortOrder"),
+    isPublished: propCheckbox(page, "IsPublished"),
+    notionUrl: (page as NotionPage).url ?? `https://www.notion.so/${page.id.replace(/-/g, "")}`,
+  };
+}
+
+export async function getAllServiceSectionsAdmin(): Promise<ServicePageSection[]> {
+  if (!DB.serviceContent) return [];
+  const response = await notion.databases.query({
+    database_id: DB.serviceContent,
+    sorts: [
+      { property: "Page", direction: "ascending" },
+      { property: "SortOrder", direction: "ascending" },
+    ],
+    page_size: 100,
+  });
+  return response.results.map(pageToServiceSection);
+}
+
+export async function getServiceSections(
+  brand: string,
+  pageName: ServicePageSection["page"]
+): Promise<ServicePageSection[]> {
+  if (!DB.serviceContent) return [];
+  const response = await notion.databases.query({
+    database_id: DB.serviceContent,
+    filter: {
+      and: [
+        { property: "Brand", select: { equals: brand } },
+        { property: "Page", select: { equals: pageName } },
+        { property: "IsPublished", checkbox: { equals: true } },
+      ],
+    },
+    sorts: [{ property: "SortOrder", direction: "ascending" }],
+    page_size: 50,
+  });
+  return response.results.map(pageToServiceSection);
+}
+
+export async function createServiceSection(data: {
+  title: string;
+  page: ServicePageSection["page"];
+  brand: string;
+  sectionKey: string;
+  sortOrder: number;
+}): Promise<ServicePageSection> {
+  const page = await notion.pages.create({
+    parent: { database_id: DB.serviceContent },
+    properties: {
+      Title: { title: [{ text: { content: data.title } }] },
+      Page: { select: { name: data.page } },
+      Brand: { select: { name: data.brand } },
+      SectionKey: { rich_text: [{ text: { content: data.sectionKey } }] },
+      SortOrder: { number: data.sortOrder },
+      IsPublished: { checkbox: false },
+    },
+  });
+  return pageToServiceSection(page);
+}
+
+export async function updateServiceSection(
+  id: string,
+  data: Partial<Pick<ServicePageSection, "title" | "sectionKey" | "sortOrder" | "isPublished">>
+): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const props: Record<string, any> = {};
+  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
+  if (data.sectionKey !== undefined) props.SectionKey = { rich_text: [{ text: { content: data.sectionKey } }] };
+  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
+  if (data.isPublished !== undefined) props.IsPublished = { checkbox: data.isPublished };
+  await notion.pages.update({ page_id: id, properties: props });
+}
+
+/** Get rendered markdown content of a Notion page (for rendering on website). */
+export async function getServiceSectionContent(pageId: string): Promise<string> {
+  const mdBlocks = await n2m.pageToMarkdown(pageId);
+  return n2m.toMarkdownString(mdBlocks).parent ?? "";
 }

@@ -34,6 +34,16 @@ function cloudinaryReady(): boolean {
   );
 }
 
+function imageFetchHeaders(url: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "User-Agent": "ch-erawan/1.0 (dealer site image sync)",
+  };
+  if (url.includes("changan.co.th")) {
+    headers.Referer = "https://www.changan.co.th/";
+  }
+  return headers;
+}
+
 async function uploadOfficialImage(
   url: string | null,
   publicId: string
@@ -45,7 +55,7 @@ async function uploadOfficialImage(
   }
   try {
     const res = await fetch(url, {
-      headers: { "User-Agent": "ch-erawan/1.0 (dealer site image sync)" },
+      headers: imageFetchHeaders(url),
     });
     if (!res.ok) {
       console.warn(`  ⚠ Fetch failed for ${publicId}: HTTP ${res.status}`);
@@ -96,6 +106,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: true,
+    navNew: false,
     slug: "mazda-cx-5-2025",
     cloudinaryId: "mazda-cx-5",
     sourceImageUrl:
@@ -146,6 +158,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: true,
+    navNew: false,
     slug: "ford-ranger-wildtrak-2026",
     cloudinaryId: "ford-ranger-wildtrak",
     sourceImageUrl:
@@ -176,6 +190,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: false,
+    navFeatured: false,
+    navNew: true,
     slug: "ford-everest-platinum-2025",
     cloudinaryId: "ford-everest-platinum",
     sourceImageUrl:
@@ -205,6 +221,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: true,
+    navNew: false,
     slug: "mitsubishi-triton-2024",
     cloudinaryId: "mitsubishi-triton",
     sourceImageUrl:
@@ -230,6 +248,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: false,
+    navNew: true,
     slug: "mitsubishi-xpander-cross-hev-2026",
     cloudinaryId: "mitsubishi-xpander-cross-hev",
     sourceImageUrl:
@@ -255,6 +275,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: true,
+    navNew: false,
     slug: "gwm-haval-h6-hev-2025",
     cloudinaryId: "gwm-haval-h6-hev",
     sourceImageUrl:
@@ -280,6 +302,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: false,
+    navNew: true,
     slug: "gwm-ora-05-bev-2025",
     cloudinaryId: "gwm-ora-05-bev",
     sourceImageUrl:
@@ -287,53 +311,299 @@ const REAL_CARS: Array<
     imageSource: "gwm.co.th",
   },
   {
-    name: "Deepal S07 BEV",
+    name: "Deepal Lumin",
     brand: "Deepal",
-    model: "S07 BEV",
-    year: 2025,
-    type: "ev",
+    model: "Lumin L / L DC",
+    year: 2026,
+    type: "hatchback",
     condition: "new",
-    priceMin: 1099000,
-    priceMax: 1299000,
+    priceMin: 479000,
+    priceMax: 499000,
     engineSize: "Electric",
     transmission: "auto",
     fuelType: "electric",
     description:
-      "SUV ไฟฟ้า Deepal S07 จาก Changan ประเทศไทย ห้องโดยสาร Premium ระบบ ADAS ครบ",
-    specs: { seats: "5", drive: "RWD / AWD" },
+      "Changan Lumin รถไฟฟ้าเมืองขนาดเล็ก จาก CHANGAN ประเทศไทย รุ่น L 479,000 บาท และ L DC 499,000 บาท (โปรโมชันพิเศษ L DC 409,000 บาท ตามช่วงเวลา) มอเตอร์ 30 kW แบต LFP ระยะทาง NEDC 301 กม.",
+    specs: {
+      seats: "4",
+      range: "301 km (NEDC, L DC)",
+      power: "41 PS",
+    },
     imageUrls: [],
     videoUrl: null,
     isActive: true,
     isFeatured: true,
-    slug: "deepal-s07-bev-2025",
-    cloudinaryId: "deepal-s07-bev",
+    navFeatured: true,
+    navNew: true,
+    slug: "deepal-lumin-2026",
+    cloudinaryId: "deepal-lumin",
     sourceImageUrl:
-      "https://www.changan.co.th/cache/images/i3XxHnTOvv9KlTxKx3m9cEzWFJM21SPYOL0L2Yu3aVA/rs:fit:640/q:75/max_bytes:120000/bG9jYWw6Ly8vbmV3X3MwNV85ZjI3ZGYxNmFiLnBuZw.webp",
-    imageSource: "changan.co.th (Deepal S07)",
+      "https://api.www.changan.co.th/uploads/lumin_LDC_e87edb1721.jpg",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/dPIhSPZDV_S3svLLYfujiKsi8NWbJ6kTC2l7w567tqE/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vSW50ZXJpb3JfQ29sb3JfTHVtaW5fMDJfODgyNzc4ZGM4Ni5qcGc.webp",
+      "https://www.changan.co.th/cache/images/nd6-epgFlBcdux7bF4tY0MhhD-pW2eHCFCmb7fd94EE/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vSW50ZXJpb3JfQ29sb3JfTHVtaW5fMDFfYzBjZGRjZjNiZS5qcGc.webp",
+      "https://www.changan.co.th/cache/images/mR1FP_Q_34OSNdadJXTyV0uCIRRku6vMGj-8ERuxrnU/rs:fit:640/q:75/max_bytes:120000/bG9jYWw6Ly8vRmVhdHVyZXNfTHVtaW5fMDNfMjY5MjRlNWE1MS5qcGc.webp",
+      "https://www.changan.co.th/cache/images/7Su8-d_YjgFi1ODS5K0s9XcFxWy6CtebygTdr77bMvA/rs:fit:640/q:75/max_bytes:120000/bG9jYWw6Ly8vTHVtaW5fQ29ybl8wM184ZmFiNTU1MGE2LnBuZw.webp",
+    ],
+    imageSource: "changan.co.th/en/lumin/luminl-dc-en/ (official)",
   },
   {
-    name: "Deepal L07 BEV",
+    name: "Deepal Nevo Q05",
     brand: "Deepal",
-    model: "L07 BEV",
-    year: 2025,
-    type: "sedan",
+    model: "Nevo Q05 BEV",
+    year: 2026,
+    type: "ev",
     condition: "new",
-    priceMin: 899000,
+    priceMin: 599900,
+    priceMax: 709900,
+    engineSize: "Electric",
+    transmission: "auto",
+    fuelType: "electric",
+    description:
+      "CHANGAN NEVO Q05 เอสยูวีไฟฟ้าอัจฉริยะ เปิดตัวในไทย พ.ค. 2569 มอเตอร์ 163 แรงม้า ระยะทาง NEDC 462 กม. ชาร์จ DC 30–80% 15 นาที ราคาโปรโมชัน 599,900–679,900 บาท (ถึง 30 มิ.ย. 2569)",
+    specs: {
+      seats: "5",
+      range: "462 km (NEDC)",
+      wheelbase: "2,735 mm",
+      dcCharge: "162 kW",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: true,
+    navNew: true,
+    slug: "deepal-nevo-q05-2026",
+    cloudinaryId: "deepal-nevo-q05",
+    sourceImageUrl:
+      "https://www.changan.co.th/images/nevo/q05/kv/kv-q05-pc.jpg?v2",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/images/nevo/q05/car/Q05-white.png",
+      "https://www.changan.co.th/images/nevo/q05/car/Q05-black.png",
+      "https://www.changan.co.th/images/nevo/q05/car/Q05-gray.png",
+      "https://www.changan.co.th/images/nevo/q05/car/Q05-pink.png",
+    ],
+    imageSource: "changan.co.th/en/nevo-q05/ (official)",
+  },
+  {
+    name: "Deepal S07 BEV",
+    brand: "Deepal",
+    model: "S07 BEV",
+    year: 2026,
+    type: "ev",
+    condition: "new",
+    priceMin: 1099000,
     priceMax: 1099000,
     engineSize: "Electric",
     transmission: "auto",
     fuelType: "electric",
     description:
-      "ซедานไฟฟ้า Deepal L07 ดีไซน์ล้ำสมัย สมรรถนะเร้าใจ จากเครือ Changan ประเทศไทย",
-    specs: { seats: "5", body: "Sedan" },
+      "Deepal New S07 รุ่นปรับโฉม 2569 แบต LFP 68.8 kWh ชาร์จ DC สูงสุด 163 kW มอเตอร์ 258 แรงม้า ขับเคลื่อนล้อหลัง ระยะทาง NEDC 485 กม. รับประกันแบต 8 ปี/160,000 กม.",
+    specs: {
+      seats: "5",
+      drive: "RWD",
+      range: "485 km (NEDC)",
+      power: "258 PS",
+    },
     imageUrls: [],
     videoUrl: null,
     isActive: true,
-    isFeatured: false,
-    slug: "deepal-l07-bev-2025",
+    isFeatured: true,
+    navFeatured: true,
+    navNew: true,
+    slug: "deepal-s07-bev-2026",
+    cloudinaryId: "deepal-s07-bev",
+    sourceImageUrl:
+      "https://www.changan.co.th/cache/images/AljG4xVwhLAOAcrZPSadP7bV9kVVdgvO9Jo2VT5lReI/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vZGVlcGFsX1MwN19pbl9vcmFuZ2VfZmU4MzhjODkyMi5qcGc.webp",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/rOLWJuRUqhtrIX42X3w_KTrirVkjo_FJJvGs6TfoEcU/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vZGVlcGFsX1MwN19pbl9ibGFja19iNDU0MGVjZWVlLmpwZw.webp",
+      "https://www.changan.co.th/cache/images/o1rpnJzgayPn2r459DSdk-34ZbSvX28N1VlBJ4lPsGg/rs:fit:1200/q:75/max_bytes:120000/bG9jYWw6Ly8vUzA3X05lYnVsYV9HcmVlbl9MZWZ0X0RhcmtfTWlycm9yX25ld18xMjgweDYwMF83YjUxYzhmZTQ2LnBuZw.webp",
+      "https://www.changan.co.th/cache/images/uJQ0uqj8LJ3BHnczzZ50rdc0HlonYMfHP_qbsfzbHrY/rs:fit:1200/q:75/max_bytes:120000/bG9jYWw6Ly8vUzA3X1N1bnNldF9PcmFuZ2VfRGFya19NaXJyb3JfbmV3XzEyODB4NjAwXzZhYTJkMmVmOGUucG5n.webp",
+      "https://www.changan.co.th/cache/images/jVbefvwv9rzLZUZ-TMpJn_nfrPJ4b45Gse4LgtVIT3o/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vV2ViX1MwN18xNng5X25ld19hODBmMTZjODNkLmpwZw.webp",
+    ],
+    imageSource: "changan.co.th/en/deepal/s07-en/ (official)",
+  },
+  {
+    name: "Deepal S07 L BEV",
+    brand: "Deepal",
+    model: "S07 L BEV",
+    year: 2026,
+    type: "suv",
+    condition: "new",
+    priceMin: 1499000,
+    priceMax: 1499000,
+    engineSize: "Electric",
+    transmission: "auto",
+    fuelType: "electric",
+    description:
+      "Deepal S07 L เอสยูวีไฟฟ้า ฐานล้อ 2,900 mm แบต 79 kWh มอเตอร์ 258 แรงม้า ขับเคลื่อนล้อหลัง ราคา 1,499,000 บาท เน้นห้องโดยสารกว้างและระยะทางไกลกว่า S07 มาตรฐาน",
+    specs: {
+      seats: "5",
+      drive: "RWD",
+      wheelbase: "2,900 mm",
+      battery: "79 kWh",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: false,
+    navNew: true,
+    slug: "deepal-s07-l-bev-2026",
+    cloudinaryId: "deepal-s07-l-bev",
+    sourceImageUrl:
+      "https://api.www.changan.co.th/uploads/AW_After_MTX_16_9_S07_L_de875b1386.jpg",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/SAFfL7Q7PIymkbR-5KjpEvZ2iimXwqPMiUvmPJ5b3wc/rs:fit:1200/q:75/max_bytes:120000/bG9jYWw6Ly8vUzA3X0x1bmFyX0dyZXlfRGFya19NaXJyb3JfbmV3XzEyODB4NjAwX2U1NjBlZTBlNjUucG5n.webp",
+      "https://api.www.changan.co.th/uploads/AW_Feb_Sale_Promotion_16x9_L07_and_S07_c4723d3363.jpg",
+    ],
+    imageSource: "changan.co.th (official Deepal S07 L press)",
+  },
+  {
+    name: "Deepal S05 BEV",
+    brand: "Deepal",
+    model: "S05 BEV",
+    year: 2026,
+    type: "ev",
+    condition: "new",
+    priceMin: 799000,
+    priceMax: 999000,
+    engineSize: "Electric",
+    transmission: "auto",
+    fuelType: "electric",
+    description:
+      "Deepal S05 ครอสโอเวอร์ไฟฟ้า ประกอบในไทย (Rayong) รุ่น BEV Lite/Plus/Max และ Max Long Range 799,000–999,000 บาท มี REEV Plus/Max 949,000–999,000 บาท พร้อม Lifetime Warranty แบต (ตามเงื่อนไขโปรโมชัน)",
+    specs: {
+      seats: "5",
+      drive: "FWD / AWD",
+      dimensions: "4,620 × 1,900 × 1,600 mm",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: false,
+    navNew: true,
+    slug: "deepal-s05-bev-2026",
+    cloudinaryId: "deepal-s05-bev",
+    sourceImageUrl:
+      "https://www.changan.co.th/cache/images/0-ksH_Dj6eNsIRfJIhCQ-0-hX3wUJZv50Ed614YsM6k/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vUzA1X3dlYl8xOTIweDEwODBfMV9kNGQxOGJkZDZiLmpwZw.webp",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/VSxT1iFyWkXq61OwBMY5V00c4TRXe5aEnz3X2dSyb7Q/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vU2lkZV9EZWVwYWxfQWRqdXN0X0JsYWNrXzRjZTc0YTg5NWUucG5n.webp",
+      "https://www.changan.co.th/cache/images/G7lzzRvFAIbK7KIa9-EtbYm8OxM5WuFwoTLTQ6ycef0/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vU2lkZV9EZWVwYWxfQWRqdXN0X0dyYXlfZDdmZjY1NjhiNi5wbmc.webp",
+      "https://www.changan.co.th/cache/images/VP2_nktEZGy8qx0viieR8PNK25clhlh4kaj49OL7ir4/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vU2lkZV9EZWVwYWxfQWRqdXN0X1NpbHZlcl9iYmU1YmNmM2VhLnBuZw.webp",
+      "https://www.changan.co.th/cache/images/48A7QFp6kIUtXTVbqp-oDYypVMzCV1VCmwxHWJ4vpqA/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vTW9kZWxfY2FyX1MwNV9lMDYzYjgzZDQ4LmpwZw.webp",
+    ],
+    imageSource: "changan.co.th/en/deepal/s05-en/ (official)",
+  },
+  {
+    name: "Deepal L07 BEV",
+    brand: "Deepal",
+    model: "L07 / L07 S BEV",
+    year: 2026,
+    type: "sedan",
+    condition: "new",
+    priceMin: 1239000,
+    priceMax: 1329000,
+    engineSize: "Electric",
+    transmission: "auto",
+    fuelType: "electric",
+    description:
+      "Deepal L07 ฟาสต์แบ็กไฟฟ้า (SL03) ดีไซน์ Red Dot Award มี L07 S 1,239,000 บาท และ L07 1,329,000 บาท มอเตอร์ล้อหลัง 258 แรงม้า แบต 66.8 kWh ระยะทาง NEDC 540 กม. รับประกันตัวรถและแบต 8 ปี",
+    specs: {
+      seats: "5",
+      body: "Fastback",
+      range: "540 km (NEDC)",
+      power: "258 PS",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: false,
+    navNew: false,
+    slug: "deepal-l07-bev-2026",
     cloudinaryId: "deepal-l07-bev",
-    sourceImageUrl: "https://api.www.changan.co.th/uploads/og_image_c60505aa9e.jpg",
-    imageSource: "changan.co.th (Deepal brand OG — replace with model KV when available)",
+    sourceImageUrl:
+      "https://api.www.changan.co.th/uploads/AW_After_MTX_16_9_L07_f127631fc6.jpg",
+    gallerySourceUrls: [
+      "https://api.www.changan.co.th/uploads/AW_Feb_Sale_Promotion_16x9_L07_and_S07_c4723d3363.jpg",
+      "https://www.changan.co.th/cache/images/rcj3gytBBSAipEr2Kb9KXhxa1nvtY_EEbVn6jROFTnc/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vZGVlcGFsX0wwN190ZWNoNV9hMDQ5ODFlYTdkLmpwZw.webp",
+    ],
+    imageSource: "changan.co.th (official Deepal L07 press)",
+  },
+  {
+    name: "Deepal E07 BEV",
+    brand: "Deepal",
+    model: "E07 Plus / Performance AWD",
+    year: 2026,
+    type: "suv",
+    condition: "new",
+    priceMin: 1649000,
+    priceMax: 1999000,
+    engineSize: "Electric",
+    transmission: "auto",
+    fuelType: "electric",
+    description:
+      "Deepal E07 ครอสโอเวอร์ไฟฟ้า 4 ประตูเปิดได้ (Transformable SUV) รุ่น Plus 1,649,000 บาท (ราคาปกติ 1,699,000) และ Performance AWD 1,999,000 บาท (ราคาปกติ 2,099,000) มอเตอร์คู่ AWD สูงสุด 435 แรงม้า แบต 89.98 kWh",
+    specs: {
+      seats: "5",
+      drive: "RWD / AWD",
+      power: "435 PS (Performance AWD)",
+      battery: "89.98 kWh",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: true,
+    navNew: true,
+    slug: "deepal-e07-bev-2026",
+    cloudinaryId: "deepal-e07-bev",
+    sourceImageUrl:
+      "https://www.changan.co.th/cache/images/2STT2NoaOIICKLoeMSHx9en3nkO--pXDpM-FKOqiLaA/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vQVdfV2ViX0JOXzE5MjB4MTA4MF8zMV84NDhiZGVjMDA3LmpwZw.webp",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/V-XLkyMyV1Be8TKbR_M20iMuK2sgTZZWWDbxepxO8Ew/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vQVVUT19QQVJLSU5HX0FTU0lTVF9BUEFfNmM5MWUyYjI2YS5qcGc.webp",
+      "https://www.changan.co.th/cache/images/FsrziNTX6uAVd9J5f62LMsWX5267LfXsdHw02xfLtrU/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vQVdfV2ViX0JOXzE5MjB4MTA4MF8wMV9FMDdfMWI2MmI1NmY5Yi5qcGc.webp",
+      "https://www.changan.co.th/cache/images/832AEAQsAqHprGmNdZhGIFTBQ_3ouuXRfxDwDZLujJI/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vQVdfV2ViX0JOXzE5MjB4MTA4MF8zNV9mMDQyNWE5MmJkLmpwZw.webp",
+    ],
+    imageSource: "changan.co.th/en/deepal/e07-plus-en/ (official)",
+  },
+  {
+    name: "Deepal Hunter K50 REEV",
+    brand: "Deepal",
+    model: "Hunter K50 REEV",
+    year: 2026,
+    type: "pickup",
+    condition: "new",
+    priceMin: 1099000,
+    priceMax: 1249000,
+    engineSize: "1.5L REEV",
+    transmission: "auto",
+    fuelType: "hybrid",
+    description:
+      "Deepal Hunter K50 กระบะปลั๊กอินไฮบริด (REEV) ขับเคลื่อน 4 ล้อ รุ่น Plus AWD 1,099,000 บาท และ Max AWD 1,249,000 บาท มอเตอร์ไฟฟ้าคู่ ระบบ Range Extender 1.5L เหมาะงานหนักและใช้งาน off-road",
+    specs: {
+      seats: "5",
+      drive: "AWD",
+      body: "Double Cab Pickup",
+    },
+    imageUrls: [],
+    videoUrl: null,
+    isActive: true,
+    isFeatured: true,
+    navFeatured: false,
+    navNew: true,
+    slug: "deepal-hunter-k50-reev-2026",
+    cloudinaryId: "deepal-hunter-k50-reev",
+    sourceImageUrl:
+      "https://www.changan.co.th/cache/images/XdnU-BiMy3195cv3aAMysjzneKOlhhKbjaGmeHBeCys/rs:fit:2048/q:75/max_bytes:120000/bG9jYWw6Ly8vazUwX2JsYWNrX3NpZGVfMGNmYzZjMWZiMS5wbmc.webp",
+    gallerySourceUrls: [
+      "https://www.changan.co.th/cache/images/Qka_ZZ6OaHzRj6c9KgPlcv0v2BuRQJ44dMe36eAzb_s/rs:fit:2048/q:75/max_bytes:120000/bG9jYWw6Ly8vSzUwX2dyZXlfc2lkZV8wZDU0MTkxNGQxLnBuZw.webp",
+      "https://www.changan.co.th/cache/images/OqR5vJgdiSwdIwVaXcG75o0FOJgjb0CogP_tgRnwgKc/rs:fit:2048/q:75/max_bytes:120000/bG9jYWw6Ly8vSzUwX3doaXRlX3NpZGVfNTZmYzQ5NzRmZC5wbmc.webp",
+      "https://www.changan.co.th/cache/images/-oLnGsUryoaUPyYEkVk6PzW9dvpyzkSq2OYVEcSrd7g/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vSFVOVEVSX0s1MF9SRUVWX01BWF9BV0RfSW50ZXJpb3JfZjYyNmRmZWJmYV9iOTc1ZGZiZTdmLmpwZw.webp",
+    ],
+    imageSource: "changan.co.th/en/deepal/hunter-k50-en/ (official)",
   },
   {
     name: "Kia EV5 Air",
@@ -354,6 +624,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: false,
+    navNew: true,
     slug: "kia-ev5-air-2025",
     cloudinaryId: "kia-ev5-air",
     sourceImageUrl:
@@ -379,6 +651,8 @@ const REAL_CARS: Array<
     videoUrl: null,
     isActive: true,
     isFeatured: true,
+    navFeatured: true,
+    navNew: false,
     slug: "kia-carnival-hev-2025",
     cloudinaryId: "kia-carnival-hev",
     sourceImageUrl:
@@ -405,7 +679,7 @@ async function seedRealCars() {
     [];
 
   for (const entry of REAL_CARS) {
-    const { imageSource, cloudinaryId, sourceImageUrl, gallerySourceUrls, ...carData } = entry;
+    const { imageSource, cloudinaryId, sourceImageUrl, gallerySourceUrls, navFeatured, navNew, ...carData } = entry;
     console.log(`\n🚗 ${carData.brand} ${carData.model}`);
 
     const uploadedUrls: string[] = [];
@@ -458,19 +732,74 @@ async function seedRealCars() {
   return created;
 }
 
+async function seedDeepalOnly(existingSlugs: Set<string>) {
+  const deepalEntries = REAL_CARS.filter((c) => c.brand === "Deepal");
+  const created: Awaited<ReturnType<typeof seedRealCars>> = [];
+  for (const entry of deepalEntries) {
+    if (existingSlugs.has(entry.slug)) {
+      console.log(`\n⏭ Skip ${entry.slug} (already in Notion)`);
+      continue;
+    }
+    const { imageSource, cloudinaryId, sourceImageUrl, gallerySourceUrls, navFeatured, navNew, ...carData } = entry;
+    console.log(`\n🚗 ${carData.brand} ${carData.model}`);
+    const uploadedUrls: string[] = [];
+    if (sourceImageUrl) {
+      const hero = dryRun
+        ? `[dry-run] ${sourceImageUrl}`
+        : await uploadOfficialImage(sourceImageUrl, cloudinaryId);
+      if (hero) uploadedUrls.push(hero);
+    }
+    if (gallerySourceUrls?.length) {
+      for (let i = 0; i < gallerySourceUrls.length; i++) {
+        const url = gallerySourceUrls[i]!;
+        const id = `${cloudinaryId}-${i + 2}`;
+        const uploaded = dryRun ? `[dry-run] ${url}` : await uploadOfficialImage(url, id);
+        if (uploaded) uploadedUrls.push(uploaded);
+      }
+    }
+    const payload: CarInput = {
+      ...carData,
+      imageUrls: uploadedUrls.filter((u) => !u.startsWith("[dry-run]")),
+    };
+    if (dryRun) {
+      console.log(`  [dry-run] would create slug=${payload.slug}`);
+      created.push({ id: "dry-run", slug: payload.slug, imageUrl: uploadedUrls[0] ?? null, imageSource });
+      continue;
+    }
+    const car = await createCar(payload);
+    console.log(`  ✓ created ${car.slug} → ${car.id}`);
+    created.push({ id: car.id, slug: car.slug, imageUrl: car.imageUrls[0] ?? null, imageSource });
+  }
+  return created;
+}
+
 async function main() {
   if (!process.env.NOTION_API_KEY || !process.env.NOTION_CARS_DB_ID) {
     console.error("Missing NOTION_API_KEY or NOTION_CARS_DB_ID in .env.local");
     process.exit(1);
   }
 
-  console.log(dryRun ? "=== DRY RUN ===" : "=== Seeding real Thailand-market cars ===");
+  const deepalOnly = process.argv.includes("--deepal-only");
+
+  console.log(
+    dryRun
+      ? "=== DRY RUN ==="
+      : deepalOnly
+        ? "=== Adding Deepal cars only (no archive) ==="
+        : "=== Seeding real Thailand-market cars ==="
+  );
 
   const existing = await getAllCarsAdmin();
   console.log(`Found ${existing.length} car row(s) in Notion`);
 
-  await deactivateExistingCars(existing);
-  const created = await seedRealCars();
+  const existingSlugs = new Set(existing.map((c) => c.slug));
+  let created: Awaited<ReturnType<typeof seedRealCars>>;
+  if (deepalOnly) {
+    created = await seedDeepalOnly(existingSlugs);
+  } else {
+    await deactivateExistingCars(existing);
+    created = await seedRealCars();
+  }
 
   console.log("\n--- Summary ---");
   console.log("| Brand | Model | Slug | Notion ID | Image |");

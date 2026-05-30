@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, Palette, MessageSquareWarning } from "lucide-react";
 import {
   Avatar, AvatarFallback,
 } from "@/components/ui/avatar";
@@ -12,12 +12,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const menuItems = [
-  { icon: BarChart3, label: "ภาพรวม", href: "/admin" },
-  { icon: BookOpen, label: "บทความ", href: "/admin/blog" },
-  { icon: Car, label: "รถยนต์", href: "/admin/cars" },
-  { icon: Calendar, label: "นัดหมาย", href: "/admin/appointments" },
-  { icon: MessageSquare, label: "รีวิวลูกค้า", href: "/admin/stories" },
-  { icon: Mail, label: "ข้อความติดต่อ", href: "/admin/contacts" },
+  { icon: BarChart3,    label: "ภาพรวม",      href: "/admin" },
+  { icon: BookOpen,     label: "บทความ",       href: "/admin/blog" },
+  { icon: Car,          label: "รถยนต์",       href: "/admin/cars" },
+  { icon: Tag,                  label: "โปรโมชั่น",    href: "/admin/promotions" },
+  { icon: MessageSquareWarning, label: "Feedback",      href: "/admin/feedback" },
+  { icon: Wrench,               label: "Brand Content", href: "/admin/service-content" },
+  { icon: Calendar,     label: "นัดหมาย",      href: "/admin/appointments" },
+  { icon: MessageSquare,label: "รีวิวลูกค้า",  href: "/admin/stories" },
+  { icon: Mail,         label: "ข้อความติดต่อ",href: "/admin/contacts" },
+];
+
+const brandWebLinks = [
+  { icon: Wrench,  label: "ศูนย์บริการ GWM",  href: "/gwm/service",     notion: "https://www.notion.so" },
+  { icon: Palette, label: "ซ่อมสี/ตัวถัง GWM", href: "/gwm/body-repair", notion: "https://www.notion.so" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -86,6 +94,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
+
+        {/* Brand Web quick links */}
+        <div className="px-2 pb-3 border-t border-gray-100 pt-3">
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest px-2 mb-2">Brand Web</p>
+          {brandWebLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              target="_blank"
+              className="flex items-center gap-2.5 h-9 px-3 rounded-lg text-xs text-gray-500 hover:bg-gray-100 hover:text-[#131F3C] transition-all"
+            >
+              <item.icon className="h-3.5 w-3.5 shrink-0" />
+              <span className="flex-1">{item.label}</span>
+              <span className="text-gray-300 text-[10px]">↗</span>
+            </Link>
+          ))}
+        </div>
 
         {/* User footer */}
         <div className="border-t border-gray-100 p-3">

@@ -29,38 +29,35 @@ export default function BranchesMap() {
       locationGroups[key].push(branch);
     });
 
-    // Create SVG marker with base64 logo embedded directly (avoids CORS issues)
+    // Create SVG marker — red teardrop pin with brand logo
     const createMarkerSVG = (brand: string): string => {
       const logoData = brandLogoBase64[brand] || brandLogoBase64["Mazda"];
-      const svg = `<svg width="90" height="64" viewBox="0 0 90 64" xmlns="http://www.w3.org/2000/svg">
+      const svg = `<svg width="52" height="68" viewBox="0 0 52 68" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <filter id="marker-shadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="2.5"/>
-      <feOffset dx="0" dy="3" result="offsetblur"/>
+    <filter id="pin-shadow" x="-40%" y="-20%" width="180%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+      <feOffset dx="0" dy="4" result="offsetblur"/>
       <feComponentTransfer>
-        <feFuncA type="linear" slope="0.4"/>
+        <feFuncA type="linear" slope="0.35"/>
       </feComponentTransfer>
       <feMerge>
         <feMergeNode/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <clipPath id="logo-clip">
-      <rect x="5" y="5" width="80" height="42" rx="21"/>
+    <clipPath id="logo-circle">
+      <circle cx="26" cy="24" r="16"/>
     </clipPath>
   </defs>
-  <!-- Main Pin Body -->
-  <g filter="url(#marker-shadow)">
-    <!-- White outer capsule background -->
-    <rect x="5" y="5" width="80" height="42" rx="21" fill="white"/>
-    <!-- Bottom tip of pin -->
-    <path d="M 38 42 L 45 56 L 52 42 Z" fill="white" stroke-linejoin="round"/>
-    <!-- Accent border -->
-    <rect x="5" y="5" width="80" height="42" rx="21" fill="none" stroke="#f1f5f9" stroke-width="1"/>
-    <!-- Brand logo container -->
-    <rect x="7" y="7" width="76" height="38" rx="19" fill="#f8fafc"/>
-    <!-- Brand logo with optimized placement container -->
-    <image href="${logoData}" x="12" y="10" width="66" height="32" clip-path="url(#logo-clip)" preserveAspectRatio="xMidYMid meet"/>
+  <g filter="url(#pin-shadow)">
+    <!-- Red teardrop pin body -->
+    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="#DD2233"/>
+    <!-- Dark bottom stroke -->
+    <path d="M26 4 C14.95 4 6 12.95 6 24 C6 38 26 60 26 60 C26 60 46 38 46 24 C46 12.95 37.05 4 26 4 Z" fill="none" stroke="#B01A2A" stroke-width="1.5"/>
+    <!-- White circle for logo -->
+    <circle cx="26" cy="24" r="16" fill="white"/>
+    <!-- Brand logo -->
+    <image href="${logoData}" x="10" y="8" width="32" height="32" clip-path="url(#logo-circle)" preserveAspectRatio="xMidYMid meet"/>
   </g>
 </svg>`;
       return svg;
@@ -88,9 +85,9 @@ export default function BranchesMap() {
           title: branch.name,
           icon: {
             url: svgUrl,
-            scaledSize: new window.google.maps.Size(60, 70),
+            scaledSize: new window.google.maps.Size(52, 68),
             origin: new window.google.maps.Point(0, 0),
-            anchor: new window.google.maps.Point(30, 68),
+            anchor: new window.google.maps.Point(26, 60),
           },
           animation: window.google.maps.Animation.DROP,
         });

@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BranchesMap from "@/components/BranchesMap";
 import BrandLogo from "@/components/BrandLogo";
+import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
-import { BRANDS, getGwmLineHref } from "@/lib/brandConfig";
+import { BRANDS } from "@/lib/brandConfig";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award,
@@ -123,93 +124,33 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
         </div>
       </section>
 
-      {/* BRAND CARDS */}
-      <section className="py-16 lg:py-24 bg-[#F8FAFC]">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h2>
-            <p className="text-gray-500 max-w-lg mx-auto">ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ชั้นนำ พร้อมศูนย์บริการมาตรฐานครบวงจร</p>
+      {/* BRAND HALL */}
+      <section className="relative py-16 lg:py-28 bg-[#0B1220] overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(221,82,89,0.12) 0%, transparent 55%), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(19,31,60,0.5) 0%, transparent 50%)",
+          }}
+          aria-hidden
+        />
+        <div className="container relative z-10">
+          <div className="text-center mb-12 lg:mb-16 max-w-2xl mx-auto">
+            <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-4">
+              Brand Hall
+            </p>
+            <h2 className="text-2xl lg:text-4xl font-bold text-white mb-4 leading-tight">
+              โลกแห่งแบรนด์ชั้นนำ
+            </h2>
+            <p className="text-white/50 text-sm lg:text-base leading-relaxed">
+              ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ระดับโลก — สำรวจเอกลักษณ์ ปรัชญา
+              และประสบการณ์ของแต่ละแบรนด์
+            </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 lg:gap-6">
-            {BRANDS.map((brand) => {
-              const brandImage = BRAND_IMAGES[brand.notionBrand] ?? null;
-              return (
-              <div
-                key={brand.slug}
-                className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden h-full"
-              >
-                <Link href={brand.hubPath} className="block cursor-pointer">
-                  <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
-                    {brandImage ? (
-                    <Image
-                      src={brandImage}
-                      alt={brand.displayName}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                    />
-                    ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1e3a5f] to-[#0F172A] flex items-center justify-center">
-                      <BrandLogo
-                        src={brand.logoPath}
-                        alt={brand.displayName}
-                        brandSlug={brand.slug}
-                        size="md"
-                        width={120}
-                        height={48}
-                        className="brightness-0 invert opacity-90"
-                      />
-                    </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <BrandLogo
-                        src={brand.logoPath}
-                        alt={brand.displayName}
-                        brandSlug={brand.slug}
-                        size="sm"
-                        width={80}
-                        height={24}
-                        className="brightness-0 invert opacity-90"
-                      />
-                    </div>
-                  </div>
-                </Link>
-                <div className="p-5 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <Link href={brand.hubPath} className="block">
-                      <h3 className="font-semibold text-[#0F172A] text-base group-hover:text-[#DD5259] transition-colors">
-                        {brand.displayNameTh}
-                      </h3>
-                      <p className="text-xs text-gray-400 mt-0.5">ดูรุ่นรถทั้งหมด</p>
-                    </Link>
-                    {brand.subLines && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {brand.subLines.map((line) => (
-                          <Link
-                            key={line.slug}
-                            href={getGwmLineHref(line.slug)}
-                            className="inline-flex items-center rounded-md bg-gray-100 hover:bg-gray-200 px-2 py-1 min-h-[28px] text-[10px] font-medium text-gray-600"
-                          >
-                            <BrandLogo
-                              src={line.logoPath}
-                              alt={line.displayName}
-                              size="xs"
-                              width={40}
-                              height={14}
-                            />
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <Link href={brand.hubPath} aria-label={`ดู ${brand.displayNameTh}`} className="shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
-                  </Link>
-                </div>
-              </div>
-            );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+            {BRANDS.map((brand) => (
+              <BrandHallCard key={brand.slug} brand={brand} />
+            ))}
           </div>
         </div>
       </section>

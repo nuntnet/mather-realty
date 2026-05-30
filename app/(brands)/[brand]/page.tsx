@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import BrandLogo from "@/components/BrandLogo";
 import BrandCarGrid from "@/components/BrandCarGrid";
 import BrandHero, { BrandHeroSubLineLinks } from "@/components/BrandHero";
+import BrandSubNav from "@/components/brands/BrandSubNav";
 import {
   BRANDS,
   BRAND_BY_SLUG,
@@ -13,6 +14,8 @@ import {
 import { getCarsByBrandLine } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
+
+const HAS_SUB_PAGES = new Set<BrandSlug>(["gwm"]);
 
 export const revalidate = 3600;
 
@@ -66,6 +69,10 @@ export default async function BrandHubPage({ params }: PageProps) {
             ) : undefined
           }
         />
+
+        {HAS_SUB_PAGES.has(brand.slug) && (
+          <BrandSubNav brand={brand} currentSection="overview" />
+        )}
 
         <div className="container py-10 lg:py-14">
           <div className="flex items-center justify-between mb-8">

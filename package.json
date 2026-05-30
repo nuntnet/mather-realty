@@ -11,6 +11,7 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "seed:cars": "bun run scripts/seed-real-cars.ts",
+    "add-th-cars": "bun run scripts/add-th-cars.ts",
     "sync:galleries": "bun run scripts/sync-car-galleries.ts",
     "audit:galleries": "bun run scripts/sync-car-galleries.ts --audit"
   },

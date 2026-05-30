@@ -12,7 +12,7 @@ export const BRAND_IMAGES: Record<string, string> = {
   GWM:
     "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/haval-h6-hev/h6-kv-pc-1-2.jpg",
   Deepal:
-    "https://www.changan.co.th/cache/images/i3XxHnTOvv9KlTxKx3m9cEzWFJM21SPYOL0L2Yu3aVA/rs:fit:640/q:75/max_bytes:120000/bG9jYWw6Ly8vbmV3X3MwNV85ZjI3ZGYxNmFiLnBuZw.webp",
+    "https://www.changan.co.th/cache/images/AljG4xVwhLAOAcrZPSadP7bV9kVVdgvO9Jo2VT5lReI/rs:fit:1920/q:75/max_bytes:120000/bG9jYWw6Ly8vZGVlcGFsX1MwN19pbl9vcmFuZ2VfZmU4MzhjODkyMi5qcGc.webp",
   Kia:
     "https://www.kia.com/content/dam/kwcms/th/th/images/showroom/carnival-pe/0-Banner/Rev.2_The-new-Kia-Carnival32_1920x1080.jpg",
   default:

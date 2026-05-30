@@ -18,6 +18,8 @@ export const validCarBody = {
   videoUrl: "",
   isActive: true,
   isFeatured: false,
+  navFeatured: false,
+  navNew: false,
   slug: "mazda-cx-5-2024",
 };
 

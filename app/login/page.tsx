@@ -5,8 +5,9 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signIn } from "@/lib/auth-client";
 import { ShieldCheck } from "lucide-react";
+import { signIn } from "@/lib/auth-client";
+import CompanyLogo from "@/components/CompanyLogo";
 
 function LoginForm() {
   const router = useRouter();
@@ -44,19 +45,8 @@ function LoginForm() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 mb-4">
-            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="url(#lg)" />
-              <path d="M18 7L8 11.5V18C8 23.4 12.48 28.52 18 30.5C23.52 28.52 28 23.4 28 18V11.5L18 7Z" fill="#2E5EA8" opacity="0.5" />
-              <text x="18" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="serif">ช</text>
-              <defs>
-                <linearGradient id="lg" x1="18" y1="2" x2="18" y2="35" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#2563EB" /><stop offset="1" stopColor="#1B3A6B" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-[#131F3C]">CH.ERAWAN Admin</h1>
+          <CompanyLogo height={56} priority className="h-14 w-auto mb-3" />
+          <h1 className="text-xl font-bold text-[#131F3C]">Admin Panel</h1>
           <p className="text-sm text-gray-500 mt-1">เข้าสู่ระบบเพื่อจัดการเว็บไซต์</p>
         </div>
 

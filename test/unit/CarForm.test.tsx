@@ -89,6 +89,8 @@ describe("CarForm", () => {
       videoUrl: null,
       isActive: true,
       isFeatured: false,
+      navFeatured: false,
+      navNew: false,
       slug: "ford-ranger",
     };
     render(<CarForm open onOpenChange={() => {}} car={existing} onSaved={() => {}} />);

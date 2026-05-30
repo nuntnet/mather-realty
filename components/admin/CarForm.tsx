@@ -56,6 +56,8 @@ const emptyCar: CarInput = {
   videoUrl: null,
   isActive: true,
   isFeatured: false,
+  navFeatured: false,
+  navNew: false,
   slug: "",
 };
 
@@ -281,7 +283,15 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
             </label>
             <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
               <Switch checked={form.isFeatured} onCheckedChange={(v) => set("isFeatured", v)} />
-              รถแนะนำ
+              รถแนะนำ (หน้าแรก)
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <Switch checked={form.navFeatured} onCheckedChange={(v) => set("navFeatured", v)} />
+              เมนูแนะนำ
+            </label>
+            <label className="flex items-center gap-2 text-sm text-gray-700 cursor-pointer">
+              <Switch checked={form.navNew} onCheckedChange={(v) => set("navNew", v)} />
+              เมนูใหม่
             </label>
           </div>
         </div>
