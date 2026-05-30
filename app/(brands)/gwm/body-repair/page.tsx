@@ -5,7 +5,7 @@ import { BRAND_BY_SLUG } from "@/lib/brandConfig";
 import { getBranchesByBrand } from "@/lib/branchData";
 import { getInsurancePartners } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
-import { CheckCircle2, ChevronRight, FileText, Clock, Phone, MessageCircle } from "lucide-react";
+import { CheckCircle2, ChevronRight, FileText, Phone, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const revalidate = 3600;
@@ -202,53 +202,33 @@ export default async function GwmBodyRepairPage() {
         </section>
 
         {/* นัดหมายเข้าซ่อม */}
-        <section className="bg-[#0C1C3E] py-12 lg:py-16">
-          <div className="container">
-            <div className="lg:flex items-center gap-12">
-              <div className="flex-1 mb-8 lg:mb-0">
-                <p className="text-sm font-medium text-[#C8102E] uppercase tracking-wider mb-3">ติดต่อเรา</p>
-                <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                  นัดหมายเข้าซ่อม<br />ติดต่อแผนกซ่อมสี-ตัวถัง ช.เอราวัณ
-                </h2>
-                <p className="text-white/60 text-sm mb-6">
-                  เปิดให้บริการ วันจันทร์ – วันเสาร์ (ยกเว้นวันหยุดนักขัตฤกษ์)<br />
-                  ตั้งแต่เวลา 08.00 – 17.00 น. ติดต่อสอบถาม 034-219-000
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link href="/booking?type=body_paint&brand=GWM">
-                    <Button className="bg-[#C8102E] hover:bg-[#a00d25] text-white border-0">
-                      นัดหมายออนไลน์
-                    </Button>
-                  </Link>
-                  <a href="tel:034-219-000">
-                    <Button variant="outline" className="border-white/20 text-white bg-transparent hover:bg-white/10">
-                      <Phone className="w-4 h-4 mr-2" />
-                      034-219-000
-                    </Button>
-                  </a>
-                  <a href="https://line.me/R/ti/p/@gwmch.erawan" target="_blank" rel="noopener noreferrer">
-                    <Button variant="outline" className="border-white/20 text-white bg-transparent hover:bg-white/10">
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      @gwmch.erawan
-                    </Button>
-                  </a>
-                </div>
-              </div>
-              <div className="lg:w-72 space-y-3">
-                {[
-                  { icon: Clock, label: "เวลาทำการ", value: "จ–ศ 08:00–17:00 น." },
-                  { icon: Phone, label: "โทรศัพท์", value: "034-219-000" },
-                  { icon: MessageCircle, label: "LINE", value: "@gwmch.erawan" },
-                ].map(({ icon: Icon, label, value }) => (
-                  <div key={label} className="flex items-center gap-3 bg-white/5 rounded-xl px-4 py-3 border border-white/10">
-                    <Icon className="w-4 h-4 text-white/40 shrink-0" />
-                    <div>
-                      <p className="text-xs text-white/40">{label}</p>
-                      <p className="text-sm font-medium text-white">{value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        <section className="bg-[#0C1C3E] py-12 lg:py-14">
+          <div className="container max-w-2xl text-center">
+            <p className="text-sm font-medium text-[#C8102E] uppercase tracking-wider mb-3">ติดต่อเรา</p>
+            <h2 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+              นัดหมายเข้าซ่อมสี-ตัวถัง
+            </h2>
+            <p className="text-white/50 text-sm mb-8">
+              เปิดให้บริการ จ–ศ 08:00–17:00 น. (ยกเว้นวันหยุดนักขัตฤกษ์)
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              <Link href="/booking?type=body_paint&brand=GWM">
+                <Button className="bg-[#C8102E] hover:bg-[#a00d25] text-white border-0">
+                  นัดหมายออนไลน์
+                </Button>
+              </Link>
+              <a href="tel:034-219-000">
+                <Button variant="outline" className="border-white/20 text-white bg-transparent hover:bg-white/10">
+                  <Phone className="w-4 h-4 mr-2" />
+                  034-219-000
+                </Button>
+              </a>
+              <a href="https://line.me/R/ti/p/@gwmch.erawan" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" className="border-white/20 text-white bg-transparent hover:bg-white/10">
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  @gwmch.erawan
+                </Button>
+              </a>
             </div>
           </div>
         </section>
