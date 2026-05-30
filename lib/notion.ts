@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Client } from "@notionhq/client";
 import { NotionToMarkdown } from "notion-to-md";
 import { markdownToBlocks as martianMarkdownToBlocks } from "@tryfabric/martian";
@@ -214,14 +215,35 @@ export async function getFeaturedCars(): Promise<Car[]> {
   return response.results.map(pageToCar);
 }
 
-export async function getCarById(id: string): Promise<Car | null> {
+export const getCarById = cache(async (id: string): Promise<Car | null> => {
   try {
     const page = await notion.pages.retrieve({ page_id: id });
     return pageToCar(page);
   } catch {
     return null;
   }
+});
+
+/** True if `value` looks like a Notion page UUID (32 hex chars, with or without dashes). */
+function looksLikeNotionId(value: string): boolean {
+  return /^[0-9a-f]{32}$/i.test(value.replace(/-/g, ""));
 }
+
+/**
+ * Fetch a car by its human-readable Slug. Falls back to `getCarById` when no
+ * slug match is found AND the passed string looks like a Notion UUID — keeps
+ * old `/cars/<uuid>` links working and covers cars with an empty Slug.
+ */
+export const getCarBySlug = cache(async (slug: string): Promise<Car | null> => {
+  const response = await notion.databases.query({
+    database_id: DB.cars,
+    filter: { property: "Slug", rich_text: { equals: slug } },
+    page_size: 1,
+  });
+  if (response.results.length) return pageToCar(response.results[0]);
+  if (looksLikeNotionId(slug)) return getCarById(slug);
+  return null;
+});
 
 export async function getAllCarIds(): Promise<string[]> {
   const response = await notion.databases.query({
@@ -229,6 +251,30 @@ export async function getAllCarIds(): Promise<string[]> {
     filter: { property: "Is Active", checkbox: { equals: true } },
   });
   return response.results.map((p) => p.id);
+}
+
+/** Slugs of all active cars (empty slugs filtered out). */
+export async function getAllCarSlugs(): Promise<string[]> {
+  const response = await notion.databases.query({
+    database_id: DB.cars,
+    filter: { property: "Is Active", checkbox: { equals: true } },
+  });
+  return response.results.map(pageToCar).map((c) => c.slug).filter(Boolean);
+}
+
+/**
+ * Bounded set of slugs to prerender at build time: the most recent active cars
+ * by Year (descending). Keeps build time flat as the catalog grows; the rest
+ * render on-demand thanks to `dynamicParams = true`.
+ */
+export async function getCarSlugsForPrerender(limit = 40): Promise<string[]> {
+  const response = await notion.databases.query({
+    database_id: DB.cars,
+    filter: { property: "Is Active", checkbox: { equals: true } },
+    sorts: [{ property: "Year", direction: "descending" }],
+    page_size: limit,
+  });
+  return response.results.map(pageToCar).map((c) => c.slug).filter(Boolean);
 }
 
 // ─── Cars (admin write) ─────────────────────────────────────────────────────
@@ -349,15 +395,17 @@ export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> 
   return pageToBlogPost(response.results[0]);
 }
 
-export async function getBlogPostWithContent(slug: string): Promise<BlogPostWithContent | null> {
-  const post = await getBlogPostBySlug(slug);
-  if (!post) return null;
+export const getBlogPostWithContent = cache(
+  async (slug: string): Promise<BlogPostWithContent | null> => {
+    const post = await getBlogPostBySlug(slug);
+    if (!post) return null;
 
-  const mdBlocks = await n2m.pageToMarkdown(post.id);
-  const contentMarkdown = n2m.toMarkdownString(mdBlocks).parent;
+    const mdBlocks = await n2m.pageToMarkdown(post.id);
+    const contentMarkdown = n2m.toMarkdownString(mdBlocks).parent;
 
-  return { ...post, contentMarkdown };
-}
+    return { ...post, contentMarkdown };
+  }
+);
 
 export async function getAllBlogSlugs(): Promise<string[]> {
   const response = await notion.databases.query({

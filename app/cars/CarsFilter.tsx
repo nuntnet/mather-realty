@@ -91,7 +91,7 @@ export default function CarsFilter({ cars }: { cars: Car[] }) {
       {/* Car Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filtered.map((car) => (
-          <Link key={car.id} href={`/cars/${car.id}`}>
+          <Link key={car.id} href={`/cars/${car.slug || car.id}`}>
             <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
               {/* Image */}
               <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">

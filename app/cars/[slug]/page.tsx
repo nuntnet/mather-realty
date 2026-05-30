@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { getCarById, getAllCarIds } from "@/lib/notion";
+import { getCarBySlug, getCarSlugsForPrerender } from "@/lib/notion";
 import CarDetailClient from "./CarDetailClient";
 import type { Metadata } from "next";
 
@@ -9,8 +8,8 @@ export const dynamicParams = true;
 
 export async function generateStaticParams() {
   try {
-    const ids = await getAllCarIds();
-    return ids.map((id) => ({ id }));
+    const slugs = await getCarSlugsForPrerender(40);
+    return slugs.map((slug) => ({ slug }));
   } catch {
     return [];
   }
@@ -19,10 +18,10 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { id } = await params;
-  const car = await getCarById(id);
+  const { slug } = await params;
+  const car = await getCarBySlug(slug);
   if (!car) return { title: "ไม่พบรถ" };
   return {
     title: `${car.brand} ${car.model} ${car.year}`,
@@ -36,10 +35,10 @@ export async function generateMetadata({
 export default async function CarDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }) {
-  const { id } = await params;
-  const car = await getCarById(id);
+  const { slug } = await params;
+  const car = await getCarBySlug(slug);
   if (!car) notFound();
 
   const carJsonLd = {

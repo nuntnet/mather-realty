@@ -148,7 +148,7 @@ export default function AdminCarsPage() {
                         </div>
                       )}
                       <div>
-                        <Link href={`/cars/${car.id}`} target="_blank" className="text-sm font-medium text-[#131F3C] hover:underline">
+                        <Link href={`/cars/${car.slug || car.id}`} target="_blank" className="text-sm font-medium text-[#131F3C] hover:underline">
                           {car.model || car.name}
                         </Link>
                         <p className="text-xs text-gray-400">{car.year} · {car.condition === "new" ? "รถใหม่" : "รถมือสอง"}</p>
