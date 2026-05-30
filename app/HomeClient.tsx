@@ -7,8 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import BranchesMap from "@/components/BranchesMap";
 import BrandLogo from "@/components/BrandLogo";
+import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
-import { BRANDS, getGwmLineHref } from "@/lib/brandConfig";
+import { BRANDS } from "@/lib/brandConfig";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award,
@@ -123,93 +124,33 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
         </div>
       </section>
 
-      {/* BRAND CARDS */}
-      <section className="py-16 lg:py-24 bg-[#F8FAFC]">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป</h2>
-            <p className="text-gray-500 max-w-lg mx-auto">ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ชั้นนำ พร้อมศูนย์บริการมาตรฐานครบวงจร</p>
+      {/* BRAND HALL */}
+      <section className="relative py-16 lg:py-28 bg-[#0B1220] overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 50% at 50% 0%, rgba(221,82,89,0.12) 0%, transparent 55%), radial-gradient(ellipse 60% 40% at 100% 100%, rgba(19,31,60,0.5) 0%, transparent 50%)",
+          }}
+          aria-hidden
+        />
+        <div className="container relative z-10">
+          <div className="text-center mb-12 lg:mb-16 max-w-2xl mx-auto">
+            <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-4">
+              Brand Hall
+            </p>
+            <h2 className="text-2xl lg:text-4xl font-bold text-white mb-4 leading-tight">
+              โลกแห่งแบรนด์ชั้นนำ
+            </h2>
+            <p className="text-white/50 text-sm lg:text-base leading-relaxed">
+              ตัวแทนจำหน่ายอย่างเป็นทางการ 6 แบรนด์ระดับโลก — สำรวจเอกลักษณ์ ปรัชญา
+              และประสบการณ์ของแต่ละแบรนด์
+            </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-5 lg:gap-6">
-            {BRANDS.map((brand) => {
-              const brandImage = BRAND_IMAGES[brand.notionBrand] ?? null;
-              return (
-              <div
-                key={brand.slug}
-                className="group bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 overflow-hidden h-full"
-              >
-                <Link href={brand.hubPath} className="block cursor-pointer">
-                  <div className="aspect-[16/10] relative overflow-hidden bg-gray-100">
-                    {brandImage ? (
-                    <Image
-                      src={brandImage}
-                      alt={brand.displayName}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      sizes="(max-width: 768px) 50vw, 33vw"
-                    />
-                    ) : (
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#1e3a5f] to-[#0F172A] flex items-center justify-center">
-                      <BrandLogo
-                        src={brand.logoPath}
-                        alt={brand.displayName}
-                        brandSlug={brand.slug}
-                        size="md"
-                        width={120}
-                        height={48}
-                        className="brightness-0 invert opacity-90"
-                      />
-                    </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                    <div className="absolute bottom-0 left-0 right-0 p-4">
-                      <BrandLogo
-                        src={brand.logoPath}
-                        alt={brand.displayName}
-                        brandSlug={brand.slug}
-                        size="sm"
-                        width={80}
-                        height={24}
-                        className="brightness-0 invert opacity-90"
-                      />
-                    </div>
-                  </div>
-                </Link>
-                <div className="p-5 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <Link href={brand.hubPath} className="block">
-                      <h3 className="font-semibold text-[#0F172A] text-base group-hover:text-[#DD5259] transition-colors">
-                        {brand.displayNameTh}
-                      </h3>
-                      <p className="text-xs text-gray-400 mt-0.5">ดูรุ่นรถทั้งหมด</p>
-                    </Link>
-                    {brand.subLines && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {brand.subLines.map((line) => (
-                          <Link
-                            key={line.slug}
-                            href={getGwmLineHref(line.slug)}
-                            className="inline-flex items-center rounded-md bg-gray-100 hover:bg-gray-200 px-2 py-1 min-h-[28px] text-[10px] font-medium text-gray-600"
-                          >
-                            <BrandLogo
-                              src={line.logoPath}
-                              alt={line.displayName}
-                              size="xs"
-                              width={40}
-                              height={14}
-                            />
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <Link href={brand.hubPath} aria-label={`ดู ${brand.displayNameTh}`} className="shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-[#0F172A] group-hover:translate-x-1 transition-all" />
-                  </Link>
-                </div>
-              </div>
-            );
-            })}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
+            {BRANDS.map((brand) => (
+              <BrandHallCard key={brand.slug} brand={brand} />
+            ))}
           </div>
         </div>
       </section>
@@ -239,7 +180,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   ) : (
                     <Image src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} fill className="object-cover opacity-80" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   )}
-                  {car.isFeatured && (
+                  {car.isBestSeller && (
                     <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">แนะนำ</Badge>
                   )}
                 </div>
@@ -379,12 +320,29 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 </Link>
               </div>
             </div>
-            <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-100">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3877.5!2d100.3!3d13.7!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQyJzAwLjAiTiAxMDDCsDE4JzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1"
-                width="100%" height="380" style={{ border: 0 }} allowFullScreen loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade" title="Ch.Erawan Location"
-              />
+            {/* Team / Showroom photo grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2 rounded-2xl overflow-hidden h-52 bg-gray-100">
+                <img
+                  src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&q=80&auto=format&fit=crop"
+                  alt="โชว์รูม ช.เอราวัณ"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
+                <img
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80&auto=format&fit=crop"
+                  alt="ทีมงาน ช.เอราวัณ"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
+                <img
+                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop"
+                  alt="ศูนย์บริการ ช.เอราวัณ"
+                  className="w-full h-full object-cover"
+                />
+              </div>
             </div>
           </div>
         </div>

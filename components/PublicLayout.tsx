@@ -3,10 +3,20 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import LineOAFloat from "./LineOAFloat";
+import type { NavCountsByBrand, NavModelsByBrand } from "@/lib/navModels";
 
 const NO_LAYOUT_PREFIXES = ["/admin", "/login"];
 
-export default function PublicLayout({ children }: { children: React.ReactNode }) {
+export default function PublicLayout({
+  children,
+  navModelsByBrand = {},
+  navCountsByBrand = {},
+}: {
+  children: React.ReactNode;
+  navModelsByBrand?: NavModelsByBrand;
+  navCountsByBrand?: NavCountsByBrand;
+}) {
   const pathname = usePathname();
   const hideLayout = NO_LAYOUT_PREFIXES.some(p => pathname.startsWith(p));
 
@@ -14,9 +24,13 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
   return (
     <>
-      <Navbar />
+      <Navbar
+        navModelsByBrand={navModelsByBrand}
+        navCountsByBrand={navCountsByBrand}
+      />
       {children}
       <Footer />
+      <LineOAFloat />
     </>
   );
 }

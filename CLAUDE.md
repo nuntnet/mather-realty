@@ -7,11 +7,12 @@
 
 - **Next.js 15** App Router + React 19 + TypeScript
 - **Tailwind CSS 3** + Radix UI + shadcn/ui + Framer Motion
-- **Notion API** — CMS หลัก (cars, blog, stories, appointments, contacts)
+- **Notion API** — CMS หลัก (cars, blog, stories, appointments, contacts, promotions, feedback, insurance partners, service content)
 - **Better Auth 1.5** + **Turso** (SQLite) — authentication + sessions
 - **Cloudinary** — image hosting + admin upload
 - **Upstash Redis** — rate limit `/api/auth/*` (optional in dev)
 - **Google Maps JS API** — branch map
+- **cmdk** — ⌘K search command palette
 - **Vercel** (sin1) — deployment
 - **Bun** — package manager
 
@@ -26,6 +27,7 @@ bun run test     # Vitest (unit + integration + component)
 bun run test:watch
 bun run test:e2e # Playwright e2e
 bun run seed:cars       # seed Notion cars + Cloudinary hero/gallery images
+bun run add-th-cars     # add TH-market models (does not archive existing cars)
 bun run sync:galleries  # push gallery URLs from seed data into Notion
 bun run audit:galleries # report cars missing gallery images in Notion
 ```
@@ -40,44 +42,101 @@ bun run audit:galleries # report cars missing gallery images in Notion
 | `lib/auth-client.ts` | Client-side auth hooks |
 | `lib/ratelimit.ts` | Upstash rate limit auth endpoints |
 | `lib/branchData.ts` | Hardcoded branch data (7 สาขา) |
+| `lib/brandConfig.ts` | Brand config (6 แบรนด์, GWM sub-lines) |
 | `lib/notion-types.ts` | TypeScript interfaces สำหรับ Notion data |
 | `middleware.ts` | Guard `/admin/*`, `/api/admin/*`, rate limit `/api/auth/*` |
 | `drizzle.config.ts` | Drizzle config สำหรับ Turso (inspect/migrate) |
+| `components/SearchPalette.tsx` | ⌘K global search palette |
+| `components/LineOAFloat.tsx` | Floating LINE OA widget (all pages) |
+| `components/BrandSubNav.tsx` | Sticky brand sub-navigation tabs |
+| `components/brands/BrandSubNav.tsx` | Brand sub-nav (scrollPastHero, sticky) |
 | `docs/ADMIN.md` | คู่มือ operator — login, env, แต่ละหน้า admin |
-| `docs/TESTING.md` | Test stack, mocks, e2e prerequisites |
-| `docs/ADMIN_CMS_PLAN.md` | แผน eng Admin CMS (Phase 0–5 — shipped) |
 | `specs/env-vars.md` | Template env vars |
 
 ## Routes
 
-**Public:** `/` `/cars` `/cars/[slug]` `/booking` `/stories` `/blog` `/blog/[slug]` `/branches` `/contact` `/about` `/awards` `/insurance` `/secondhand` `/career`
+**Public:**
+- `/` `/cars` `/cars/[slug]` `/booking` `/stories` `/blog` `/blog/[slug]`
+- `/branches` `/contact` `/about` `/awards` `/insurance` `/secondhand` `/career`
+- `/feedback` — ศูนย์ร้องเรียนทันใจ (แนะนำ-ติชม)
 
-**Admin (require role=admin):** `/admin` `/admin/cars` `/admin/blog` `/admin/contacts` `/admin/appointments` `/admin/stories`
+**Brand Web (GWM MVP — replicable to all brands):**
+- `/gwm` `/gwm/haval` `/gwm/ora` `/gwm/tank`
+- `/gwm/service` — ศูนย์บริการ
+- `/gwm/body-repair` — ซ่อมสีตัวถัง (insurance list จาก Notion)
+- `/gwm/promotions` — โปรโมชั่น (Notion DB)
+- `/gwm/reviews` — รีวิว (Blog DB)
+- `/gwm/one-stop` — One Stop Service
+
+**Admin (require role=admin):**
+- `/admin` `/admin/cars` `/admin/blog` `/admin/contacts` `/admin/appointments` `/admin/stories`
+- `/admin/promotions` — จัดการ promotions CRUD
+- `/admin/feedback` — ดู/จัดการ customer feedback (สถานะ: ใหม่/กำลังดำเนินการ/แก้ไขแล้ว)
+- `/admin/service-content` — บริษัทประกัน + Service Page Sections (link → Notion)
 
 **Auth:** `/login`
 
-**API:** `POST /api/submit/booking|contact|story` · `GET|PATCH /api/admin/appointments|stories` · `GET|POST|PATCH|DELETE /api/admin/cars|blog` · `GET /api/admin/contacts` · `POST /api/admin/revalidate` · `POST /api/upload` · `POST /api/revalidate`
+**API:**
+- `POST /api/submit/booking|contact|story|feedback`
+- `POST /api/search-log` — บันทึก failed search queries → Notion analytics
+- `GET|PATCH /api/admin/appointments|stories|feedback`
+- `GET|POST|PATCH|DELETE /api/admin/cars|blog|promotions|insurance-partners`
+- `GET|POST|PATCH /api/admin/service-content`
+- `GET /api/admin/contacts` · `POST /api/admin/revalidate`
+- `POST /api/upload` · `POST /api/revalidate`
 
-## Notion Databases (5)
+## Notion Databases (11)
 
-`NOTION_CARS_DB_ID` · `NOTION_BLOG_DB_ID` · `NOTION_STORIES_DB_ID` · `NOTION_APPOINTMENTS_DB_ID` · `NOTION_CONTACTS_DB_ID`
+| Env Var | หน้าที่ |
+|---------|--------|
+| `NOTION_CARS_DB_ID` | รถยนต์ |
+| `NOTION_BLOG_DB_ID` | บทความ (category: review/tips/news/promotion/csr, tags: brand) |
+| `NOTION_STORIES_DB_ID` | รีวิวลูกค้า |
+| `NOTION_APPOINTMENTS_DB_ID` | นัดหมาย |
+| `NOTION_CONTACTS_DB_ID` | ข้อความติดต่อ |
+| `NOTION_PROMOTIONS_DB_ID` | โปรโมชั่น (Brand, IsActive, Start/End Date) |
+| `NOTION_FEEDBACK_DB_ID` | Customer Feedback (Type, Brand, Branch, Status) |
+| `NOTION_SEARCH_ANALYTICS_DB_ID` | Failed search queries (Query, Count, LastSearchedAt) |
+| `NOTION_INSURANCE_PARTNERS_DB_ID` | บริษัทประกัน (Name, Brand, IsActive, SortOrder) |
+| `NOTION_SERVICE_CONTENT_DB_ID` | Service Page Sections (Page, Brand, SectionKey, IsPublished) |
 
 Content แก้ที่ Notion หรือผ่าน Admin Panel — หลังแก้ trigger revalidation:
 ```bash
-# จาก dashboard admin (session) หรือ
 curl -X POST "http://localhost:3002/api/revalidate?secret=YOUR_SECRET"
 ```
+
+## Brand Web Architecture
+
+Brand sub-pages ใช้ pattern นี้ (GWM เป็น MVP):
+- `app/(brands)/gwm/[section]/page.tsx` — static route ชนะ `gwm/[line]` dynamic
+- `BrandSubNav` — sticky tab bar, `scrollPastHero` prop สำหรับ sub-pages
+- `BrandSubNav` dispatch `brand-subnav-sticky` event → Navbar แสดง brand logo
+
+เมื่อ replicate ไปแบรนด์อื่น:
+- สร้าง `app/(brands)/[brand]/service/page.tsx` etc. (generic route)
+- เพิ่ม brand slug ใน `HAS_SUB_PAGES` set ใน `[brand]/page.tsx`
+
+## Search Analytics
+
+`SearchPalette.tsx` debounce 2s → `POST /api/search-log` เมื่อ query ไม่มีผลลัพธ์  
+ดู failed queries ใน Notion DB `Search Analytics` (Query, Count, LastSearchedAt)
+
+## LINE OA
+
+- `LineOAFloat.tsx` — floating button ทุกหน้า public (ยกเว้น admin/login)
+- Footer column 4 — LINE OA cards แยกแบรนด์
+- LINE IDs: Mazda `@mazdach.erawan` · Deepal `@deepalch.erawan` · Ford `@fordch.erawan` · Mitsubishi `@mitsuch.erawan` · GWM `@gwmch.erawan` · Kia `@kiach.erawan`
 
 ## Auth
 
 - Email/password only (minPasswordLength: 8)
 - Admin role เก็บใน `user.role` ใน Turso
 - ถ้า `TURSO_DATABASE_URL` ไม่ถูกตั้ง — auth disabled (warning ใน console)
-- สร้าง admin: sign-up แล้ว `UPDATE user SET role='admin'` — ดู `docs/ADMIN.md` (อย่า rely `seed-admin.ts` ใน prod)
+- สร้าง admin: sign-up แล้ว `UPDATE user SET role='admin'`
 
 ## Environment Variables
 
-ดู `specs/env-vars.md` — Notion (6) · Better Auth (2) · Turso (2) · Cloudinary (3) · Google Maps (1) · Revalidate (1) · Upstash (2, prod แนะนำ)
+ดู `specs/env-vars.md` — Notion (10) · Better Auth (2) · Turso (2) · Cloudinary (3) · Google Maps (1) · Revalidate (1) · Upstash (2, prod แนะนำ)
 
 ## Conventions
 
@@ -86,14 +145,14 @@ curl -X POST "http://localhost:3002/api/revalidate?secret=YOUR_SECRET"
 - Form submissions → `fetch("/api/submit/...")` จาก client
 - Admin data fetching → `fetch("/api/admin/...")` จาก client ใน admin pages
 - Images: admin upload ผ่าน `/api/upload` → Cloudinary URL → เก็บใน Notion
+- `scripts/` excluded จาก tsconfig (build utilities เท่านั้น)
 
 ## Known Gaps (TODO)
 
+- Brand sub-pages ยังทำแค่ GWM — replicate ไปอีก 5 แบรนด์
+- Service Page Sections ยังไม่ render Notion content บนหน้าเว็บ (admin link → Notion แล้ว toggle publish)
 - `revalidatePath` หลังแก้รถใช้ Notion id แทน slug (หน้า detail อาจ stale)
-- SEO: JSON-LD, canonical, sitemap lastModified
 - File upload (damage photos, insurance docs) ใน booking ยังไม่ implement
 - ไม่มี email notifications สำหรับนัดหมายใหม่
+- Video reviews page (YouTube API + Notion TikTok URLs) ยังไม่ implement
 - Upstash env ต้องตั้งใน prod สำหรับ rate limit
-- ESLint config ยังไม่ครบ
-
-ดู `specs/todo.md` สำหรับรายการครบ (P0/P1/P2)

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import PublicLayout from "@/components/PublicLayout";
+import PublicLayoutServer from "@/components/PublicLayoutServer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { JsonLd, organizationGraph, websiteJsonLd } from "@/lib/seo";
 
@@ -63,9 +63,9 @@ export default function RootLayout({
       <body className={`${inter.variable} ${ibmPlexSansThai.variable} font-sans antialiased`}>
         <JsonLd data={organizationGraph()} />
         <JsonLd data={websiteJsonLd()} />
-        <PublicLayout>
+        <PublicLayoutServer>
           {children}
-        </PublicLayout>
+        </PublicLayoutServer>
         <Toaster richColors position="top-right" />
       </body>
     </html>

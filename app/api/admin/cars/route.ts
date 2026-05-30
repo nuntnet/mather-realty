@@ -29,7 +29,9 @@ const carSchema = z.object({
   imageUrls: z.array(z.string()),
   videoUrl: z.string().url().nullable().or(z.literal("")),
   isActive: z.boolean(),
-  isFeatured: z.boolean(),
+  isBestSeller: z.boolean(),
+  navFeatured: z.boolean().optional().default(false),
+  navNew: z.boolean().optional().default(false),
   slug: z.string(),
 });
 
@@ -86,7 +88,12 @@ const patchSchema = z.object({
   id: z.string().min(1),
   data: carSchema.partial().optional(),
   flags: z
-    .object({ isActive: z.boolean().optional(), isFeatured: z.boolean().optional() })
+    .object({
+      isActive: z.boolean().optional(),
+      isBestSeller: z.boolean().optional(),
+      navFeatured: z.boolean().optional(),
+      navNew: z.boolean().optional(),
+    })
     .optional(),
 });
 

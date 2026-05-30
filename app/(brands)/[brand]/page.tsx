@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import BrandLogo from "@/components/BrandLogo";
 import BrandCarGrid from "@/components/BrandCarGrid";
 import BrandHero, { BrandHeroSubLineLinks } from "@/components/BrandHero";
+import BrandSubNav from "@/components/brands/BrandSubNav";
 import {
   BRANDS,
   BRAND_BY_SLUG,
@@ -10,9 +11,12 @@ import {
   isBrandSlug,
   type BrandSlug,
 } from "@/lib/brandConfig";
-import { getCarsByBrandLine } from "@/lib/notion";
+import { getCarsByBrandLine, getSocialLinksByBrand } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
+import BrandSocialLinks from "@/components/BrandSocialLinks";
+
+const HAS_SUB_PAGES = new Set<BrandSlug>(["gwm"]);
 
 export const revalidate = 3600;
 
@@ -41,7 +45,10 @@ export default async function BrandHubPage({ params }: PageProps) {
   if (!isBrandSlug(slug)) notFound();
 
   const brand = BRAND_BY_SLUG[slug as BrandSlug];
-  const cars = await getCarsByBrandLine(brand.notionBrand);
+  const [cars, socialLinks] = await Promise.all([
+    getCarsByBrandLine(brand.notionBrand),
+    getSocialLinksByBrand(brand.notionBrand),
+  ]);
 
   const breadcrumbs = [
     { name: "หน้าแรก", path: "/" },
@@ -60,12 +67,17 @@ export default async function BrandHubPage({ params }: PageProps) {
         <BrandHero
           brand={brand}
           breadcrumbs={breadcrumbs}
+          socialLinks={socialLinks}
           footer={
             brand.subLines?.length ? (
               <BrandHeroSubLineLinks brand={brand} />
             ) : undefined
           }
         />
+
+        {HAS_SUB_PAGES.has(brand.slug) && (
+          <BrandSubNav brand={brand} currentSection="overview" />
+        )}
 
         <div className="container py-10 lg:py-14">
           <div className="flex items-center justify-between mb-8">
@@ -87,6 +99,17 @@ export default async function BrandHubPage({ params }: PageProps) {
           </div>
 
           <BrandCarGrid cars={cars} />
+
+          {/* Social links — from Notion CMS */}
+          {(socialLinks.length > 0 || brand.social) && (
+            <div className="mt-10 flex items-center justify-between bg-gray-50 rounded-2xl px-6 py-4 border border-gray-100">
+              <div>
+                <p className="text-sm font-semibold text-[#0F172A]">ติดตาม {brand.displayNameTh}</p>
+                <p className="text-xs text-gray-400 mt-0.5">ข่าวสาร โปรโมชั่น และ content ล่าสุด</p>
+              </div>
+              <BrandSocialLinks links={socialLinks} brand={brand} variant="light" />
+            </div>
+          )}
 
           <div className="mt-10 flex flex-wrap gap-4 justify-center">
             <p className="w-full text-center text-sm text-gray-400 mb-2">

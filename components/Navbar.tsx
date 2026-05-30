@@ -4,10 +4,17 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, Phone, ChevronDown } from "lucide-react";
+import { Menu, X, Phone, ChevronDown, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { BrandMegaMenuPanel, MobileBrandLinks } from "@/components/BrandNavMenu";
+import {
+  BrandMegaMenuPanel,
+  MobileBrandLinks,
+  type BrandNavMenuProps,
+} from "@/components/BrandNavMenu";
 import CompanyLogo from "@/components/CompanyLogo";
+import BrandLogo from "@/components/BrandLogo";
+import SearchPalette from "@/components/SearchPalette";
+import type { BrandConfig } from "@/lib/brandConfig";
 
 const MEGA_MENU_LABEL = "แบรนด์รถยนต์";
 
@@ -23,17 +30,24 @@ const navItems = [
     ],
   },
   { label: MEGA_MENU_LABEL, href: "/cars", megaMenu: true },
-  { label: "ทดลองขับ", href: "/booking?type=test_drive" },
+  { label: "นัดหมายเรา", href: "/booking?type=test_drive" },
   { label: "การประกันรถยนต์", href: "/insurance" },
   { label: "ข่าวสารและกิจกรรม", href: "/blog" },
   { label: "ติดต่อเรา", href: "/contact" },
 ];
 
-export default function Navbar() {
+export default function Navbar({
+  navModelsByBrand = {},
+  navCountsByBrand = {},
+}: BrandNavMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [stickyBrand, setStickyBrand] = useState<BrandConfig | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [pinnedDropdown, setPinnedDropdown] = useState<string | null>(null);
   const [mobileBrandOpen, setMobileBrandOpen] = useState(false);
+  const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
   const pathname = usePathname();
   const navRef = useRef<HTMLElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -41,6 +55,7 @@ export default function Navbar() {
   const closeDropdown = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     setActiveDropdown(null);
+    setPinnedDropdown(null);
   }, []);
 
   useEffect(() => {
@@ -50,8 +65,29 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    const handleStickyBrand = (e: Event) => {
+      const { isSticky, brand } = (e as CustomEvent).detail;
+      setStickyBrand(isSticky ? brand : null);
+    };
+    window.addEventListener("brand-subnav-sticky", handleStickyBrand);
+    return () => window.removeEventListener("brand-subnav-sticky", handleStickyBrand);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  useEffect(() => {
     setIsOpen(false);
     setMobileBrandOpen(false);
+    setMobileAboutOpen(false);
     closeDropdown();
   }, [pathname, closeDropdown]);
 
@@ -86,7 +122,31 @@ export default function Navbar() {
   };
 
   const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => setActiveDropdown(null), 150);
+    if (pinnedDropdown) return;
+    timeoutRef.current = setTimeout(() => {
+      setActiveDropdown(null);
+    }, 250);
+  };
+
+  const togglePinnedDropdown = (label: string) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (pinnedDropdown === label) {
+      setPinnedDropdown(null);
+      setActiveDropdown(null);
+      return;
+    }
+    setPinnedDropdown(label);
+    setActiveDropdown(label);
+  };
+
+  const handleDropdownTriggerKeyDown = (
+    event: React.KeyboardEvent,
+    label: string
+  ) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      togglePinnedDropdown(label);
+    }
   };
 
   const isActive = (href: string) => {
@@ -105,13 +165,37 @@ export default function Navbar() {
     >
       <div className="container">
         <div className="flex items-center justify-between h-[68px]">
-          <Link
-            href="/"
-            className="flex items-center shrink-0"
-            aria-label="ช.เอราวัณ ออโต้ กรุ๊ป — หน้าแรก"
-          >
-            <CompanyLogo height={44} priority className="h-11 w-auto" />
-          </Link>
+          <div className="flex items-center gap-3 shrink-0">
+            <Link
+              href="/"
+              aria-label="ช.เอราวัณ ออโต้ กรุ๊ป — หน้าแรก"
+            >
+              <CompanyLogo height={44} priority className="h-11 w-auto" />
+            </Link>
+            <AnimatePresence>
+              {stickyBrand && (
+                <motion.div
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: 0.18 }}
+                  className="flex items-center gap-2"
+                >
+                  <div className="w-px h-6 bg-gray-200" />
+                  <Link href={stickyBrand.hubPath} className="flex items-center">
+                    <BrandLogo
+                      src={stickyBrand.logoPath}
+                      alt={stickyBrand.displayName}
+                      brandSlug={stickyBrand.slug}
+                      size="md"
+                      width={72}
+                      height={28}
+                    />
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           {/* Desktop nav */}
           <div className="hidden lg:flex items-center gap-0">
@@ -131,6 +215,7 @@ export default function Navbar() {
                 {item.megaMenu ? (
                   <button
                     type="button"
+                    id={`nav-trigger-${item.label}`}
                     className={`flex items-center gap-1 px-3.5 py-2 text-[13px] font-medium transition-all whitespace-nowrap relative ${
                       isActive(item.href)
                         ? "text-[#131F3C] font-semibold"
@@ -138,11 +223,43 @@ export default function Navbar() {
                     }`}
                     aria-expanded={megaMenuOpen}
                     aria-haspopup="true"
+                    aria-controls="nav-brand-mega-menu"
+                    onClick={() => togglePinnedDropdown(item.label)}
+                    onKeyDown={(event) =>
+                      handleDropdownTriggerKeyDown(event, item.label)
+                    }
                   >
                     {item.label}
                     <ChevronDown
                       className={`w-3 h-3 transition-transform ${
                         megaMenuOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                    {isActive(item.href) && (
+                      <span className="absolute bottom-0 left-3.5 right-3.5 h-[2px] bg-[#DD5259] rounded-full" />
+                    )}
+                  </button>
+                ) : item.children ? (
+                  <button
+                    type="button"
+                    id={`nav-trigger-${item.label}`}
+                    className={`flex items-center gap-1 px-3.5 py-2 text-[13px] font-medium transition-all whitespace-nowrap relative ${
+                      isActive(item.href)
+                        ? "text-[#131F3C] font-semibold"
+                        : "text-[#4A5568] hover:text-[#131F3C]"
+                    }`}
+                    aria-expanded={activeDropdown === item.label}
+                    aria-haspopup="true"
+                    aria-controls={`nav-submenu-${item.label}`}
+                    onClick={() => togglePinnedDropdown(item.label)}
+                    onKeyDown={(event) =>
+                      handleDropdownTriggerKeyDown(event, item.label)
+                    }
+                  >
+                    {item.label}
+                    <ChevronDown
+                      className={`w-3 h-3 transition-transform ${
+                        activeDropdown === item.label ? "rotate-180" : ""
                       }`}
                     />
                     {isActive(item.href) && (
@@ -159,13 +276,6 @@ export default function Navbar() {
                       }`}
                     >
                       {item.label}
-                      {item.children && (
-                        <ChevronDown
-                          className={`w-3 h-3 transition-transform ${
-                            activeDropdown === item.label ? "rotate-180" : ""
-                          }`}
-                        />
-                      )}
                       {isActive(item.href) && (
                         <span className="absolute bottom-0 left-3.5 right-3.5 h-[2px] bg-[#DD5259] rounded-full" />
                       )}
@@ -175,6 +285,8 @@ export default function Navbar() {
 
                 {item.children && activeDropdown === item.label && (
                   <div
+                    id={`nav-submenu-${item.label}`}
+                    role="menu"
                     className="absolute top-full left-0 mt-0 w-56 bg-white rounded-xl shadow-xl border border-gray-100/80 py-2 z-50"
                     onMouseEnter={() => handleMouseEnter(item.label)}
                     onMouseLeave={handleMouseLeave}
@@ -194,7 +306,18 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="hidden lg:flex items-center">
+          <div className="hidden lg:flex items-center gap-2">
+            {/* Search button */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-colors text-sm bg-gray-50/50"
+            >
+              <Search className="w-3.5 h-3.5" />
+              <span className="text-xs hidden xl:block">ค้นหา</span>
+              <kbd className="hidden xl:inline-flex items-center gap-0.5 text-[10px] bg-white border border-gray-200 px-1 py-0.5 rounded text-gray-400">
+                <span className="text-[11px]">⌘</span>K
+              </kbd>
+            </button>
             <a href="tel:034305500">
               <Button
                 size="sm"
@@ -204,6 +327,17 @@ export default function Navbar() {
                 034-305500
               </Button>
             </a>
+          </div>
+
+          <div className="lg:hidden flex items-center gap-1">
+            {/* Mobile search */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+              aria-label="ค้นหา"
+            >
+              <Search className="w-5 h-5" />
+            </button>
           </div>
 
           <button
@@ -217,20 +351,28 @@ export default function Navbar() {
         </div>
       </div>
 
+      <SearchPalette open={searchOpen} onOpenChange={setSearchOpen} />
+
       {/* Mega menu — full-width panel anchored to nav, not nested in narrow item */}
       <AnimatePresence>
         {megaMenuOpen && (
           <motion.div
             key="brand-mega-menu"
+            id="nav-brand-mega-menu"
+            role="region"
+            aria-labelledby={`nav-trigger-${MEGA_MENU_LABEL}`}
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="hidden lg:block absolute left-0 right-0 top-full bg-white shadow-2xl border-t border-gray-100 z-50"
+            className="hidden lg:block absolute left-0 right-0 top-full z-50 bg-white shadow-2xl border-t border-gray-100 pt-3 -mt-3"
             onMouseEnter={() => handleMouseEnter(MEGA_MENU_LABEL)}
             onMouseLeave={handleMouseLeave}
           >
-            <BrandMegaMenuPanel />
+            <BrandMegaMenuPanel
+              navModelsByBrand={navModelsByBrand}
+              navCountsByBrand={navCountsByBrand}
+            />
           </motion.div>
         )}
       </AnimatePresence>
@@ -259,21 +401,33 @@ export default function Navbar() {
                         }`}
                       />
                     </button>
-                    {mobileBrandOpen && <MobileBrandLinks />}
+                    {mobileBrandOpen && (
+                      <MobileBrandLinks
+                        navModelsByBrand={navModelsByBrand}
+                        navCountsByBrand={navCountsByBrand}
+                      />
+                    )}
                   </>
-                ) : (
+                ) : item.children ? (
                   <>
-                    <Link
-                      href={item.href}
-                      className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    <button
+                      type="button"
+                      onClick={() => setMobileAboutOpen((open) => !open)}
+                      className={`flex w-full items-center justify-between px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
                         isActive(item.href)
                           ? "text-[#131F3C] bg-gray-50 font-semibold"
                           : "text-gray-600 hover:bg-gray-50"
                       }`}
+                      aria-expanded={mobileAboutOpen}
                     >
                       {item.label}
-                    </Link>
-                    {item.children && (
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          mobileAboutOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+                    {mobileAboutOpen && (
                       <div className="ml-4 mt-0.5 space-y-0.5">
                         {item.children.map((child) => (
                           <Link
@@ -287,6 +441,17 @@ export default function Navbar() {
                       </div>
                     )}
                   </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`block px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive(item.href)
+                        ? "text-[#131F3C] bg-gray-50 font-semibold"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
                 )}
               </div>
             ))}

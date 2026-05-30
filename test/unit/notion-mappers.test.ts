@@ -68,6 +68,8 @@ describe("pageToCar (via createCar mapping output)", () => {
       videoUrl: "https://youtube.com/watch?v=abc",
       isActive: true,
       isFeatured: false,
+      navFeatured: false,
+      navNew: false,
       slug: "mazda-cx-5-2024",
     });
     expect(car.specs).toEqual({ horsepower: "170hp", seats: "5" });

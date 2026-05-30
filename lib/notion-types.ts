@@ -19,7 +19,11 @@ export interface Car {
   imageUrls: string[]; // Cloudinary URLs parsed from newline-separated text
   videoUrl: string | null;
   isActive: boolean;
-  isFeatured: boolean;
+  isBestSeller: boolean;
+  /** Notion checkbox "Nav Featured" — mega menu highlight (แนะนำ) */
+  navFeatured: boolean;
+  /** Notion checkbox "Nav New" — mega menu highlight (ใหม่) */
+  navNew: boolean;
   slug: string;
 }
 
@@ -86,6 +90,17 @@ export interface ContactSubmission {
   submittedAt: string;
 }
 
+export interface Promotion {
+  id: string; // Notion page ID
+  title: string;
+  brand: "Mazda" | "Ford" | "Mitsubishi" | "GWM" | "Deepal" | "Kia";
+  coverImageUrl: string | null;
+  linkUrl: string | null;
+  startDate: string | null; // ISO date string
+  endDate: string | null; // ISO date string
+  isActive: boolean;
+}
+
 // ─── Admin write inputs ─────────────────────────────────────────────────────
 
 /** Payload for creating a car (all fields). Update uses Partial of this. */
@@ -125,6 +140,85 @@ export interface StoryFormData {
   rating: number;
   carModel: string;
   imageUrl?: string;
+}
+
+export interface FAQItem {
+  id: string;
+  question: string;
+  answer: string;
+  page: string;
+  brand: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface VideoReview {
+  id: string;
+  title: string;
+  brand: string;
+  platform: "YouTube" | "TikTok";
+  videoUrl: string;
+  thumbnailUrl: string | null;
+  description: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface BrandSocialLink {
+  id: string;
+  label: string;
+  brand: string;
+  platform: "Facebook" | "TikTok" | "YouTube" | "LINE" | "Instagram";
+  url: string;
+  isActive: boolean;
+}
+
+export interface InsurancePartner {
+  id: string;
+  name: string;
+  brand: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+export interface ServicePageSection {
+  id: string;
+  title: string;
+  page: "body-repair" | "service" | "one-stop";
+  brand: string;
+  sectionKey: string;
+  sortOrder: number;
+  isPublished: boolean;
+  notionUrl: string;
+}
+
+export interface CustomerFeedback {
+  id: string;
+  name: string;
+  type: "ร้องเรียน" | "ชมเชย" | "เสนอแนะ";
+  brand: string;
+  branch: string;
+  department: string;
+  phone: string;
+  email: string;
+  licensePlate: string;
+  serviceDate: string | null;
+  message: string;
+  status: "ใหม่" | "กำลังดำเนินการ" | "แก้ไขแล้ว";
+  submittedAt: string;
+}
+
+export interface FeedbackFormData {
+  name: string;
+  type: "ร้องเรียน" | "ชมเชย" | "เสนอแนะ";
+  brand: string;
+  branch: string;
+  department: string;
+  phone: string;
+  email: string;
+  licensePlate: string;
+  serviceDate: string;
+  message: string;
 }
 
 export interface ContactFormData {

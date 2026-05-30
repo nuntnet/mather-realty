@@ -13,11 +13,45 @@ import {
   type BrandConfig,
   type BrandSlug,
 } from "@/lib/brandConfig";
+import type {
+  NavCountsByBrand,
+  NavHighlightModel,
+  NavModelBadge,
+  NavModelsByBrand,
+} from "@/lib/navModels";
 import { cn } from "@/lib/utils";
 import { ChevronRight } from "lucide-react";
 
+export interface BrandNavMenuProps {
+  navModelsByBrand?: NavModelsByBrand;
+  navCountsByBrand?: NavCountsByBrand;
+}
+
+function navBadgeLabel(badge: NavModelBadge): string {
+  return badge === "featured" ? "แนะนำ" : "ใหม่";
+}
+
+function resolveNavModels(
+  brand: BrandConfig,
+  navModelsByBrand: NavModelsByBrand
+): NavHighlightModel[] {
+  const fromNotion = navModelsByBrand[brand.notionBrand];
+  if (fromNotion?.length) return fromNotion;
+  return (brand.featuredModels ?? []).map((m) => ({ name: m.name, slug: m.slug }));
+}
+
+function resolveNavCount(
+  brand: BrandConfig,
+  navCountsByBrand: NavCountsByBrand
+): number | undefined {
+  const n = navCountsByBrand[brand.notionBrand];
+  return n && n > 0 ? n : undefined;
+}
+
 interface BrandNavTileProps {
   brand: BrandConfig;
+  navModels: NavHighlightModel[];
+  navTotalCount?: number;
   compact?: boolean;
   showFeatured?: boolean;
   showGwmSubLines?: boolean;
@@ -26,33 +60,70 @@ interface BrandNavTileProps {
 
 function FeaturedModelLinks({
   brand,
+  models,
+  totalCount,
   compact = false,
 }: {
   brand: BrandConfig;
+  models: NavHighlightModel[];
+  totalCount?: number;
   compact?: boolean;
 }) {
-  if (!brand.featuredModels?.length) return null;
+  if (!models.length) return null;
+
+  const countLabel = totalCount ?? models.length;
 
   return (
-    <ul
+    <div
       className={cn(
-        "space-y-1",
         compact ? "mt-2" : "mt-3 border-t border-gray-100/80 pt-3"
       )}
     >
-      {brand.featuredModels.map((model) => (
-        <li key={model.slug}>
-          <Link
-            href={`/cars/${model.slug}`}
-            onClick={(e) => e.stopPropagation()}
-            className="group/model flex items-center justify-between gap-2 rounded-md px-2 py-1.5 min-h-[32px] text-xs text-gray-500 hover:bg-[#131F3C]/5 hover:text-[#131F3C] transition-colors"
-          >
-            <span className="truncate">{model.name}</span>
-            <ChevronRight className="w-3 h-3 shrink-0 opacity-0 -translate-x-1 group-hover/model:opacity-60 group-hover/model:translate-x-0 transition-all" />
-          </Link>
-        </li>
-      ))}
-    </ul>
+      {!compact && (
+        <p className="text-[10px] uppercase tracking-wider text-gray-400 mb-1.5 px-1">
+          รุ่นแนะนำ / ใหม่
+        </p>
+      )}
+      <ul className="space-y-1">
+        {models.map((model) => (
+          <li key={model.slug}>
+            <Link
+              href={`/cars/${model.slug}`}
+              className="group/model flex items-center justify-between gap-2 rounded-md px-2 py-1.5 min-h-[32px] text-xs text-gray-500 hover:bg-[#131F3C]/5 hover:text-[#131F3C] transition-colors"
+            >
+              <span className="flex min-w-0 items-center gap-1.5 truncate">
+                <span className="truncate">{model.name}</span>
+                {model.badge ? (
+                  <span
+                    className={cn(
+                      "shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide",
+                      model.badge === "featured"
+                        ? "bg-[#DD5259]/10 text-[#DD5259]"
+                        : "bg-emerald-50 text-emerald-700"
+                    )}
+                  >
+                    {navBadgeLabel(model.badge)}
+                  </span>
+                ) : null}
+              </span>
+              <ChevronRight className="w-3 h-3 shrink-0 opacity-0 -translate-x-1 group-hover/model:opacity-60 group-hover/model:translate-x-0 transition-all" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+      <Link
+        href={brand.hubPath}
+        className={cn(
+          "mt-2 flex items-center justify-between gap-2 rounded-md px-2 py-1.5 min-h-[32px] text-xs font-semibold text-[#131F3C] hover:bg-[#131F3C]/5 hover:text-[#DD5259] transition-colors",
+          compact ? "" : "border border-gray-100/80 bg-white/60"
+        )}
+      >
+        <span className="truncate">
+          ดูรุ่น {brand.displayNameTh} ทั้งหมด ({countLabel})
+        </span>
+        <ChevronRight className="w-3 h-3 shrink-0 opacity-60" />
+      </Link>
+    </div>
   );
 }
 
@@ -81,7 +152,6 @@ function GwmSubLineLinks({
           <Link
             key={line.slug}
             href={getGwmLineHref(line.slug)}
-            onClick={(e) => e.stopPropagation()}
             className="inline-flex items-center gap-1.5 rounded-md border border-gray-100 hover:border-[#DD5259]/40 px-2 py-1 min-h-[32px] bg-gray-50/80 hover:bg-white transition-all text-xs font-medium text-gray-600 hover:text-[#131F3C]"
           >
             <BrandLogo
@@ -102,13 +172,15 @@ function GwmSubLineLinks({
 
 export function BrandNavTile({
   brand,
+  navModels,
+  navTotalCount,
   compact = false,
   showFeatured = false,
   showGwmSubLines = false,
   className,
 }: BrandNavTileProps) {
   const [hovered, setHovered] = useState(false);
-  const tileRef = useRef<HTMLAnchorElement>(null);
+  const tileRef = useRef<HTMLDivElement>(null);
   const [pointer, setPointer] = useState({
     x: 50,
     y: 50,
@@ -116,7 +188,7 @@ export function BrandNavTile({
     tiltY: 0,
   });
 
-  const handleMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = tileRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -125,8 +197,8 @@ export function BrandNavTile({
     setPointer({
       x,
       y,
-      tiltX: ((y - 50) / 50) * -5,
-      tiltY: ((x - 50) / 50) * 5,
+      tiltX: ((y - 50) / 50) * -3,
+      tiltY: ((x - 50) / 50) * 3,
     });
   }, []);
 
@@ -135,13 +207,12 @@ export function BrandNavTile({
   }, []);
 
   const active = hovered || showFeatured || showGwmSubLines;
-  const parallaxX = (pointer.x - 50) * 0.12;
-  const parallaxY = (pointer.y - 50) * 0.12;
+  const logoRotateY = ((pointer.x - 50) / 50) * 10;
+  const logoRotateX = ((pointer.y - 50) / 50) * -4;
 
   return (
-    <Link
+    <div
       ref={tileRef}
-      href={brand.hubPath}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => {
         setHovered(false);
@@ -150,7 +221,7 @@ export function BrandNavTile({
       onMouseMove={handleMove}
       style={{
         transform: active
-          ? `perspective(900px) rotateX(${pointer.tiltX}deg) rotateY(${pointer.tiltY}deg) scale(1.02)`
+          ? `perspective(900px) rotateX(${pointer.tiltX}deg) rotateY(${pointer.tiltY}deg) scale(1.01)`
           : "perspective(900px) rotateX(0deg) rotateY(0deg) scale(1)",
       }}
       className={cn(
@@ -164,6 +235,11 @@ export function BrandNavTile({
         className
       )}
     >
+      <Link
+        href={brand.hubPath}
+        aria-label={`ดู ${brand.displayNameTh}`}
+        className="absolute inset-0 z-[2] rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DD5259] focus-visible:ring-offset-2"
+      />
       {brand.navBgImage ? (
         <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-xl">
           <Image
@@ -209,18 +285,18 @@ export function BrandNavTile({
         aria-hidden
       />
 
-      <div className="relative z-10 flex flex-col flex-1">
+      <div className="relative z-10 pointer-events-none flex flex-col flex-1">
         <motion.div
           className={cn(
             "mx-auto flex items-center justify-center mb-2",
             compact ? "w-14 h-14" : "w-[4.5rem] h-[4.5rem]"
           )}
+          style={{ perspective: 500, transformStyle: "preserve-3d" }}
           animate={{
-            scale: active ? 1.05 : 1,
-            x: active ? parallaxX : 0,
-            y: active ? parallaxY - 2 : 0,
+            rotateY: active ? logoRotateY : 0,
+            rotateX: active ? logoRotateX : 0,
           }}
-          transition={{ type: "spring", stiffness: 320, damping: 28 }}
+          transition={{ type: "spring", stiffness: 260, damping: 32 }}
         >
           <BrandLogo
             src={brand.logoPath}
@@ -253,15 +329,21 @@ export function BrandNavTile({
         </div>
 
         <AnimatePresence>
-          {showFeatured && brand.featuredModels?.length ? (
+          {showFeatured && navModels.length > 0 ? (
             <motion.div
               key="featured"
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 4 }}
               transition={{ duration: 0.2 }}
+              className="pointer-events-auto relative z-20"
             >
-              <FeaturedModelLinks brand={brand} compact={compact} />
+              <FeaturedModelLinks
+                brand={brand}
+                models={navModels}
+                totalCount={navTotalCount}
+                compact={compact}
+              />
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -269,16 +351,21 @@ export function BrandNavTile({
         {brand.slug === "gwm" && (
           <AnimatePresence>
             {showGwmSubLines ? (
-              <GwmSubLineLinks key="gwm-sublines" compact={compact} visible />
+              <div className="pointer-events-auto relative z-20">
+                <GwmSubLineLinks key="gwm-sublines" compact={compact} visible />
+              </div>
             ) : null}
           </AnimatePresence>
         )}
       </div>
-    </Link>
+    </div>
   );
 }
 
-export function BrandMegaMenuGrid() {
+export function BrandMegaMenuGrid({
+  navModelsByBrand = {},
+  navCountsByBrand = {},
+}: BrandNavMenuProps) {
   const [hoveredSlug, setHoveredSlug] = useState<BrandSlug | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelSpot, setPanelSpot] = useState({ x: 50, y: 30 });
@@ -316,6 +403,8 @@ export function BrandMegaMenuGrid() {
           >
             <BrandNavTile
               brand={brand}
+              navModels={resolveNavModels(brand, navModelsByBrand)}
+              navTotalCount={resolveNavCount(brand, navCountsByBrand)}
               showFeatured={hoveredSlug === brand.slug}
               showGwmSubLines={
                 brand.slug === "gwm" && hoveredSlug === "gwm"
@@ -329,7 +418,10 @@ export function BrandMegaMenuGrid() {
 }
 
 /** Full desktop mega menu panel — rendered only when dropdown is open */
-export function BrandMegaMenuPanel() {
+export function BrandMegaMenuPanel({
+  navModelsByBrand = {},
+  navCountsByBrand = {},
+}: BrandNavMenuProps) {
   return (
     <div className="container py-8">
       <div className="mb-6">
@@ -337,23 +429,28 @@ export function BrandMegaMenuPanel() {
           แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป
         </h3>
         <p className="text-sm text-gray-400 mt-1">
-          เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด — ชี้เมาส์เพื่อดูรุ่นยอดนิยม
+          เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด — ชี้เมาส์เพื่อดูไฮไลท์รุ่นแนะนำ / ใหม่
         </p>
       </div>
-      <BrandMegaMenuGrid />
-      <div className="mt-6 pt-5 border-t border-gray-100 flex items-center justify-between">
-        <Link
-          href="/cars"
-          className="text-sm text-[#131F3C] font-semibold hover:text-[#DD5259] transition-colors"
-        >
-          ดูรถยนต์ทั้งหมด →
-        </Link>
-        <Link
-          href="/cars?condition=used"
-          className="text-sm text-gray-400 hover:text-[#131F3C] transition-colors"
-        >
-          รถยนต์มือสอง →
-        </Link>
+      <div className="space-y-5">
+        <BrandMegaMenuGrid
+          navModelsByBrand={navModelsByBrand}
+          navCountsByBrand={navCountsByBrand}
+        />
+        <div className="border-t border-gray-100 pt-5 flex items-center justify-between gap-4">
+          <Link
+            href="/cars"
+            className="inline-flex items-center min-h-[44px] py-2 text-sm text-[#131F3C] font-semibold hover:text-[#DD5259] transition-colors"
+          >
+            ดูรถยนต์ทั้งหมด →
+          </Link>
+          <Link
+            href="/cars?condition=used"
+            className="inline-flex items-center min-h-[44px] py-2 text-sm text-gray-400 hover:text-[#131F3C] transition-colors"
+          >
+            รถยนต์มือสอง →
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -400,10 +497,18 @@ export function GwmSubLineRow({ compact = false }: { compact?: boolean }) {
   );
 }
 
-function MobileBrandTile({ brand }: { brand: BrandConfig }) {
+function MobileBrandTile({
+  brand,
+  navModels,
+  navTotalCount,
+}: {
+  brand: BrandConfig;
+  navModels: NavHighlightModel[];
+  navTotalCount?: number;
+}) {
   const [expanded, setExpanded] = useState(false);
   const isGwm = brand.slug === "gwm";
-  const hasExtra = isGwm || (brand.featuredModels?.length ?? 0) > 0;
+  const hasExtra = isGwm || navModels.length > 0;
 
   return (
     <div className="rounded-lg border border-gray-100 overflow-hidden bg-white">
@@ -456,8 +561,13 @@ function MobileBrandTile({ brand }: { brand: BrandConfig }) {
             transition={{ duration: 0.22, ease: "easeOut" }}
             className="overflow-hidden border-t border-gray-100 bg-gray-50/50 px-3 py-2"
           >
-            {brand.featuredModels?.length ? (
-              <FeaturedModelLinks brand={brand} compact />
+            {navModels.length > 0 ? (
+              <FeaturedModelLinks
+                brand={brand}
+                models={navModels}
+                totalCount={navTotalCount}
+                compact
+              />
             ) : null}
             {isGwm ? <GwmSubLineLinks compact visible /> : null}
           </motion.div>
@@ -467,12 +577,20 @@ function MobileBrandTile({ brand }: { brand: BrandConfig }) {
   );
 }
 
-export function MobileBrandLinks() {
+export function MobileBrandLinks({
+  navModelsByBrand = {},
+  navCountsByBrand = {},
+}: BrandNavMenuProps) {
   return (
     <div className="ml-4 mt-1 space-y-2">
       <div className="grid grid-cols-1 gap-2">
         {BRANDS.map((brand) => (
-          <MobileBrandTile key={brand.slug} brand={brand} />
+          <MobileBrandTile
+            key={brand.slug}
+            brand={brand}
+            navModels={resolveNavModels(brand, navModelsByBrand)}
+            navTotalCount={resolveNavCount(brand, navCountsByBrand)}
+          />
         ))}
       </div>
       <Link

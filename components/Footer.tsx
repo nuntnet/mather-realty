@@ -3,6 +3,21 @@ import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import { branches } from "@/lib/branchData";
 
+const LINE_ACCOUNTS = [
+  { brand: "Mazda",      lineId: "@mazdach.erawan", url: "https://line.me/R/ti/p/@mazdach.erawan", color: "#910023" },
+  { brand: "Deepal",     lineId: "@deepalch.erawan", url: "https://line.me/R/ti/p/@deepalch.erawan", color: "#0066FF" },
+  { brand: "Ford",       lineId: "@fordch.erawan",  url: "https://line.me/R/ti/p/@fordch.erawan",  color: "#003478" },
+  { brand: "Mitsubishi", lineId: "@mitsuch.erawan", url: "https://line.me/R/ti/p/@mitsuch.erawan", color: "#E60012" },
+  { brand: "GWM",        lineId: "@gwmch.erawan",   url: "https://line.me/R/ti/p/@gwmch.erawan",   color: "#C8102E" },
+  { brand: "Kia",        lineId: "@kiach.erawan",   url: "https://line.me/R/ti/p/@kiach.erawan",   color: "#BB162B" },
+];
+
+const LINE_SVG = (
+  <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current flex-shrink-0">
+    <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+  </svg>
+);
+
 const quickLinks = [
   { label: "หน้าแรก", href: "/" },
   { label: "เกี่ยวกับเรา", href: "/about" },
@@ -19,6 +34,7 @@ const serviceLinks = [
   { label: "ซื้อขายรถมือสอง", href: "/secondhand" },
   { label: "เรื่องราวลูกค้า", href: "/stories" },
   { label: "ร่วมงานกับเรา", href: "/career" },
+  { label: "แนะนำ–ติชม", href: "/feedback" },
 ];
 
 export default function Footer() {
@@ -84,47 +100,44 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Branches + Social */}
+          {/* Column 4: LINE OA */}
           <div>
-            <h3 className="text-white font-semibold text-sm mb-5 tracking-wide uppercase">สาขาของเรา</h3>
-            <ul className="space-y-3 mb-6">
-              {branches.map((branch) => (
-                <li key={branch.id}>
-                  <Link
-                    href="/branches"
-                    className="text-sm text-white/50 hover:text-white transition-colors leading-snug block"
-                  >
-                    {branch.name}
-                  </Link>
-                </li>
+            <h3 className="text-white font-semibold text-sm mb-2 tracking-wide uppercase">Line Official</h3>
+            <p className="text-white/40 text-xs mb-5">เพิ่มเพื่อนเพื่อรับโปรโมชั่นและข่าวสาร</p>
+            <div className="space-y-2.5">
+              {LINE_ACCOUNTS.map((account) => (
+                <a
+                  key={account.lineId}
+                  href={account.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between gap-3 bg-white/5 hover:bg-[#06C755]/15 border border-white/10 hover:border-[#06C755]/40 rounded-xl px-3.5 py-2.5 transition-all group"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-[#06C755] flex items-center justify-center shrink-0 text-white">
+                      {LINE_SVG}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-white/80 group-hover:text-white transition-colors truncate">{account.brand}</p>
+                      <p className="text-[11px] text-white/40 group-hover:text-[#06C755] transition-colors">{account.lineId}</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] text-white/30 group-hover:text-[#06C755] transition-colors shrink-0 font-medium">
+                    เพิ่มเพื่อน
+                  </span>
+                </a>
               ))}
-            </ul>
-            <Link
-              href="/branches"
-              className="inline-flex items-center text-xs text-white/40 hover:text-white/70 transition-colors mb-8"
-            >
-              ดูสาขาทั้งหมดและแผนที่ →
-            </Link>
+            </div>
 
-            <h3 className="text-white font-semibold text-sm mb-4 tracking-wide uppercase">ติดตามเรา</h3>
-            <div className="flex items-center gap-2">
-              {/* Facebook - verified */}
+            <div className="mt-6">
+              <h3 className="text-white font-semibold text-sm mb-3 tracking-wide uppercase">ติดตามเรา</h3>
               <a href="https://www.facebook.com/cherawan.autogroup" target="_blank" rel="noopener noreferrer"
-                className="w-9 h-9 rounded-full bg-white/8 hover:bg-[#1877F2] flex items-center justify-center text-white/50 hover:text-white transition-all"
+                className="w-9 h-9 rounded-full bg-white/8 hover:bg-[#1877F2] inline-flex items-center justify-center text-white/50 hover:text-white transition-all"
                 aria-label="Facebook">
                 <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
               </a>
-              {/* LINE - placeholder, disabled until real link */}
-              <span
-                className="w-9 h-9 rounded-full bg-white/5 flex items-center justify-center text-white/20 cursor-not-allowed"
-                title="เร็วๆ นี้"
-                aria-label="LINE (เร็วๆ นี้)">
-                <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
-                  <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63h2.386c.349 0 .63.285.63.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.627-.63.349 0 .631.285.631.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
-                </svg>
-              </span>
             </div>
           </div>
         </div>

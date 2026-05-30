@@ -30,7 +30,6 @@ export async function POST(req: NextRequest) {
         ...(data.customerPhone ? { Phone: { phone_number: data.customerPhone } } : {}),
         Status: { select: { name: "pending" } },
         "Is Public": { checkbox: false },
-        "Submitted At": { date: { start: new Date().toISOString() } },
       },
     });
 

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { BookOpen, Pencil, Plus, Search, Trash2, Filter } from "lucide-react";
+import Pagination from "@/components/admin/Pagination";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -30,6 +31,10 @@ export default function AdminBlogPage() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [publishedFilter, setPublishedFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const PAGE_SIZE = 10;
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<BlogPost | null>(null);
@@ -80,11 +85,19 @@ export default function AdminBlogPage() {
     }
   };
 
+  // Reset to page 1 when filters change
+  const resetPage = () => setPage(1);
+
   const filtered = posts.filter((p) => {
-    if (!search) return true;
     const q = search.toLowerCase();
-    return p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q);
+    const matchSearch = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q);
+    const matchCat = categoryFilter === "all" || p.category === categoryFilter;
+    const matchPub = publishedFilter === "all" || (publishedFilter === "published" ? p.isPublished : !p.isPublished);
+    return matchSearch && matchCat && matchPub;
   });
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <div className="p-6 space-y-5">
@@ -105,15 +118,46 @@ export default function AdminBlogPage() {
         </button>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="ค้นหาบทความ..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
-        />
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input
+            type="text"
+            placeholder="ค้นหาบทความ..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); resetPage(); }}
+            className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20 w-56"
+          />
+        </div>
+        <select
+          value={categoryFilter}
+          onChange={(e) => { setCategoryFilter(e.target.value); resetPage(); }}
+          className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
+        >
+          <option value="all">ทุกหมวด</option>
+          {Object.entries(CATEGORY_LABEL).map(([k, v]) => (
+            <option key={k} value={k}>{v}</option>
+          ))}
+        </select>
+        <select
+          value={publishedFilter}
+          onChange={(e) => { setPublishedFilter(e.target.value); resetPage(); }}
+          className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
+        >
+          <option value="all">ทั้งเผยแพร่และฉบับร่าง</option>
+          <option value="published">เผยแพร่แล้ว</option>
+          <option value="draft">ฉบับร่าง</option>
+        </select>
+        {(search || categoryFilter !== "all" || publishedFilter !== "all") && (
+          <button
+            onClick={() => { setSearch(""); setCategoryFilter("all"); setPublishedFilter("all"); resetPage(); }}
+            className="text-xs text-gray-400 hover:text-gray-600 flex items-center gap-1"
+          >
+            <Filter className="w-3.5 h-3.5" /> ล้าง filter
+          </button>
+        )}
+        <span className="ml-auto text-xs text-gray-400">{filtered.length} บทความ</span>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
@@ -138,7 +182,7 @@ export default function AdminBlogPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((post) => (
+              {paginated.map((post) => (
                 <tr key={post.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2">
@@ -192,6 +236,15 @@ export default function AdminBlogPage() {
             </tbody>
           </table>
         )}
+        <div className="px-5 pb-4">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={filtered.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
 
       <BlogForm open={formOpen} onOpenChange={setFormOpen} postId={editingId} onSaved={fetchPosts} />

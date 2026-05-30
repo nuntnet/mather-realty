@@ -3,10 +3,12 @@ import Image from "next/image";
 import BrandLogo from "@/components/BrandLogo";
 import BrandBreadcrumb from "@/components/BrandBreadcrumb";
 import BrandHeroContent from "@/components/BrandHeroContent";
+import BrandSocialLinks from "@/components/BrandSocialLinks";
 import { Button } from "@/components/ui/button";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 import type { BrandConfig } from "@/lib/brandConfig";
 import type { BreadcrumbItem } from "@/lib/site";
+import type { BrandSocialLink } from "@/lib/notion-types";
 import { ArrowRight } from "lucide-react";
 
 interface BrandHeroProps {
@@ -20,6 +22,8 @@ interface BrandHeroProps {
   secondaryCta?: { label: string; href: string };
   /** Optional second logo (GWM line pages) */
   secondaryLogo?: { src: string; alt: string; label?: string };
+  /** Social media links — fetched from Notion, shown below description */
+  socialLinks?: BrandSocialLink[];
 }
 
 export default function BrandHero({
@@ -30,6 +34,7 @@ export default function BrandHero({
   primaryCta,
   secondaryCta,
   secondaryLogo,
+  socialLinks,
 }: BrandHeroProps) {
   const heroImage =
     bgImage ??
@@ -137,6 +142,14 @@ export default function BrandHero({
               <p className="text-white/70 text-base lg:text-lg leading-relaxed max-w-xl">
                 {brand.descriptionTh}
               </p>
+
+              {/* Social links */}
+              {socialLinks && socialLinks.length > 0 && (
+                <div className="flex items-center gap-3 mt-5">
+                  <span className="text-white/35 text-xs tracking-wider uppercase">ติดตาม</span>
+                  <BrandSocialLinks links={socialLinks} brand={brand} variant="dark" size="sm" />
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-3 shrink-0">

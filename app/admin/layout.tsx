@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2 } from "lucide-react";
+import CompanyLogo from "@/components/CompanyLogo";
 import {
   Avatar, AvatarFallback,
 } from "@/components/ui/avatar";
@@ -12,13 +13,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const menuItems = [
-  { icon: BarChart3, label: "ภาพรวม", href: "/admin" },
-  { icon: BookOpen, label: "บทความ", href: "/admin/blog" },
-  { icon: Car, label: "รถยนต์", href: "/admin/cars" },
-  { icon: Calendar, label: "นัดหมาย", href: "/admin/appointments" },
-  { icon: MessageSquare, label: "รีวิวลูกค้า", href: "/admin/stories" },
-  { icon: Mail, label: "ข้อความติดต่อ", href: "/admin/contacts" },
+  { icon: BarChart3,    label: "ภาพรวม",      href: "/admin" },
+  { icon: BookOpen,     label: "บทความ",       href: "/admin/blog" },
+  { icon: Car,          label: "รถยนต์",       href: "/admin/cars" },
+  { icon: Tag,                  label: "โปรโมชั่น",    href: "/admin/promotions" },
+  { icon: MessageSquareWarning, label: "Feedback",      href: "/admin/feedback" },
+  { icon: Wrench,               label: "Brand Content", href: "/admin/service-content" },
+  { icon: Share2,               label: "Social Links",  href: "/admin/social-links" },
+  { icon: Calendar,     label: "นัดหมาย",      href: "/admin/appointments" },
+  { icon: MessageSquare,label: "รีวิวลูกค้า",  href: "/admin/stories" },
+  { icon: Mail,         label: "ข้อความติดต่อ",href: "/admin/contacts" },
 ];
+
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -45,21 +51,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-56 shrink-0 bg-white border-r border-gray-100 flex flex-col fixed inset-y-0">
         {/* Logo */}
         <div className="h-14 border-b border-gray-100 px-4 flex items-center gap-2.5">
-          <div className="w-7 h-7 shrink-0">
-            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <path d="M18 2L4 8V18C4 25.73 10.24 32.98 18 35C25.76 32.98 32 25.73 32 18V8L18 2Z" fill="url(#ag)" />
-              <path d="M18 7L8 11.5V18C8 23.4 12.48 28.52 18 30.5C23.52 28.52 28 23.4 28 18V11.5L18 7Z" fill="#2E5EA8" opacity="0.5" />
-              <text x="18" y="22" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold" fontFamily="serif">ช</text>
-              <defs>
-                <linearGradient id="ag" x1="18" y1="2" x2="18" y2="35" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#2563EB" /><stop offset="1" stopColor="#1B3A6B" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div>
-            <div className="font-bold text-[#131F3C] text-[12px] leading-tight">CH.ERAWAN</div>
-            <div className="text-[9px] text-gray-400 uppercase tracking-wider">Admin Panel</div>
+          <CompanyLogo height={36} className="h-9 w-auto" />
+          <div className="text-[9px] text-gray-400 uppercase tracking-wider leading-tight">
+            Admin Panel
           </div>
         </div>
 
@@ -86,6 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
         </nav>
+
 
         {/* User footer */}
         <div className="border-t border-gray-100 p-3">

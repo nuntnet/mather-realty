@@ -106,12 +106,32 @@ export default function CarsFilter({ cars }: { cars: Car[] }) {
                     {car.brand[0]}
                   </div>
                 )}
-                <div className="absolute top-3 left-3 flex gap-2">
+                {/* Brand + condition — bottom-left */}
+                <div className="absolute top-3 left-3 flex gap-1.5">
                   <Badge className="bg-[#0F172A]/80 text-white text-xs backdrop-blur-sm border-0">
                     {car.brand}
                   </Badge>
                   {car.condition === "used" && (
                     <Badge className="bg-amber-500/90 text-white text-xs border-0">มือสอง</Badge>
+                  )}
+                </div>
+
+                {/* Status badges — top-right */}
+                <div className="absolute top-3 right-3 flex flex-col gap-1.5 items-end">
+                  {car.navNew && (
+                    <span className="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                      ใหม่
+                    </span>
+                  )}
+                  {car.navFeatured && (
+                    <span className="bg-[#DD5259] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                      แนะนำ
+                    </span>
+                  )}
+                  {car.isBestSeller && !car.navFeatured && (
+                    <span className="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                      ขายดี
+                    </span>
                   )}
                 </div>
               </div>

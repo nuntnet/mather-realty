@@ -52,7 +52,7 @@ export default function BrandCarGrid({
                   loading="lazy"
                   decoding="async"
                 />
-                {car.isFeatured && (
+                {car.isBestSeller && (
                   <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">
                     แนะนำ
                   </Badge>

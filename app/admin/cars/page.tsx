@@ -39,7 +39,11 @@ export default function AdminCarsPage() {
     fetchCars();
   }, []);
 
-  const toggleFlag = async (car: Car, flag: "isActive" | "isFeatured", value: boolean) => {
+  const toggleFlag = async (
+    car: Car,
+    flag: "isActive" | "isBestSeller" | "navFeatured" | "navNew",
+    value: boolean
+  ) => {
     setBusyId(car.id);
     setCars((prev) => prev.map((c) => (c.id === car.id ? { ...c, [flag]: value } : c)));
     try {
@@ -129,8 +133,25 @@ export default function AdminCarsPage() {
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">รถยนต์</th>
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-24">แบรนด์</th>
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-36">ราคา (เริ่มต้น)</th>
-                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20">แสดงผล</th>
-                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20">แนะนำ</th>
+                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20" title="แสดง/ซ่อนรถบนเว็บไซต์">เผยแพร่</th>
+                <th className="text-center text-xs font-semibold text-gray-500 px-3 py-3 uppercase tracking-wider w-20" title="แสดงหน้า Home + badge ขายดี บนหน้า /cars">
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>ขายดี</span>
+                    <span className="text-[9px] text-orange-400 font-normal normal-case">Home</span>
+                  </span>
+                </th>
+                <th className="text-center text-xs font-semibold text-gray-500 px-2 py-3 uppercase tracking-wider w-20" title="แสดงใน Mega Nav + badge แนะนำ บนหน้า /cars">
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>แนะนำ</span>
+                    <span className="text-[9px] text-blue-400 font-normal normal-case">mega nav</span>
+                  </span>
+                </th>
+                <th className="text-center text-xs font-semibold text-gray-500 px-2 py-3 uppercase tracking-wider w-16" title="แสดงใน Mega Nav + badge ใหม่ บนหน้า /cars">
+                  <span className="flex flex-col items-center gap-0.5">
+                    <span>ใหม่</span>
+                    <span className="text-[9px] text-blue-400 font-normal normal-case">mega nav</span>
+                  </span>
+                </th>
                 <th className="text-right text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-28">จัดการ</th>
               </tr>
             </thead>
@@ -168,9 +189,23 @@ export default function AdminCarsPage() {
                   </td>
                   <td className="px-3 py-4 text-center">
                     <Switch
-                      checked={car.isFeatured}
+                      checked={car.isBestSeller}
                       disabled={busyId === car.id}
-                      onCheckedChange={(v) => toggleFlag(car, "isFeatured", v)}
+                      onCheckedChange={(v) => toggleFlag(car, "isBestSeller", v)}
+                    />
+                  </td>
+                  <td className="px-2 py-4 text-center">
+                    <Switch
+                      checked={car.navFeatured}
+                      disabled={busyId === car.id}
+                      onCheckedChange={(v) => toggleFlag(car, "navFeatured", v)}
+                    />
+                  </td>
+                  <td className="px-2 py-4 text-center">
+                    <Switch
+                      checked={car.navNew}
+                      disabled={busyId === car.id}
+                      onCheckedChange={(v) => toggleFlag(car, "navNew", v)}
                     />
                   </td>
                   <td className="px-5 py-4">

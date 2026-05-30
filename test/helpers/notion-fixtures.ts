@@ -65,6 +65,8 @@ export function makeCarPage(overrides?: Partial<Record<string, Prop>>): FakePage
     "Video URL": url("https://youtube.com/watch?v=abc"),
     "Is Active": checkbox(true),
     "Is Featured": checkbox(false),
+    "Nav Featured": checkbox(false),
+    "Nav New": checkbox(false),
     Slug: richText("mazda-cx-5-2024"),
     ...overrides,
   }, { id: "car-1" });
