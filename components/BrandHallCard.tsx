@@ -110,32 +110,34 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
         />
       )}
 
-      {/* Showroom image — crossfades in on hover */}
+      {/* Showroom image — CSS transition (no Framer opacity to avoid blink) */}
       {showroomImage && (
-        <motion.div
-          className="absolute inset-0 z-[1]"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+        <div
+          className="absolute inset-0 z-[1] rounded-2xl overflow-hidden"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.55s ease-in-out",
+          }}
         >
           <Image
             src={showroomImage}
             alt={`โชว์รูม ${brand.displayNameTh} ช.เอราวัณ`}
             fill
-            className="object-cover object-[center_40%]"
-            style={{ transform: "scale(0.92)", transformOrigin: "center center" }}
+            className="object-cover object-[center_35%]"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
-          {/* "SHOWROOM" badge on hover */}
-          <motion.div
+          {/* "SHOWROOM" badge */}
+          <div
             className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-[#0F172A] text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : -6 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
+            style={{
+              opacity: hovered ? 1 : 0,
+              transform: hovered ? "translateY(0)" : "translateY(-6px)",
+              transition: "opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s",
+            }}
           >
             Showroom
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
 
       {/* Gradient overlay — lightens when showing showroom photo */}
