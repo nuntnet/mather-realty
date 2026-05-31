@@ -358,7 +358,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 "ช.เอราวัณ คือเพื่อนแท้ที่พร้อมดูแลรถคุณ ด้วยมาตรฐานระดับสากล และหัวใจของคนไทย"
               </blockquote>
               <div className="flex flex-wrap gap-6">
-                {[["57+", "ปีแห่งประสบการณ์"], ["15+", "โชว์รูมและศูนย์บริการ"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
+                {[["57+", "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-3xl font-bold text-[#DD5259]">{num}</div>
                     <div className="text-xs text-white/40 mt-1">{label}</div>

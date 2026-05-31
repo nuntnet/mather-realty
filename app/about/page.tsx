@@ -163,7 +163,8 @@ const awards = [
  * photoUrl: upload portrait photo to Cloudinary → https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/team/[name].jpg
  * teamPhotoUrl: group photo of all executives together (for hero banner of team section)
  */
-const TEAM_GROUP_PHOTO_URL = "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238965/ch-erawan/team/team-group.jpg";
+// Set to null to show HQ map fallback instead
+const TEAM_GROUP_PHOTO_URL: string | null = "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238965/ch-erawan/team/team-group.jpg";
 
 const management = [
   {
@@ -492,7 +493,7 @@ export default function About() {
       {/* ── All sections scroll continuously ── */}
       <div className="container py-12 lg:py-16 space-y-24">
         {/* HISTORY */}
-        <section id="history" ref={(el) => { sectionRefs.current.history = el; }}>
+        <section id="history" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.history = el; }}>
           <div>
             <div className="max-w-3xl mb-12">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ประวัติความเป็นมา</h2>
@@ -536,7 +537,7 @@ export default function About() {
         </section>
 
         {/* BRANDS */}
-        <section id="brands" ref={(el) => { sectionRefs.current.brands = el; }}>
+        <section id="brands" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.brands = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ในเครือ</h2>
@@ -630,7 +631,7 @@ export default function About() {
         </section>
 
         {/* TEAM */}
-        <section id="team" ref={(el) => { sectionRefs.current.team = el; }}>
+        <section id="team" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.team = el; }}>
           <div className="space-y-12">
             {/* ── Section header ── */}
             <div className="max-w-3xl">
@@ -771,7 +772,7 @@ export default function About() {
         </section>
 
         {/* VALUES */}
-        <section id="values" ref={(el) => { sectionRefs.current.values = el; }}>
+        <section id="values" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.values = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">วิสัยทัศน์และค่านิยมองค์กร</h2>

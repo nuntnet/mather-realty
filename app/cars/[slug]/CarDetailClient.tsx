@@ -69,6 +69,27 @@ const SPEC_GROUPS = [
   },
 ];
 
+/** Shared features bullet list — used in both overview and specs tabs */
+function FeaturesList({ features, className = "" }: { features?: string[]; className?: string }) {
+  if (!Array.isArray(features) || features.length === 0) return null;
+  return (
+    <div className={`bg-[#F8FAFC] rounded-xl p-4 border border-[#E2E8F0] ${className}`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Star className="w-4 h-4 text-[#0F172A]" />
+        <span className="font-semibold text-[#0F172A] text-sm">จุดเด่น</span>
+      </div>
+      <ul className="space-y-1.5">
+        {features.map((f, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#DD5259] mt-1.5 shrink-0" />
+            <span>{f}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 const fuelLabel: Record<string, string> = {
   petrol: "เบนซิน", diesel: "ดีเซล", hybrid: "ไฮบริด", electric: "ไฟฟ้า",
 };
@@ -170,12 +191,16 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
                     {car.year > 0 && <Badge variant="outline">ปี {car.year}</Badge>}
                   </div>
 
-                  {/* Description — rendered as readable paragraphs */}
+                  {/* Description — Safari-safe split (no lookbehind) */}
                   {car.description ? (
                     <div className="space-y-3 text-[#475569] text-sm leading-relaxed">
-                      {car.description.split(/(?<=[.。])\s+|(?<=\n)/).filter(Boolean).map((para, i) => (
-                        <p key={i}>{para.trim()}</p>
-                      ))}
+                      {car.description
+                        .split("\n")
+                        .flatMap((line) => line.split(/[.。]\s+/).map((s, i, arr) => i < arr.length - 1 ? s + "." : s))
+                        .map((s) => s.trim())
+                        .filter(Boolean)
+                        .map((para, i) => <p key={i}>{para}</p>)
+                      }
                     </div>
                   ) : (
                     <p className="text-[#475569] text-sm leading-relaxed">
@@ -183,41 +208,14 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
                     </p>
                   )}
 
-                  {/* Key features bullets from specs */}
-                  {Array.isArray(car.specs.features) && (car.specs.features as string[]).length > 0 && (
-                    <div className="mt-5 bg-[#F8FAFC] rounded-xl p-4 border border-[#E2E8F0]">
-                      <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wide mb-3">จุดเด่น</p>
-                      <ul className="space-y-2">
-                        {(car.specs.features as string[]).map((f, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#DD5259] mt-1.5 shrink-0" />
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  {/* Key features — shared component (same in specs tab) */}
+                  <FeaturesList features={car.specs.features as string[]} className="mt-5" />
                 </TabsContent>
                 <TabsContent value="specs">
                   {Object.keys(car.specs).length > 0 ? (
                     <div className="space-y-6">
-                      {/* Features highlight */}
-                      {Array.isArray(car.specs.features) && car.specs.features.length > 0 && (
-                        <div className="bg-[#F8FAFC] rounded-xl p-4 border border-[#E2E8F0]">
-                          <div className="flex items-center gap-2 mb-3">
-                            <Star className="w-4 h-4 text-[#0F172A]" />
-                            <span className="font-semibold text-[#0F172A] text-sm">จุดเด่น</span>
-                          </div>
-                          <ul className="space-y-1.5">
-                            {(car.specs.features as string[]).map((f, i) => (
-                              <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
-                                <span className="text-[#0F172A] font-bold mt-0.5">·</span>
-                                <span>{f}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                      {/* Features highlight — reuse shared component */}
+                      <FeaturesList features={car.specs.features as string[]} />
 
                       {/* Grouped spec rows */}
                       {SPEC_GROUPS.map((group) => {

@@ -51,8 +51,8 @@ export default async function CarDetailPage({
   const car = await getCarBySlug(slug);
   if (!car) notFound();
 
-  // Fetch related cars: same brand first, exclude self, limit 4
-  const brandCars = await getActiveCars({ brand: car.brand });
+  // Fetch related cars in parallel after car is resolved (needs car.brand)
+  const [brandCars] = await Promise.all([getActiveCars({ brand: car.brand })]);
   const relatedCars = brandCars
     .filter((c) => c.id !== car.id && c.imageUrls.length > 0)
     .slice(0, 4);
