@@ -29,10 +29,10 @@ export default function BranchesMapLibre() {
         zoom={10.5}
         pitch={30}
         className="w-full h-full"
-        // OpenFreeMap — free, no API key required, commercial-friendly
+        // Proxied through /api/map-style to bypass browser CORS on OpenFreeMap
         styles={{
-          dark:  "https://tiles.openfreemap.org/styles/dark",
-          light: "https://tiles.openfreemap.org/styles/positron",
+          dark:  "/api/map-style?theme=dark",
+          light: "/api/map-style?theme=light",
         }}
       >
         <MapControls position="bottom-right" showZoom />

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cldUrl } from "@/lib/cloudinary";
 import Link from "next/link";
 import BrandHero from "@/components/BrandHero";
 import BrandSubNav from "@/components/brands/BrandSubNav";
@@ -143,7 +144,7 @@ export default async function GwmPromotionsPage() {
                         {promo.coverImageUrl ? (
                           <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
                             <Image
-                              src={promo.coverImageUrl}
+                              src={cldUrl(promo.coverImageUrl, "quality")}
                               alt={promo.title}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-500"

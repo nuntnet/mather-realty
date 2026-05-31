@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cldUrl } from "@/lib/cloudinary";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BrandHero from "@/components/BrandHero";
@@ -195,7 +196,7 @@ export default async function BrandPromotionsPage({ params }: PageProps) {
                         {promo.coverImageUrl ? (
                           <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
                             <Image
-                              src={promo.coverImageUrl}
+                              src={cldUrl(promo.coverImageUrl, "quality")}
                               alt={promo.title}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-500"

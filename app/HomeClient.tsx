@@ -14,6 +14,7 @@ import BrandLogo from "@/components/BrandLogo";
 import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 import { BRANDS } from "@/lib/brandConfig";
+import { cldUrl } from "@/lib/cloudinary";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award, TrendingUp,
@@ -29,15 +30,15 @@ import { th } from "date-fns/locale";
  * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
  */
 const AWARD_SLIDES: { url: string; caption: string }[] = [
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
 ];
 
 const heroSlides = [
@@ -312,7 +313,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 {/* Whole image area links to car detail */}
                 <Link href={`/cars/${car.slug || car.id}`} className="block relative aspect-[16/10] bg-gray-50 overflow-hidden">
                   {car.imageUrls[0] ? (
-                    <Image src={car.imageUrls[0]} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image src={cldUrl(car.imageUrls[0], "quality")} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
                     <Image src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} fill className="object-cover opacity-80" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   )}
@@ -565,7 +566,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 <div className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
                   <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
                     {post.coverImageUrl ? (
-                      <Image src={post.coverImageUrl} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
+                      <Image src={cldUrl(post.coverImageUrl, "quality")} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <Calendar className="w-10 h-10 text-gray-300" />
