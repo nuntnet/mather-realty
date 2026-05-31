@@ -7,7 +7,7 @@ import HomeClient from "./HomeClient";
 export const revalidate = 3600;
 
 const HOME_DESCRIPTION =
-  "ช.เอราวัณ ออโต้ กรุ๊ป — ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ในนครปฐม 7 สาขา ทดลองขับ นัดบริการ ประกันภัย และรถมือสอง";
+  "ช.เอราวัณ ออโต้ กรุป — ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ในนครปฐม 7 สาขา ทดลองขับ นัดบริการ ประกันภัย และรถมือสอง";
 
 export const metadata: Metadata = pageMetadata({
   title: `ตัวแทนจำหน่ายรถยนต์ นครปฐม | ${SITE_NAME}`,

@@ -167,7 +167,7 @@ export default function CarDetailClient({ car }: { car: Car }) {
                     {car.engineSize && <Badge variant="outline">{car.engineSize}</Badge>}
                   </div>
                   <p className="text-[#475569] leading-relaxed">
-                    {car.description || `${car.brand} ${car.model} รถยนต์คุณภาพสูงจาก ช.เอราวัณ กรุ๊ป พร้อมบริการหลังการขายครบวงจร`}
+                    {car.description || `${car.brand} ${car.model} รถยนต์คุณภาพสูงจาก ช.เอราวัณ กรุป พร้อมบริการหลังการขายครบวงจร`}
                   </p>
                 </TabsContent>
                 <TabsContent value="specs">

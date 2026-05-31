@@ -21,7 +21,7 @@ export interface AppointmentEmailPayload {
 
 function buildPlainTextBody(data: AppointmentEmailPayload): string {
   const lines = [
-    "มีการนัดหมายใหม่จากเว็บไซต์ ช.เอราวัณ ออโต้ กรุ๊ป",
+    "มีการนัดหมายใหม่จากเว็บไซต์ ช.เอราวัณ ออโต้ กรุป",
     "",
     `ประเภท: ${TYPE_LABELS[data.type] ?? data.type}`,
     `ชื่อลูกค้า: ${data.customerName}`,

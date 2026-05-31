@@ -99,10 +99,10 @@ const timeline: TimelineItem[] = [
   {
     year: "ปัจจุบัน",
     title: "6 แบรนด์ 7 สาขา",
-    desc: "ช.เอราวัณ กรุ๊ป เติบโตเป็นกลุ่มดีลเลอร์ชั้นนำในภาคตะวันตก ครอบคลุม ICE, Hybrid และ EV ครบทุกกลุ่ม ส่วนแบ่งตลาดรวม ~13.1%",
+    desc: "ช.เอราวัณ กรุป เติบโตเป็นกลุ่มดีลเลอร์ชั้นนำในภาคตะวันตก ครอบคลุม ICE, Hybrid และ EV ครบทุกกลุ่ม ส่วนแบ่งตลาดรวม ~13.1%",
     milestone: "ผู้นำภาคตะวันตก",
     image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg",
-    imageAlt: "ทีมงาน ช.เอราวัณ กรุ๊ป",
+    imageAlt: "ทีมงาน ช.เอราวัณ กรุป",
   },
 ];
 
@@ -152,7 +152,7 @@ const awards = [
   {
     title: "กิจกรรมเพื่อสังคม",
     year: "2565",
-    desc: "ช.เอราวัณ กรุ๊ป บริจาคของช่วยเหลือผู้ประสบภัยน้ำท่วมภาคอีสาน",
+    desc: "ช.เอราวัณ กรุป บริจาคของช่วยเหลือผู้ประสบภัยน้ำท่วมภาคอีสาน",
     img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/TsCmIkumrflAejvu.jpg",
     brand: "CSR",
   },
@@ -399,7 +399,7 @@ export default function About() {
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ในเครือ</h2>
               <p className="text-gray-500 leading-relaxed">
-                ช.เอราวัณ กรุ๊ป เป็นตัวแทนจำหน่ายอย่างเป็นทางการของ 6 แบรนด์ชั้นนำ
+                ช.เอราวัณ กรุป เป็นตัวแทนจำหน่ายอย่างเป็นทางการของ 6 แบรนด์ชั้นนำ
                 ครอบคลุมทุกกลุ่มรถยนต์ตั้งแต่ ICE, Hybrid ไปจนถึง EV เต็มรูปแบบ
               </p>
             </div>
@@ -493,7 +493,7 @@ export default function About() {
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">ทีมผู้บริหาร</h2>
               <p className="text-gray-500 leading-relaxed">
-                ช.เอราวัณ กรุ๊ป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนาน
+                ช.เอราวัณ กรุป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนาน
                 ภายใต้การนำของตระกูลจันทร์วาววาม ที่สืบทอดปณิธานการให้บริการที่เป็นเลิศมาตลอดกว่า 57 ปี
               </p>
             </div>
@@ -524,7 +524,7 @@ export default function About() {
             <div className="mt-8 relative rounded-2xl overflow-hidden aspect-[21/9] min-h-[200px]">
               <Image
                 src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg"
-                alt="ทีมงาน ช.เอราวัณ กรุ๊ป"
+                alt="ทีมงาน ช.เอราวัณ กรุป"
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 1200px"
@@ -650,7 +650,7 @@ export default function About() {
           <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.2em] mb-3">Get Started</p>
           <h2 className="text-2xl lg:text-3xl font-bold mb-3">พร้อมให้บริการคุณทุกวัน</h2>
           <p className="text-white/50 mb-8 max-w-xl mx-auto">
-            ไม่ว่าจะเป็นการซื้อรถใหม่ บริการซ่อมบำรุง หรือประกันภัย ช.เอราวัณ กรุ๊ป พร้อมดูแลคุณ
+            ไม่ว่าจะเป็นการซื้อรถใหม่ บริการซ่อมบำรุง หรือประกันภัย ช.เอราวัณ กรุป พร้อมดูแลคุณ
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/cars">

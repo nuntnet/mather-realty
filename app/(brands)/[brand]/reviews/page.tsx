@@ -28,8 +28,8 @@ export async function generateMetadata({ params }: PageProps) {
   if (!isBrandSlug(slug)) return {};
   const brand = BRAND_BY_SLUG[slug];
   return pageMetadata({
-    title: `รีวิวรถ ${brand.displayName} — ช.เอราวัณ ออโต้ กรุ๊ป`,
-    description: `รีวิวรถ ${brand.displayNameTh} จาก YouTube และ TikTok ที่ ช.เอราวัณ ออโต้ กรุ๊ป จ.นครปฐม`,
+    title: `รีวิวรถ ${brand.displayName} — ช.เอราวัณ ออโต้ กรุป`,
+    description: `รีวิวรถ ${brand.displayNameTh} จาก YouTube และ TikTok ที่ ช.เอราวัณ ออโต้ กรุป จ.นครปฐม`,
     path: `${brand.hubPath}/reviews`,
   });
 }

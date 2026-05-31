@@ -4,7 +4,7 @@ import { organizationNode } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "เกี่ยวกับเรา",
-  description: "ประวัติและวิสัยทัศน์ ช.เอราวัณ ออโต้ กรุ๊ป ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี",
+  description: "ประวัติและวิสัยทัศน์ ช.เอราวัณ ออโต้ กรุป ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี",
   path: "/about",
 });
 
@@ -21,7 +21,7 @@ const aboutPageSchema = {
     {
       "@type": "AboutPage",
       "@id": `${SITE_URL}/about#webpage`,
-      name: "เกี่ยวกับ ช.เอราวัณ ออโต้ กรุ๊ป",
+      name: "เกี่ยวกับ ช.เอราวัณ ออโต้ กรุป",
       url: `${SITE_URL}/about`,
       description: "ประวัติกว่า 57 ปี ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia จ.นครปฐม",
       mainEntity: { "@id": `${SITE_URL}/#organization` },

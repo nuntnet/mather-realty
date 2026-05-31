@@ -24,9 +24,16 @@ import { th } from "date-fns/locale";
  *
  * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
  */
-// ── อัปเดตรูปรางวัลจริงที่นี่หลัง upload ขึ้น Cloudinary ──
 const AWARD_SLIDES: { url: string; caption: string }[] = [
-  // { url: "https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/awards/award1.jpg", caption: "รางวัล ..." },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
 ];
 
 const heroSlides = [
@@ -381,7 +388,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ช.เอราวัณ ออโต้ กรุ๊ป</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ช.เอราวัณ ออโต้ กรุป</h2>
               <p className="text-gray-500 leading-relaxed mb-6">
                 กลุ่มบริษัท ช.เอราวัณ ก่อตั้งขึ้นเมื่อปี พ.ศ. 2510 โดยคุณวิชัย จันทร์วาววาม
                 เริ่มต้นจากอู่ซ่อมรถเล็กๆ ในจังหวัดนครปฐม จนเติบโตเป็นกลุ่มธุรกิจยานยนต์ครบวงจร
@@ -410,6 +417,26 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             </div>
             {/* Award Photo Slideshow */}
             <AwardSlideshow />
+          </div>
+        </div>
+      </section>
+
+      {/* SECONDHAND CTA */}
+      <section className="py-12 lg:py-16 bg-[#0F172A]">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-[#DD5259] text-sm font-bold uppercase tracking-widest mb-1">รถมือสอง</p>
+              <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">รถยนต์มือสองคัดสรรคุณภาพ</h2>
+              <p className="text-white/50 text-sm max-w-lg">
+                รถมือสองผ่านการตรวจสภาพและรับประกัน คัดเลือกจากลูกค้าช.เอราวัณ พร้อมประวัติการดูแลรักษา
+              </p>
+            </div>
+            <Link href="/secondhand" className="shrink-0">
+              <Button className="bg-[#DD5259] hover:bg-[#c94048] text-white font-semibold px-8 py-3 text-base rounded-xl">
+                ดูรถมือสอง <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

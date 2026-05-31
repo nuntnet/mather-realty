@@ -4,7 +4,7 @@ import { pageMetadata } from "@/lib/site";
 
 export const metadata = pageMetadata({
   title: "รับซื้อรถมือสอง",
-  description: "บริการรับซื้อรถมือสอง ประเมินราคายุติธรรม จาก ช.เอราวัณ ออโต้ กรุ๊ป",
+  description: "บริการรับซื้อรถมือสอง ประเมินราคายุติธรรม จาก ช.เอราวัณ ออโต้ กรุป",
   path: "/secondhand",
 });
 
