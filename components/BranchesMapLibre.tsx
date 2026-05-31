@@ -23,16 +23,16 @@ export default function BranchesMapLibre() {
 
   return (
     <div className="relative w-full h-[520px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+      {/* CSS invert+hue-rotate on canvas makes the light map look dark — no CORS issues */}
       <Map
-        theme="dark"
+        theme="light"
         center={CENTER}
         zoom={10.5}
         pitch={30}
-        className="w-full h-full"
-        // Proxied through /api/map-style to bypass browser CORS on OpenFreeMap
+        className="w-full h-full [&_.maplibregl-canvas]:invert [&_.maplibregl-canvas]:hue-rotate-180 [&_.maplibregl-canvas]:saturate-150 [&_.maplibregl-canvas]:brightness-90"
         styles={{
-          dark:  "/api/map-style?theme=dark",
-          light: "/api/map-style?theme=light",
+          light: "https://demotiles.maplibre.org/style.json",
+          dark:  "https://demotiles.maplibre.org/style.json",
         }}
       >
         <MapControls position="bottom-right" showZoom />
