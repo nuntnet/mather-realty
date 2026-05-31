@@ -421,10 +421,12 @@ export function BrandMegaMenuGrid({
 
       <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {BRANDS.map((brand) => (
+          // Only onMouseEnter here — NO onMouseLeave on individual tiles.
+          // Clearing hoveredSlug is handled solely by the outer panelRef onMouseLeave.
+          // This prevents the panel from shrinking mid-mouse-travel (service links stay accessible).
           <div
             key={brand.slug}
             onMouseEnter={() => setHoveredWithDelay(brand.slug)}
-            onMouseLeave={() => setHoveredWithDelay(null)}
           >
             <BrandNavTile
               brand={brand}
@@ -437,8 +439,9 @@ export function BrandMegaMenuGrid({
         ))}
       </div>
 
-      {/* Service links row — reactive to hovered brand */}
-      <div className="mt-4 pt-4 border-t border-gray-100 min-h-[44px]">
+      {/* Service links row — reactive to hovered brand.
+          min-h is fixed so panel height never shrinks while mouse is inside. */}
+      <div className="mt-4 pt-4 border-t border-gray-100 min-h-[52px]">
         {hoveredSlug && HAS_SUB_PAGES.has(hoveredSlug) ? (
           (() => {
             const hb = BRANDS.find(b => b.slug === hoveredSlug);
