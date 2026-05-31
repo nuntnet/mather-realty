@@ -12,7 +12,7 @@ import { BRAND_IMAGES } from "@/lib/brandImages";
 import { BRANDS } from "@/lib/brandConfig";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
-  Shield, Wrench, Award,
+  Shield, Wrench, Award, TrendingUp,
 } from "lucide-react";
 import type { Car, BlogPost, CustomerStory } from "@/lib/notion-types";
 import { format } from "date-fns";
@@ -368,16 +368,42 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             </div>
             <div className="flex flex-col gap-4">
               {[
-                { icon: Award, title: "Mitsubishi President Award 2018", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากมิตซูบิชิ มอเตอร์ส ประเทศไทย" },
-                { icon: Star, title: "Mazda Excellence Award 2017-2018", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากมาสด้า เซลส์ ประเทศไทย" },
-                { icon: Shield, title: "Ford President Award", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากฟอร์ด มอเตอร์ ประเทศไทย" },
+                {
+                  icon: Award,
+                  year: "2025",
+                  title: "GWM Partner Challenge 2025",
+                  desc: "รางวัลยอดขายอันดับ 1 สองปีซ้อน (2024–2025) จาก GWM Thailand",
+                },
+                {
+                  icon: Star,
+                  year: "2024",
+                  title: "Mazda Dealer of Excellence 2024",
+                  desc: "รางวัลผู้จำหน่ายยอดเยี่ยมแห่งปี พร้อมรางวัลทีมงานฝ่ายขายยอดเยี่ยม",
+                },
+                {
+                  icon: Shield,
+                  year: "2025",
+                  title: "Mitsubishi Skills Contest Winner 2025",
+                  desc: "รางวัลชนะเลิศ The Winner of Sales Consultant Mitsubishi Skills Contest",
+                },
+                {
+                  icon: TrendingUp,
+                  year: "2025",
+                  title: "Deepal Top Sale Performance 2025",
+                  desc: "รางวัล Top Sale Performance Award & Spare Parts Achievement Award จาก Deepal Thailand",
+                },
               ].map((item) => (
-                <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                  <div className="flex items-center gap-3 mb-3">
-                    <item.icon className="w-6 h-6 text-[#DD5259]" />
-                    <span className="text-white font-semibold text-sm">{item.title}</span>
+                <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 hover:border-white/20 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <item.icon className="w-5 h-5 text-[#DD5259] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-white font-semibold text-sm leading-snug">{item.title}</span>
+                        <span className="text-[#DD5259] text-[10px] font-bold bg-[#DD5259]/15 px-1.5 py-0.5 rounded">{item.year}</span>
+                      </div>
+                      <p className="text-white/45 text-xs leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
-                  <p className="text-white/40 text-sm">{item.desc}</p>
                 </div>
               ))}
             </div>
