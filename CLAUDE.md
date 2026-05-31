@@ -60,13 +60,14 @@ bun run audit:galleries # report cars missing gallery images in Notion
 - `/branches` `/contact` `/about` `/awards` `/insurance` `/secondhand` `/career`
 - `/feedback` — ศูนย์ร้องเรียนทันใจ (แนะนำ-ติชม)
 
-**Brand Web (GWM MVP — replicable to all brands):**
-- `/gwm` `/gwm/haval` `/gwm/ora` `/gwm/tank`
-- `/gwm/service` — ศูนย์บริการ
-- `/gwm/body-repair` — ซ่อมสีตัวถัง (insurance list จาก Notion)
-- `/gwm/promotions` — โปรโมชั่น (Notion DB)
-- `/gwm/reviews` — รีวิว (Blog DB)
-- `/gwm/one-stop` — One Stop Service
+**Brand Web (ทุกแบรนด์ใช้ generic routes `app/(brands)/[brand]/`):**
+- `/gwm` `/ford` `/mazda` `/mitsubishi` `/deepal` `/kia` — brand hub
+- `/gwm/haval` `/gwm/ora` `/gwm/tank` — GWM sub-lines
+- `/[brand]/service` — ศูนย์บริการ
+- `/[brand]/body-repair` — ซ่อมสีตัวถัง (insurance list จาก Notion)
+- `/[brand]/promotions` — โปรโมชั่น (Notion DB)
+- `/[brand]/reviews` — รีวิว (Blog DB + Video Reviews)
+- `/gwm/one-stop` — One Stop Service (GWM only)
 
 **Admin (require role=admin):**
 - `/admin` `/admin/cars` `/admin/blog` `/admin/contacts` `/admin/appointments` `/admin/stories`
@@ -147,12 +148,20 @@ Brand sub-pages ใช้ pattern นี้ (GWM เป็น MVP):
 - Images: admin upload ผ่าน `/api/upload` → Cloudinary URL → เก็บใน Notion
 - `scripts/` excluded จาก tsconfig (build utilities เท่านั้น)
 
+## Car Data (Notion Cars DB)
+
+- **44 active cars** ครบ 6 แบรนด์ — Gallery images 5+ imgs/คัน (official CDN เท่านั้น)
+- **Specs ครบ 100%**: engine, power, torque, battery kWh, charging speed (AC/DC kW), EV range, dimensions, acceleration, features
+- CDN domains: `gwm.co.th`, `kia.com`, `mazda-media-s3.s3.ap-southeast-1.amazonaws.com`, `ford.co.th`, `mitsubishi-motors.co.th`, `changan.co.th`
+- Car detail page (`/cars/[slug]`) แสดง specs แบบ grouped + Thai labels + features highlight
+
 ## Known Gaps (TODO)
 
-- Brand sub-pages ยังทำแค่ GWM — replicate ไปอีก 5 แบรนด์
+- ~~Brand sub-pages ยังทำแค่ GWM~~ ✅ ทำ generic routes ครบทุกแบรนด์แล้ว
+- ~~`revalidatePath` หลังแก้รถใช้ Notion id แทน slug~~ ✅ ใช้ `revalidateCarsByNotionId` แล้ว
 - Service Page Sections ยังไม่ render Notion content บนหน้าเว็บ (admin link → Notion แล้ว toggle publish)
-- `revalidatePath` หลังแก้รถใช้ Notion id แทน slug (หน้า detail อาจ stale)
 - File upload (damage photos, insurance docs) ใน booking ยังไม่ implement
 - ไม่มี email notifications สำหรับนัดหมายใหม่
-- Video reviews page (YouTube API + Notion TikTok URLs) ยังไม่ implement
+- Video reviews (YouTube/TikTok) — ต้องเพิ่มข้อมูลลง Notion `Video Reviews DB` เพื่อให้หน้า `/[brand]/reviews` แสดงผล
 - Upstash env ต้องตั้งใน prod สำหรับ rate limit
+- SEO gaps: LocalBusiness JSON-LD ใน `/branches`, breadcrumbs ใน blog/about/contact

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "ติดต่อเรา",
@@ -7,6 +7,16 @@ export const metadata: Metadata = pageMetadata({
   path: "/contact",
 });
 
+const crumbs = breadcrumbJsonLd([
+  { name: "หน้าแรก", path: "/" },
+  { name: "ติดต่อเรา", path: "/contact" },
+]);
+
 export default function ContactLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      {children}
+    </>
+  );
 }

@@ -1,6 +1,6 @@
 import { getPublishedBlogPosts } from "@/lib/notion";
 import BlogList from "./BlogList";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
 
 export const revalidate = 3600;
 
@@ -13,7 +13,14 @@ export const metadata = pageMetadata({
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts();
 
+  const crumbs = breadcrumbJsonLd([
+    { name: "หน้าแรก", path: "/" },
+    { name: "บทความและข่าวสาร", path: "/blog" },
+  ]);
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
       {/* Header */}
       <div className="bg-[#0F172A] text-white py-16 lg:py-20">
@@ -30,5 +37,6 @@ export default async function BlogPage() {
 
       <BlogList posts={posts} />
     </div>
+    </>
   );
 }

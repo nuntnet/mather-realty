@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata } from "@/lib/site";
+import { localBusinessGraph } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "สาขาของเรา",
@@ -8,5 +9,13 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default function BranchesLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessGraph()) }}
+      />
+      {children}
+    </>
+  );
 }
