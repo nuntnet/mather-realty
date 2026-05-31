@@ -11,6 +11,7 @@ import {
 import { getBranchesByBrand } from "@/lib/branchData";
 import { getSocialLinksByBrand, getFAQItems } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
+import { faqPageJsonLd } from "@/lib/seo";
 import {
   MapPin,
   Phone,
@@ -69,6 +70,12 @@ export default async function BrandServicePage({ params }: PageProps) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd(breadcrumbs)) }}
       />
+      {faqItems.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqPageJsonLd(faqItems.map(f => ({ question: f.question, answer: f.answer })))) }}
+        />
+      )}
       <div className="min-h-screen bg-[#F8FAFC] pt-[64px]">
         <BrandHero
           brand={brand}

@@ -14,8 +14,8 @@ import {
   type BrandSlug,
 } from "@/lib/brandConfig";
 
-// Brands ที่มี sub-pages (service/body-repair/promotions/reviews)
-const HAS_SUB_PAGES = new Set<string>(["gwm"]);
+// All brands now have sub-pages via generic [brand]/* routes
+const HAS_SUB_PAGES = new Set<string>(["gwm", "mazda", "ford", "mitsubishi", "deepal", "kia"]);
 
 const BRAND_SUB_LINKS = [
   { label: "ศูนย์บริการ",    section: "service" },
@@ -449,18 +449,25 @@ export function BrandMegaMenuPanel({
           navCountsByBrand={navCountsByBrand}
         />
 
-        {/* Brand sub-page quick access — GWM */}
+        {/* Brand service quick links — all brands */}
         <div className="border-t border-gray-100 pt-4">
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-xs text-gray-400 font-medium shrink-0">บริการ GWM:</span>
-            {BRAND_SUB_LINKS.map(({ label, section }) => (
-              <Link
-                key={section}
-                href={`/gwm/${section}`}
-                className="text-xs text-gray-600 hover:text-[#C8102E] hover:bg-red-50 px-3 py-1.5 rounded-full border border-gray-200 hover:border-red-200 transition-colors"
-              >
-                {label}
-              </Link>
+          <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-3 font-medium">
+            บริการ — เข้าถึงโดยตรง
+          </p>
+          <div className="grid grid-cols-3 gap-x-6 gap-y-1">
+            {BRANDS.map((brand) => (
+              <div key={brand.slug} className="flex items-center gap-1.5 flex-wrap">
+                <span className="text-[10px] text-gray-400 w-16 shrink-0 truncate">{brand.displayName}</span>
+                {BRAND_SUB_LINKS.slice(0, 2).map(({ label, section }) => (
+                  <Link
+                    key={section}
+                    href={`${brand.hubPath}/${section}`}
+                    className="text-[10px] text-gray-500 hover:text-[#DD5259] transition-colors"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </div>
             ))}
           </div>
         </div>
