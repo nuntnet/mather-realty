@@ -67,7 +67,7 @@ describe("pageToCar (via createCar mapping output)", () => {
       description: "A great SUV",
       videoUrl: "https://youtube.com/watch?v=abc",
       isActive: true,
-      isFeatured: false,
+      isBestSeller: false, sortOrder: 0,
       navFeatured: false,
       navNew: false,
       slug: "mazda-cx-5-2024",
@@ -111,7 +111,7 @@ describe("carToProperties (via createCar payload)", () => {
       imageUrls: ["https://a.jpg", "https://b.jpg"],
       videoUrl: null,
       isActive: true,
-      isFeatured: true,
+      isBestSeller: true, sortOrder: 0,
       slug: "ford-ranger",
     });
 
@@ -129,7 +129,7 @@ describe("carToProperties (via createCar payload)", () => {
     expect(props["Specs"]).toEqual({
       rich_text: [{ text: { content: JSON.stringify({ seats: "5" }) } }],
     });
-    expect(props["Is Featured"]).toEqual({ checkbox: true });
+    expect(props["Is Best Seller"]).toEqual({ checkbox: true });
     // null videoUrl maps to { url: null }
     expect(props["Video URL"]).toEqual({ url: null });
   });
@@ -159,7 +159,7 @@ describe("getActiveCars filter building", () => {
       { property: "Condition", select: { equals: "new" } },
       { property: "Type", select: { equals: "suv" } },
     ]);
-    expect(query.sorts).toEqual([{ property: "Year", direction: "descending" }]);
+    expect(query.sorts).toEqual([{ property: "Sort Order", direction: "ascending" }, { property: "Year", direction: "descending" }]);
   });
 
   it("only filters Is Active when no filters passed", async () => {
@@ -212,6 +212,7 @@ describe("getAllCarSlugs / getCarSlugsForPrerender", () => {
     await notion.getCarSlugsForPrerender(10);
     const query = notionMock.databases.query.mock.calls[0][0];
     expect(query.page_size).toBe(10);
+    // getCarSlugsForPrerender uses only Year sort (not Sort Order — different from getActiveCars)
     expect(query.sorts).toEqual([{ property: "Year", direction: "descending" }]);
   });
 });
