@@ -163,7 +163,7 @@ const awards = [
  * photoUrl: upload portrait photo to Cloudinary → https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/team/[name].jpg
  * teamPhotoUrl: group photo of all executives together (for hero banner of team section)
  */
-const TEAM_GROUP_PHOTO_URL: string | null = null; // ← ใส่ Cloudinary URL รูปหมู่ทีมบริหาร
+const TEAM_GROUP_PHOTO_URL = "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238965/ch-erawan/team/team-group.jpg";
 
 const management = [
   {
@@ -174,7 +174,7 @@ const management = [
     desc: "ผู้บุกเบิกและขยายธุรกิจ ช.เอราวัณ สู่จังหวัดนครปฐมตั้งแต่ปี พ.ศ. 2530 ด้วยวิสัยทัศน์ที่มองเห็นโอกาสในธุรกิจยานยนต์",
     initial: "ว",
     accent: "from-red-600 to-red-800",
-    photoUrl: null as string | null, // ← ใส่ URL รูปโปรไฟล์
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238982/ch-erawan/team/vichai.jpg",
   },
   {
     name: "คุณสุกัญญา จันทร์วาววาม",
@@ -184,7 +184,7 @@ const management = [
     desc: "ผู้ร่วมบุกเบิกธุรกิจในนครปฐม ดูแลภาพรวมการบริหารและการเงินองค์กร พร้อมสืบสานปณิธานการให้บริการที่เป็นเลิศ",
     initial: "ส",
     accent: "from-pink-600 to-pink-800",
-    photoUrl: null as string | null,
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238968/ch-erawan/team/sukanya.jpg",
   },
   {
     name: "คุณณัฐวุฒิ จันทร์วาววาม",
@@ -194,7 +194,7 @@ const management = [
     desc: "ดูแลด้านเทคโนโลยีสารสนเทศ การพัฒนาธุรกิจดิจิทัล และวางแผนกลยุทธ์องค์กรสู่อนาคต",
     initial: "ณ",
     accent: "from-slate-700 to-slate-900",
-    photoUrl: null as string | null,
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238986/ch-erawan/team/nattawut.jpg",
   },
   {
     name: "คุณอรพา พงษ์วิทยภานุ",
@@ -204,7 +204,7 @@ const management = [
     desc: "ดูแลงานขาย บริการหลังการขาย และบัญชีการเงิน ด้วยประสบการณ์ยาวนานในอุตสาหกรรมยานยนต์",
     initial: "อ",
     accent: "from-rose-600 to-rose-800",
-    photoUrl: null as string | null,
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238979/ch-erawan/team/orepa.jpg",
   },
   {
     name: "คุณนันทวิทย์ จันทร์วาววาม",
@@ -214,7 +214,7 @@ const management = [
     desc: "ดูแลการตลาด สื่อดิจิทัล และวางแผนกลยุทธ์การตลาดเพื่อเสริมความแข็งแกร่งแบรนด์ในภูมิภาค",
     initial: "น",
     accent: "from-blue-600 to-blue-800",
-    photoUrl: null as string | null,
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238975/ch-erawan/team/nantawit.jpg",
   },
   {
     name: "คุณจันทร์จิรา จันทร์วาววาม",
@@ -224,7 +224,7 @@ const management = [
     desc: "ดูแลงานบุคคล การสรรหาทีมงาน งานกฎหมาย และการจัดการทะเบียนประกันภัยทุกสาขา",
     initial: "จ",
     accent: "from-violet-600 to-violet-800",
-    photoUrl: null as string | null,
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238972/ch-erawan/team/jantjira.jpg",
   },
 ];
 
