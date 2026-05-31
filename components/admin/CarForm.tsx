@@ -85,7 +85,10 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
         : { ...emptyCar, year: new Date().getFullYear() };
       setForm(base);
       setSpecRows(
-        Object.entries(base.specs ?? {}).map(([key, value]) => ({ key, value }))
+        Object.entries(base.specs ?? {}).map(([key, value]) => ({
+          key,
+          value: Array.isArray(value) ? value.join(", ") : String(value ?? ""),
+        }))
       );
     }
   }, [open, car]);

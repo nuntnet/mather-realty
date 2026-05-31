@@ -15,7 +15,7 @@ export interface Car {
   transmission: "auto" | "manual";
   fuelType: "petrol" | "diesel" | "hybrid" | "electric";
   description: string;
-  specs: Record<string, string>; // parsed from JSON string
+  specs: Record<string, string | number | string[]>; // parsed from JSON string
   imageUrls: string[]; // Cloudinary URLs parsed from newline-separated text
   videoUrl: string | null;
   isActive: boolean;

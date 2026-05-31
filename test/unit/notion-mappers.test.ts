@@ -112,6 +112,8 @@ describe("carToProperties (via createCar payload)", () => {
       videoUrl: null,
       isActive: true,
       isBestSeller: true, sortOrder: 0,
+      navFeatured: false,
+      navNew: false,
       slug: "ford-ranger",
     });
 
