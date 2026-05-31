@@ -18,22 +18,41 @@ const BRAND_GLOW: Record<string, { bg: string; ring: string; text: string }> = {
 // Centre of all branches (Nakhon Pathom area)
 const CENTER: [number, number] = [100.315, 13.785];
 
+/**
+ * Inline raster style using OSM tiles (CORS=* — no external style.json fetch needed)
+ * CSS invert+hue-rotate applied to canvas gives the dark futuristic look.
+ */
+const OSM_STYLE = {
+  version: 8 as const,
+  sources: {
+    osm: {
+      type: "raster" as const,
+      tiles: [
+        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      ],
+      tileSize: 256,
+      attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
+    },
+  },
+  layers: [{ id: "osm-tiles", type: "raster" as const, source: "osm" }],
+};
+
 export default function BranchesMapLibre() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   return (
     <div className="relative w-full h-[520px] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-      {/* CSS invert+hue-rotate on canvas makes the light map look dark — no CORS issues */}
+      {/* Inline OSM raster style — no external style.json fetch, CORS=* on tiles */}
+      {/* CSS invert+hue-rotate on canvas element gives dark futuristic look */}
       <Map
         theme="light"
         center={CENTER}
         zoom={10.5}
-        pitch={30}
-        className="w-full h-full [&_.maplibregl-canvas]:invert [&_.maplibregl-canvas]:hue-rotate-180 [&_.maplibregl-canvas]:saturate-150 [&_.maplibregl-canvas]:brightness-90"
-        styles={{
-          light: "https://demotiles.maplibre.org/style.json",
-          dark:  "https://demotiles.maplibre.org/style.json",
-        }}
+        pitch={0}
+        className="w-full h-full [&_.maplibregl-canvas]:invert [&_.maplibregl-canvas]:hue-rotate-180 [&_.maplibregl-canvas]:saturate-150 [&_.maplibregl-canvas]:brightness-85"
+        styles={{ light: OSM_STYLE, dark: OSM_STYLE }}
       >
         <MapControls position="bottom-right" showZoom />
 
