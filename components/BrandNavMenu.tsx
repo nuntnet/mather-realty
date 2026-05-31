@@ -13,6 +13,16 @@ import {
   type BrandConfig,
   type BrandSlug,
 } from "@/lib/brandConfig";
+
+// Brands ที่มี sub-pages (service/body-repair/promotions/reviews)
+const HAS_SUB_PAGES = new Set<string>(["gwm"]);
+
+const BRAND_SUB_LINKS = [
+  { label: "ศูนย์บริการ",    section: "service" },
+  { label: "ซ่อมสี/ตัวถัง", section: "body-repair" },
+  { label: "โปรโมชั่น",      section: "promotions" },
+  { label: "รีวิวรถ",         section: "reviews" },
+];
 import type {
   NavCountsByBrand,
   NavHighlightModel,
@@ -357,6 +367,7 @@ export function BrandNavTile({
             ) : null}
           </AnimatePresence>
         )}
+
       </div>
     </div>
   );
@@ -437,6 +448,23 @@ export function BrandMegaMenuPanel({
           navModelsByBrand={navModelsByBrand}
           navCountsByBrand={navCountsByBrand}
         />
+
+        {/* Brand sub-page quick access — GWM */}
+        <div className="border-t border-gray-100 pt-4">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span className="text-xs text-gray-400 font-medium shrink-0">บริการ GWM:</span>
+            {BRAND_SUB_LINKS.map(({ label, section }) => (
+              <Link
+                key={section}
+                href={`/gwm/${section}`}
+                className="text-xs text-gray-600 hover:text-[#C8102E] hover:bg-red-50 px-3 py-1.5 rounded-full border border-gray-200 hover:border-red-200 transition-colors"
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
         <div className="border-t border-gray-100 pt-5 flex items-center justify-between gap-4">
           <Link
             href="/cars"
@@ -570,6 +598,24 @@ function MobileBrandTile({
               />
             ) : null}
             {isGwm ? <GwmSubLineLinks compact visible /> : null}
+
+            {/* Brand sub-page links (mobile) */}
+            {HAS_SUB_PAGES.has(brand.slug) && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1.5">บริการ</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {BRAND_SUB_LINKS.map(({ label, section }) => (
+                    <Link
+                      key={section}
+                      href={`${brand.hubPath}/${section}`}
+                      className="text-xs text-gray-600 hover:text-[#C8102E] border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded-full transition-colors"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
