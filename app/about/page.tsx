@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -248,6 +248,13 @@ const brandCards = [
 
 type Section = "history" | "brands" | "team" | "values";
 
+const NAV_TABS = [
+  { key: "history" as Section, label: "ประวัติบริษัท" },
+  { key: "brands" as Section, label: "แบรนด์รถยนต์" },
+  { key: "team" as Section, label: "ทีมผู้บริหาร" },
+  { key: "values" as Section, label: "ค่านิยมองค์กร" },
+];
+
 function TimelineImage({ item }: { item: TimelineItem }) {
   if (!item.image) return null;
   const imageClass = item.imageClass ?? "object-cover";
@@ -267,6 +274,33 @@ function TimelineImage({ item }: { item: TimelineItem }) {
 
 export default function About() {
   const [active, setActive] = useState<Section>("history");
+  const sectionRefs = useRef<Record<Section, HTMLElement | null>>({
+    history: null, brands: null, team: null, values: null,
+  });
+
+  // Scroll to section when nav clicked
+  const scrollTo = useCallback((key: Section) => {
+    sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  // Update active nav based on scroll position (IntersectionObserver)
+  useEffect(() => {
+    const OFFSET = 160; // sticky nav height + buffer
+    const observers: IntersectionObserver[] = [];
+
+    NAV_TABS.forEach(({ key }) => {
+      const el = sectionRefs.current[key];
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(key); },
+        { rootMargin: `-${OFFSET}px 0px -60% 0px`, threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
@@ -434,19 +468,14 @@ export default function About() {
         </div>
       </section>
 
-      {/* Tabs */}
-      <div className="sticky top-[68px] z-30 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+      {/* Sticky scroll-nav */}
+      <div className="sticky top-[68px] z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div className="container">
           <div className="flex overflow-x-auto scrollbar-none">
-            {([
-              { key: "history", label: "ประวัติบริษัท" },
-              { key: "brands", label: "แบรนด์รถยนต์" },
-              { key: "team", label: "ทีมผู้บริหาร" },
-              { key: "values", label: "ค่านิยมองค์กร" },
-            ] as { key: Section; label: string }[]).map((tab) => (
+            {NAV_TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActive(tab.key)}
+                onClick={() => scrollTo(tab.key)}
                 className={`shrink-0 px-5 sm:px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   active === tab.key
                     ? "border-[#DD5259] text-[#0F172A]"
@@ -460,9 +489,10 @@ export default function About() {
         </div>
       </div>
 
-      <div className="container py-12 lg:py-16">
+      {/* ── All sections scroll continuously ── */}
+      <div className="container py-12 lg:py-16 space-y-24">
         {/* HISTORY */}
-        {active === "history" && (
+        <section id="history" ref={(el) => { sectionRefs.current.history = el; }}>
           <div>
             <div className="max-w-3xl mb-12">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ประวัติความเป็นมา</h2>
@@ -503,10 +533,10 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* BRANDS */}
-        {active === "brands" && (
+        <section id="brands" ref={(el) => { sectionRefs.current.brands = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ในเครือ</h2>
@@ -597,10 +627,10 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* TEAM */}
-        {active === "team" && (
+        <section id="team" ref={(el) => { sectionRefs.current.team = el; }}>
           <div className="space-y-12">
             {/* ── Section header ── */}
             <div className="max-w-3xl">
@@ -670,13 +700,13 @@ export default function About() {
                     className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
                   >
                     {/* Photo area */}
-                    <div className={`relative h-56 bg-gradient-to-br ${person.accent} overflow-hidden`}>
+                    <div className={`relative aspect-[3/4] bg-gradient-to-br ${person.accent} overflow-hidden`}>
                       {person.photoUrl ? (
                         <Image
                           src={person.photoUrl}
                           alt={person.name}
                           fill
-                          className="object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                          className="object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-500"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       ) : (
@@ -738,10 +768,10 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* VALUES */}
-        {active === "values" && (
+        <section id="values" ref={(el) => { sectionRefs.current.values = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">วิสัยทัศน์และค่านิยมองค์กร</h2>
@@ -838,7 +868,7 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
       </div>
 
       {/* CTA */}
