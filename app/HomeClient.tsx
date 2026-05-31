@@ -25,12 +25,12 @@ import { th } from "date-fns/locale";
  * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
  */
 const AWARD_SLIDES: { url: string; caption: string }[] = [
-  // ── เพิ่ม Cloudinary URL ของรูปรางวัลที่ Upload มาแทนที่ ──
-  // ตัวอย่าง:
-  // { url: "https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/awards/gwm-number-one-2024.jpg", caption: "GWM Number One Award 2024" },
-  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "GWM Number One Award 2024" },
-  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "Mazda Excellence Award 2024" },
-  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "Mitsubishi President Award" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232081/23356b8dd4f6a0f0f343dd8c5731f5b33565adf9_yogc1z.png", caption: "GWM Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232080/f89626b59ed4a3e4d1e8bd9bc02425aab34baac9_pfkga4.png", caption: "Mazda Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/7d595956bfc73f66b458b3bf124456e0c87daefe_h8rdtn.png", caption: "Ford Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/2025-08-07_ehic0w.webp", caption: "Mitsubishi Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232080/078345fc0504bfe8a7a869aefe1b8c3657f392be_afwo4t.png", caption: "Deepal Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/c07d5385558a48bc887dc7c14bc8c6cd5d9ed80a_gkgjv8.png", caption: "Kia Award — ช.เอราวัณ ออโต้ กรุ๊ป" },
 ];
 
 const heroSlides = [
