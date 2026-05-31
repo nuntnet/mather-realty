@@ -242,7 +242,11 @@ export async function getFeaturedCars(): Promise<Car[]> {
         { property: "Is Best Seller", checkbox: { equals: true } },
       ],
     },
-    page_size: 6,
+    sorts: [
+      { property: "Sort Order", direction: "ascending" },
+      { property: "Year", direction: "descending" },
+    ],
+    page_size: 60, // fetch all best sellers across all brands for client-side filtering
   });
   return response.results.map(pageToCar);
 }

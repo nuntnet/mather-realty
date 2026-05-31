@@ -174,7 +174,8 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <div className="col-span-3 text-center py-16 text-gray-400">ไม่พบรุ่นรถในหมวดนี้</div>
             ) : filteredCars.map((car) => (
               <div key={car.id} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
+                {/* Whole image area links to car detail */}
+                <Link href={`/cars/${car.slug || car.id}`} className="block relative aspect-[16/10] bg-gray-50 overflow-hidden">
                   {car.imageUrls[0] ? (
                     <Image src={car.imageUrls[0]} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
@@ -183,10 +184,12 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   {car.isBestSeller && (
                     <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">แนะนำ</Badge>
                   )}
-                </div>
+                </Link>
                 <div className="p-5">
                   <p className="text-xs text-gray-400 font-medium tracking-wider uppercase mb-1">{car.brand}</p>
-                  <h3 className="font-bold text-[#0F172A] text-lg mb-2">{car.model}</h3>
+                  <Link href={`/cars/${car.slug || car.id}`}>
+                    <h3 className="font-bold text-[#0F172A] text-lg mb-2 hover:text-[#334155] transition-colors">{car.model}</h3>
+                  </Link>
                   {car.priceMin > 0 && (
                     <p className="text-lg font-bold text-[#0F172A] mb-4">
                       ฿{car.priceMin.toLocaleString()}
@@ -194,16 +197,13 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                     </p>
                   )}
                   <div className="flex gap-2">
-                    <Link href="/contact">
-                      <Button variant="outline" size="sm" className="text-xs border-gray-200 text-gray-600 hover:border-[#0F172A] flex-1">สอบถามเพิ่มเติม</Button>
+                    <Link href={`/cars/${car.slug || car.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="text-xs border-gray-200 text-gray-600 hover:border-[#0F172A] w-full">ดูรายละเอียด</Button>
                     </Link>
-                    <Link href={`/booking?type=test_drive&car=${car.model}`}>
-                      <Button size="sm" className="text-xs bg-[#0F172A] hover:bg-[#1E293B] text-white flex-1">ทดลองขับ</Button>
+                    <Link href={`/booking?type=test_drive&car=${car.model}`} className="flex-1">
+                      <Button size="sm" className="text-xs bg-[#0F172A] hover:bg-[#1E293B] text-white w-full">ทดลองขับ</Button>
                     </Link>
                   </div>
-                  <Link href={`/cars/${car.slug || car.id}`}>
-                    <p className="text-xs text-gray-400 hover:text-[#0F172A] mt-3 text-center cursor-pointer transition-colors font-medium">รายละเอียด →</p>
-                  </Link>
                 </div>
               </div>
             ))}
