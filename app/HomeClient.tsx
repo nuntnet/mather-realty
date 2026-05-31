@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import dynamic from "next/dynamic";
-const BranchesMap = dynamic(() => import("@/components/BranchesMapLibre"), {
+const BranchesMap = dynamic(() => import("@/components/BranchesMapEmbed"), {
   ssr: false,
   loading: () => <div className="h-[520px] rounded-2xl bg-[#0B1220] animate-pulse" />,
 });
@@ -43,19 +43,19 @@ const AWARD_SLIDES: { url: string; caption: string }[] = [
 
 const heroSlides = [
   {
-    bg: "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
     brand: "Mazda", tagline: "FEEL ALIVE",
     thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
     desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
   },
   {
-    bg: "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/haval-h6-hev/h6-kv-pc-1-2.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245615/ch-erawan/hero/gwm-haval-h6-hero.jpg",
     brand: "GWM", tagline: "HAVAL H6 HEV",
     thaiTitle: "SUV ไฮบริดยอดนิยม",
     desc: "GWM HAVAL H6 HEV ประหยัดน้ำมัน ออพชั่นครบ ราคาเริ่มต้น 969,000 บาท จาก gwm.co.th",
   },
   {
-    bg: "https://www.kia.com/content/dam/kwcms/gt/en/images/showroom/EV5-ovc-25my/Gallery/ext/ev5-25my-wide-exterior-01.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245617/ch-erawan/hero/kia-ev5-hero.jpg",
     brand: "Kia", tagline: "INSPIRATION DRIVEN",
     thaiTitle: "SUV ไฟฟ้าแห่งอนาคต",
     desc: "Kia EV5 ดีไซน์ Opposites United ห้องโดยสารกว้าง ราคาเริ่มต้น 1,399,000 บาท",
