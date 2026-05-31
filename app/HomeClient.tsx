@@ -6,9 +6,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import dynamic from "next/dynamic";
-const BranchesMap = dynamic(() => import("@/components/BranchesMap"), {
+const BranchesMap = dynamic(() => import("@/components/BranchesMapLibre"), {
   ssr: false,
-  loading: () => <div className="h-96 rounded-2xl bg-gray-100 animate-pulse" />,
+  loading: () => <div className="h-[520px] rounded-2xl bg-[#0B1220] animate-pulse" />,
 });
 import BrandLogo from "@/components/BrandLogo";
 import BrandHallCard from "@/components/BrandHallCard";
