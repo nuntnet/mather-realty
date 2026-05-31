@@ -172,23 +172,54 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent z-10" />
-        <div className="absolute bottom-16 left-0 right-0 z-20">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/10 to-transparent z-10" />
+
+        {/* ── Main hero text overlay ── */}
+        <div className="absolute inset-0 z-20 flex flex-col justify-end pb-20">
           <div className="container">
-            <div className="max-w-2xl">
-              <h1 className="font-black italic uppercase text-white leading-none mb-2" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.01em" }}>
-                {heroSlides[heroSlide].tagline}
+            <div className="max-w-3xl">
+              {/* Brand label */}
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-px bg-[#DD5259]" />
+                <span className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.3em]">
+                  Ch.Erawan Auto Group
+                </span>
+              </div>
+
+              {/* Main quote */}
+              <h1
+                className="text-white font-bold leading-[1.1] mb-3"
+                style={{ fontSize: "clamp(2rem, 4.5vw, 3.75rem)" }}
+              >
+                ช.เอราวัณ คือเพื่อนแท้
+                <br />
+                <span className="text-white/75">ที่พร้อมดูแลรถคุณ</span>
               </h1>
-              <p className="text-white/80 text-sm lg:text-base font-medium mb-1">{heroSlides[heroSlide].thaiTitle}</p>
-              <p className="text-white/50 text-xs lg:text-sm leading-relaxed max-w-lg">{heroSlides[heroSlide].desc}</p>
+
+              {/* Description */}
+              <p className="text-white/55 text-sm lg:text-base leading-relaxed max-w-xl mb-6">
+                ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี — 6 แบรนด์ 7 สาขา
+                ครอบคลุม ICE, Hybrid และ EV ด้วยทีมงานมืออาชีพกว่า 200 คน
+              </p>
+
+              {/* Per-slide tagline (subtle, changes with slide) */}
+              <p
+                className="text-white/35 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
+                key={heroSlide}
+              >
+                {heroSlides[heroSlide].tagline} · {heroSlides[heroSlide].thaiTitle}
+              </p>
             </div>
           </div>
         </div>
+
+        {/* Slide dots */}
         <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
           {heroSlides.map((_, i) => (
             <button key={i} onClick={() => setHeroSlide(i)}
-              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/40 hover:bg-white/70"}`}
+              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
             />
           ))}
         </div>
