@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd, SITE_URL } from "@/lib/site";
+import { organizationNode } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "เกี่ยวกับเรา",
@@ -12,10 +13,27 @@ const crumbs = breadcrumbJsonLd([
   { name: "เกี่ยวกับเรา", path: "/about" },
 ]);
 
+// Organization schema — tells Google/AI who we are
+const aboutPageSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    organizationNode(),
+    {
+      "@type": "AboutPage",
+      "@id": `${SITE_URL}/about#webpage`,
+      name: "เกี่ยวกับ ช.เอราวัณ ออโต้ กรุ๊ป",
+      url: `${SITE_URL}/about`,
+      description: "ประวัติกว่า 57 ปี ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia จ.นครปฐม",
+      mainEntity: { "@id": `${SITE_URL}/#organization` },
+    },
+  ],
+};
+
 export default function AboutLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutPageSchema) }} />
       {children}
     </>
   );

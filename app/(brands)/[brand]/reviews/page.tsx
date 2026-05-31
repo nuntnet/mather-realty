@@ -8,7 +8,8 @@ import {
   isBrandSlug,
 } from "@/lib/brandConfig";
 import { getVideoReviewsByBrand, getSocialLinksByBrand } from "@/lib/notion";
-import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
+import { breadcrumbJsonLd, pageMetadata, SITE_URL } from "@/lib/site";
+import { videoObjectJsonLd } from "@/lib/seo";
 import { Play, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -93,12 +94,32 @@ export default async function BrandReviewsPage({ params }: PageProps) {
 
   const subscribeUrl = getYouTubeSubscribeUrl(slug, brand.social?.youtube);
 
+  // VideoObject schemas for all YouTube videos
+  const videoSchemas = ytVideos
+    .filter((v) => v.thumbnailUrl)
+    .map((v) => {
+      const ytId = getYouTubeId(v.videoUrl);
+      return videoObjectJsonLd({
+        name: v.title,
+        description: v.description || `รีวิว ${brand.displayName} โดย ช.เอราวัณ`,
+        thumbnailUrl: v.thumbnailUrl!,
+        embedUrl: ytId ? `https://www.youtube.com/embed/${ytId}` : v.videoUrl,
+      });
+    });
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd(breadcrumbs)) }}
       />
+      {videoSchemas.map((s, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(s) }}
+        />
+      ))}
       <div className="min-h-screen bg-[#F8FAFC] pt-[64px]">
         <BrandHero
           brand={brand}

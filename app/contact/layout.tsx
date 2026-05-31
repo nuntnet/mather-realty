@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
+import { contactPageJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "ติดต่อเรา",
@@ -16,6 +17,7 @@ export default function ContactLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd()) }} />
       {children}
     </>
   );

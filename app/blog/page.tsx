@@ -1,6 +1,7 @@
 import { getPublishedBlogPosts } from "@/lib/notion";
 import BlogList from "./BlogList";
-import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd, SITE_URL } from "@/lib/site";
+import { itemListJsonLd } from "@/lib/seo";
 
 export const revalidate = 3600;
 
@@ -18,9 +19,27 @@ export default async function BlogPage() {
     { name: "บทความและข่าวสาร", path: "/blog" },
   ]);
 
+  // CollectionPage + ItemList for Google/AI discovery
+  const collectionPage = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "บทความและข่าวสาร — ช.เอราวัณ",
+    url: `${SITE_URL}/blog`,
+    description: "ความรู้ด้านยานยนต์ เคล็ดลับการดูแลรถ และข่าวสารล่าสุดจาก ช.เอราวัณ",
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization` },
+  };
+
+  const itemList = itemListJsonLd(
+    "บทความทั้งหมด",
+    posts.map((p) => ({ name: p.title, path: `/blog/${p.slug}` })),
+    "/blog",
+  );
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPage) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemList) }} />
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
       {/* Header */}
       <div className="bg-[#0F172A] text-white py-16 lg:py-20">
