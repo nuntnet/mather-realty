@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2 } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2, Video } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import {
   Avatar, AvatarFallback,
@@ -21,6 +21,7 @@ const menuItems = [
   // ── Brand Web ─────────────────────────────
   { icon: Wrench,               label: "Brand Content",  href: "/admin/service-content" },
   { icon: Share2,               label: "Social Links",   href: "/admin/social-links" },
+  { icon: Video,                label: "วิดีโอรีวิว",    href: "/admin/video-reviews" },
   // ── CRM ───────────────────────────────────
   { icon: Calendar,             label: "นัดหมาย",        href: "/admin/appointments" },
   { icon: MessageSquareWarning, label: "Feedback",        href: "/admin/feedback" },
