@@ -185,6 +185,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             width={160}
             height={52}
             containerClassName="!justify-start"
+            className="object-left"
           />
         </motion.div>
 
