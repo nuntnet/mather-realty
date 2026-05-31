@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai, Inter } from "next/font/google";
 import "./globals.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { Toaster } from "sonner";
 import PublicLayoutServer from "@/components/PublicLayoutServer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";

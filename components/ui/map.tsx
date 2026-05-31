@@ -1,7 +1,7 @@
 "use client";
 
 import MapLibreGL, { type PopupOptions, type MarkerOptions } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+// CSS is imported globally in app/globals.css
 import {
   createContext,
   forwardRef,
