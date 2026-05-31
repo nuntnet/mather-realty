@@ -24,7 +24,7 @@ const carSchema = z.object({
   priceMax: z.number().nonnegative(),
   engineSize: z.string(),
   transmission: z.enum(["auto", "manual"]),
-  fuelType: z.enum(["petrol", "diesel", "hybrid", "electric"]),
+  fuelType: z.enum(["petrol", "diesel", "hybrid", "electric", "phev"]),
   description: z.string(),
   specs: z.record(z.string(), z.union([z.string(), z.number(), z.array(z.string())])),
   imageUrls: z.array(z.string()),

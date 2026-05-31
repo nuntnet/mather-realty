@@ -29,8 +29,9 @@ const TRANSMISSIONS: { value: Car["transmission"]; label: string }[] = [
 const FUEL_TYPES: { value: Car["fuelType"]; label: string }[] = [
   { value: "petrol", label: "เบนซิน" },
   { value: "diesel", label: "ดีเซล" },
-  { value: "hybrid", label: "ไฮบริด" },
-  { value: "electric", label: "ไฟฟ้า" },
+  { value: "hybrid", label: "ไฮบริด (HEV)" },
+  { value: "phev", label: "ปลั๊กอินไฮบริด (PHEV)" },
+  { value: "electric", label: "ไฟฟ้า (BEV)" },
 ];
 
 const emptyCar: CarInput = {

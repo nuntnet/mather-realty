@@ -13,7 +13,7 @@ export interface Car {
   priceMax: number;
   engineSize: string;
   transmission: "auto" | "manual";
-  fuelType: "petrol" | "diesel" | "hybrid" | "electric";
+  fuelType: "petrol" | "diesel" | "hybrid" | "electric" | "phev";
   description: string;
   specs: Record<string, string | number | string[]>; // parsed from JSON string
   imageUrls: string[]; // Cloudinary URLs parsed from newline-separated text
