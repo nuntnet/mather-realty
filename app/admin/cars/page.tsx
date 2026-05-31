@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Car as CarIcon, Pencil, Plus, Search, Trash2, GripVertical, ArrowUpDown, Check, Loader2 } from "lucide-react";
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
@@ -24,7 +25,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import CarForm from "@/components/admin/CarForm";
+// CarForm modal removed — form is now at /admin/cars/new and /admin/cars/[id]/edit
 
 // ── Sortable row ────────────────────────────────────────────
 function SortableRow({ car, children }: { car: CarType; children: React.ReactNode }) {
@@ -51,9 +52,8 @@ export default function AdminCarsPage() {
   const [brandFilter, setBrandFilter] = useState("all");
   const [sortMode, setSortMode] = useState(false);
   const [savingOrder, setSavingOrder] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<CarType | null>(null);
   const [deleting, setDeleting] = useState<CarType | null>(null);
+  const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -174,7 +174,7 @@ export default function AdminCarsPage() {
                 เรียงลำดับ
               </button>
               <button
-                onClick={() => { setEditing(null); setFormOpen(true); }}
+                onClick={() => router.push("/admin/cars/new")}
                 className="flex items-center gap-2 bg-[#131F3C] text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-[#1a2a50] transition-colors">
                 <Plus className="w-4 h-4" />
                 เพิ่มรถ
@@ -330,10 +330,7 @@ export default function AdminCarsPage() {
                   <td className="px-5 py-4">
                     <div className="flex items-center justify-end gap-1">
                       <button
-                        onClick={() => {
-                          setEditing(car);
-                          setFormOpen(true);
-                        }}
+                        onClick={() => router.push(`/admin/cars/${car.id}/edit`)}
                         className="p-2 text-gray-500 hover:text-[#131F3C] hover:bg-gray-100 rounded-lg transition-colors"
                         aria-label="แก้ไข"
                       >
@@ -356,8 +353,6 @@ export default function AdminCarsPage() {
           </DndContext>
         )}
       </div>
-
-      <CarForm open={formOpen} onOpenChange={setFormOpen} car={editing} onSaved={fetchCars} />
 
       <AlertDialog open={!!deleting} onOpenChange={(o) => !o && setDeleting(null)}>
         <AlertDialogContent>
