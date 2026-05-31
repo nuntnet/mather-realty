@@ -29,9 +29,10 @@ export default function BranchesMapLibre() {
         zoom={10.5}
         pitch={30}
         className="w-full h-full"
-        // Use OpenFreeMap dark style (free, no API key, commercial-friendly)
+        // OpenFreeMap — free, no API key required, commercial-friendly
         styles={{
-          dark: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+          dark:  "https://tiles.openfreemap.org/styles/dark",
+          light: "https://tiles.openfreemap.org/styles/positron",
         }}
       >
         <MapControls position="bottom-right" showZoom />
