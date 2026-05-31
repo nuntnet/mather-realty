@@ -9,6 +9,7 @@ import {
   updateCar,
   setCarFlags,
   archiveCar,
+  bulkSetCarSortOrder,
 } from "@/lib/notion";
 import type { CarInput } from "@/lib/notion-types";
 
@@ -143,5 +144,26 @@ export async function DELETE(req: NextRequest) {
   } catch (err) {
     console.error("Admin cars DELETE error:", err);
     return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+}
+
+// PUT — bulk update sort order after drag-and-drop
+export async function PUT(req: NextRequest) {
+  const denied = await requireAdmin();
+  if (denied) return denied;
+  try {
+    const { items } = z.object({
+      items: z.array(z.object({ id: z.string(), sortOrder: z.number() })),
+    }).parse(await req.json());
+    await bulkSetCarSortOrder(items);
+    revalidatePath("/cars");
+    revalidatePath("/");
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    if (err instanceof z.ZodError) {
+      return NextResponse.json({ error: "Invalid data" }, { status: 400 });
+    }
+    console.error("Admin cars PUT error:", err);
+    return NextResponse.json({ error: "Reorder failed" }, { status: 500 });
   }
 }

@@ -56,6 +56,7 @@ const emptyCar: CarInput = {
   videoUrl: null,
   isActive: true,
   isBestSeller: false,
+  sortOrder: 0,
   navFeatured: false,
   navNew: false,
   slug: "",

@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Car as CarIcon, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { Car as CarIcon, Pencil, Plus, Search, Trash2, GripVertical, ArrowUpDown, Check, Loader2 } from "lucide-react";
+import {
+  DndContext, closestCenter, PointerSensor, useSensor, useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove, SortableContext, verticalListSortingStrategy, useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import type { Car as CarType } from "@/lib/notion-types";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -16,16 +25,38 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import CarForm from "@/components/admin/CarForm";
-import type { Car } from "@/lib/notion-types";
 
+// ── Sortable row ────────────────────────────────────────────
+function SortableRow({ car, children }: { car: CarType; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: car.id });
+  return (
+    <tr
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 }}
+      className={`border-b border-gray-50 bg-white ${isDragging ? "shadow-lg" : ""}`}
+    >
+      <td className="w-8 px-2 py-3 cursor-grab" {...attributes} {...listeners}>
+        <GripVertical className="w-4 h-4 text-gray-300 hover:text-gray-500" />
+      </td>
+      {children}
+    </tr>
+  );
+}
+
+// ── Main page ────────────────────────────────────────────────
 export default function AdminCarsPage() {
-  const [cars, setCars] = useState<Car[]>([]);
+  const [cars, setCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [brandFilter, setBrandFilter] = useState("all");
+  const [sortMode, setSortMode] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
-  const [editing, setEditing] = useState<Car | null>(null);
-  const [deleting, setDeleting] = useState<Car | null>(null);
+  const [editing, setEditing] = useState<CarType | null>(null);
+  const [deleting, setDeleting] = useState<CarType | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const fetchCars = () => {
     setLoading(true);
@@ -35,12 +66,42 @@ export default function AdminCarsPage() {
       .finally(() => setLoading(false));
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setCars((prev) => {
+      const oldIdx = prev.findIndex((c) => c.id === active.id);
+      const newIdx = prev.findIndex((c) => c.id === over.id);
+      return arrayMove(prev, oldIdx, newIdx);
+    });
+  };
+
+  const saveOrder = async () => {
+    setSavingOrder(true);
+    try {
+      const items = cars.map((c, i) => ({ id: c.id, sortOrder: i + 1 }));
+      const res = await fetch("/api/admin/cars", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items }),
+      });
+      if (!res.ok) throw new Error();
+      setCars(prev => prev.map((c, i) => ({ ...c, sortOrder: i + 1 })));
+      toast.success("บันทึกลำดับแล้ว");
+      setSortMode(false);
+    } catch {
+      toast.error("บันทึกลำดับไม่สำเร็จ");
+    } finally {
+      setSavingOrder(false);
+    }
+  };
+
   useEffect(() => {
     fetchCars();
   }, []);
 
   const toggleFlag = async (
-    car: Car,
+    car: CarType,
     flag: "isActive" | "isBestSeller" | "navFeatured" | "navNew",
     value: boolean
   ) => {
@@ -76,45 +137,81 @@ export default function AdminCarsPage() {
     }
   };
 
-  const filtered = cars.filter((c) => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (
-      c.name.toLowerCase().includes(q) ||
-      c.model.toLowerCase().includes(q) ||
-      c.brand.toLowerCase().includes(q)
-    );
-  });
+  const filtered = sortMode
+    ? cars // in sort mode show all, no filter
+    : cars.filter((c) => {
+        const q = search.toLowerCase();
+        const matchSearch = !q || c.name.toLowerCase().includes(q) || c.model.toLowerCase().includes(q) || c.brand.toLowerCase().includes(q);
+        const matchBrand = brandFilter === "all" || c.brand === brandFilter;
+        return matchSearch && matchBrand;
+      });
 
   return (
     <div className="p-6 space-y-5">
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-[#131F3C]">รถยนต์</h1>
-          <p className="text-sm text-gray-500 mt-0.5">จัดการข้อมูลรถยนต์ทั้งหมด</p>
+          <p className="text-sm text-gray-500 mt-0.5">{cars.length} รุ่น</p>
         </div>
-        <button
-          onClick={() => {
-            setEditing(null);
-            setFormOpen(true);
-          }}
-          className="flex items-center gap-2 bg-[#131F3C] text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-[#1a2a50] transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          เพิ่มรถ
-        </button>
+        <div className="flex items-center gap-2">
+          {sortMode ? (
+            <>
+              <button onClick={() => { setSortMode(false); fetchCars(); }}
+                className="px-4 py-2 text-sm text-gray-600 border border-gray-200 rounded-xl hover:bg-gray-50">
+                ยกเลิก
+              </button>
+              <button onClick={saveOrder} disabled={savingOrder}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-4 py-2 rounded-xl disabled:opacity-50">
+                {savingOrder ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                บันทึกลำดับ
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setSortMode(true)}
+                className="flex items-center gap-2 border border-gray-200 text-gray-600 text-sm font-medium px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors">
+                <ArrowUpDown className="w-4 h-4" />
+                เรียงลำดับ
+              </button>
+              <button
+                onClick={() => { setEditing(null); setFormOpen(true); }}
+                className="flex items-center gap-2 bg-[#131F3C] text-white text-sm font-medium px-4 py-2 rounded-xl hover:bg-[#1a2a50] transition-colors">
+                <Plus className="w-4 h-4" />
+                เพิ่มรถ
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      <div className="relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-        <input
-          type="text"
-          placeholder="ค้นหาชื่อ / รุ่น / แบรนด์..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20"
-        />
-      </div>
+      {/* Filters — hidden in sort mode */}
+      {!sortMode && (
+        <div className="flex flex-wrap gap-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="ค้นหาชื่อ / รุ่น / แบรนด์..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20 w-64"
+            />
+          </div>
+          <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)}
+            className="px-3 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none">
+            <option value="all">ทุกแบรนด์</option>
+            {["Mazda","Ford","Mitsubishi","GWM","Deepal","Kia"].map(b => <option key={b} value={b}>{b}</option>)}
+          </select>
+          <span className="ml-auto text-xs text-gray-400 self-center">{filtered.length} รุ่น</span>
+        </div>
+      )}
+
+      {sortMode && (
+        <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 text-sm text-blue-700 flex items-center gap-2">
+          <GripVertical className="w-4 h-4 shrink-0" />
+          ลาก-วางเพื่อเรียงลำดับ แล้วกด "บันทึกลำดับ" — รถที่อยู่บนสุดจะแสดงก่อนในทุกหน้า
+        </div>
+      )}
 
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
         {loading ? (
@@ -127,9 +224,11 @@ export default function AdminCarsPage() {
             <p className="text-sm">ยังไม่มีรถยนต์ในระบบ</p>
           </div>
         ) : (
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <table className="w-full">
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50/50">
+                {sortMode && <th className="w-8 px-2 py-3" />}
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">รถยนต์</th>
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-24">แบรนด์</th>
                 <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-36">ราคา (เริ่มต้น)</th>
@@ -155,8 +254,28 @@ export default function AdminCarsPage() {
                 <th className="text-right text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider w-28">จัดการ</th>
               </tr>
             </thead>
+            <SortableContext items={filtered.map(c => c.id)} strategy={verticalListSortingStrategy}>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map((car) => (
+              {filtered.map((car) => sortMode ? (
+                <SortableRow key={car.id} car={car}>
+                  <td className="px-5 py-4">
+                    <div className="flex items-center gap-3">
+                      {car.imageUrls[0]
+                        ? <img src={car.imageUrls[0]} alt="" className="w-12 h-9 object-cover rounded-lg bg-gray-100 shrink-0" />
+                        : <div className="w-12 h-9 bg-gray-100 rounded-lg flex items-center justify-center shrink-0"><CarIcon className="w-4 h-4 text-gray-300" /></div>}
+                      <div>
+                        <p className="text-sm font-medium text-[#131F3C]">{car.model || car.name}</p>
+                        <p className="text-xs text-gray-400">{car.brand} · {car.year}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full">{car.brand}</span>
+                  </td>
+                  <td className="px-5 py-4 text-sm text-gray-500">฿{car.priceMin.toLocaleString()}</td>
+                  <td colSpan={4} className="px-5 py-4 text-xs text-gray-400 italic">ลากเพื่อเรียงลำดับ</td>
+                </SortableRow>
+              ) : (
                 <tr key={car.id} className={`hover:bg-gray-50/50 transition-colors ${!car.isActive ? "opacity-50" : ""}`}>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
@@ -232,7 +351,9 @@ export default function AdminCarsPage() {
                 </tr>
               ))}
             </tbody>
+            </SortableContext>
           </table>
+          </DndContext>
         )}
       </div>
 

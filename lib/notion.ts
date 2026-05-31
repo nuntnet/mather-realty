@@ -175,6 +175,7 @@ function pageToCar(page: NotionPage): Car {
     videoUrl: propUrl(page, "Video URL"),
     isActive: propCheckbox(page, "Is Active"),
     isBestSeller: propCheckbox(page, "Is Best Seller"),
+    sortOrder: propNumber(page, "Sort Order"),
     navFeatured: propCheckbox(page, "Nav Featured"),
     navNew: propCheckbox(page, "Nav New"),
     slug: propText(page, "Slug"),
@@ -213,7 +214,10 @@ export async function getActiveCars(filters?: {
   const response = await notion.databases.query({
     database_id: DB.cars,
     filter: { and: filterConditions },
-    sorts: [{ property: "Year", direction: "descending" }],
+    sorts: [
+      { property: "Sort Order", direction: "ascending" },
+      { property: "Year", direction: "descending" },
+    ],
   });
 
   return response.results.map(pageToCar);
@@ -399,6 +403,19 @@ export async function setCarFlags(
   if (flags.navFeatured !== undefined) props["Nav Featured"] = { checkbox: flags.navFeatured };
   if (flags.navNew !== undefined) props["Nav New"] = { checkbox: flags.navNew };
   await notion.pages.update({ page_id: id, properties: props });
+}
+
+/** Update sort order of a single car. */
+export async function setCarSortOrder(id: string, sortOrder: number): Promise<void> {
+  await notion.pages.update({
+    page_id: id,
+    properties: { "Sort Order": { number: sortOrder } },
+  });
+}
+
+/** Bulk update sort orders (used after drag-and-drop reorder). */
+export async function bulkSetCarSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
+  await Promise.all(items.map(({ id, sortOrder }) => setCarSortOrder(id, sortOrder)));
 }
 
 /** Soft delete: set Is Active = false. */

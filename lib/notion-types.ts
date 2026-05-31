@@ -20,6 +20,8 @@ export interface Car {
   videoUrl: string | null;
   isActive: boolean;
   isBestSeller: boolean;
+  /** Display order — lower number = shown first. 0 = unset */
+  sortOrder: number;
   /** Notion checkbox "Nav Featured" — mega menu highlight (แนะนำ) */
   navFeatured: boolean;
   /** Notion checkbox "Nav New" — mega menu highlight (ใหม่) */
