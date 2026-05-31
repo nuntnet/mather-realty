@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -101,9 +102,16 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
       toast.error("กรุณากรอกชื่อรถและรุ่น");
       return;
     }
-    const specs: Record<string, string> = {};
+    const specs: Record<string, string | number | string[]> = {};
     for (const { key, value } of specRows) {
-      if (key.trim()) specs[key.trim()] = value;
+      if (!key.trim()) continue;
+      // Preserve numeric values as numbers
+      const trimmed = value.trim();
+      if (trimmed !== "" && !isNaN(Number(trimmed))) {
+        specs[key.trim()] = Number(trimmed);
+      } else {
+        specs[key.trim()] = trimmed;
+      }
     }
     const payload: CarInput = {
       ...form,
@@ -143,6 +151,9 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
           <DialogTitle className="text-[#131F3C]">
             {car ? "แก้ไขรถยนต์" : "เพิ่มรถยนต์"}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {car ? `แก้ไขข้อมูล ${car.name}` : "กรอกข้อมูลรถยนต์ใหม่"}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

@@ -134,12 +134,12 @@ describe("getFeaturedCars — Is Best Seller filter", () => {
     ]);
   });
 
-  it("limits results to 6 pages", async () => {
+  it("fetches up to 60 best-seller pages for cross-brand filtering", async () => {
     notionMock.databases.query.mockResolvedValue({ results: [] });
     await notion.getFeaturedCars();
 
     const query = notionMock.databases.query.mock.calls[0][0];
-    expect(query.page_size).toBe(6);
+    expect(query.page_size).toBe(60);
   });
 
   it("returns Car objects mapped from result pages", async () => {

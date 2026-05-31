@@ -26,7 +26,7 @@ const carSchema = z.object({
   transmission: z.enum(["auto", "manual"]),
   fuelType: z.enum(["petrol", "diesel", "hybrid", "electric"]),
   description: z.string(),
-  specs: z.record(z.string(), z.string()),
+  specs: z.record(z.string(), z.union([z.string(), z.number(), z.array(z.string())])),
   imageUrls: z.array(z.string()),
   videoUrl: z.string().url().nullable().or(z.literal("")),
   isActive: z.boolean(),
