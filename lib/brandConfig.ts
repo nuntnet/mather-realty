@@ -41,6 +41,12 @@ export interface BrandConfig {
   hubPath: string;
   featuredModels?: FeaturedModel[];
   subLines?: GwmSubLine[];
+  /**
+   * Showroom/dealership photo for BrandHall card hover effect.
+   * Must be a Cloudinary URL. Upload via /admin → แบรนด์ หรือ Cloudinary dashboard.
+   * Shape: https://res.cloudinary.com/n5llrdnq/image/upload/...
+   */
+  showroomImageUrl?: string;
   /** Social media links for this brand */
   social?: {
     facebook?: string;

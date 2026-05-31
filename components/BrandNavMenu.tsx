@@ -452,20 +452,22 @@ export function BrandMegaMenuGrid({
                 initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.15 }}
-                className="flex items-center gap-3 flex-wrap"
+                className="flex flex-col items-center gap-2 w-full"
               >
-                <span className="text-xs font-semibold text-[#131F3C]">
-                  บริการ {hb.displayNameTh}:
-                </span>
-                {BRAND_SUB_LINKS.map(({ label, section }) => (
-                  <Link
-                    key={section}
-                    href={`${hb.hubPath}/${section}`}
-                    className="text-xs text-gray-600 hover:text-[#DD5259] border border-gray-200 hover:border-[#DD5259]/40 bg-white px-3 py-1.5 rounded-full transition-colors"
-                  >
-                    {label}
-                  </Link>
-                ))}
+                <p className="text-[11px] text-gray-400 font-medium">
+                  บริการ {hb.displayNameTh}
+                </p>
+                <div className="flex justify-center gap-3 flex-wrap w-full">
+                  {BRAND_SUB_LINKS.map(({ label, section }) => (
+                    <Link
+                      key={section}
+                      href={`${hb.hubPath}/${section}`}
+                      className="text-sm font-medium text-gray-700 hover:text-[#DD5259] border border-gray-200 hover:border-[#DD5259]/50 hover:bg-[#DD5259]/5 bg-white px-6 py-2.5 rounded-xl transition-all min-w-[120px] text-center"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
               </motion.div>
             );
           })()
