@@ -130,10 +130,13 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
             <div className="bg-white rounded-2xl overflow-hidden border border-[#E2E8F0] mb-6">
               <div className="aspect-[16/9] bg-gray-100 relative">
                 {images.length > 0 ? (
-                  <img
+                  <Image
                     src={images[currentImage]}
                     alt={`${car.brand} ${car.model}`}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    priority
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-300 text-6xl font-bold">
@@ -144,12 +147,14 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
                   <>
                     <button
                       onClick={() => setCurrentImage(Math.max(0, currentImage - 1))}
+                      aria-label="ภาพก่อนหน้า"
                       className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center shadow hover:bg-white"
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
                       onClick={() => setCurrentImage(Math.min(images.length - 1, currentImage + 1))}
+                      aria-label="ภาพถัดไป"
                       className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 flex items-center justify-center shadow hover:bg-white"
                     >
                       <ChevronRight className="w-5 h-5" />
@@ -165,7 +170,7 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
                       onClick={() => setCurrentImage(i)}
                       className={`w-16 h-12 rounded-lg overflow-hidden border-2 shrink-0 ${i === currentImage ? "border-[#0F172A]" : "border-transparent"}`}
                     >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
+                      <img src={img} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>

@@ -3,6 +3,8 @@ import { CheckCircle, Phone, MessageCircle, Shield, Clock, Gift, Users, Heart, C
 import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/seo";
 
+export const revalidate = 86400;
+
 export const metadata = pageMetadata({
   title: "ประกันภัยรถยนต์",
   description: "บริการประกันภัยรถยนต์ครบวงจรจาก ช.เอราวัณ ออโต้ กรุป",

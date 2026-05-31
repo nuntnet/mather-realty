@@ -5,7 +5,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import BranchesMap from "@/components/BranchesMap";
+import dynamic from "next/dynamic";
+const BranchesMap = dynamic(() => import("@/components/BranchesMap"), {
+  ssr: false,
+  loading: () => <div className="h-96 rounded-2xl bg-gray-100 animate-pulse" />,
+});
 import BrandLogo from "@/components/BrandLogo";
 import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
@@ -25,15 +29,15 @@ import { th } from "date-fns/locale";
  * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
  */
 const AWARD_SLIDES: { url: string; caption: string }[] = [
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
-  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good,w_1200/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
 ];
 
 const heroSlides = [
@@ -93,10 +97,14 @@ function AwardSlideshow() {
           key={i}
           className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
         >
-          <img
+          <Image
             src={slide.url}
             alt={slide.caption}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={i === 0}
+            loading={i === 0 ? undefined : "lazy"}
           />
           {/* Dark overlay + caption */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -217,8 +225,9 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
         {/* Slide dots */}
         <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
-          {heroSlides.map((_, i) => (
+          {heroSlides.map((slide, i) => (
             <button key={i} onClick={() => setHeroSlide(i)}
+              aria-label={`สไลด์ ${slide.brand}`}
               className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
             />
           ))}
