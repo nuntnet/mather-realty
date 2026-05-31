@@ -186,10 +186,10 @@ export const BRANDS: BrandConfig[] = [
     tagline: "Electric Future",
     descriptionTh:
       "ตัวแทนจำหน่าย Deepal รถยนต์ไฟฟ้าและปลั๊กอินไฮบริดจาก Changan ประเทศไทย — SUV และซีดานสมรรถนะสูง พร้อมเทคโนโลยี ADAS",
-    logoPath: "/brands/deepal.png",
-    logoLightPath: "/brands/deepal-light.svg",
+    logoPath: "/brands/deepal-dark.svg",       // horizontal wordmark (icon + DEEPAL text) on light bg
+    logoLightPath: "/brands/deepal-light.svg", // same on dark bg
     logoOnDark: "native",
-    logoScale: 1.05,
+    logoScale: 1.15,
     accentColor: "#0066FF",
     heroBgImage: BRAND_IMAGES.Deepal,
     navBgImage: BRAND_IMAGES.Deepal,
