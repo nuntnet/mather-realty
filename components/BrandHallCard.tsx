@@ -184,7 +184,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             nativeOnDark={brand.logoOnDark === "native"}
             width={160}
             height={52}
-            className=""
+            containerClassName="!justify-start"
           />
         </motion.div>
 
