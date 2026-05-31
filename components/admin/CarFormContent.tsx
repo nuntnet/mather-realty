@@ -133,7 +133,12 @@ export default function CarFormContent({ car, onSaved }: CarFormContentProps) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error("API error:", errBody);
+        toast.error(`Error: ${JSON.stringify(errBody)}`);
+        return;
+      }
       toast.success(car ? "บันทึกการแก้ไขสำเร็จ" : "เพิ่มรถสำเร็จ");
       onSaved?.();
       router.push("/admin/cars");
