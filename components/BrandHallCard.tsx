@@ -122,7 +122,8 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             src={showroomImage}
             alt={`โชว์รูม ${brand.displayNameTh} ช.เอราวัณ`}
             fill
-            className="object-cover object-center"
+            className="object-cover object-[center_40%]"
+            style={{ transform: "scale(0.92)", transformOrigin: "center center" }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
           {/* "SHOWROOM" badge on hover */}
@@ -137,12 +138,19 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
         </motion.div>
       )}
 
-      <div
-        className="absolute inset-0 z-[2] bg-gradient-to-t from-black via-black/70 to-black/20"
+      {/* Gradient overlay — lightens when showing showroom photo */}
+      <motion.div
+        className="absolute inset-0 z-[2]"
+        animate={{ opacity: hovered && showroomImage ? 0.45 : 1 }}
+        transition={{ duration: 0.5 }}
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 100%)" }}
         aria-hidden
       />
-      <div
-        className="absolute inset-0 z-[2] bg-gradient-to-r from-black/80 via-black/30 to-transparent"
+      <motion.div
+        className="absolute inset-0 z-[2]"
+        animate={{ opacity: hovered && showroomImage ? 0.2 : 0.7 }}
+        transition={{ duration: 0.5 }}
+        style={{ background: "linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }}
         aria-hidden
       />
       <motion.div
