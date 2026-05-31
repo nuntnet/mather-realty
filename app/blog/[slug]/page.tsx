@@ -5,6 +5,7 @@ import { getBlogPostWithContent, getAllBlogSlugs, getPublishedBlogPosts } from "
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
+import { cldUrl } from "@/lib/cloudinary";
 import type { Metadata } from "next";
 import { breadcrumbJsonLd, canonicalUrl } from "@/lib/site";
 import { JsonLd, articleJsonLd } from "@/lib/seo";
@@ -74,7 +75,7 @@ export default async function BlogPostPage({
       <div className="relative h-[400px] lg:h-[500px]">
         {post.coverImageUrl ? (
           <img
-            src={post.coverImageUrl}
+            src={cldUrl(post.coverImageUrl, "full")}
             alt={post.title}
             className="w-full h-full object-cover"
           />
@@ -123,8 +124,10 @@ export default async function BlogPostPage({
                     <div className="aspect-video overflow-hidden bg-gray-100">
                       {rp.coverImageUrl && (
                         <img
-                          src={rp.coverImageUrl}
+                          src={cldUrl(rp.coverImageUrl)}
                           alt={rp.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       )}

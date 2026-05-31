@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -99,10 +99,10 @@ const timeline: TimelineItem[] = [
   {
     year: "ปัจจุบัน",
     title: "6 แบรนด์ 7 สาขา",
-    desc: "ช.เอราวัณ กรุ๊ป เติบโตเป็นกลุ่มดีลเลอร์ชั้นนำในภาคตะวันตก ครอบคลุม ICE, Hybrid และ EV ครบทุกกลุ่ม ส่วนแบ่งตลาดรวม ~13.1%",
+    desc: "ช.เอราวัณ กรุป เติบโตเป็นกลุ่มดีลเลอร์ชั้นนำในภาคตะวันตก ครอบคลุม ICE, Hybrid และ EV ครบทุกกลุ่ม ส่วนแบ่งตลาดรวม ~13.1%",
     milestone: "ผู้นำภาคตะวันตก",
     image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg",
-    imageAlt: "ทีมงาน ช.เอราวัณ กรุ๊ป",
+    imageAlt: "ทีมงาน ช.เอราวัณ กรุป",
   },
 ];
 
@@ -152,18 +152,81 @@ const awards = [
   {
     title: "กิจกรรมเพื่อสังคม",
     year: "2565",
-    desc: "ช.เอราวัณ กรุ๊ป บริจาคของช่วยเหลือผู้ประสบภัยน้ำท่วมภาคอีสาน",
+    desc: "ช.เอราวัณ กรุป บริจาคของช่วยเหลือผู้ประสบภัยน้ำท่วมภาคอีสาน",
     img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/TsCmIkumrflAejvu.jpg",
     brand: "CSR",
   },
 ];
 
+/**
+ * Management team data
+ * photoUrl: upload portrait photo to Cloudinary → https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/team/[name].jpg
+ * teamPhotoUrl: group photo of all executives together (for hero banner of team section)
+ */
+// Set to null to show HQ map fallback instead
+const TEAM_GROUP_PHOTO_URL: string | null = "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238965/ch-erawan/team/team-group.jpg";
+
 const management = [
-  { name: "คุณวิชัย จันทร์วาววาม", role: "ประธานกรรมการ", desc: "ผู้บุกเบิกและขยายธุรกิจ ช.เอราวัณ สู่จังหวัดนครปฐมตั้งแต่ปี 2530", initial: "ว", accent: "from-red-600 to-red-800" },
-  { name: "คุณณัฐวุฒิ จันทร์วาววาม", nickname: "คุณณัฐ", role: "IT Support & พัฒนาธุรกิจ", desc: "ดูแลด้าน IT การพัฒนาธุรกิจ และวางแผนกลยุทธ์องค์กร", initial: "ณ", accent: "from-slate-700 to-slate-900" },
-  { name: "คุณอรพา พงษ์วิทยภานุ", nickname: "คุณหยี", role: "ขาย & บริการหลังการขาย", desc: "ดูแลงานขาย บริการหลังการขาย และบัญชีการเงิน", initial: "อ", accent: "from-rose-600 to-rose-800" },
-  { name: "คุณนันทวิทย์ จันทร์วาววาม", nickname: "คุณนันท์", role: "การตลาด & วางแผนกลยุทธ์", desc: "ดูแลการตลาด บริการหลังการขาย และวางแผนกลยุทธ์", initial: "น", accent: "from-blue-600 to-blue-800" },
-  { name: "คุณจันทร์จิรา จันทร์วาววาม", nickname: "คุณนุ้ย", role: "งานบุคคล & กฎหมาย", desc: "ดูแลงานบุคคล กฎหมาย และทะเบียนประกัน", initial: "จ", accent: "from-violet-600 to-violet-800" },
+  {
+    name: "คุณวิชัย จันทร์วาววาม",
+    nickname: null,
+    role: "ประธานกรรมการ",
+    roleEn: "Chairman",
+    desc: "ผู้บุกเบิกและขยายธุรกิจ ช.เอราวัณ สู่จังหวัดนครปฐมตั้งแต่ปี พ.ศ. 2530 ด้วยวิสัยทัศน์ที่มองเห็นโอกาสในธุรกิจยานยนต์",
+    initial: "ว",
+    accent: "from-red-600 to-red-800",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238982/ch-erawan/team/vichai.jpg",
+  },
+  {
+    name: "คุณสุกัญญา จันทร์วาววาม",
+    nickname: null,
+    role: "กรรมการผู้จัดการ",
+    roleEn: "Managing Director",
+    desc: "ผู้ร่วมบุกเบิกธุรกิจในนครปฐม ดูแลภาพรวมการบริหารและการเงินองค์กร พร้อมสืบสานปณิธานการให้บริการที่เป็นเลิศ",
+    initial: "ส",
+    accent: "from-pink-600 to-pink-800",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238968/ch-erawan/team/sukanya.jpg",
+  },
+  {
+    name: "คุณณัฐวุฒิ จันทร์วาววาม",
+    nickname: "คุณณัฐ",
+    role: "ผู้อำนวยการ IT & พัฒนาธุรกิจ",
+    roleEn: "Director, IT & Business Development",
+    desc: "ดูแลด้านเทคโนโลยีสารสนเทศ การพัฒนาธุรกิจดิจิทัล และวางแผนกลยุทธ์องค์กรสู่อนาคต",
+    initial: "ณ",
+    accent: "from-slate-700 to-slate-900",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238986/ch-erawan/team/nattawut.jpg",
+  },
+  {
+    name: "คุณอรพา พงษ์วิทยภานุ",
+    nickname: "คุณหยี",
+    role: "ผู้อำนวยการฝ่ายขาย & บริการ",
+    roleEn: "Director, Sales & After-Sales",
+    desc: "ดูแลงานขาย บริการหลังการขาย และบัญชีการเงิน ด้วยประสบการณ์ยาวนานในอุตสาหกรรมยานยนต์",
+    initial: "อ",
+    accent: "from-rose-600 to-rose-800",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238979/ch-erawan/team/orepa.jpg",
+  },
+  {
+    name: "คุณนันทวิทย์ จันทร์วาววาม",
+    nickname: "คุณนันท์",
+    role: "ผู้อำนวยการฝ่ายการตลาด",
+    roleEn: "Director, Marketing & Strategy",
+    desc: "ดูแลการตลาด สื่อดิจิทัล และวางแผนกลยุทธ์การตลาดเพื่อเสริมความแข็งแกร่งแบรนด์ในภูมิภาค",
+    initial: "น",
+    accent: "from-blue-600 to-blue-800",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238975/ch-erawan/team/nantawit.jpg",
+  },
+  {
+    name: "คุณจันทร์จิรา จันทร์วาววาม",
+    nickname: "คุณนุ้ย",
+    role: "ผู้อำนวยการฝ่ายบุคคล & กฎหมาย",
+    roleEn: "Director, HR & Legal",
+    desc: "ดูแลงานบุคคล การสรรหาทีมงาน งานกฎหมาย และการจัดการทะเบียนประกันภัยทุกสาขา",
+    initial: "จ",
+    accent: "from-violet-600 to-violet-800",
+    photoUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780238972/ch-erawan/team/jantjira.jpg",
+  },
 ];
 
 const stats = [
@@ -186,6 +249,13 @@ const brandCards = [
 
 type Section = "history" | "brands" | "team" | "values";
 
+const NAV_TABS = [
+  { key: "history" as Section, label: "ประวัติบริษัท" },
+  { key: "brands" as Section, label: "แบรนด์รถยนต์" },
+  { key: "team" as Section, label: "ทีมผู้บริหาร" },
+  { key: "values" as Section, label: "ค่านิยมองค์กร" },
+];
+
 function TimelineImage({ item }: { item: TimelineItem }) {
   if (!item.image) return null;
   const imageClass = item.imageClass ?? "object-cover";
@@ -205,26 +275,64 @@ function TimelineImage({ item }: { item: TimelineItem }) {
 
 export default function About() {
   const [active, setActive] = useState<Section>("history");
+  const sectionRefs = useRef<Record<Section, HTMLElement | null>>({
+    history: null, brands: null, team: null, values: null,
+  });
+
+  // Scroll to section when nav clicked
+  const scrollTo = useCallback((key: Section) => {
+    sectionRefs.current[key]?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, []);
+
+  // Update active nav based on scroll position (IntersectionObserver)
+  useEffect(() => {
+    const OFFSET = 160; // sticky nav height + buffer
+    const observers: IntersectionObserver[] = [];
+
+    NAV_TABS.forEach(({ key }) => {
+      const el = sectionRefs.current[key];
+      if (!el) return;
+      const obs = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) setActive(key); },
+        { rootMargin: `-${OFFSET}px 0px -60% 0px`, threshold: 0 }
+      );
+      obs.observe(el);
+      observers.push(obs);
+    });
+
+    return () => observers.forEach((o) => o.disconnect());
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-[68px]">
       {/* Hero */}
       <section className="relative overflow-hidden bg-[#0B1220] text-white">
         <div className="absolute inset-0">
-          <Image
-            src={hqBranch.graphicMapUrl}
-            alt={hqBranch.name}
-            fill
-            priority
-            className="object-cover object-center opacity-35"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220] via-[#0B1220]/90 to-[#0B1220]/70" />
+          {TEAM_GROUP_PHOTO_URL ? (
+            <Image
+              src={TEAM_GROUP_PHOTO_URL}
+              alt="ทีมบริหาร ช.เอราวัณ ออโต้ กรุป"
+              fill
+              priority
+              className="object-cover object-center opacity-30"
+              sizes="100vw"
+            />
+          ) : (
+            <Image
+              src={hqBranch.graphicMapUrl}
+              alt={hqBranch.name}
+              fill
+              priority
+              className="object-cover object-center opacity-25"
+              sizes="100vw"
+            />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220] via-[#0B1220]/85 to-[#0B1220]/60" />
           <div
-            className="absolute inset-0 opacity-70"
+            className="absolute inset-0 opacity-60"
             style={{
               background:
-                "radial-gradient(ellipse 70% 60% at 20% 50%, rgba(221,82,89,0.15) 0%, transparent 55%)",
+                "radial-gradient(ellipse 70% 60% at 20% 50%, rgba(221,82,89,0.18) 0%, transparent 55%)",
             }}
           />
         </div>
@@ -233,18 +341,33 @@ export default function About() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-4">
-                About Us
+                About Us · กว่า 57 ปี
               </p>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-5">
-                ช.เอราวัณ คือเพื่อนแท้
+                &ldquo;ช.เอราวัณ คือเพื่อนแท้
                 <br />
-                <span className="text-white/80">ที่พร้อมดูแลรถคุณ</span>
+                <span className="text-white/80">ที่พร้อมดูแลรถคุณ&rdquo;</span>
               </h1>
               <p className="text-white/55 text-base lg:text-lg leading-relaxed max-w-xl">
-                ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี — 6 แบรนด์ 7 สาขา
+                ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม ตั้งแต่ปี พ.ศ. 2510 — 6 แบรนด์ 7 สาขา
                 ครอบคลุม ICE, Hybrid และ EV ด้วยทีมงานมืออาชีพกว่า 200 คน
               </p>
-              <div className="flex flex-wrap gap-3 mt-8">
+
+              {/* Quick stats */}
+              <div className="grid grid-cols-3 gap-4 mt-8 mb-8">
+                {[
+                  { value: "57+", label: "ปี" },
+                  { value: "7", label: "สาขา" },
+                  { value: "200+", label: "ทีมงาน" },
+                ].map((s) => (
+                  <div key={s.label} className="text-center bg-white/5 rounded-xl p-3 border border-white/10">
+                    <p className="text-2xl font-bold text-white">{s.value}</p>
+                    <p className="text-white/50 text-xs mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex flex-wrap gap-3">
                 <Link href="/branches">
                   <Button className="bg-[#DD5259] hover:bg-[#c9454c] text-white font-semibold">
                     <MapPin className="w-4 h-4 mr-1.5" />
@@ -260,23 +383,47 @@ export default function About() {
               </div>
             </div>
 
+            {/* Right: Team photo or HQ map */}
             <div className="relative hidden lg:block">
               <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-white/10 shadow-2xl">
-                <Image
-                  src={hqBranch.graphicMapUrl}
-                  alt={hqBranch.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 0vw, 560px"
-                />
+                {TEAM_GROUP_PHOTO_URL ? (
+                  <Image
+                    src={TEAM_GROUP_PHOTO_URL}
+                    alt="ทีมบริหาร ช.เอราวัณ ออโต้ กรุป"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 1024px) 0vw, 560px"
+                  />
+                ) : (
+                  <Image
+                    src={hqBranch.graphicMapUrl}
+                    alt={hqBranch.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1024px) 0vw, 560px"
+                  />
+                )}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0B1220]/80 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <div className="flex items-center gap-2 text-white/50 text-xs mb-2">
-                    <Building2 className="w-3.5 h-3.5" />
-                    สำนักงานใหญ่
-                  </div>
-                  <p className="font-bold text-lg">{hqBranch.name}</p>
-                  <p className="text-white/60 text-sm mt-1">{hqBranch.address}</p>
+                  {TEAM_GROUP_PHOTO_URL ? (
+                    <>
+                      <div className="flex items-center gap-2 text-white/50 text-xs mb-2">
+                        <Users className="w-3.5 h-3.5" />
+                        ทีมผู้บริหาร
+                      </div>
+                      <p className="font-bold text-lg">ช.เอราวัณ ออโต้ กรุป</p>
+                      <p className="text-white/60 text-sm mt-1">ตระกูลจันทร์วาววาม · ผู้บุกเบิกกว่า 57 ปี</p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-2 text-white/50 text-xs mb-2">
+                        <Building2 className="w-3.5 h-3.5" />
+                        สำนักงานใหญ่
+                      </div>
+                      <p className="font-bold text-lg">{hqBranch.name}</p>
+                      <p className="text-white/60 text-sm mt-1">{hqBranch.address}</p>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -322,19 +469,14 @@ export default function About() {
         </div>
       </section>
 
-      {/* Tabs */}
-      <div className="sticky top-[68px] z-30 bg-white/95 backdrop-blur border-b border-gray-100 shadow-sm">
+      {/* Sticky scroll-nav */}
+      <div className="sticky top-[68px] z-30 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
         <div className="container">
           <div className="flex overflow-x-auto scrollbar-none">
-            {([
-              { key: "history", label: "ประวัติบริษัท" },
-              { key: "brands", label: "แบรนด์รถยนต์" },
-              { key: "team", label: "ทีมผู้บริหาร" },
-              { key: "values", label: "ค่านิยมองค์กร" },
-            ] as { key: Section; label: string }[]).map((tab) => (
+            {NAV_TABS.map((tab) => (
               <button
                 key={tab.key}
-                onClick={() => setActive(tab.key)}
+                onClick={() => scrollTo(tab.key)}
                 className={`shrink-0 px-5 sm:px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
                   active === tab.key
                     ? "border-[#DD5259] text-[#0F172A]"
@@ -348,9 +490,10 @@ export default function About() {
         </div>
       </div>
 
-      <div className="container py-12 lg:py-16">
+      {/* ── All sections scroll continuously ── */}
+      <div className="container py-12 lg:py-16 space-y-24">
         {/* HISTORY */}
-        {active === "history" && (
+        <section id="history" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.history = el; }}>
           <div>
             <div className="max-w-3xl mb-12">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ประวัติความเป็นมา</h2>
@@ -391,15 +534,15 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* BRANDS */}
-        {active === "brands" && (
+        <section id="brands" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.brands = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">แบรนด์รถยนต์ในเครือ</h2>
               <p className="text-gray-500 leading-relaxed">
-                ช.เอราวัณ กรุ๊ป เป็นตัวแทนจำหน่ายอย่างเป็นทางการของ 6 แบรนด์ชั้นนำ
+                ช.เอราวัณ กรุป เป็นตัวแทนจำหน่ายอย่างเป็นทางการของ 6 แบรนด์ชั้นนำ
                 ครอบคลุมทุกกลุ่มรถยนต์ตั้งแต่ ICE, Hybrid ไปจนถึง EV เต็มรูปแบบ
               </p>
             </div>
@@ -485,66 +628,151 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* TEAM */}
-        {active === "team" && (
-          <div>
-            <div className="max-w-3xl mb-10">
+        <section id="team" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.team = el; }}>
+          <div className="space-y-12">
+            {/* ── Section header ── */}
+            <div className="max-w-3xl">
+              <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-2">Our Team</p>
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">ทีมผู้บริหาร</h2>
-              <p className="text-gray-500 leading-relaxed">
-                ช.เอราวัณ กรุ๊ป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนาน
-                ภายใต้การนำของตระกูลจันทร์วาววาม ที่สืบทอดปณิธานการให้บริการที่เป็นเลิศมาตลอดกว่า 57 ปี
+              <p className="text-gray-500 leading-relaxed text-base">
+                ช.เอราวัณ กรุป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนานกว่า 57 ปี
+                ภายใต้การนำของตระกูลจันทร์วาววาม ที่สืบทอดปณิธานการให้บริการที่เป็นเลิศแก่ลูกค้าทุกท่าน
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {management.map((person) => (
-                <div
-                  key={person.name}
-                  className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-lg transition-all"
-                >
-                  <div
-                    className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${person.accent} flex items-center justify-center mb-4 shadow-md`}
-                  >
-                    <span className="text-white font-bold text-2xl">{person.initial}</span>
-                  </div>
-                  <h3 className="font-bold text-[#0F172A] text-base">{person.name}</h3>
-                  {"nickname" in person && person.nickname && (
-                    <p className="text-gray-400 text-sm">{person.nickname}</p>
-                  )}
-                  <p className="text-[#DD5259] text-xs font-semibold mt-1 mb-3 uppercase tracking-wide">
-                    {person.role}
+            {/* ── Team Group Photo Banner ── */}
+            <div className="relative rounded-2xl overflow-hidden bg-[#0F172A]"
+              style={{ minHeight: "280px" }}>
+              {TEAM_GROUP_PHOTO_URL ? (
+                <>
+                  <Image
+                    src={TEAM_GROUP_PHOTO_URL}
+                    alt="ทีมบริหาร ช.เอราวัณ ออโต้ กรุป"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 1024px) 100vw, 1200px"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220]/90 via-[#0B1220]/40 to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#1E293B]" />
+              )}
+              <div className="relative z-10 flex items-center p-8 lg:p-12 min-h-[280px]">
+                <div className="max-w-lg">
+                  <p className="text-[#DD5259] text-xs font-bold uppercase tracking-widest mb-3">Management Team</p>
+                  <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3">
+                    ตระกูลจันทร์วาววาม
+                  </h3>
+                  <p className="text-white/60 leading-relaxed mb-4">
+                    ผู้บุกเบิกธุรกิจยานยนต์นครปฐมกว่า 57 ปี ด้วยความมุ่งมั่นที่จะพัฒนาคุณภาพการบริการอย่างไม่หยุดยั้ง
+                    เพื่อตอบสนองความต้องการของลูกค้า
                   </p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{person.desc}</p>
+                  <div className="flex flex-wrap gap-4">
+                    {[
+                      { value: "57+", label: "ปีแห่งประสบการณ์" },
+                      { value: "200+", label: "ทีมงานทั่วสาขา" },
+                      { value: "3", label: "รุ่นครอบครัว" },
+                    ].map((s) => (
+                      <div key={s.label} className="text-center">
+                        <p className="text-2xl font-bold text-white">{s.value}</p>
+                        <p className="text-white/50 text-xs">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {!TEAM_GROUP_PHOTO_URL && (
+                    <p className="text-white/30 text-xs mt-4 italic">
+                      * เพิ่มรูปหมู่ทีมบริหารได้ที่ TEAM_GROUP_PHOTO_URL ใน about/page.tsx
+                    </p>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
 
-            <div className="mt-8 relative rounded-2xl overflow-hidden aspect-[21/9] min-h-[200px]">
+            {/* ── Management Profile Cards ── */}
+            <div>
+              <h3 className="text-lg font-semibold text-[#0F172A] mb-6">คณะผู้บริหาร</h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {management.map((person) => (
+                  <div
+                    key={person.name}
+                    className="bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                  >
+                    {/* Photo area */}
+                    <div className={`relative aspect-[3/4] bg-gradient-to-br ${person.accent} overflow-hidden`}>
+                      {person.photoUrl ? (
+                        <Image
+                          src={person.photoUrl}
+                          alt={person.name}
+                          fill
+                          className="object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+                          <div className="w-20 h-20 rounded-full bg-white/15 border-2 border-white/20 flex items-center justify-center">
+                            <span className="text-white font-bold text-4xl">{person.initial}</span>
+                          </div>
+                          <p className="text-white/40 text-[10px] italic">รอรูปโปรไฟล์</p>
+                        </div>
+                      )}
+                      {/* Role badge */}
+                      <div className="absolute bottom-3 left-3 right-3">
+                        <span className="inline-block bg-white/20 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border border-white/20">
+                          {person.roleEn}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Info */}
+                    <div className="p-5">
+                      <h3 className="font-bold text-[#0F172A] text-base leading-snug">{person.name}</h3>
+                      {person.nickname && (
+                        <p className="text-gray-400 text-sm mt-0.5">{person.nickname}</p>
+                      )}
+                      <p className="text-[#DD5259] text-xs font-semibold mt-1.5 mb-3 uppercase tracking-wide">
+                        {person.role}
+                      </p>
+                      <p className="text-gray-500 text-sm leading-relaxed">{person.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── Full staff banner ── */}
+            <div className="relative rounded-2xl overflow-hidden" style={{ minHeight: "200px" }}>
               <Image
                 src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg"
-                alt="ทีมงาน ช.เอราวัณ กรุ๊ป"
+                alt="ทีมงาน ช.เอราวัณ กรุป"
                 fill
-                className="object-cover"
+                className="object-cover object-center"
                 sizes="(max-width: 1024px) 100vw, 1200px"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220]/90 via-[#0B1220]/50 to-transparent" />
-              <div className="absolute inset-0 flex items-center p-8 lg:p-12">
-                <div className="max-w-md">
-                  <p className="text-[#DD5259] text-xs font-bold uppercase tracking-wider mb-2">Our Team</p>
-                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">ทีมงานมืออาชีพกว่า 200 คน</h3>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220]/90 via-[#0B1220]/60 to-[#0B1220]/20" />
+              <div className="relative z-10 flex items-center p-8 lg:p-12 min-h-[200px]">
+                <div className="max-w-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-4 h-4 text-[#DD5259]" />
+                    <p className="text-[#DD5259] text-xs font-bold uppercase tracking-wider">ทีมงานทั้งหมด</p>
+                  </div>
+                  <h3 className="text-xl lg:text-2xl font-bold text-white mb-2">
+                    ทีมงานมืออาชีพกว่า 200 คน
+                  </h3>
                   <p className="text-white/60 text-sm leading-relaxed">
-                    ฝ่ายขาย ศูนย์บริการ อะไหล่ และประกันภัย พร้อมดูแลลูกค้าทุกท่านด้วยใจ
+                    ฝ่ายขาย · ศูนย์บริการ · Body & Paint · อะไหล่ · ประกันภัย
+                    พร้อมดูแลลูกค้าทุกท่านด้วยใจ ทุกวัน 8:00–17:00 น.
                   </p>
                 </div>
               </div>
             </div>
           </div>
-        )}
+        </section>
 
         {/* VALUES */}
-        {active === "values" && (
+        <section id="values" className="scroll-mt-[140px]" ref={(el) => { sectionRefs.current.values = el; }}>
           <div>
             <div className="max-w-3xl mb-10">
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">วิสัยทัศน์และค่านิยมองค์กร</h2>
@@ -641,7 +869,7 @@ export default function About() {
               </div>
             </div>
           </div>
-        )}
+        </section>
       </div>
 
       {/* CTA */}
@@ -650,7 +878,7 @@ export default function About() {
           <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.2em] mb-3">Get Started</p>
           <h2 className="text-2xl lg:text-3xl font-bold mb-3">พร้อมให้บริการคุณทุกวัน</h2>
           <p className="text-white/50 mb-8 max-w-xl mx-auto">
-            ไม่ว่าจะเป็นการซื้อรถใหม่ บริการซ่อมบำรุง หรือประกันภัย ช.เอราวัณ กรุ๊ป พร้อมดูแลคุณ
+            ไม่ว่าจะเป็นการซื้อรถใหม่ บริการซ่อมบำรุง หรือประกันภัย ช.เอราวัณ กรุป พร้อมดูแลคุณ
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/cars">

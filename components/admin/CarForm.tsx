@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -56,6 +57,7 @@ const emptyCar: CarInput = {
   videoUrl: null,
   isActive: true,
   isBestSeller: false,
+  sortOrder: 0,
   navFeatured: false,
   navNew: false,
   slug: "",
@@ -84,7 +86,10 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
         : { ...emptyCar, year: new Date().getFullYear() };
       setForm(base);
       setSpecRows(
-        Object.entries(base.specs ?? {}).map(([key, value]) => ({ key, value }))
+        Object.entries(base.specs ?? {}).map(([key, value]) => ({
+          key,
+          value: Array.isArray(value) ? value.join(", ") : String(value ?? ""),
+        }))
       );
     }
   }, [open, car]);
@@ -97,9 +102,16 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
       toast.error("กรุณากรอกชื่อรถและรุ่น");
       return;
     }
-    const specs: Record<string, string> = {};
+    const specs: Record<string, string | number | string[]> = {};
     for (const { key, value } of specRows) {
-      if (key.trim()) specs[key.trim()] = value;
+      if (!key.trim()) continue;
+      // Preserve numeric values as numbers
+      const trimmed = value.trim();
+      if (trimmed !== "" && !isNaN(Number(trimmed))) {
+        specs[key.trim()] = Number(trimmed);
+      } else {
+        specs[key.trim()] = trimmed;
+      }
     }
     const payload: CarInput = {
       ...form,
@@ -139,6 +151,9 @@ export default function CarForm({ open, onOpenChange, car, onSaved }: CarFormPro
           <DialogTitle className="text-[#131F3C]">
             {car ? "แก้ไขรถยนต์" : "เพิ่มรถยนต์"}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {car ? `แก้ไขข้อมูล ${car.name}` : "กรอกข้อมูลรถยนต์ใหม่"}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">

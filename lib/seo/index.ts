@@ -15,3 +15,7 @@ export { productVehicleJsonLd, carBreadcrumbJsonLd } from "./product-vehicle";
 export { articleJsonLd } from "./article";
 export { faqPageJsonLd, type FaqItem } from "./faq";
 export { itemListJsonLd, type ItemListEntry } from "./item-list";
+export {
+  howToJsonLd, contactPageJsonLd, serviceJsonLd, videoObjectJsonLd,
+  type HowToStep,
+} from "./how-to";

@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, SlidersHorizontal, ArrowRight, Fuel, Gauge, Calendar } from "lucide-react";
 import type { Car } from "@/lib/notion-types";
+import { cldUrl } from "@/lib/cloudinary";
 
 const brands = ["ทั้งหมด", "Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"];
 const types = [
@@ -97,8 +98,10 @@ export default function CarsFilter({ cars }: { cars: Car[] }) {
               <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden relative">
                 {car.imageUrls[0] ? (
                   <img
-                    src={car.imageUrls[0]}
+                    src={cldUrl(car.imageUrls[0])}
                     alt={`${car.brand} ${car.model}`}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 ) : (

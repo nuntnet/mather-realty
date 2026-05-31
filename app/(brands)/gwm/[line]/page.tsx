@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: PageProps) {
   const gwm = BRAND_BY_SLUG.gwm;
   return pageMetadata({
     title: `${line.displayName} — GWM รถยนต์`,
-    description: `รุ่นรถ ${line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุ๊ป — ${gwm.descriptionTh}`,
+    description: `รุ่นรถ ${line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุป — ${gwm.descriptionTh}`,
     path: `/gwm/${slug}`,
     openGraphImage: line.logoPath,
   });
@@ -66,7 +66,7 @@ export default async function GwmLinePage({ params }: PageProps) {
             displayName: line.displayName,
             displayNameTh: line.displayNameTh,
             tagline: line.displayName,
-            descriptionTh: `รุ่นรถ ${line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุ๊ป พร้อมทดลองขับและบริการหลังการขายครบวงจร`,
+            descriptionTh: `รุ่นรถ ${line.displayName} จาก GWM ที่ ช.เอราวัณ ออโต้ กรุป พร้อมทดลองขับและบริการหลังการขายครบวงจร`,
             logoPath: line.logoPath,
           }}
           breadcrumbs={breadcrumbs}

@@ -17,7 +17,8 @@ export const validCarBody = {
   imageUrls: ["https://cdn.example/car.jpg"],
   videoUrl: "",
   isActive: true,
-  isFeatured: false,
+  isBestSeller: false,
+  sortOrder: 0,
   navFeatured: false,
   navNew: false,
   slug: "mazda-cx-5-2024",
@@ -68,3 +69,16 @@ export const validStoryBody = {
 
 export const mockCar = { ...validCarBody, id: "car-1" };
 export const mockBlogPost = { ...validBlogCreateBody.meta, id: "blog-1" };
+
+export const validFeedbackBody = {
+  name: "สมชาย ใจดี",
+  type: "ร้องเรียน" as const,
+  brand: "Mazda",
+  branch: "Mazda ช.เอราวัณ นครปฐม",
+  department: "ศูนย์บริการ",
+  phone: "0812345678",
+  email: "",
+  licensePlate: "",
+  serviceDate: "",
+  message: "บริการไม่ดี ต้องรอนานมากกว่า 2 ชั่วโมง",
+};

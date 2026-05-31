@@ -41,5 +41,10 @@ export async function uploadToCloudinary(
     resource_type: options.resourceType ?? "auto",
   });
 
-  return result.secure_url;
+  // Insert delivery transforms into URL so all consumers get WebP/AVIF + compressed output
+  // regardless of whether they use <Image> or <img>
+  return result.secure_url.replace(
+    "/upload/",
+    "/upload/f_auto,q_auto:best,w_1920/"
+  );
 }

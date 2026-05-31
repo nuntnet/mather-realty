@@ -162,19 +162,21 @@ function pageToCar(page: NotionPage): Car {
     brand: propSelect(page, "Brand") as Car["brand"],
     model: propText(page, "Model"),
     year: propNumber(page, "Year"),
-    type: propSelect(page, "Type") as Car["type"],
-    condition: propSelect(page, "Condition") as Car["condition"],
+    // Lowercase enums — Notion may store "SUV"/"Pickup"/"EV"/"Sedan" mixed-case
+    type: (propSelect(page, "Type") || "other").toLowerCase() as Car["type"],
+    condition: (propSelect(page, "Condition") || "new").toLowerCase() as Car["condition"],
     priceMin: propNumber(page, "Price Min"),
     priceMax: propNumber(page, "Price Max"),
     engineSize: propText(page, "Engine Size"),
-    transmission: propSelect(page, "Transmission") as Car["transmission"],
-    fuelType: propSelect(page, "Fuel Type") as Car["fuelType"],
+    transmission: (propSelect(page, "Transmission") || "auto").toLowerCase() as Car["transmission"],
+    fuelType: (propSelect(page, "Fuel Type") || "petrol").toLowerCase() as Car["fuelType"],
     description: propText(page, "Description"),
     specs: propJson(page, "Specs"),
     imageUrls: propImageUrls(page, "Image URLs"),
     videoUrl: propUrl(page, "Video URL"),
     isActive: propCheckbox(page, "Is Active"),
     isBestSeller: propCheckbox(page, "Is Best Seller"),
+    sortOrder: propNumber(page, "Sort Order"),
     navFeatured: propCheckbox(page, "Nav Featured"),
     navNew: propCheckbox(page, "Nav New"),
     slug: propText(page, "Slug"),
@@ -213,7 +215,10 @@ export async function getActiveCars(filters?: {
   const response = await notion.databases.query({
     database_id: DB.cars,
     filter: { and: filterConditions },
-    sorts: [{ property: "Year", direction: "descending" }],
+    sorts: [
+      { property: "Sort Order", direction: "ascending" },
+      { property: "Year", direction: "descending" },
+    ],
   });
 
   return response.results.map(pageToCar);
@@ -238,7 +243,11 @@ export async function getFeaturedCars(): Promise<Car[]> {
         { property: "Is Best Seller", checkbox: { equals: true } },
       ],
     },
-    page_size: 6,
+    sorts: [
+      { property: "Sort Order", direction: "ascending" },
+      { property: "Year", direction: "descending" },
+    ],
+    page_size: 60, // fetch all best sellers across all brands for client-side filtering
   });
   return response.results.map(pageToCar);
 }
@@ -399,6 +408,19 @@ export async function setCarFlags(
   if (flags.navFeatured !== undefined) props["Nav Featured"] = { checkbox: flags.navFeatured };
   if (flags.navNew !== undefined) props["Nav New"] = { checkbox: flags.navNew };
   await notion.pages.update({ page_id: id, properties: props });
+}
+
+/** Update sort order of a single car. */
+export async function setCarSortOrder(id: string, sortOrder: number): Promise<void> {
+  await notion.pages.update({
+    page_id: id,
+    properties: { "Sort Order": { number: sortOrder } },
+  });
+}
+
+/** Bulk update sort orders (used after drag-and-drop reorder). */
+export async function bulkSetCarSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
+  await Promise.all(items.map(({ id, sortOrder }) => setCarSortOrder(id, sortOrder)));
 }
 
 /** Soft delete: set Is Active = false. */

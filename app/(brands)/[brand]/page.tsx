@@ -16,7 +16,8 @@ import { breadcrumbJsonLd, pageMetadata } from "@/lib/site";
 import { ArrowRight } from "lucide-react";
 import BrandSocialLinks from "@/components/BrandSocialLinks";
 
-const HAS_SUB_PAGES = new Set<BrandSlug>(["gwm"]);
+// All brands now have sub-pages via generic [brand]/service, [brand]/body-repair etc.
+const HAS_SUB_PAGES = new Set<BrandSlug>(["gwm", "mazda", "ford", "mitsubishi", "deepal", "kia"]);
 
 export const revalidate = 3600;
 

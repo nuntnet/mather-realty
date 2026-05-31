@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,6 +13,16 @@ import {
   type BrandConfig,
   type BrandSlug,
 } from "@/lib/brandConfig";
+
+// All brands now have sub-pages via generic [brand]/* routes
+const HAS_SUB_PAGES = new Set<string>(["gwm", "mazda", "ford", "mitsubishi", "deepal", "kia"]);
+
+const BRAND_SUB_LINKS = [
+  { label: "ศูนย์บริการ",    section: "service" },
+  { label: "ซ่อมสี/ตัวถัง", section: "body-repair" },
+  { label: "โปรโมชั่น",      section: "promotions" },
+  { label: "รีวิวรถ",         section: "reviews" },
+];
 import type {
   NavCountsByBrand,
   NavHighlightModel,
@@ -357,6 +367,7 @@ export function BrandNavTile({
             ) : null}
           </AnimatePresence>
         )}
+
       </div>
     </div>
   );
@@ -369,6 +380,19 @@ export function BrandMegaMenuGrid({
   const [hoveredSlug, setHoveredSlug] = useState<BrandSlug | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelSpot, setPanelSpot] = useState({ x: 50, y: 30 });
+  // Delay clearing hoveredSlug so mouse can travel between tiles without flash
+  const hoverClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setHoveredWithDelay = useCallback((slug: BrandSlug | null) => {
+    if (hoverClearRef.current) clearTimeout(hoverClearRef.current);
+    if (slug) {
+      setHoveredSlug(slug);
+    } else {
+      hoverClearRef.current = setTimeout(() => setHoveredSlug(null), 200);
+    }
+  }, []);
+
+  useEffect(() => () => { if (hoverClearRef.current) clearTimeout(hoverClearRef.current); }, []);
 
   const handlePanelMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = panelRef.current;
@@ -385,7 +409,7 @@ export function BrandMegaMenuGrid({
       ref={panelRef}
       onMouseMove={handlePanelMove}
       className="relative"
-      onMouseLeave={() => setHoveredSlug(null)}
+      onMouseLeave={() => setHoveredWithDelay(null)}
     >
       <div
         className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500"
@@ -397,21 +421,61 @@ export function BrandMegaMenuGrid({
 
       <div className="relative grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {BRANDS.map((brand) => (
+          // Only onMouseEnter here — NO onMouseLeave on individual tiles.
+          // Clearing hoveredSlug is handled solely by the outer panelRef onMouseLeave.
+          // This prevents the panel from shrinking mid-mouse-travel (service links stay accessible).
           <div
             key={brand.slug}
-            onMouseEnter={() => setHoveredSlug(brand.slug)}
+            onMouseEnter={() => setHoveredWithDelay(brand.slug)}
           >
             <BrandNavTile
               brand={brand}
               navModels={resolveNavModels(brand, navModelsByBrand)}
               navTotalCount={resolveNavCount(brand, navCountsByBrand)}
               showFeatured={hoveredSlug === brand.slug}
-              showGwmSubLines={
-                brand.slug === "gwm" && hoveredSlug === "gwm"
-              }
+              showGwmSubLines={false}
             />
           </div>
         ))}
+      </div>
+
+      {/* Service links row — reactive to hovered brand.
+          min-h is fixed so panel height never shrinks while mouse is inside. */}
+      <div className="mt-4 pt-4 border-t border-gray-100 min-h-[52px]">
+        {hoveredSlug && HAS_SUB_PAGES.has(hoveredSlug) ? (
+          (() => {
+            const hb = BRANDS.find(b => b.slug === hoveredSlug);
+            if (!hb) return null;
+            return (
+              <motion.div
+                key={hoveredSlug}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.15 }}
+                className="flex flex-col items-center gap-2 w-full"
+              >
+                <p className="text-[11px] text-gray-400 font-medium">
+                  บริการ {hb.displayNameTh}
+                </p>
+                <div className="flex justify-center gap-3 flex-wrap w-full">
+                  {BRAND_SUB_LINKS.map(({ label, section }) => (
+                    <Link
+                      key={section}
+                      href={`${hb.hubPath}/${section}`}
+                      className="text-sm font-medium text-gray-700 hover:text-[#DD5259] border border-gray-200 hover:border-[#DD5259]/50 hover:bg-[#DD5259]/5 bg-white px-6 py-2.5 rounded-xl transition-all min-w-[120px] text-center"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </motion.div>
+            );
+          })()
+        ) : (
+          <p className="text-xs text-gray-400">
+            ชี้เมาส์ที่แบรนด์เพื่อดูบริการด่วน
+          </p>
+        )}
       </div>
     </div>
   );
@@ -426,7 +490,7 @@ export function BrandMegaMenuPanel({
     <div className="container py-8">
       <div className="mb-6">
         <h3 className="text-lg font-bold text-[#131F3C]">
-          แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุ๊ป
+          แบรนด์รถยนต์ที่ ช.เอราวัณ ออโต้ กรุป
         </h3>
         <p className="text-sm text-gray-400 mt-1">
           เลือกแบรนด์เพื่อดูรุ่นรถทั้งหมด — ชี้เมาส์เพื่อดูไฮไลท์รุ่นแนะนำ / ใหม่
@@ -437,6 +501,9 @@ export function BrandMegaMenuPanel({
           navModelsByBrand={navModelsByBrand}
           navCountsByBrand={navCountsByBrand}
         />
+
+        {/* Brand service links are rendered inside BrandMegaMenuGrid, reactive to hover */}
+
         <div className="border-t border-gray-100 pt-5 flex items-center justify-between gap-4">
           <Link
             href="/cars"
@@ -507,8 +574,7 @@ function MobileBrandTile({
   navTotalCount?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const isGwm = brand.slug === "gwm";
-  const hasExtra = isGwm || navModels.length > 0;
+  const hasExtra = navModels.length > 0 || HAS_SUB_PAGES.has(brand.slug);
 
   return (
     <div className="rounded-lg border border-gray-100 overflow-hidden bg-white">
@@ -569,7 +635,24 @@ function MobileBrandTile({
                 compact
               />
             ) : null}
-            {isGwm ? <GwmSubLineLinks compact visible /> : null}
+
+            {/* Brand sub-page links (mobile) */}
+            {HAS_SUB_PAGES.has(brand.slug) && (
+              <div className="mt-2 pt-2 border-t border-gray-100">
+                <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-1.5">บริการ</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {BRAND_SUB_LINKS.map(({ label, section }) => (
+                    <Link
+                      key={section}
+                      href={`${brand.hubPath}/${section}`}
+                      className="text-xs text-gray-600 hover:text-[#C8102E] border border-gray-200 hover:border-red-200 px-2.5 py-1 rounded-full transition-colors"
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

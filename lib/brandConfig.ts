@@ -41,6 +41,12 @@ export interface BrandConfig {
   hubPath: string;
   featuredModels?: FeaturedModel[];
   subLines?: GwmSubLine[];
+  /**
+   * Showroom/dealership photo for BrandHall card hover effect.
+   * Must be a Cloudinary URL. Upload via /admin → แบรนด์ หรือ Cloudinary dashboard.
+   * Shape: https://res.cloudinary.com/n5llrdnq/image/upload/...
+   */
+  showroomImageUrl?: string;
   /** Social media links for this brand */
   social?: {
     facebook?: string;
@@ -93,6 +99,7 @@ export const BRANDS: BrandConfig[] = [
       { name: "CX-5", slug: "mazda-cx-5-2025" },
       { name: "CX-30", slug: "mazda-cx-30-2025" },
     ],
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232080/f89626b59ed4a3e4d1e8bd9bc02425aab34baac9_pfkga4.png",
     social: {
       facebook: "https://www.facebook.com/mazdacherawannakhonpathom",
       line: "https://line.me/R/ti/p/@mazdach.erawan",
@@ -117,6 +124,7 @@ export const BRANDS: BrandConfig[] = [
       { name: "Ranger Wildtrak", slug: "ford-ranger-wildtrak-2026" },
       { name: "Everest Platinum", slug: "ford-everest-platinum-2025" },
     ],
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/7d595956bfc73f66b458b3bf124456e0c87daefe_h8rdtn.png",
     social: {
       facebook: "https://www.facebook.com/fordcherawan",
       line: "https://line.me/R/ti/p/@fordch.erawan",
@@ -139,6 +147,7 @@ export const BRANDS: BrandConfig[] = [
       { name: "Triton", slug: "mitsubishi-triton-2024" },
       { name: "Xpander Cross HEV", slug: "mitsubishi-xpander-cross-hev-2026" },
     ],
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/2025-08-07_ehic0w.webp",
     social: {
       facebook: "https://www.facebook.com/mitsucherawan",
       line: "https://line.me/R/ti/p/@mitsuch.erawan",
@@ -161,6 +170,7 @@ export const BRANDS: BrandConfig[] = [
       { name: "HAVAL H6 HEV", slug: "gwm-haval-h6-hev-2025" },
       { name: "ORA 05 BEV", slug: "gwm-ora-05-bev-2025" },
     ],
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232081/23356b8dd4f6a0f0f343dd8c5731f5b33565adf9_yogc1z.png",
     subLines: GWM_SUB_LINES,
     social: {
       facebook: "https://www.facebook.com/gwmcherawan",
@@ -176,14 +186,15 @@ export const BRANDS: BrandConfig[] = [
     tagline: "Electric Future",
     descriptionTh:
       "ตัวแทนจำหน่าย Deepal รถยนต์ไฟฟ้าและปลั๊กอินไฮบริดจาก Changan ประเทศไทย — SUV และซีดานสมรรถนะสูง พร้อมเทคโนโลยี ADAS",
-    logoPath: "/brands/deepal.png",
-    logoLightPath: "/brands/deepal-light.svg",
+    logoPath: "/brands/deepal-dark.svg",       // horizontal wordmark (icon + DEEPAL text) on light bg
+    logoLightPath: "/brands/deepal-light.svg", // same on dark bg
     logoOnDark: "native",
-    logoScale: 1.05,
+    logoScale: 1.15,
     accentColor: "#0066FF",
     heroBgImage: BRAND_IMAGES.Deepal,
     navBgImage: BRAND_IMAGES.Deepal,
     hubPath: "/deepal",
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232080/078345fc0504bfe8a7a869aefe1b8c3657f392be_afwo4t.png",
     social: {
       facebook: "https://www.facebook.com/deepalcherawan",
       line: "https://line.me/R/ti/p/@deepalch.erawan",
@@ -216,6 +227,7 @@ export const BRANDS: BrandConfig[] = [
       { name: "EV5 Air", slug: "kia-ev5-air-2025" },
       { name: "Carnival HEV", slug: "kia-carnival-hev-2025" },
     ],
+    showroomImageUrl: "https://res.cloudinary.com/n5llrdnq/image/upload/v1780232079/c07d5385558a48bc887dc7c14bc8c6cd5d9ed80a_gkgjv8.png",
     social: {
       facebook: "https://www.facebook.com/kiacherawan",
       line: "https://line.me/R/ti/p/@kiach.erawan",

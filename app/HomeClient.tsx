@@ -1,38 +1,61 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import BranchesMap from "@/components/BranchesMap";
+import dynamic from "next/dynamic";
+const BranchesMap = dynamic(() => import("@/components/BranchesMapEmbed"), {
+  ssr: false,
+  loading: () => <div className="h-[520px] rounded-2xl bg-[#0B1220] animate-pulse" />,
+});
 import BrandLogo from "@/components/BrandLogo";
 import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 import { BRANDS } from "@/lib/brandConfig";
+import { cldUrl } from "@/lib/cloudinary";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
-  Shield, Wrench, Award,
+  Shield, Wrench, Award, TrendingUp,
 } from "lucide-react";
 import type { Car, BlogPost, CustomerStory } from "@/lib/notion-types";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 
+/**
+ * Award slideshow images — upload photos from Google Drive to Cloudinary
+ * then replace URLs here. Format: https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/awards/...
+ *
+ * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
+ */
+const AWARD_SLIDES: { url: string; caption: string }[] = [
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233444/ch-erawan/awards/mazda-dealer-excellence-2024.jpg", caption: "Mazda Dealer of Excellence Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233448/ch-erawan/awards/mazda-dealer-excellence-2022.jpg", caption: "Mazda Dealer of Excellence Award 2022" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233450/ch-erawan/awards/mazda-guild-sale-2024.jpg", caption: "Mazda Guild — ทีมงานฝ่ายขายยอดเยี่ยม 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233453/ch-erawan/awards/mitsu-body-paint-2024.jpg", caption: "Mitsubishi Body&Paint Performance Award 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233457/ch-erawan/awards/mitsu-president-award-2018.jpg", caption: "Mitsubishi President Award — ผู้จำหน่ายยอดเยี่ยม 2018" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233460/ch-erawan/awards/gwm-top-sale-2024.jpg", caption: "GWM — ยอดขายสูงสุด 2024" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233463/ch-erawan/awards/gwm-top-sale-2025.jpg", caption: "GWM — สุดยอดนักขาย 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233467/ch-erawan/awards/deepal-top-advisor-2025.jpg", caption: "Deepal — ที่ปรึกษาการขายยอดเยี่ยม 2025" },
+  { url: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best,w_1200/v1780233470/ch-erawan/awards/deepal-top-sale-spare-part.jpg", caption: "Deepal — Top Sale & Spare Part Award" },
+];
+
 const heroSlides = [
   {
-    bg: "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
     brand: "Mazda", tagline: "FEEL ALIVE",
     thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
     desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
   },
   {
-    bg: "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/haval-h6-hev/h6-kv-pc-1-2.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245615/ch-erawan/hero/gwm-haval-h6-hero.jpg",
     brand: "GWM", tagline: "HAVAL H6 HEV",
     thaiTitle: "SUV ไฮบริดยอดนิยม",
     desc: "GWM HAVAL H6 HEV ประหยัดน้ำมัน ออพชั่นครบ ราคาเริ่มต้น 969,000 บาท จาก gwm.co.th",
   },
   {
-    bg: "https://www.kia.com/content/dam/kwcms/gt/en/images/showroom/EV5-ovc-25my/Gallery/ext/ev5-25my-wide-exterior-01.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245617/ch-erawan/hero/kia-ev5-hero.jpg",
     brand: "Kia", tagline: "INSPIRATION DRIVEN",
     thaiTitle: "SUV ไฟฟ้าแห่งอนาคต",
     desc: "Kia EV5 ดีไซน์ Opposites United ห้องโดยสารกว้าง ราคาเริ่มต้น 1,399,000 บาท",
@@ -45,6 +68,87 @@ interface Props {
   featuredCars: Car[];
   recentPosts: BlogPost[];
   publicStories: CustomerStory[];
+}
+
+/** Auto-play award photo slideshow for the About section */
+function AwardSlideshow() {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const total = AWARD_SLIDES.length;
+
+  const go = useCallback((idx: number) => {
+    setCurrent((idx + total) % total);
+  }, [total]);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => setCurrent((s) => (s + 1) % total), 4000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [total]);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setCurrent((s) => (s + 1) % total), 4000);
+  };
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden bg-[#0F172A] aspect-[4/3] group">
+      {/* Slides */}
+      {AWARD_SLIDES.map((slide, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
+        >
+          <Image
+            src={slide.url}
+            alt={slide.caption}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            priority={i === 0}
+            loading={i === 0 ? undefined : "lazy"}
+          />
+          {/* Dark overlay + caption */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Award className="w-4 h-4 text-[#F59E0B]" />
+              <span className="text-[10px] font-bold text-[#F59E0B] uppercase tracking-widest">รางวัล</span>
+            </div>
+            <p className="text-white text-sm font-semibold leading-snug">{slide.caption}</p>
+          </div>
+        </div>
+      ))}
+
+      {/* Prev / Next arrows */}
+      <button
+        onClick={() => { go(current - 1); resetTimer(); }}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+        aria-label="ก่อนหน้า"
+      >‹</button>
+      <button
+        onClick={() => { go(current + 1); resetTimer(); }}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+        aria-label="ถัดไป"
+      >›</button>
+
+      {/* Dots */}
+      <div className="absolute bottom-14 right-4 flex gap-1.5">
+        {AWARD_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { go(i); resetTimer(); }}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${i === current ? "bg-white w-4" : "bg-white/40"}`}
+            aria-label={`สไลด์ ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Counter */}
+      <div className="absolute top-4 right-4 bg-black/40 text-white/70 text-[10px] px-2 py-0.5 rounded-full">
+        {current + 1} / {total}
+      </div>
+    </div>
+  );
 }
 
 export default function HomeClient({ featuredCars, recentPosts, publicStories }: Props) {
@@ -77,23 +181,55 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             />
           </div>
         ))}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/40 via-transparent to-transparent z-10" />
-        <div className="absolute bottom-16 left-0 right-0 z-20">
+        {/* Gradient overlays */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/10 to-transparent z-10" />
+
+        {/* ── Main hero text overlay ── */}
+        <div className="absolute inset-0 z-20 flex flex-col justify-end pb-20">
           <div className="container">
-            <div className="max-w-2xl">
-              <h1 className="font-black italic uppercase text-white leading-none mb-2" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.01em" }}>
-                {heroSlides[heroSlide].tagline}
+            <div className="max-w-3xl">
+              {/* Brand label */}
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-px bg-[#DD5259]" />
+                <span className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.3em]">
+                  Ch.Erawan Auto Group
+                </span>
+              </div>
+
+              {/* Main quote */}
+              <h1
+                className="text-white font-bold leading-[1.1] mb-3"
+                style={{ fontSize: "clamp(2rem, 4.5vw, 3.75rem)" }}
+              >
+                ช.เอราวัณ คือเพื่อนแท้
+                <br />
+                <span className="text-white/75">ที่พร้อมดูแลรถคุณ</span>
               </h1>
-              <p className="text-white/80 text-sm lg:text-base font-medium mb-1">{heroSlides[heroSlide].thaiTitle}</p>
-              <p className="text-white/50 text-xs lg:text-sm leading-relaxed max-w-lg">{heroSlides[heroSlide].desc}</p>
+
+              {/* Description */}
+              <p className="text-white/55 text-sm lg:text-base leading-relaxed max-w-xl mb-6">
+                ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี — 6 แบรนด์ 7 สาขา
+                ครอบคลุม ICE, Hybrid และ EV ด้วยทีมงานมืออาชีพกว่า 200 คน
+              </p>
+
+              {/* Per-slide tagline (subtle, changes with slide) */}
+              <p
+                className="text-white/35 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
+                key={heroSlide}
+              >
+                {heroSlides[heroSlide].tagline} · {heroSlides[heroSlide].thaiTitle}
+              </p>
             </div>
           </div>
         </div>
+
+        {/* Slide dots */}
         <div className="absolute bottom-6 left-0 right-0 z-20 flex justify-center gap-2">
-          {heroSlides.map((_, i) => (
+          {heroSlides.map((slide, i) => (
             <button key={i} onClick={() => setHeroSlide(i)}
-              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/40 hover:bg-white/70"}`}
+              aria-label={`สไลด์ ${slide.brand}`}
+              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
             />
           ))}
         </div>
@@ -107,7 +243,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <Link
                 key={brand.slug}
                 href={brand.hubPath}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-2 transition-all group"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2 transition-all duration-300 group hover:scale-110 hover:opacity-80"
               >
                 <BrandLogo
                   src={brand.logoPath}
@@ -116,7 +252,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   size="md"
                   width={88}
                   height={32}
-                  className="grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                  className="transition-all duration-300"
                 />
               </Link>
             ))}
@@ -174,19 +310,22 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <div className="col-span-3 text-center py-16 text-gray-400">ไม่พบรุ่นรถในหมวดนี้</div>
             ) : filteredCars.map((car) => (
               <div key={car.id} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
+                {/* Whole image area links to car detail */}
+                <Link href={`/cars/${car.slug || car.id}`} className="block relative aspect-[16/10] bg-gray-50 overflow-hidden">
                   {car.imageUrls[0] ? (
-                    <Image src={car.imageUrls[0]} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <Image src={cldUrl(car.imageUrls[0], "quality")} alt={car.model} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   ) : (
                     <Image src={BRAND_IMAGES[car.brand] ?? BRAND_IMAGES.default} alt={car.brand} fill className="object-cover opacity-80" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
                   )}
                   {car.isBestSeller && (
                     <Badge className="absolute top-3 left-3 bg-[#0F172A] text-white text-[10px] font-semibold px-2.5 py-1 border-0">แนะนำ</Badge>
                   )}
-                </div>
+                </Link>
                 <div className="p-5">
                   <p className="text-xs text-gray-400 font-medium tracking-wider uppercase mb-1">{car.brand}</p>
-                  <h3 className="font-bold text-[#0F172A] text-lg mb-2">{car.model}</h3>
+                  <Link href={`/cars/${car.slug || car.id}`}>
+                    <h3 className="font-bold text-[#0F172A] text-lg mb-2 hover:text-[#334155] transition-colors">{car.model}</h3>
+                  </Link>
                   {car.priceMin > 0 && (
                     <p className="text-lg font-bold text-[#0F172A] mb-4">
                       ฿{car.priceMin.toLocaleString()}
@@ -194,16 +333,13 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                     </p>
                   )}
                   <div className="flex gap-2">
-                    <Link href="/contact">
-                      <Button variant="outline" size="sm" className="text-xs border-gray-200 text-gray-600 hover:border-[#0F172A] flex-1">สอบถามเพิ่มเติม</Button>
+                    <Link href={`/cars/${car.slug || car.id}`} className="flex-1">
+                      <Button variant="outline" size="sm" className="text-xs border-gray-200 text-gray-600 hover:border-[#0F172A] w-full">ดูรายละเอียด</Button>
                     </Link>
-                    <Link href={`/booking?type=test_drive&car=${car.model}`}>
-                      <Button size="sm" className="text-xs bg-[#0F172A] hover:bg-[#1E293B] text-white flex-1">ทดลองขับ</Button>
+                    <Link href={`/booking?type=test_drive&car=${car.model}`} className="flex-1">
+                      <Button size="sm" className="text-xs bg-[#0F172A] hover:bg-[#1E293B] text-white w-full">ทดลองขับ</Button>
                     </Link>
                   </div>
-                  <Link href={`/cars/${car.slug || car.id}`}>
-                    <p className="text-xs text-gray-400 hover:text-[#0F172A] mt-3 text-center cursor-pointer transition-colors font-medium">รายละเอียด →</p>
-                  </Link>
                 </div>
               </div>
             ))}
@@ -232,7 +368,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 "ช.เอราวัณ คือเพื่อนแท้ที่พร้อมดูแลรถคุณ ด้วยมาตรฐานระดับสากล และหัวใจของคนไทย"
               </blockquote>
               <div className="flex flex-wrap gap-6">
-                {[["57+", "ปีแห่งประสบการณ์"], ["15+", "โชว์รูมและศูนย์บริการ"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
+                {[["57+", "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-3xl font-bold text-[#DD5259]">{num}</div>
                     <div className="text-xs text-white/40 mt-1">{label}</div>
@@ -242,16 +378,42 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
             </div>
             <div className="flex flex-col gap-4">
               {[
-                { icon: Award, title: "Mitsubishi President Award 2018", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากมิตซูบิชิ มอเตอร์ส ประเทศไทย" },
-                { icon: Star, title: "Mazda Excellence Award 2017-2018", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากมาสด้า เซลส์ ประเทศไทย" },
-                { icon: Shield, title: "Ford President Award", desc: "รางวัลดีลเลอร์ยอดเยี่ยมจากฟอร์ด มอเตอร์ ประเทศไทย" },
+                {
+                  icon: Award,
+                  year: "2025",
+                  title: "GWM Partner Challenge 2025",
+                  desc: "รางวัลยอดขายอันดับ 1 สองปีซ้อน (2024–2025) จาก GWM Thailand",
+                },
+                {
+                  icon: Star,
+                  year: "2024",
+                  title: "Mazda Dealer of Excellence 2024",
+                  desc: "รางวัลผู้จำหน่ายยอดเยี่ยมแห่งปี พร้อมรางวัลทีมงานฝ่ายขายยอดเยี่ยม",
+                },
+                {
+                  icon: Shield,
+                  year: "2025",
+                  title: "Mitsubishi Skills Contest Winner 2025",
+                  desc: "รางวัลชนะเลิศ The Winner of Sales Consultant Mitsubishi Skills Contest",
+                },
+                {
+                  icon: TrendingUp,
+                  year: "2025",
+                  title: "Deepal Top Sale Performance 2025",
+                  desc: "รางวัล Top Sale Performance Award & Spare Parts Achievement Award จาก Deepal Thailand",
+                },
               ].map((item) => (
-                <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                  <div className="flex items-center gap-3 mb-3">
-                    <item.icon className="w-6 h-6 text-[#DD5259]" />
-                    <span className="text-white font-semibold text-sm">{item.title}</span>
+                <div key={item.title} className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10 hover:border-white/20 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <item.icon className="w-5 h-5 text-[#DD5259] shrink-0 mt-0.5" />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <span className="text-white font-semibold text-sm leading-snug">{item.title}</span>
+                        <span className="text-[#DD5259] text-[10px] font-bold bg-[#DD5259]/15 px-1.5 py-0.5 rounded">{item.year}</span>
+                      </div>
+                      <p className="text-white/45 text-xs leading-relaxed">{item.desc}</p>
+                    </div>
                   </div>
-                  <p className="text-white/40 text-sm">{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -293,7 +455,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
         <div className="container">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ช.เอราวัณ ออโต้ กรุ๊ป</h2>
+              <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-4">ช.เอราวัณ ออโต้ กรุป</h2>
               <p className="text-gray-500 leading-relaxed mb-6">
                 กลุ่มบริษัท ช.เอราวัณ ก่อตั้งขึ้นเมื่อปี พ.ศ. 2510 โดยคุณวิชัย จันทร์วาววาม
                 เริ่มต้นจากอู่ซ่อมรถเล็กๆ ในจังหวัดนครปฐม จนเติบโตเป็นกลุ่มธุรกิจยานยนต์ครบวงจร
@@ -320,30 +482,28 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 </Link>
               </div>
             </div>
-            {/* Team / Showroom photo grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2 rounded-2xl overflow-hidden h-52 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&q=80&auto=format&fit=crop"
-                  alt="โชว์รูม ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80&auto=format&fit=crop"
-                  alt="ทีมงาน ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop"
-                  alt="ศูนย์บริการ ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            {/* Award Photo Slideshow */}
+            <AwardSlideshow />
+          </div>
+        </div>
+      </section>
+
+      {/* SECONDHAND CTA */}
+      <section className="py-12 lg:py-16 bg-[#0F172A]">
+        <div className="container">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-[#DD5259] text-sm font-bold uppercase tracking-widest mb-1">รถมือสอง</p>
+              <h2 className="text-2xl lg:text-3xl font-bold text-white mb-2">รถยนต์มือสองคัดสรรคุณภาพ</h2>
+              <p className="text-white/50 text-sm max-w-lg">
+                รถมือสองผ่านการตรวจสภาพและรับประกัน คัดเลือกจากลูกค้าช.เอราวัณ พร้อมประวัติการดูแลรักษา
+              </p>
             </div>
+            <Link href="/secondhand" className="shrink-0">
+              <Button className="bg-[#DD5259] hover:bg-[#c94048] text-white font-semibold px-8 py-3 text-base rounded-xl">
+                ดูรถมือสอง <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -406,7 +566,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 <div className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer">
                   <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
                     {post.coverImageUrl ? (
-                      <Image src={post.coverImageUrl} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
+                      <Image src={cldUrl(post.coverImageUrl, "quality")} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 100vw, 33vw" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
                         <Calendar className="w-10 h-10 text-gray-300" />

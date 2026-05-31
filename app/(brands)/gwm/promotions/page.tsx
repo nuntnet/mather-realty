@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cldUrl } from "@/lib/cloudinary";
 import Link from "next/link";
 import BrandHero from "@/components/BrandHero";
 import BrandSubNav from "@/components/brands/BrandSubNav";
@@ -12,8 +13,8 @@ import type { Promotion } from "@/lib/notion-types";
 export const revalidate = 3600;
 
 export const metadata = pageMetadata({
-  title: "โปรโมชั่น GWM — ช.เอราวัณ ออโต้ กรุ๊ป",
-  description: "โปรโมชั่นและแคมเปญสุดพิเศษจาก GWM ที่ ช.เอราวัณ ออโต้ กรุ๊ป จ.นครปฐม",
+  title: "โปรโมชั่น GWM — ช.เอราวัณ ออโต้ กรุป",
+  description: "โปรโมชั่นและแคมเปญสุดพิเศษจาก GWM ที่ ช.เอราวัณ ออโต้ กรุป จ.นครปฐม",
   path: "/gwm/promotions",
 });
 
@@ -143,7 +144,7 @@ export default async function GwmPromotionsPage() {
                         {promo.coverImageUrl ? (
                           <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
                             <Image
-                              src={promo.coverImageUrl}
+                              src={cldUrl(promo.coverImageUrl, "quality")}
                               alt={promo.title}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-500"

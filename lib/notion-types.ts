@@ -13,13 +13,15 @@ export interface Car {
   priceMax: number;
   engineSize: string;
   transmission: "auto" | "manual";
-  fuelType: "petrol" | "diesel" | "hybrid" | "electric";
+  fuelType: "petrol" | "diesel" | "hybrid" | "electric" | "phev";
   description: string;
-  specs: Record<string, string>; // parsed from JSON string
+  specs: Record<string, string | number | string[]>; // parsed from JSON string
   imageUrls: string[]; // Cloudinary URLs parsed from newline-separated text
   videoUrl: string | null;
   isActive: boolean;
   isBestSeller: boolean;
+  /** Display order — lower number = shown first. 0 = unset */
+  sortOrder: number;
   /** Notion checkbox "Nav Featured" — mega menu highlight (แนะนำ) */
   navFeatured: boolean;
   /** Notion checkbox "Nav New" — mega menu highlight (ใหม่) */

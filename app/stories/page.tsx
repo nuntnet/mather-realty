@@ -6,7 +6,7 @@ export const revalidate = 3600;
 
 export const metadata = pageMetadata({
   title: "เรื่องราวลูกค้า",
-  description: "ความประทับใจจากลูกค้าจริงที่ไว้วางใจ ช.เอราวัณ กรุ๊ป มากว่า 57 ปี",
+  description: "ความประทับใจจากลูกค้าจริงที่ไว้วางใจ ช.เอราวัณ กรุป มากว่า 57 ปี",
   path: "/stories",
 });
 
@@ -22,7 +22,7 @@ export default async function StoriesPage() {
             <p className="text-white/40 text-sm font-medium tracking-wider uppercase mb-3">Customer Stories</p>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">เรื่องราวลูกค้า</h1>
             <p className="text-white/50 text-base lg:text-lg">
-              ความประทับใจจากลูกค้าจริงที่ไว้วางใจ ช.เอราวัณ กรุ๊ป มากว่า 57 ปี
+              ความประทับใจจากลูกค้าจริงที่ไว้วางใจ ช.เอราวัณ กรุป มากว่า 57 ปี
             </p>
           </div>
         </div>

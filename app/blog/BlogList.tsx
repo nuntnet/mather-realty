@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Search, Clock, ChevronRight } from "lucide-react";
 import type { BlogPost } from "@/lib/notion-types";
+import { cldUrl } from "@/lib/cloudinary";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 
@@ -82,7 +83,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
               <div className="aspect-video md:aspect-auto min-h-[280px] relative overflow-hidden bg-gradient-to-br from-[#0F172A] to-[#334155]">
                 {featured.coverImageUrl && (
                   <img
-                    src={featured.coverImageUrl}
+                    src={cldUrl(featured.coverImageUrl, "full")}
                     alt={featured.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -123,8 +124,10 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
               <div className="aspect-video overflow-hidden bg-gradient-to-br from-[#0F172A] to-[#334155]">
                 {post.coverImageUrl && (
                   <img
-                    src={post.coverImageUrl}
+                    src={cldUrl(post.coverImageUrl)}
                     alt={post.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 )}

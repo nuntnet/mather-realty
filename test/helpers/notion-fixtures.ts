@@ -64,7 +64,8 @@ export function makeCarPage(overrides?: Partial<Record<string, Prop>>): FakePage
     "Image URLs": richText("https://cdn/img1.jpg\nhttps://cdn/img2.jpg"),
     "Video URL": url("https://youtube.com/watch?v=abc"),
     "Is Active": checkbox(true),
-    "Is Featured": checkbox(false),
+    "Is Best Seller": checkbox(false),
+    "Sort Order": number(0),
     "Nav Featured": checkbox(false),
     "Nav New": checkbox(false),
     Slug: richText("mazda-cx-5-2024"),
@@ -89,3 +90,34 @@ export function makeBlogPage(overrides?: Partial<Record<string, Prop>>): FakePag
     ...overrides,
   }, { id: "blog-1" });
 }
+
+
+// ─── New fixtures ─────────────────────────────────────────
+
+/** A fully-populated Notion "Promotion" page. */
+export function makePromoPage(overrides?: Partial<Record<string, Prop>>): FakePage {
+  return makePage({
+    Title: title("GWM Summer Sale"),
+    Brand: select("GWM"),
+    "Cover Image URL": richText("https://cdn/promo-cover.jpg"),
+    "Link URL": url("https://example.com/promo"),
+    "Start Date": date("2024-06-01"),
+    "End Date": date("2024-08-31"),
+    "Is Active": checkbox(true),
+    ...overrides,
+  }, { id: "promo-1" });
+}
+
+
+export const validFeedbackBody = {
+  name: "Somchai",
+  type: "ร้องเรียน" as const,
+  brand: "GWM",
+  branch: "นครปฐม",
+  department: "ช่างซ่อม",
+  phone: "0812345678",
+  email: "",
+  licensePlate: "",
+  serviceDate: "",
+  message: "บริการไม่ได้มาตรฐานต้องการให้แก้ไข",
+};

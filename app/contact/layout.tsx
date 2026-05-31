@@ -1,12 +1,24 @@
 import type { Metadata } from "next";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
+import { contactPageJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "ติดต่อเรา",
-  description: "ติดต่อ ช.เอราวัณ ออโต้ กรุ๊ป 7 สาขาในนครปฐมและปริมณฑล",
+  description: "ติดต่อ ช.เอราวัณ ออโต้ กรุป 7 สาขาในนครปฐมและปริมณฑล",
   path: "/contact",
 });
 
+const crumbs = breadcrumbJsonLd([
+  { name: "หน้าแรก", path: "/" },
+  { name: "ติดต่อเรา", path: "/contact" },
+]);
+
 export default function ContactLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactPageJsonLd()) }} />
+      {children}
+    </>
+  );
 }

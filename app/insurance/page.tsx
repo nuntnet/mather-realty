@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { CheckCircle, Phone, MessageCircle, Shield, Clock, Gift, Users, Heart, CreditCard, Home, Truck } from "lucide-react";
-import { pageMetadata } from "@/lib/site";
+import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
+import { serviceJsonLd } from "@/lib/seo";
+
+export const revalidate = 86400;
 
 export const metadata = pageMetadata({
   title: "ประกันภัยรถยนต์",
-  description: "บริการประกันภัยรถยนต์ครบวงจรจาก ช.เอราวัณ ออโต้ กรุ๊ป",
+  description: "บริการประกันภัยรถยนต์ครบวงจรจาก ช.เอราวัณ ออโต้ กรุป",
   path: "/insurance",
 });
 
@@ -67,8 +70,23 @@ const steps = [
   },
 ];
 
+const crumbs = breadcrumbJsonLd([
+  { name: "หน้าแรก", path: "/" },
+  { name: "ประกันภัยรถยนต์", path: "/insurance" },
+]);
+
+const insuranceService = serviceJsonLd({
+  name: "บริการประกันภัยรถยนต์",
+  description: "บริการประกันภัยรถยนต์ครบวงจร ประกันชั้น 1-3+ จากบริษัทชั้นนำ ซ่อมเร็ว ผ่อนสบาย สิทธิพิเศษลูกค้า ช.เอราวัณ",
+  path: "/insurance",
+  serviceType: "AutoInsurance",
+});
+
 export default function Insurance() {
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(crumbs) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(insuranceService) }} />
     <div className="min-h-screen bg-white pt-[68px]">
       {/* Header Banner */}
       <div className="relative bg-[#0F172A] overflow-hidden">
@@ -211,5 +229,6 @@ export default function Insurance() {
         </div>
       </div>
     </div>
+    </>
   );
 }

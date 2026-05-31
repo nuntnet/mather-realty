@@ -31,6 +31,8 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
   const accent = brand.accentColor ?? "#DD5259";
   const heroImage =
     brand.heroBgImage ?? brand.navBgImage ?? BRAND_IMAGES[brand.notionBrand];
+  // Showroom photo shown on hover (crossfade from car → dealership exterior)
+  const showroomImage = brand.showroomImageUrl ?? null;
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = cardRef.current;
@@ -81,6 +83,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
         aria-label={`เข้าสู่โลก ${brand.displayNameTh}`}
         className="absolute inset-0 z-[5] rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#DD5259] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1220]"
       />
+      {/* Car image — default state */}
       {heroImage ? (
         <motion.div
           className="absolute inset-0 z-0"
@@ -88,6 +91,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             x: hovered ? parallaxX : 0,
             y: hovered ? parallaxY : 0,
             scale: hovered ? 1.08 : 1,
+            opacity: hovered && showroomImage ? 0 : 1,
           }}
           transition={{ type: "spring", stiffness: 200, damping: 28 }}
         >
@@ -106,16 +110,53 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
         />
       )}
 
-      <div
-        className="absolute inset-0 z-[1] bg-gradient-to-t from-black via-black/70 to-black/20"
-        aria-hidden
-      />
-      <div
-        className="absolute inset-0 z-[1] bg-gradient-to-r from-black/80 via-black/30 to-transparent"
+      {/* Showroom image — CSS transition (no Framer opacity to avoid blink) */}
+      {showroomImage && (
+        <div
+          className="absolute inset-0 z-[1] rounded-2xl overflow-hidden"
+          style={{
+            opacity: hovered ? 1 : 0,
+            transition: "opacity 0.55s ease-in-out",
+          }}
+        >
+          <Image
+            src={showroomImage}
+            alt={`โชว์รูม ${brand.displayNameTh} ช.เอราวัณ`}
+            fill
+            className="object-cover object-[center_35%]"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+          {/* "SHOWROOM" badge */}
+          <div
+            className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-[#0F172A] text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full"
+            style={{
+              opacity: hovered ? 1 : 0,
+              transform: hovered ? "translateY(0)" : "translateY(-6px)",
+              transition: "opacity 0.3s ease 0.1s, transform 0.3s ease 0.1s",
+            }}
+          >
+            Showroom
+          </div>
+        </div>
+      )}
+
+      {/* Gradient overlay — lightens when showing showroom photo */}
+      <motion.div
+        className="absolute inset-0 z-[2]"
+        animate={{ opacity: hovered && showroomImage ? 0.45 : 1 }}
+        transition={{ duration: 0.5 }}
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.55) 40%, rgba(0,0,0,0.15) 100%)" }}
         aria-hidden
       />
       <motion.div
-        className="absolute inset-0 z-[1] mix-blend-soft-light"
+        className="absolute inset-0 z-[2]"
+        animate={{ opacity: hovered && showroomImage ? 0.2 : 0.7 }}
+        transition={{ duration: 0.5 }}
+        style={{ background: "linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)" }}
+        aria-hidden
+      />
+      <motion.div
+        className="absolute inset-0 z-[3] mix-blend-soft-light"
         animate={{ opacity: hovered ? 0.55 : 0.35 }}
         transition={{ duration: 0.4 }}
         style={{
@@ -126,7 +167,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
 
       <div className="relative z-10 pointer-events-none flex flex-col p-6 sm:p-7 lg:p-8">
         <motion.div
-          className="mb-auto pb-6"
+          className="mb-auto pb-6 self-start"
           animate={{
             y: hovered ? -4 : 0,
             scale: hovered ? 1.03 : 1,
@@ -143,7 +184,8 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             nativeOnDark={brand.logoOnDark === "native"}
             width={160}
             height={52}
-            className="drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
+            containerClassName="!justify-start"
+            className="object-left"
           />
         </motion.div>
 

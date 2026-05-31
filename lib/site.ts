@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://ch-erawan.com";
 
-export const SITE_NAME = "ช.เอราวัณ กรุ๊ป";
+export const SITE_NAME = "ช.เอราวัณ กรุป";
 
 /** Build absolute canonical URL for a site path (no query string). */
 export function canonicalUrl(path: string): string {

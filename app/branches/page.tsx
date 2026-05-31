@@ -89,7 +89,7 @@ export default function ServiceLocator() {
         <div className="container">
           <p className="text-[#0F172A] text-sm font-medium mb-2 tracking-wider uppercase">สาขาของเรา</p>
           <h1 className="text-3xl md:text-4xl font-bold mb-3">ค้นหาสาขาและศูนย์บริการ</h1>
-          <p className="text-white/70 max-w-xl">ช.เอราวัณ กรุ๊ป มี 7 สาขาครอบคลุมจังหวัดนครปฐมและสามพราน พร้อมให้บริการทั้งการขายและบริการหลังการขาย</p>
+          <p className="text-white/70 max-w-xl">ช.เอราวัณ กรุป มี 7 สาขาครอบคลุมจังหวัดนครปฐมและสามพราน พร้อมให้บริการทั้งการขายและบริการหลังการขาย</p>
         </div>
       </div>
 
@@ -154,7 +154,23 @@ export default function ServiceLocator() {
           <div className="lg:col-span-3">
             {selected ? (
               <div className="bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden sticky top-24">
-                {/* Tabs */}
+
+                {/* ── Google Maps Direction — always visible, outside tabs ── */}
+                <div className="px-4 pt-4 pb-3 border-b border-[#F1F5F9] flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs text-[#64748B] truncate">{selected.address}</p>
+                  </div>
+                  <a
+                    href={selected.mapUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 flex items-center gap-2 bg-[#0F172A] hover:bg-[#1E293B] text-white text-sm font-semibold px-4 py-2 rounded-xl transition-colors"
+                  >
+                    <MapPin className="w-4 h-4" />
+                    นำทาง
+                    <ExternalLink className="w-3.5 h-3.5 opacity-70" />
+                  </a>
+                </div>
 
                 {/* Tabs */}
                 <div className="flex border-b border-[#E2E8F0]">
@@ -178,26 +194,17 @@ export default function ServiceLocator() {
                   </button>
                 </div>
 
-                <div className="max-h-[520px] overflow-y-auto">
+                <div className="overflow-hidden">
                   {activeTab === "map" ? (
-                    <div className="relative bg-[#F8FAFC]">
+                    /* Map: fit-to-width, no horizontal scroll */
+                    <div className="bg-[#F8FAFC]">
                       {selected.graphicMapUrl ? (
-                        <>
-                          <img
-                            src={selected.graphicMapUrl}
-                            alt={`แผนที่กราฟฟิค ${selected.name}`}
-                            className="w-full object-contain"
-                          />
-                          <a
-                            href={selected.mapUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="absolute bottom-3 right-3 bg-white rounded-lg px-3 py-1.5 text-xs font-medium text-[#0F172A] shadow-md hover:shadow-lg transition-shadow flex items-center gap-1"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            เปิดใน Google Maps
-                          </a>
-                        </>
+                        <img
+                          src={selected.graphicMapUrl}
+                          alt={`แผนที่ ${selected.name}`}
+                          className="w-full h-auto block"
+                          style={{ display: "block", maxWidth: "100%" }}
+                        />
                       ) : (
                         <div className="h-64 flex items-center justify-center">
                           <MapPin className="w-10 h-10 text-gray-300" />
