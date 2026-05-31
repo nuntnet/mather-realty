@@ -107,7 +107,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <Link
                 key={brand.slug}
                 href={brand.hubPath}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-2 transition-all group"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2 rounded-xl transition-all duration-300 group hover:shadow-md hover:bg-white hover:scale-110"
               >
                 <BrandLogo
                   src={brand.logoPath}
@@ -116,7 +116,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   size="md"
                   width={88}
                   height={32}
-                  className="grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                  className="transition-all duration-300"
                 />
               </Link>
             ))}
