@@ -13,16 +13,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const menuItems = [
-  { icon: BarChart3,    label: "ภาพรวม",      href: "/admin" },
-  { icon: BookOpen,     label: "บทความ",       href: "/admin/blog" },
-  { icon: Car,          label: "รถยนต์",       href: "/admin/cars" },
-  { icon: Tag,                  label: "โปรโมชั่น",    href: "/admin/promotions" },
-  { icon: MessageSquareWarning, label: "Feedback",      href: "/admin/feedback" },
-  { icon: Wrench,               label: "Brand Content", href: "/admin/service-content" },
-  { icon: Share2,               label: "Social Links",  href: "/admin/social-links" },
-  { icon: Calendar,     label: "นัดหมาย",      href: "/admin/appointments" },
-  { icon: MessageSquare,label: "รีวิวลูกค้า",  href: "/admin/stories" },
-  { icon: Mail,         label: "ข้อความติดต่อ",href: "/admin/contacts" },
+  // ── Content ───────────────────────────────
+  { icon: BarChart3,            label: "ภาพรวม",        href: "/admin" },
+  { icon: Car,                  label: "รถยนต์",         href: "/admin/cars" },
+  { icon: BookOpen,             label: "บทความ",         href: "/admin/blog" },
+  { icon: Tag,                  label: "โปรโมชั่น",      href: "/admin/promotions" },
+  // ── Brand Web ─────────────────────────────
+  { icon: Wrench,               label: "Brand Content",  href: "/admin/service-content" },
+  { icon: Share2,               label: "Social Links",   href: "/admin/social-links" },
+  // ── CRM ───────────────────────────────────
+  { icon: Calendar,             label: "นัดหมาย",        href: "/admin/appointments" },
+  { icon: MessageSquareWarning, label: "Feedback",        href: "/admin/feedback" },
+  { icon: MessageSquare,        label: "รีวิวลูกค้า",    href: "/admin/stories" },
+  { icon: Mail,                 label: "ข้อความติดต่อ",  href: "/admin/contacts" },
 ];
 
 

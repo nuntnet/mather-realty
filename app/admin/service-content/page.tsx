@@ -314,7 +314,7 @@ function SectionsTab() {
 
 // PAGE_LABELS defined at line 21 — reused here
 const BRANDS_FAQ = ["GWM", "Mazda", "Ford", "Mitsubishi", "Deepal", "Kia", "ทุกแบรนด์"] as const;
-const PAGES_FAQ = ["body-repair", "service", "one-stop", "general"] as const;
+const PAGES_FAQ = ["body-repair", "service"] as const;
 
 type FAQForm = { question: string; answer: string; page: string; brand: string; isActive: boolean; sortOrder: number };
 const EMPTY_FAQ: FAQForm = { question: "", answer: "", page: "body-repair", brand: "GWM", isActive: true, sortOrder: 99 };
@@ -393,12 +393,13 @@ function FAQTab() {
       <div className="flex flex-wrap items-center gap-3">
         <select value={brandFilter} onChange={e => setBrandFilter(e.target.value)}
           className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
-          <option value="all">ทุกแบรนด์</option>
-          {BRANDS_FAQ.map(b => <option key={b} value={b}>{b}</option>)}
+          <option value="all">— ทุกแบรนด์ —</option>
+          {BRANDS_FAQ.filter(b => b !== "ทุกแบรนด์").map(b => <option key={b} value={b}>{b}</option>)}
+          <option value="ทุกแบรนด์">ทุกแบรนด์ (ทั่วไป)</option>
         </select>
         <select value={pageFilter} onChange={e => setPageFilter(e.target.value)}
           className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none">
-          <option value="all">ทุกหน้า</option>
+          <option value="all">— ทุกหน้า —</option>
           {PAGES_FAQ.map(p => <option key={p} value={p}>{PAGE_LABELS[p]}</option>)}
         </select>
         <span className="ml-auto text-xs text-gray-400">{filtered.length} รายการ</span>
