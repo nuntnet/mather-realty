@@ -165,7 +165,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
 
       <div className="relative z-10 pointer-events-none flex flex-col p-6 sm:p-7 lg:p-8">
         <motion.div
-          className="mb-auto pb-6"
+          className="mb-auto pb-6 self-start"
           animate={{
             y: hovered ? -4 : 0,
             scale: hovered ? 1.03 : 1,
@@ -182,7 +182,7 @@ export default function BrandHallCard({ brand, className }: BrandHallCardProps) 
             nativeOnDark={brand.logoOnDark === "native"}
             width={160}
             height={52}
-            className="drop-shadow-[0_2px_12px_rgba(0,0,0,0.5)]"
+            className=""
           />
         </motion.div>
 

@@ -202,7 +202,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <Link
                 key={brand.slug}
                 href={brand.hubPath}
-                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2 rounded-xl transition-all duration-300 group hover:shadow-md hover:bg-white hover:scale-110"
+                className="flex items-center justify-center min-w-[44px] min-h-[44px] px-3 py-2 transition-all duration-300 group hover:scale-110 hover:opacity-80"
               >
                 <BrandLogo
                   src={brand.logoPath}
