@@ -424,6 +424,42 @@ export function BrandMegaMenuGrid({
           </div>
         ))}
       </div>
+
+      {/* Service links row — reactive to hovered brand */}
+      <div className="mt-4 pt-4 border-t border-gray-100 min-h-[44px]">
+        {hoveredSlug && HAS_SUB_PAGES.has(hoveredSlug) ? (
+          (() => {
+            const hb = BRANDS.find(b => b.slug === hoveredSlug);
+            if (!hb) return null;
+            return (
+              <motion.div
+                key={hoveredSlug}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.15 }}
+                className="flex items-center gap-3 flex-wrap"
+              >
+                <span className="text-xs font-semibold text-[#131F3C]">
+                  บริการ {hb.displayNameTh}:
+                </span>
+                {BRAND_SUB_LINKS.map(({ label, section }) => (
+                  <Link
+                    key={section}
+                    href={`${hb.hubPath}/${section}`}
+                    className="text-xs text-gray-600 hover:text-[#DD5259] border border-gray-200 hover:border-[#DD5259]/40 bg-white px-3 py-1.5 rounded-full transition-colors"
+                  >
+                    {label}
+                  </Link>
+                ))}
+              </motion.div>
+            );
+          })()
+        ) : (
+          <p className="text-xs text-gray-400">
+            ชี้เมาส์ที่แบรนด์เพื่อดูบริการด่วน
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -449,28 +485,7 @@ export function BrandMegaMenuPanel({
           navCountsByBrand={navCountsByBrand}
         />
 
-        {/* Brand service quick links — all brands */}
-        <div className="border-t border-gray-100 pt-4">
-          <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-3 font-medium">
-            บริการ — เข้าถึงโดยตรง
-          </p>
-          <div className="grid grid-cols-3 gap-x-6 gap-y-1">
-            {BRANDS.map((brand) => (
-              <div key={brand.slug} className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[10px] text-gray-400 w-16 shrink-0 truncate">{brand.displayName}</span>
-                {BRAND_SUB_LINKS.slice(0, 2).map(({ label, section }) => (
-                  <Link
-                    key={section}
-                    href={`${brand.hubPath}/${section}`}
-                    className="text-[10px] text-gray-500 hover:text-[#DD5259] transition-colors"
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Brand service links are rendered inside BrandMegaMenuGrid, reactive to hover */}
 
         <div className="border-t border-gray-100 pt-5 flex items-center justify-between gap-4">
           <Link
