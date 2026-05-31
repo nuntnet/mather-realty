@@ -120,12 +120,12 @@ describe("PATCH /api/admin/cars", () => {
     const res = await PATCH(
       makeRequest("/api/admin/cars", {
         method: "PATCH",
-        body: { id: "car-1", flags: { isFeatured: true } },
+        body: { id: "car-1", flags: { isBestSeller: true } },
       })
     );
     expect(res.status).toBe(200);
     await expect(jsonBody(res)).resolves.toEqual({ success: true });
-    expect(mocks.setCarFlags).toHaveBeenCalledWith("car-1", { isFeatured: true });
+    expect(mocks.setCarFlags).toHaveBeenCalledWith("car-1", { isBestSeller: true });
   });
 
   it("updates car data when data is sent", async () => {
