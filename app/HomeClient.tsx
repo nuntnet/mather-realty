@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,21 @@ import {
 import type { Car, BlogPost, CustomerStory } from "@/lib/notion-types";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+
+/**
+ * Award slideshow images — upload photos from Google Drive to Cloudinary
+ * then replace URLs here. Format: https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/awards/...
+ *
+ * Current placeholders use graphicMapUrl from branchData until real award photos are uploaded.
+ */
+const AWARD_SLIDES: { url: string; caption: string }[] = [
+  // ── เพิ่ม Cloudinary URL ของรูปรางวัลที่ Upload มาแทนที่ ──
+  // ตัวอย่าง:
+  // { url: "https://res.cloudinary.com/n5llrdnq/image/upload/ch-erawan/awards/gwm-number-one-2024.jpg", caption: "GWM Number One Award 2024" },
+  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "GWM Number One Award 2024" },
+  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "Mazda Excellence Award 2024" },
+  { url: "https://d2xsxph8kpxj0f.cloudfront.net/310519663161651958/aQKoZFokvv2LAz3MGmmmgh/Artboard6_1d7745a4.png", caption: "Mitsubishi President Award" },
+];
 
 const heroSlides = [
   {
@@ -45,6 +60,83 @@ interface Props {
   featuredCars: Car[];
   recentPosts: BlogPost[];
   publicStories: CustomerStory[];
+}
+
+/** Auto-play award photo slideshow for the About section */
+function AwardSlideshow() {
+  const [current, setCurrent] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const total = AWARD_SLIDES.length;
+
+  const go = useCallback((idx: number) => {
+    setCurrent((idx + total) % total);
+  }, [total]);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => setCurrent((s) => (s + 1) % total), 4000);
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, [total]);
+
+  const resetTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setCurrent((s) => (s + 1) % total), 4000);
+  };
+
+  return (
+    <div className="relative rounded-2xl overflow-hidden bg-[#0F172A] aspect-[4/3] group">
+      {/* Slides */}
+      {AWARD_SLIDES.map((slide, i) => (
+        <div
+          key={i}
+          className={`absolute inset-0 transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
+        >
+          <img
+            src={slide.url}
+            alt={slide.caption}
+            className="w-full h-full object-cover"
+          />
+          {/* Dark overlay + caption */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="flex items-center gap-2 mb-1">
+              <Award className="w-4 h-4 text-[#F59E0B]" />
+              <span className="text-[10px] font-bold text-[#F59E0B] uppercase tracking-widest">รางวัล</span>
+            </div>
+            <p className="text-white text-sm font-semibold leading-snug">{slide.caption}</p>
+          </div>
+        </div>
+      ))}
+
+      {/* Prev / Next arrows */}
+      <button
+        onClick={() => { go(current - 1); resetTimer(); }}
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+        aria-label="ก่อนหน้า"
+      >‹</button>
+      <button
+        onClick={() => { go(current + 1); resetTimer(); }}
+        className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/70"
+        aria-label="ถัดไป"
+      >›</button>
+
+      {/* Dots */}
+      <div className="absolute bottom-14 right-4 flex gap-1.5">
+        {AWARD_SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => { go(i); resetTimer(); }}
+            className={`w-1.5 h-1.5 rounded-full transition-all ${i === current ? "bg-white w-4" : "bg-white/40"}`}
+            aria-label={`สไลด์ ${i + 1}`}
+          />
+        ))}
+      </div>
+
+      {/* Counter */}
+      <div className="absolute top-4 right-4 bg-black/40 text-white/70 text-[10px] px-2 py-0.5 rounded-full">
+        {current + 1} / {total}
+      </div>
+    </div>
+  );
 }
 
 export default function HomeClient({ featuredCars, recentPosts, publicStories }: Props) {
@@ -320,30 +412,8 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 </Link>
               </div>
             </div>
-            {/* Team / Showroom photo grid */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2 rounded-2xl overflow-hidden h-52 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=900&q=80&auto=format&fit=crop"
-                  alt="โชว์รูม ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&q=80&auto=format&fit=crop"
-                  alt="ทีมงาน ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="rounded-xl overflow-hidden h-36 bg-gray-100">
-                <img
-                  src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80&auto=format&fit=crop"
-                  alt="ศูนย์บริการ ช.เอราวัณ"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            {/* Award Photo Slideshow */}
+            <AwardSlideshow />
           </div>
         </div>
       </section>
