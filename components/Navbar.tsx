@@ -123,9 +123,10 @@ export default function Navbar({
 
   const handleMouseLeave = () => {
     if (pinnedDropdown) return;
+    // 400ms gives mouse time to travel from trigger button → dropdown panel
     timeoutRef.current = setTimeout(() => {
       setActiveDropdown(null);
-    }, 250);
+    }, 400);
   };
 
   const togglePinnedDropdown = (label: string) => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -380,6 +380,19 @@ export function BrandMegaMenuGrid({
   const [hoveredSlug, setHoveredSlug] = useState<BrandSlug | null>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [panelSpot, setPanelSpot] = useState({ x: 50, y: 30 });
+  // Delay clearing hoveredSlug so mouse can travel between tiles without flash
+  const hoverClearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setHoveredWithDelay = useCallback((slug: BrandSlug | null) => {
+    if (hoverClearRef.current) clearTimeout(hoverClearRef.current);
+    if (slug) {
+      setHoveredSlug(slug);
+    } else {
+      hoverClearRef.current = setTimeout(() => setHoveredSlug(null), 200);
+    }
+  }, []);
+
+  useEffect(() => () => { if (hoverClearRef.current) clearTimeout(hoverClearRef.current); }, []);
 
   const handlePanelMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const el = panelRef.current;
@@ -396,7 +409,7 @@ export function BrandMegaMenuGrid({
       ref={panelRef}
       onMouseMove={handlePanelMove}
       className="relative"
-      onMouseLeave={() => setHoveredSlug(null)}
+      onMouseLeave={() => setHoveredWithDelay(null)}
     >
       <div
         className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-500"
@@ -410,16 +423,15 @@ export function BrandMegaMenuGrid({
         {BRANDS.map((brand) => (
           <div
             key={brand.slug}
-            onMouseEnter={() => setHoveredSlug(brand.slug)}
+            onMouseEnter={() => setHoveredWithDelay(brand.slug)}
+            onMouseLeave={() => setHoveredWithDelay(null)}
           >
             <BrandNavTile
               brand={brand}
               navModels={resolveNavModels(brand, navModelsByBrand)}
               navTotalCount={resolveNavCount(brand, navCountsByBrand)}
               showFeatured={hoveredSlug === brand.slug}
-              showGwmSubLines={
-                brand.slug === "gwm" && hoveredSlug === "gwm"
-              }
+              showGwmSubLines={false}
             />
           </div>
         ))}
@@ -557,8 +569,7 @@ function MobileBrandTile({
   navTotalCount?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const isGwm = brand.slug === "gwm";
-  const hasExtra = isGwm || navModels.length > 0;
+  const hasExtra = navModels.length > 0 || HAS_SUB_PAGES.has(brand.slug);
 
   return (
     <div className="rounded-lg border border-gray-100 overflow-hidden bg-white">
@@ -619,7 +630,6 @@ function MobileBrandTile({
                 compact
               />
             ) : null}
-            {isGwm ? <GwmSubLineLinks compact visible /> : null}
 
             {/* Brand sub-page links (mobile) */}
             {HAS_SUB_PAGES.has(brand.slug) && (
