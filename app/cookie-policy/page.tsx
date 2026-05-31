@@ -169,7 +169,7 @@ export default function CookiePolicy() {
               <p><strong>กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุป</strong></p>
               <p>75/2 หมู่ 1 ต.ธรรมศาลา อ.เมือง จ.นครปฐม 73000</p>
               <p>โทรศัพท์: 034-305-500</p>
-              <p>อีเมล: info@cherawan.co.th</p>
+              <p>อีเมล: info@ch-erawan.com</p>
             </div>
           </CookieSection>
 

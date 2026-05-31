@@ -28,7 +28,7 @@ export default function PrivacyPolicy() {
             <p>กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุป</p>
             <p>ที่อยู่: 75/2 หมู่ 1 ต.ธรรมศาลา อ.เมือง จ.นครปฐม 73000</p>
             <p>โทรศัพท์: 034-305-500</p>
-            <p>อีเมล: info@cherawan.co.th</p>
+            <p>อีเมล: info@ch-erawan.com</p>
           </Section>
 
           <Section title="2. ข้อมูลส่วนบุคคลที่เราเก็บรวบรวม">

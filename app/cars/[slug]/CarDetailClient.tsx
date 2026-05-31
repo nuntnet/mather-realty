@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Calendar, Wrench, ArrowLeft, ChevronLeft, ChevronRight, Calculator, Share2, Zap, Gauge, Ruler, BatteryCharging, Star } from "lucide-react";
+import Image from "next/image";
+import { Calendar, ArrowLeft, ChevronLeft, ChevronRight, Calculator, Share2, Zap, Gauge, Ruler, BatteryCharging, Star, ChevronRight as ArrowRight } from "lucide-react";
 import type { Car } from "@/lib/notion-types";
 import { BRAND_BY_NOTION } from "@/lib/brandConfig";
 
@@ -72,7 +73,7 @@ const fuelLabel: Record<string, string> = {
   petrol: "เบนซิน", diesel: "ดีเซล", hybrid: "ไฮบริด", electric: "ไฟฟ้า",
 };
 
-export default function CarDetailClient({ car }: { car: Car }) {
+export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; relatedCars?: Car[] }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [downPayment, setDownPayment] = useState(20);
   const [loanTerm, setLoanTerm] = useState(60);
@@ -158,17 +159,44 @@ export default function CarDetailClient({ car }: { car: Car }) {
                   <TabsTrigger value="specs">สเปค</TabsTrigger>
                 </TabsList>
                 <TabsContent value="overview">
-                  <div className="flex flex-wrap gap-3 mb-4">
+                  {/* Spec badges */}
+                  <div className="flex flex-wrap gap-2 mb-5">
                     <Badge className="bg-[#0F172A] text-white border-0">
                       {car.condition === "new" ? "รถใหม่" : "รถใช้แล้ว"}
                     </Badge>
                     {car.fuelType && <Badge variant="outline">{fuelLabel[car.fuelType] ?? car.fuelType}</Badge>}
                     {car.transmission && <Badge variant="outline">{car.transmission === "auto" ? "อัตโนมัติ" : "ธรรมดา"}</Badge>}
                     {car.engineSize && <Badge variant="outline">{car.engineSize}</Badge>}
+                    {car.year > 0 && <Badge variant="outline">ปี {car.year}</Badge>}
                   </div>
-                  <p className="text-[#475569] leading-relaxed">
-                    {car.description || `${car.brand} ${car.model} รถยนต์คุณภาพสูงจาก ช.เอราวัณ กรุป พร้อมบริการหลังการขายครบวงจร`}
-                  </p>
+
+                  {/* Description — rendered as readable paragraphs */}
+                  {car.description ? (
+                    <div className="space-y-3 text-[#475569] text-sm leading-relaxed">
+                      {car.description.split(/(?<=[.。])\s+|(?<=\n)/).filter(Boolean).map((para, i) => (
+                        <p key={i}>{para.trim()}</p>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[#475569] text-sm leading-relaxed">
+                      {car.brand} {car.model} รถยนต์คุณภาพสูงจาก ช.เอราวัณ กรุป พร้อมบริการหลังการขายครบวงจร
+                    </p>
+                  )}
+
+                  {/* Key features bullets from specs */}
+                  {Array.isArray(car.specs.features) && (car.specs.features as string[]).length > 0 && (
+                    <div className="mt-5 bg-[#F8FAFC] rounded-xl p-4 border border-[#E2E8F0]">
+                      <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wide mb-3">จุดเด่น</p>
+                      <ul className="space-y-2">
+                        {(car.specs.features as string[]).map((f, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#DD5259] mt-1.5 shrink-0" />
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </TabsContent>
                 <TabsContent value="specs">
                   {Object.keys(car.specs).length > 0 ? (
@@ -276,12 +304,6 @@ export default function CarDetailClient({ car }: { car: Car }) {
                     นัดหมายทดลองขับ
                   </Button>
                 </Link>
-                <Link href={`/booking?type=service&car=${car.model}`}>
-                  <Button variant="outline" className="w-full">
-                    <Wrench className="w-4 h-4 mr-2" />
-                    นัดหมายบริการ
-                  </Button>
-                </Link>
                 <Button
                   variant="ghost"
                   className="w-full text-[#64748B]"
@@ -327,6 +349,52 @@ export default function CarDetailClient({ car }: { car: Car }) {
           </div>
         </div>
       </div>
+
+      {/* ── Related Cars ── */}
+      {relatedCars.length > 0 && (
+        <div className="container py-12 border-t border-[#F1F5F9]">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <p className="text-xs text-[#64748B] uppercase tracking-wide font-medium mb-1">รุ่นอื่นจาก {car.brand}</p>
+              <h2 className="text-lg font-bold text-[#0F172A]">รุ่นที่อาจสนใจ</h2>
+            </div>
+            <Link href={`/cars?brand=${car.brand}`} className="text-sm text-[#DD5259] font-medium hover:underline flex items-center gap-1">
+              ดูทั้งหมด <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {relatedCars.map((rc) => (
+              <Link key={rc.id} href={`/cars/${rc.slug || rc.id}`} className="group bg-white rounded-2xl border border-[#E2E8F0] overflow-hidden hover:shadow-lg transition-all duration-300">
+                {/* Thumbnail */}
+                <div className="relative aspect-[16/10] bg-gray-50 overflow-hidden">
+                  {rc.imageUrls[0] ? (
+                    <Image
+                      src={rc.imageUrls[0]}
+                      alt={rc.model}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-200 text-3xl font-bold">
+                      {rc.brand[0]}
+                    </div>
+                  )}
+                </div>
+                {/* Info */}
+                <div className="p-3">
+                  <p className="text-[10px] text-[#64748B] font-medium uppercase tracking-wide">{rc.brand}</p>
+                  <p className="font-semibold text-[#0F172A] text-sm leading-snug mt-0.5 line-clamp-2">{rc.model}</p>
+                  {rc.priceMin > 0 && (
+                    <p className="text-[#DD5259] font-bold text-sm mt-1.5">฿{rc.priceMin.toLocaleString()}</p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

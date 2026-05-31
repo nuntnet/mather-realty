@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getCarBySlug, getCarSlugsForPrerender } from "@/lib/notion";
+import { getCarBySlug, getCarSlugsForPrerender, getActiveCars } from "@/lib/notion";
 import CarDetailClient from "./CarDetailClient";
 import type { Metadata } from "next";
 import { JsonLd, productVehicleJsonLd, carBreadcrumbJsonLd } from "@/lib/seo";
@@ -51,6 +51,12 @@ export default async function CarDetailPage({
   const car = await getCarBySlug(slug);
   if (!car) notFound();
 
+  // Fetch related cars: same brand first, exclude self, limit 4
+  const brandCars = await getActiveCars({ brand: car.brand });
+  const relatedCars = brandCars
+    .filter((c) => c.id !== car.id && c.imageUrls.length > 0)
+    .slice(0, 4);
+
   const vehicleSchema = productVehicleJsonLd({ car, slug });
   const breadcrumbs = carBreadcrumbJsonLd(car, slug);
 
@@ -58,7 +64,7 @@ export default async function CarDetailPage({
     <>
       <JsonLd data={vehicleSchema} />
       <JsonLd data={breadcrumbs} />
-      <CarDetailClient car={car} />
+      <CarDetailClient car={car} relatedCars={relatedCars} />
     </>
   );
 }

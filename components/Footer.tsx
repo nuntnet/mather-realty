@@ -65,9 +65,9 @@ export default function Footer() {
                 <Phone className="w-4 h-4 shrink-0 text-white/30" />
                 034-305-500
               </a>
-              <a href="mailto:info@cherawan.co.th" className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors">
+              <a href="mailto:info@ch-erawan.com" className="flex items-center gap-2.5 text-sm text-white/60 hover:text-white transition-colors">
                 <Mail className="w-4 h-4 shrink-0 text-white/30" />
-                info@cherawan.co.th
+                info@ch-erawan.com
               </a>
               <div className="flex items-start gap-2.5 text-sm text-white/60">
                 <Clock className="w-4 h-4 mt-0.5 shrink-0 text-white/30" />

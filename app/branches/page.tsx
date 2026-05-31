@@ -194,7 +194,7 @@ export default function ServiceLocator() {
                   </button>
                 </div>
 
-                <div className="max-h-[520px] overflow-y-auto">
+                <div className="overflow-hidden">
                   {activeTab === "map" ? (
                     /* Map: fit-to-width, no horizontal scroll */
                     <div className="bg-[#F8FAFC]">
