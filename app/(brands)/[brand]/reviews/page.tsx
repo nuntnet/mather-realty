@@ -11,6 +11,7 @@ import { getVideoReviewsByBrand, getSocialLinksByBrand } from "@/lib/notion";
 import { breadcrumbJsonLd, pageMetadata, SITE_URL } from "@/lib/site";
 import { videoObjectJsonLd } from "@/lib/seo";
 import { Play, ExternalLink } from "lucide-react";
+import CallToAction from "@/components/CallToAction";
 import { Button } from "@/components/ui/button";
 
 export const revalidate = 3600;
@@ -328,6 +329,13 @@ export default async function BrandReviewsPage({ params }: PageProps) {
           </section>
         )}
       </div>
+
+      {/* CTA */}
+      <CallToAction
+        brand={brand.displayName}
+        heading={`สนใจรถ ${brand.displayNameTh}? ทดลองขับฟรี`}
+        description={`ช.เอราวัณ ตัวแทนจำหน่าย ${brand.displayName} อย่างเป็นทางการ นครปฐม พร้อมศูนย์บริการครบวงจร`}
+      />
     </>
   );
 }
