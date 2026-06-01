@@ -60,7 +60,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.0584!3d13.8199!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ5JzExLjYiTiAxMDDCsDAzJzMwLjIiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-mazda-nakhon-pathom.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-mitsubishi-nakhon-pathom.png",
     lat: 13.8131222,
     lng: 100.1167787,
     color: "bg-red-500",
@@ -101,7 +101,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.3!3d13.79!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ3JzI0LjAiTiAxMDDCsDE4JzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-mazda-salaya.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245635/ch-erawan/branch-maps/branch-map-kia-samphran.png",
     lat: 13.7861688,
     lng: 100.3010389,
     color: "bg-red-500",
@@ -142,7 +142,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.31!3d13.80!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ4JzAwLjAiTiAxMDDCsDE4JzM2LjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-deepal-salaya.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245633/ch-erawan/branch-maps/branch-map-gwm-nakhon-pathom.png",
     lat: 13.7861688,
     lng: 100.3010389,
     color: "bg-purple-600",
@@ -181,7 +181,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.25!3d13.72!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQzJzEyLjAiTiAxMDDCsDE1JzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-ford-omnoi.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245626/ch-erawan/branch-maps/branch-map-mazda-nakhon-pathom.png",
     lat: 13.708359,
     lng: 100.285138,
     color: "bg-blue-600",
@@ -219,7 +219,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.07!3d13.81!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ4JzM2LjAiTiAxMDDCsDA0JzEyLjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-mitsubishi-nakhon-pathom.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245631/ch-erawan/branch-maps/branch-map-ford-omnoi.png",
     lat: 13.804027,
     lng: 100.015492,
     color: "bg-red-600",
@@ -258,7 +258,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.09!3d13.83!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ5JzQ4LjAiTiAxMDDCsDA1JzI0LjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-gwm-nakhon-pathom.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245628/ch-erawan/branch-maps/branch-map-mazda-salaya.png",
     lat: 13.8114368,
     lng: 100.120443,
     color: "bg-orange-500",
@@ -296,7 +296,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.06!3d13.82!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ5JzEyLjAiTiAxMDDCsDAzJzM2LjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245632/ch-erawan/branch-maps/branch-map-kia-samphran.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245629/ch-erawan/branch-maps/branch-map-deepal-salaya.png",
     lat: 13.7241055,
     lng: 100.2543942,
     color: "bg-indigo-600",
