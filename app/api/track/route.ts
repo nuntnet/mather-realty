@@ -1,18 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { trackEvent, type AnalyticsEventType } from "@/lib/analytics";
 
-const ALLOWED_EVENTS: AnalyticsEventType[] = ["car_view", "booking", "contact", "search"];
-
+/**
+ * POST /api/track — lightweight event tracking endpoint
+ * Body: { event: "car_view"|"booking"|"contact"|"search", path?, brand?, model? }
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { event, path, brand, model, meta } = body;
-    if (!ALLOWED_EVENTS.includes(event)) {
-      return NextResponse.json({ error: "invalid event" }, { status: 400 });
+    const event = body.event as AnalyticsEventType;
+    if (!event || !["car_view", "booking", "contact", "search"].includes(event)) {
+      return NextResponse.json({ ok: false }, { status: 400 });
     }
-    await trackEvent(event, { path, brand, model, meta });
+    void trackEvent(event, {
+      path: body.path ?? undefined,
+      brand: body.brand ?? undefined,
+      model: body.model ?? undefined,
+      meta: body.meta ?? undefined,
+    });
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "bad request" }, { status: 400 });
+    return NextResponse.json({ ok: false }, { status: 400 });
   }
 }

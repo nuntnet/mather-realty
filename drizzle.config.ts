@@ -1,6 +1,7 @@
 import type { Config } from "drizzle-kit";
 
 export default {
+  schema: "./lib/db/schema.ts",
   dialect: "turso",
   dbCredentials: {
     url: process.env.TURSO_DATABASE_URL!,

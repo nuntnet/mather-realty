@@ -3,11 +3,12 @@ import { getFeaturedCars, getPublishedBlogPosts, getPublicStories } from "@/lib/
 import { pageMetadata, SITE_NAME } from "@/lib/site";
 import { JsonLd, itemListJsonLd } from "@/lib/seo";
 import HomeClient from "./HomeClient";
+import { getYearsOfExperience } from "@/lib/company";
 
 export const revalidate = 3600;
 
 const HOME_DESCRIPTION =
-  "ดีลเลอร์รถยนต์ครบวงจร จ.นครปฐม กว่า 57 ปี — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ราคาดีที่สุด 7 สาขา ทดลองขับฟรี จองนัดออนไลน์ได้เลย";
+  `ดีลเลอร์รถยนต์ครบวงจร จ.นครปฐม กว่า ${getYearsOfExperience()} ปี — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ราคาดีที่สุด 7 สาขา ทดลองขับฟรี จองนัดออนไลน์ได้เลย`;
 
 export const metadata: Metadata = pageMetadata({
   title: `ดีลเลอร์รถยนต์นครปฐม Mazda Ford Mitsubishi GWM Deepal Kia | ${SITE_NAME}`,

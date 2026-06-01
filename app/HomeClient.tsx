@@ -15,6 +15,7 @@ import BrandHallCard from "@/components/BrandHallCard";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 import { BRANDS } from "@/lib/brandConfig";
 import { cldUrl } from "@/lib/cloudinary";
+import { getYearsLabel, getYearsOfExperience } from "@/lib/company";
 import {
   ArrowRight, Phone, MapPin, Calendar, Star,
   Shield, Wrench, Award, TrendingUp,
@@ -210,7 +211,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
               {/* Description */}
               <p className="text-white/55 text-sm lg:text-base leading-relaxed max-w-xl mb-6">
-                ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า 57 ปี — 6 แบรนด์ 7 สาขา
+                {`ตัวแทนจำหน่ายรถยนต์ชั้นนำจ.นครปฐม กว่า ${getYearsOfExperience()} ปี — 6 แบรนด์ 7 สาขา`}
                 ครอบคลุม ICE, Hybrid และ EV ด้วยทีมงานมืออาชีพกว่า 200 คน
               </p>
 
@@ -371,7 +372,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 "ช.เอราวัณ คือเพื่อนแท้ที่พร้อมดูแลรถคุณ ด้วยมาตรฐานระดับสากล และหัวใจของคนไทย"
               </blockquote>
               <div className="flex flex-wrap gap-6">
-                {[["57+", "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
+                {[[getYearsLabel(), "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-3xl font-bold text-[#DD5259]">{num}</div>
                     <div className="text-xs text-white/65 mt-1">{label}</div>

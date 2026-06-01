@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Phone, Mail, MapPin, Clock } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import { branches } from "@/lib/branchData";
+import { getYearsOfExperience } from "@/lib/company";
 
 const LINE_ACCOUNTS = [
   { brand: "Mazda",      lineId: "@mazdach.erawan", url: "https://line.me/R/ti/p/@mazdach.erawan", color: "#910023" },
@@ -52,7 +53,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-white/70 text-sm leading-relaxed mb-6">
-              กลุ่มบริษัท ช.เอราวัณ ผู้จำหน่ายรถยนต์อย่างเป็นทางการ 6 แบรนด์ชั้นนำ ด้วยประสบการณ์กว่า 57 ปี ในจังหวัดนครปฐมและนครปฐม
+              {`กลุ่มบริษัท ช.เอราวัณ ผู้จำหน่ายรถยนต์อย่างเป็นทางการ 6 แบรนด์ชั้นนำ ด้วยประสบการณ์กว่า ${getYearsOfExperience()} ปี ในจังหวัดนครปฐมและนครปฐม`}
             </p>
 
             {/* Contact details */}

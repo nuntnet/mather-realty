@@ -8,6 +8,8 @@ import BrandLogo from "@/components/BrandLogo";
 import { BRANDS } from "@/lib/brandConfig";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 import { branches } from "@/lib/branchData";
+import CoverageMap from "@/components/about/CoverageMap";
+import { getYearsLabel, getYearsOfExperience, FOUNDED_YEAR_BE } from "@/lib/company";
 import {
   Award,
   Users,
@@ -230,7 +232,7 @@ const management = [
 ];
 
 const stats = [
-  { value: "57+", label: "ปีแห่งประสบการณ์", sub: "ก่อตั้งปี 2510" },
+  { value: getYearsLabel(), label: "ปีแห่งประสบการณ์", sub: `ก่อตั้งปี ${FOUNDED_YEAR_BE}` },
   { value: "6", label: "แบรนด์รถยนต์", sub: "Mazda · Ford · Mitsubishi · GWM · Deepal · Kia" },
   { value: "7", label: "สาขาทั่วนครปฐม", sub: "ครอบคลุมทุกพื้นที่" },
   { value: "4", label: "ศูนย์ Body & Paint", sub: "มาตรฐาน OEM" },
@@ -341,7 +343,7 @@ export default function About() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <div>
               <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-4">
-                About Us · กว่า 57 ปี
+                {`About Us · กว่า ${getYearsOfExperience()} ปี`}
               </p>
               <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-5">
                 &ldquo;ช.เอราวัณ คือเพื่อนแท้
@@ -356,7 +358,7 @@ export default function About() {
               {/* Quick stats */}
               <div className="grid grid-cols-3 gap-4 mt-8 mb-8">
                 {[
-                  { value: "57+", label: "ปี" },
+                  { value: getYearsLabel(), label: "ปี" },
                   { value: "7", label: "สาขา" },
                   { value: "200+", label: "ทีมงาน" },
                 ].map((s) => (
@@ -412,7 +414,7 @@ export default function About() {
                         ทีมผู้บริหาร
                       </div>
                       <p className="font-bold text-lg">ช.เอราวัณ ออโต้ กรุป</p>
-                      <p className="text-white/60 text-sm mt-1">ตระกูลจันทร์วาววาม · ผู้บุกเบิกกว่า 57 ปี</p>
+                      <p className="text-white/60 text-sm mt-1">{`ตระกูลจันทร์วาววาม · ผู้บุกเบิกกว่า ${getYearsOfExperience()} ปี`}</p>
                     </>
                   ) : (
                     <>
@@ -638,43 +640,33 @@ export default function About() {
               <p className="text-[#DD5259] text-xs font-bold uppercase tracking-[0.25em] mb-2">Our Team</p>
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-3">ทีมผู้บริหาร</h2>
               <p className="text-gray-500 leading-relaxed text-base">
-                ช.เอราวัณ กรุป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนานกว่า 57 ปี
+                {`ช.เอราวัณ กรุป บริหารงานโดยทีมผู้บริหารที่มีความเชี่ยวชาญและประสบการณ์ยาวนานกว่า ${getYearsOfExperience()} ปี`}
                 ภายใต้การนำของตระกูลจันทร์วาววาม ที่สืบทอดปณิธานการให้บริการที่เป็นเลิศแก่ลูกค้าทุกท่าน
               </p>
             </div>
 
-            {/* ── Team Group Photo Banner ── */}
-            <div className="relative rounded-2xl overflow-hidden bg-[#0F172A]"
+            {/* ── Dealer Coverage Map Banner ── */}
+            <div className="relative rounded-2xl overflow-hidden bg-[#0B1220]"
               style={{ minHeight: "280px" }}>
-              {TEAM_GROUP_PHOTO_URL ? (
-                <>
-                  <Image
-                    src={TEAM_GROUP_PHOTO_URL}
-                    alt="ทีมบริหาร ช.เอราวัณ ออโต้ กรุป"
-                    fill
-                    className="object-cover object-top"
-                    sizes="(max-width: 1024px) 100vw, 1200px"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220]/90 via-[#0B1220]/40 to-transparent" />
-                </>
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] to-[#1E293B]" />
-              )}
+              <CoverageMap />
+              {/* left-side fade keeps the Thai text readable over the map */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0B1220] via-[#0B1220]/75 to-transparent" />
               <div className="relative z-10 flex items-center p-8 lg:p-12 min-h-[280px]">
                 <div className="max-w-lg">
-                  <p className="text-[#DD5259] text-xs font-bold uppercase tracking-widest mb-3">Management Team</p>
+                  <p className="text-[#DD5259] text-xs font-bold uppercase tracking-widest mb-3">Dealer Coverage</p>
                   <h3 className="text-2xl lg:text-3xl font-bold text-white mb-3">
-                    ตระกูลจันทร์วาววาม
+                    ครอบคลุมฝั่งตะวันตก<br className="hidden sm:block" />กรุงเทพฯ &amp; นครปฐม
                   </h3>
-                  <p className="text-white/60 leading-relaxed mb-4">
-                    ผู้บุกเบิกธุรกิจยานยนต์นครปฐมกว่า 57 ปี ด้วยความมุ่งมั่นที่จะพัฒนาคุณภาพการบริการอย่างไม่หยุดยั้ง
-                    เพื่อตอบสนองความต้องการของลูกค้า
+                  <p className="text-white/60 leading-relaxed mb-5">
+                    {`ตระกูลจันทร์วาววาม ผู้บุกเบิกธุรกิจยานยนต์นครปฐมกว่า ${getYearsOfExperience()} ปี`}
+                    ด้วยเครือข่ายดีลเลอร์ครบ 6 แบรนด์ 7 สาขา ดูแลลูกค้าทั่วโซนนครปฐม–ศาลายา–สามพราน–อ้อมใหญ่
                   </p>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-5">
                     {[
-                      { value: "57+", label: "ปีแห่งประสบการณ์" },
+                      { value: "7", label: "สาขาในเครือ" },
+                      { value: "6", label: "แบรนด์ชั้นนำ" },
+                      { value: getYearsLabel(), label: "ปีแห่งประสบการณ์" },
                       { value: "200+", label: "ทีมงานทั่วสาขา" },
-                      { value: "3", label: "รุ่นครอบครัว" },
                     ].map((s) => (
                       <div key={s.label} className="text-center">
                         <p className="text-2xl font-bold text-white">{s.value}</p>
@@ -682,11 +674,6 @@ export default function About() {
                       </div>
                     ))}
                   </div>
-                  {!TEAM_GROUP_PHOTO_URL && (
-                    <p className="text-white/60 text-xs mt-4 italic">
-                      * เพิ่มรูปหมู่ทีมบริหารได้ที่ TEAM_GROUP_PHOTO_URL ใน about/page.tsx
-                    </p>
-                  )}
                 </div>
               </div>
             </div>

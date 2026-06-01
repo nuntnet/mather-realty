@@ -166,13 +166,21 @@ export default function Navbar({
     >
       <div className="container">
         <div className="flex items-center justify-between h-[68px]">
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/"
               aria-label="ช.เอราวัณ ออโต้ กรุป — หน้าแรก"
             >
               <CompanyLogo height={44} priority className="h-11 w-auto" />
             </Link>
+            {/* Mobile search — ติดโลโก้ฝั่งซ้าย */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors"
+              aria-label="ค้นหา"
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <AnimatePresence>
               {stickyBrand && (
                 <motion.div
@@ -328,17 +336,6 @@ export default function Navbar({
                 034-305500
               </Button>
             </a>
-          </div>
-
-          <div className="lg:hidden flex items-center gap-1">
-            {/* Mobile search */}
-            <button
-              onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
-              aria-label="ค้นหา"
-            >
-              <Search className="w-5 h-5" />
-            </button>
           </div>
 
           <button
