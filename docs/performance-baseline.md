@@ -1,5 +1,33 @@
 # Performance Baseline — ch-erawanwebsite.vercel.app
 
+> **สรุป:** Optimize แล้ว — Payload ลด 87%, TBT ลด 60%, Speed Index ลด 31%
+
+---
+
+## After Optimize (2026-06-01) — Production
+
+| Category | Score | เปลี่ยน |
+|----------|-------|--------|
+| Performance | **75** | +4 |
+| Accessibility | **89** | +6 |
+| Best Practices | **96** | +4 |
+| SEO | **100** | — |
+
+| Metric | ค่า | เปลี่ยน |
+|--------|-----|--------|
+| FCP | 1.5s | −0.2s |
+| LCP | 5.7s | ≈ noise |
+| TBT | **80ms** | **−60%** |
+| CLS | 0 | — |
+| Speed Index | **4.8s** | **−31%** |
+| TTI | **5.8s** | **−40%** |
+| TTFB | 30ms | −10ms |
+| Total Payload | **711 KB** | **−87%** |
+
+---
+
+## Baseline (2026-05-31) — ก่อน Optimize
+
 **วันที่วัด:** 2026-05-31  
 **URL:** https://ch-erawanwebsite.vercel.app/  
 **Tool:** Lighthouse 13.3.0 (Mobile Simulated Throttling)

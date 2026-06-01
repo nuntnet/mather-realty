@@ -43,7 +43,7 @@ const AWARD_SLIDES: { url: string; caption: string }[] = [
 
 const heroSlides = [
   {
-    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
     brand: "Mazda", tagline: "FEEL ALIVE",
     thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
     desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
@@ -104,8 +104,7 @@ function AwardSlideshow() {
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority={i === 0}
-            loading={i === 0 ? undefined : "lazy"}
+            loading="lazy"
           />
           {/* Dark overlay + caption */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -137,9 +136,11 @@ function AwardSlideshow() {
           <button
             key={i}
             onClick={() => { go(i); resetTimer(); }}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${i === current ? "bg-white w-4" : "bg-white/40"}`}
+            className="flex items-center justify-center w-6 h-6"
             aria-label={`สไลด์ ${i + 1}`}
-          />
+          >
+            <span className={`block rounded-full transition-all ${i === current ? "bg-white w-4 h-1.5" : "w-1.5 h-1.5 bg-white/40"}`} />
+          </button>
         ))}
       </div>
 
@@ -215,7 +216,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
               {/* Per-slide tagline (subtle, changes with slide) */}
               <p
-                className="text-white/35 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
+                className="text-white/60 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
                 key={heroSlide}
               >
                 {heroSlides[heroSlide].tagline} · {heroSlides[heroSlide].thaiTitle}
@@ -229,8 +230,10 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
           {heroSlides.map((slide, i) => (
             <button key={i} onClick={() => setHeroSlide(i)}
               aria-label={`สไลด์ ${slide.brand}`}
-              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
-            />
+              className="flex items-center justify-center w-8 h-8 -m-2"
+            >
+              <span className={`block rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`} />
+            </button>
           ))}
         </div>
       </section>
@@ -371,7 +374,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 {[["57+", "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-3xl font-bold text-[#DD5259]">{num}</div>
-                    <div className="text-xs text-white/40 mt-1">{label}</div>
+                    <div className="text-xs text-white/65 mt-1">{label}</div>
                   </div>
                 ))}
               </div>
@@ -411,7 +414,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                         <span className="text-white font-semibold text-sm leading-snug">{item.title}</span>
                         <span className="text-[#DD5259] text-[10px] font-bold bg-[#DD5259]/15 px-1.5 py-0.5 rounded">{item.year}</span>
                       </div>
-                      <p className="text-white/45 text-xs leading-relaxed">{item.desc}</p>
+                      <p className="text-white/65 text-xs leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -601,7 +604,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
       <section className="py-16 lg:py-20 bg-[#0F172A]">
         <div className="container text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">ติดต่อเราได้เลย ยินดีให้บริการ</h2>
-          <p className="text-white/40 max-w-lg mx-auto mb-8">ให้ทีมผู้เชี่ยวชาญของเราช่วยคุณค้นหารถยนต์ที่ตรงกับความต้องการและงบประมาณของคุณ</p>
+          <p className="text-white/65 max-w-lg mx-auto mb-8">ให้ทีมผู้เชี่ยวชาญของเราช่วยคุณค้นหารถยนต์ที่ตรงกับความต้องการและงบประมาณของคุณ</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a href="tel:034305500">
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold px-8 h-12">

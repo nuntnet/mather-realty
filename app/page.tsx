@@ -45,6 +45,11 @@ export default async function HomePage() {
         )
       : null;
 
+  // NOTE: hero LCP image is preloaded automatically by next/image `priority`
+  // on the first slide in HomeClient — no manual <link rel="preload"> needed
+  // (it would duplicate the auto-generated one). preconnect to Cloudinary is
+  // handled in app/layout.tsx <head>.
+
   return (
     <>
       {featuredList && <JsonLd data={featuredList} />}

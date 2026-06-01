@@ -163,7 +163,7 @@ function BookingForm() {
       <div className="bg-[#0F172A] text-white py-16 lg:py-20">
         <div className="container">
           <div className="max-w-2xl">
-            <p className="text-white/40 text-sm font-medium tracking-wider uppercase mb-3">Appointment</p>
+            <p className="text-white/65 text-sm font-medium tracking-wider uppercase mb-3">Appointment</p>
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">จองนัดหมาย</h1>
             <p className="text-white/50 text-base lg:text-lg">เลือกบริการที่ต้องการและกรอกข้อมูลเพื่อจองนัดหมาย</p>
           </div>

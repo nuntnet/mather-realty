@@ -1,7 +1,5 @@
 "use client";
 
-'use client';
-
 import { useState } from "react";
 import { Award, Trophy, Star, Users, Heart, Camera, X } from "lucide-react";
 
