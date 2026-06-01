@@ -6,22 +6,22 @@
 export const BRAND_IMAGES: Record<string, string> = {
   // Mazda — CX-5 wide hero banner (official Mazda media S3)
   Mazda:
-    "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
   // Ford — Ranger Raptor 3.0L V6 (flagship model, ZigWheels official press photo)
   Ford:
-    "https://imgcdn.zigwheels.co.th/large/gallery/exterior/8/3176/ford-ranger-raptor-front-angle-low-view-922927.jpg",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245624/ch-erawan/brands/ford-ranger-raptor.jpg",
   // Mitsubishi — Triton Athlete 4WD (flagship pickup, official Mitsubishi TH CDN)
   Mitsubishi:
-    "https://www.mitsubishi-motors.co.th/content/dam/mitsubishi-motors-th/images/site-images/news-activity/jun-2025/01%20Mitsubishi%20Triton%20Athlete%204WD.jpg",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245621/ch-erawan/brands/mitsubishi-triton-athlete.jpg",
   // GWM — Tank 300 HEV (flagship model, official GWM TH CDN)
   GWM:
-    "https://www.gwm.co.th/content/dam/gwm/pages/th/en/model/tank-300-hev/tank-300-kv-pc.webp",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245618/ch-erawan/brands/gwm-tank-300-hev.webp",
   // Deepal — S07 BEV hero banner (official changan.co.th S3 CDN)
   Deepal:
-    "https://www.changan.co.th/cache/images/t9l43xIO9pZswrsAqWOcOsP9VyPJBCBz3v0KyCfDhFI/rs:fit:3840/q:75/max_bytes:120000/bG9jYWw6Ly8vV2ViX1MwN18xNng5X25ld19hODBmMTZjODNkLmpwZw.webp",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245623/ch-erawan/brands/deepal-s07-hero.webp",
   // Kia — EV9 dark promo banner (dark bg = good contrast with white KIA logo)
   Kia:
-    "https://www.kia.com/content/dam/kwcms/th/th/images/util/promotion/2026/MAR2026/EV9/R1_MAR_Home_EV9-1920x1080.jpg",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245620/ch-erawan/brands/kia-ev9-promo-2026.jpg",
   default:
-    "https://mazda-media-s3.s3.ap-southeast-1.amazonaws.com/s3fs-public/2026-02/MAZDA-CX-5_GWS_Homepage-Banner_Desktop_1920x1000px.jpg",
+    "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
 };

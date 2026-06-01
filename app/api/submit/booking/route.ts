@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Client } from "@notionhq/client";
 import { sendAppointmentNotification } from "@/lib/email";
+import { trackEvent } from "@/lib/analytics";
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -72,6 +73,7 @@ export async function POST(req: NextRequest) {
       notes: data.notes,
     });
 
+    void trackEvent("booking", { model: data.carModel, path: "/booking" });
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {

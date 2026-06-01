@@ -101,7 +101,7 @@ const timeline: TimelineItem[] = [
     title: "6 แบรนด์ 7 สาขา",
     desc: "ช.เอราวัณ กรุป เติบโตเป็นกลุ่มดีลเลอร์ชั้นนำในภาคตะวันตก ครอบคลุม ICE, Hybrid และ EV ครบทุกกลุ่ม ส่วนแบ่งตลาดรวม ~13.1%",
     milestone: "ผู้นำภาคตะวันตก",
-    image: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg",
+    image: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245672/ch-erawan/team/team-photo-2.jpg",
     imageAlt: "ทีมงาน ช.เอราวัณ กรุป",
   },
 ];
@@ -118,42 +118,42 @@ const awards = [
     title: "GWM Number One Award",
     year: "2567",
     desc: "รางวัลผู้จำหน่ายยอดเยี่ยมอันดับ 1 จาก GWM Thailand สาขานครปฐม",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/YGdTgqCrWnMlNebF.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245670/ch-erawan/awards/ford-advisor-award.jpg",
     brand: "GWM",
   },
   {
     title: "Mazda Dealer of Excellence 2024",
     year: "2567",
     desc: "รางวัลผู้จำหน่ายมาสด้ายอดเยี่ยมแห่งปี 2024 ภาคตะวันตก",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/TouZjLPQPSxSaBkD.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245659/ch-erawan/awards/deepal-top-sales-2025.jpg",
     brand: "Mazda",
   },
   {
     title: "GWM Leader Challenge 2025",
     year: "2568",
     desc: "รางวัลผู้นำยอดเยี่ยมแห่งปี 2025 จาก GWM Thailand",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/yPDnwmkqVzEYuBeq.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245636/ch-erawan/awards/gwm-leader-challenge-2025.jpg",
     brand: "GWM",
   },
   {
     title: "Mitsubishi Skill Contest Winner",
     year: "2568",
     desc: "ผู้ชนะการแข่งขันทักษะมิตซูบิชิ 2025 ศูนย์บริการ ช.เอราวัณ",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/vQFMStXvuBEcIwci.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245648/ch-erawan/awards/mitsu-president-award.jpg",
     brand: "Mitsubishi",
   },
   {
     title: "ทีมงาน ช.เอราวัณ",
     year: "2567",
     desc: "ทีมงานมืออาชีพกว่า 200 คน พร้อมให้บริการลูกค้าทุกท่านด้วยใจ",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245672/ch-erawan/team/team-photo-2.jpg",
     brand: "Team",
   },
   {
     title: "กิจกรรมเพื่อสังคม",
     year: "2565",
     desc: "ช.เอราวัณ กรุป บริจาคของช่วยเหลือผู้ประสบภัยน้ำท่วมภาคอีสาน",
-    img: "https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/TsCmIkumrflAejvu.jpg",
+    img: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245677/ch-erawan/team/team-photo-6.jpg",
     brand: "CSR",
   },
 ];
@@ -745,7 +745,7 @@ export default function About() {
             {/* ── Full staff banner ── */}
             <div className="relative rounded-2xl overflow-hidden" style={{ minHeight: "200px" }}>
               <Image
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/BrXLfFaBkBOpwsss.jpg"
+                src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245672/ch-erawan/team/team-photo-2.jpg"
                 alt="ทีมงาน ช.เอราวัณ กรุป"
                 fill
                 className="object-cover object-center"

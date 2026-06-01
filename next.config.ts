@@ -27,8 +27,9 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["@libsql/client", "drizzle-orm"],
   images: {
-    // Optimize image quality globally
+    loaderFile: "./lib/image-loader.ts",
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
       { protocol: "https", hostname: "res.cloudinary.com" },

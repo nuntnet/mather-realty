@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTrackEvent } from "@/hooks/useTrack";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -98,6 +99,8 @@ export default function CarDetailClient({ car, relatedCars = [] }: { car: Car; r
   const [currentImage, setCurrentImage] = useState(0);
   const [downPayment, setDownPayment] = useState(20);
   const [loanTerm, setLoanTerm] = useState(60);
+
+  useTrackEvent("car_view", { path: `/cars/${car.slug || car.id}`, brand: car.brand, model: car.model });
 
   const basePrice = car.priceMin || 1000000;
   const downAmount = Math.round(basePrice * downPayment / 100);
