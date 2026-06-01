@@ -13,14 +13,64 @@ const BRAND_DOT: Record<string, string> = {
   Kia:        "bg-slate-700",
 };
 
-const BRAND_COLOR: Record<string, string> = {
+const BRAND_HEX: Record<string, string> = {
   Mazda:      "#e60012",
   Ford:       "#003478",
   Mitsubishi: "#c8102e",
   GWM:        "#c8102e",
   Deepal:     "#0066ff",
-  Kia:        "#05141f",
+  Kia:        "#0d1b2a",
 };
+
+/** Build a Google Maps embed URL from real coordinates — no API key needed */
+function embedUrl(lat: number, lng: number) {
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&hl=th`;
+}
+
+/** Custom teardrop SVG marker matching the brand color */
+function BranchMarker({ brand, isHQ }: { brand: string; isHQ?: boolean }) {
+  const color = BRAND_HEX[brand] ?? "#DD5259";
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+      <div className="relative flex flex-col items-center" style={{ marginTop: "-28px" }}>
+        {/* Glow ring */}
+        <div
+          className="absolute -inset-3 rounded-full opacity-20 animate-pulse"
+          style={{ backgroundColor: color }}
+        />
+        {/* Pin body */}
+        <svg width="38" height="50" viewBox="0 0 38 50" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-xl">
+          {/* Drop shadow */}
+          <ellipse cx="19" cy="47" rx="7" ry="3" fill="rgba(0,0,0,0.2)" />
+          {/* Pin shape */}
+          <path
+            d="M19 2C10.163 2 3 9.163 3 18C3 29 19 48 19 48C19 48 35 29 35 18C35 9.163 27.837 2 19 2Z"
+            fill={color}
+          />
+          {/* Inner highlight */}
+          <circle cx="19" cy="18" r="8" fill="white" fillOpacity="0.25" />
+          {/* Brand initial */}
+          <text
+            x="19"
+            y="23"
+            textAnchor="middle"
+            fill="white"
+            fontWeight="700"
+            fontSize="11"
+            fontFamily="system-ui, sans-serif"
+            letterSpacing="0"
+          >
+            {brand.slice(0, 2).toUpperCase()}
+          </text>
+          {/* HQ star */}
+          {isHQ && (
+            <text x="28" y="8" fill="#FCD34D" fontSize="9" fontWeight="700">★</text>
+          )}
+        </svg>
+      </div>
+    </div>
+  );
+}
 
 export default function BranchesMapEmbed() {
   const [selected, setSelected] = useState(branches[0]);
@@ -91,24 +141,20 @@ export default function BranchesMapEmbed() {
 
         {/* Map + info */}
         <div className="flex-1 flex flex-col min-w-0">
-          {/* Iframe */}
-          <div className="relative w-full h-[280px] lg:h-[380px]">
-            {selected.mapEmbed ? (
-              <iframe
-                key={selected.id}
-                src={selected.mapEmbed}
-                width="100%"
-                height="100%"
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title={`แผนที่ ${selected.name}`}
-                className="absolute inset-0 border-0 w-full h-full"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-[#F8FAFC]">
-                <MapPin className="w-10 h-10 text-[#E2E8F0]" />
-              </div>
-            )}
+          {/* Map with custom marker overlay */}
+          <div className="relative w-full h-[280px] lg:h-[380px] bg-[#F8FAFC]">
+            <iframe
+              key={selected.id}
+              src={embedUrl(selected.lat, selected.lng)}
+              width="100%"
+              height="100%"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title={`แผนที่ ${selected.name}`}
+              className="absolute inset-0 border-0 w-full h-full"
+            />
+            {/* Custom marker overlay */}
+            <BranchMarker brand={selected.brand} isHQ={selected.isHQ} />
           </div>
 
           {/* Info strip */}
@@ -122,7 +168,6 @@ export default function BranchesMapEmbed() {
                   </span>
                 </div>
                 <p className="font-bold text-[#0F172A] text-sm leading-snug">{selected.name}</p>
-
                 <div className="flex flex-col sm:flex-row sm:flex-wrap gap-x-4 gap-y-1 mt-1.5">
                   <div className="flex items-start gap-1.5 text-[#64748B] text-xs">
                     <MapPin className="w-3 h-3 shrink-0 mt-0.5" />
@@ -140,12 +185,11 @@ export default function BranchesMapEmbed() {
                   </div>
                 </div>
               </div>
-
               <a
                 href={selected.mapUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-xl transition-all bg-[#0F172A] hover:bg-[#1E293B] whitespace-nowrap"
+                className="shrink-0 flex items-center gap-1.5 text-xs font-semibold text-white px-3 py-2 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] transition-all whitespace-nowrap"
               >
                 <ExternalLink className="w-3 h-3" />
                 นำทาง
