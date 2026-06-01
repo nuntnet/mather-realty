@@ -187,9 +187,10 @@ kia ev9 ราคา ไทย
 - [ ] GBP อัปเดต
 
 ### Phase 2 Status
-- [ ] เขียนบทความ Tier 1 (0/5)
-- [ ] เขียนบทความ Local SEO (0/4)
-- [ ] FAQ บทความทุกชิ้น
+- [x] เขียนบทความ Tier 1 (5/5) — Mazda CX-5, Ford Ranger, Mitsubishi Triton, HAVAL H6 HEV, Kia Carnival
+- [x] เขียนบทความ Local SEO (3/4) — Deepal S07 review, EV Guide นครปฐม, Tank vs Everest
+- [x] เขียนบทความ 50 ชิ้น ครอบคลุมทุกแผนก (แผนกขาย/บริการ/ซ่อมสี/ประกัน/เปรียบเทียบ/EV)
+- [ ] FAQ schema บนหน้ารถแต่ละรุ่น (Phase 4)
 
 ### Phase 3 Status
 - [ ] one2car.com registration
