@@ -1,7 +1,13 @@
 # CLAUDE.md — ch-erawan-next
 
-เว็บไซต์ดีลเลอร์รถยนต์ **ช.เอราวัณ ออโต้ กรุ๊ป** จ.นครปฐม  
+เว็บไซต์ดีลเลอร์รถยนต์ **ช.เอราวัณ ออโต้ กรุป** จ.นครปฐม  
 6 แบรนด์: Mazda, Ford, Mitsubishi, GWM, Deepal, Kia — 7 สาขา
+
+## Workflow Rules
+
+- **Do NOT** git add/commit/push/deploy after every change. Batch changes together.
+- Only commit when the user **explicitly asks** to commit, push, or deploy.
+- Focus on making code changes quickly without stopping for git operations.
 
 ## Stack
 

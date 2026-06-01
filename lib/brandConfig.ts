@@ -2,7 +2,7 @@ import type { Car } from "@/lib/notion-types";
 import { BRAND_IMAGES } from "@/lib/brandImages";
 
 export type BrandSlug = "mazda" | "ford" | "mitsubishi" | "gwm" | "deepal" | "kia";
-export type GwmLineSlug = "haval" | "ora" | "tank";
+export type GwmLineSlug = "haval" | "ora" | "tank" | "poer";
 
 export interface FeaturedModel {
   name: string;
@@ -78,6 +78,13 @@ export const GWM_SUB_LINES: GwmSubLine[] = [
     displayNameTh: "แทงค์",
     logoPath: "/brands/tank.svg",
     modelPrefixes: ["TANK", "Tank"],
+  },
+  {
+    slug: "poer",
+    displayName: "POER",
+    displayNameTh: "โพเออร์",
+    logoPath: "/brands/poer.svg",
+    modelPrefixes: ["POER", "Poer"],
   },
 ];
 
@@ -160,7 +167,7 @@ export const BRANDS: BrandConfig[] = [
     displayNameTh: "จีดับเบิลยูเอ็ม",
     tagline: "Great Wall Motor",
     descriptionTh:
-      "ตัวแทนจำหน่าย GWM อย่างเป็นทางการ ครบทั้ง HAVAL, ORA และ TANK — SUV ไฮบริดและรถไฟฟ้า",
+      "ตัวแทนจำหน่าย GWM อย่างเป็นทางการ ครบทั้ง HAVAL, ORA, TANK และ POER — SUV ไฮบริด รถไฟฟ้า และกระบะสมรรถนะสูง",
     logoPath: "/brands/gwm.png",
     logoScale: 1.15,
     accentColor: "#C8102E",

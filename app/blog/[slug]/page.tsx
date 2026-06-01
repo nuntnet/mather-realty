@@ -5,6 +5,7 @@ import { getBlogPostWithContent, getAllBlogSlugs, getPublishedBlogPosts } from "
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
 import { ChevronRight } from "lucide-react";
+import CallToAction from "@/components/CallToAction";
 import { cldUrl } from "@/lib/cloudinary";
 import type { Metadata } from "next";
 import { breadcrumbJsonLd, canonicalUrl } from "@/lib/site";
@@ -110,6 +111,13 @@ export default async function BlogPostPage({
         <article className="prose prose-slate prose-lg max-w-none">
           <ReactMarkdown>{post.contentMarkdown}</ReactMarkdown>
         </article>
+
+        {/* CTA after content */}
+        <CallToAction
+          brand={post.tags?.find((t: string) => ["mazda","ford","mitsubishi","gwm","deepal","kia"].includes(t.toLowerCase()))?.toUpperCase()}
+          variant="compact"
+          className="mt-10"
+        />
       </div>
 
       {/* Related Posts */}

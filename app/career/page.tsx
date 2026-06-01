@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getYearsLabel, getYearsOfExperience } from "@/lib/company";
 import Image from "next/image";
 import {
   CheckCircle, Phone, Mail, Building, DollarSign,
@@ -214,7 +215,7 @@ export default function Career() {
           <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4">มาเป็นส่วนหนึ่งของทีมเรา</h1>
           <p className="text-white/60 max-w-xl leading-relaxed mb-6">
             ร่วมงานกับ ช.เอราวัณ ออโต้ กรุป ผู้จำหน่ายรถยนต์อย่างเป็นทางการ 6 แบรนด์ชั้นนำ
-            ใน 7 สาขา จ.นครปฐม ด้วยประสบการณ์กว่า 57 ปี
+            {`ใน 7 สาขา จ.นครปฐม ด้วยประสบการณ์กว่า ${getYearsOfExperience()} ปี`}
           </p>
           <div className="flex flex-wrap gap-4 text-sm text-white/50">
             {["Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"].map((b) => (
@@ -228,7 +229,7 @@ export default function Career() {
       <div className="bg-[#0C1C3E] py-8">
         <div className="container grid grid-cols-2 lg:grid-cols-4 gap-6 text-center text-white">
           {[
-            { num: "57+", label: "ปีประสบการณ์" },
+            { num: getYearsLabel(), label: "ปีประสบการณ์" },
             { num: "7", label: "สาขาทั่วนครปฐม" },
             { num: "6", label: "แบรนด์รถยนต์" },
             { num: `${jobListings.length}+`, label: "ตำแหน่งที่เปิดรับ" },

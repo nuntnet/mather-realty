@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BrandHero from "@/components/BrandHero";
+import CallToAction from "@/components/CallToAction";
 import BrandSubNav from "@/components/brands/BrandSubNav";
 import {
   BRAND_BY_SLUG,
@@ -411,6 +412,12 @@ export default async function BrandBodyRepairPage({ params }: PageProps) {
           </div>
         </section>
       </div>
+
+      <CallToAction
+        brand={brand.displayName}
+        heading={`ซ่อมสีตัวถัง ${brand.displayNameTh} มาตรฐาน OEM`}
+        description={`ศูนย์ซ่อมสีตัวถัง ${brand.displayName} มาตรฐานโรงงาน ระบบสีน้ำ เครื่องมือมาตรฐาน ที่ ช.เอราวัณ นครปฐม นัดซ่อมออนไลน์`}
+      />
     </>
   );
 }

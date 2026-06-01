@@ -94,7 +94,7 @@ export default async function GwmLinePage({ params }: PageProps) {
                     white={sub.slug !== slug}
                     width={56}
                     height={20}
-                    className={sub.slug === slug ? "" : "opacity-90"}
+                    className={sub.slug === slug ? "brightness-0" : "opacity-90"}
                   />
                   {sub.displayName}
                 </Link>

@@ -101,7 +101,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.3!3d13.79!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ3JzI0LjAiTiAxMDDCsDE4JzAwLjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245633/ch-erawan/branch-maps/branch-map-gwm-nakhon-pathom.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245635/ch-erawan/branch-maps/branch-map-kia-samphran.png",
     lat: 13.7861688,
     lng: 100.3010389,
     color: "bg-red-500",
@@ -142,7 +142,7 @@ export const branches: Branch[] = [
     mapEmbed:
       "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.5!2d100.31!3d13.80!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTPCsDQ4JzAwLjAiTiAxMDDCsDE4JzM2LjAiRQ!5e0!3m2!1sth!2sth!4v1",
     graphicMapUrl:
-      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245635/ch-erawan/branch-maps/branch-map-kia-samphran.png",
+      "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245633/ch-erawan/branch-maps/branch-map-gwm-nakhon-pathom.png",
     lat: 13.7861688,
     lng: 100.3010389,
     color: "bg-purple-600",

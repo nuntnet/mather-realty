@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Clock, Car, Wrench, ChevronRight, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Clock, Car, Wrench, ChevronRight, ExternalLink, Loader2 } from "lucide-react";
+import { cldUrl } from "@/lib/cloudinary";
 import { branches as branchData, type Branch } from "@/lib/branchData";
 
 /** UI-only extras not stored in canonical branch data */
@@ -72,6 +73,44 @@ const serviceMenuByBrand: Record<string, { category: string; items: string[] }[]
     { category: "Body & Paint", items: ["ซ่อมตัวถังจากอุบัติเหตุ", "พ่นสีมาตรฐาน OEM", "ซ่อมรอยขีดข่วน/บุบ", "บริการประกันภัย"] },
   ],
 };
+
+/** Map graphic image with loading skeleton — prevents layout shift */
+function MapImage({ url, name }: { url: string; name: string }) {
+  const [loaded, setLoaded] = useState(false);
+
+  if (!url) {
+    return (
+      <div className="h-64 flex items-center justify-center bg-[#F8FAFC]">
+        <MapPin className="w-10 h-10 text-gray-300" />
+      </div>
+    );
+  }
+
+  // Optimize via Cloudinary: resize to 800px width + auto format + quality
+  const optimizedUrl = url.includes("cloudinary.com")
+    ? url.replace("/upload/", "/upload/f_auto,q_auto:good,w_800/")
+    : url;
+
+  return (
+    <div className="relative bg-[#F8FAFC]" style={{ minHeight: 280 }}>
+      {/* Skeleton loader — shown until image loads */}
+      {!loaded && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#F8FAFC]">
+          <Loader2 className="w-6 h-6 text-[#94A3B8] animate-spin" />
+          <p className="text-xs text-[#94A3B8]">กำลังโหลดแผนที่...</p>
+        </div>
+      )}
+      <img
+        src={optimizedUrl}
+        alt={`แผนที่ ${name}`}
+        className={`w-full h-auto block transition-opacity duration-300 ${loaded ? "opacity-100" : "opacity-0"}`}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+      />
+    </div>
+  );
+}
 
 export default function ServiceLocator() {
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -196,21 +235,7 @@ export default function ServiceLocator() {
 
                 <div className="overflow-hidden">
                   {activeTab === "map" ? (
-                    /* Map: fit-to-width, no horizontal scroll */
-                    <div className="bg-[#F8FAFC]">
-                      {selected.graphicMapUrl ? (
-                        <img
-                          src={selected.graphicMapUrl}
-                          alt={`แผนที่ ${selected.name}`}
-                          className="w-full h-auto block"
-                          style={{ display: "block", maxWidth: "100%" }}
-                        />
-                      ) : (
-                        <div className="h-64 flex items-center justify-center">
-                          <MapPin className="w-10 h-10 text-gray-300" />
-                        </div>
-                      )}
-                    </div>
+                    <MapImage url={selected.graphicMapUrl} name={selected.name} />
                   ) : activeTab === "info" ? (
                     <div className="p-5">
                       <div className="flex items-start gap-2 mb-4">
