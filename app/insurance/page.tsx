@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { CheckCircle, Phone, MessageCircle, Shield, Clock, Gift, Users, Heart, CreditCard, Home, Truck } from "lucide-react";
 import { pageMetadata, breadcrumbJsonLd } from "@/lib/site";
 import { serviceJsonLd } from "@/lib/seo";
@@ -90,7 +91,7 @@ export default function Insurance() {
     <div className="min-h-screen bg-white pt-[68px]">
       {/* Header Banner */}
       <div className="relative bg-[#0F172A] overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1920&q=80&auto=format&fit=crop')] bg-cover bg-center opacity-15" />
+        <Image src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/ch-erawan/pages/insurance-hero-bg" alt="" fill className="object-cover opacity-15" />
         <div className="container relative z-10 py-14 lg:py-16">
           <p className="text-white/40 text-sm font-medium tracking-wider uppercase mb-3">Insurance</p>
           <h1 className="text-3xl lg:text-4xl font-bold text-white mb-3">ประกันภัยรถยนต์</h1>
@@ -103,7 +104,7 @@ export default function Insurance() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div className="rounded-2xl overflow-hidden">
             <img
-              src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/QltSFDxDyTVQLYih.jpg"
+              src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245655/ch-erawan/awards/mazda-service-advisor.jpg"
               alt="ทีมงานประกันภัย ช.เอราวัณ"
               className="w-full h-[400px] object-cover"
             />
@@ -220,7 +221,7 @@ export default function Insurance() {
             </div>
             <div className="hidden lg:block">
               <img
-                src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663161651958/YGdTgqCrWnMlNebF.jpg"
+                src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245670/ch-erawan/awards/ford-advisor-award.jpg"
                 alt="ทีมงาน ช.เอราวัณ"
                 className="w-full h-full object-cover"
               />

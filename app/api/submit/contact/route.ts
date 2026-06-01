@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Client } from "@notionhq/client";
+import { trackEvent } from "@/lib/analytics";
 
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    void trackEvent("contact", { path: "/contact" });
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {

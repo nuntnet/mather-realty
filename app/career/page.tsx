@@ -207,10 +207,7 @@ export default function Career() {
 
       {/* ── Hero ── */}
       <div className="relative bg-[#0F172A] overflow-hidden min-h-[340px] flex items-center">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1521737711867-e3b97375f902?w=1920&q=80&auto=format&fit=crop')" }}
-        />
+        <Image src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/ch-erawan/pages/career-hero-bg2" alt="" fill className="object-cover opacity-20" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0F172A] via-[#0F172A]/90 to-[#0F172A]/60" />
         <div className="container relative z-10 py-16">
           <p className="text-[#C8102E] text-sm font-medium tracking-widest uppercase mb-3">Join Our Team</p>
@@ -275,7 +272,7 @@ export default function Career() {
           </div>
           <div className="mt-10 lg:mt-0 rounded-2xl overflow-hidden shadow-lg">
             <Image
-              src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=80&auto=format&fit=crop"
+              src="https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/ch-erawan/pages/career-team-photo"
               alt="ทีมงาน ช.เอราวัณ ออโต้ กรุป"
               width={900}
               height={600}

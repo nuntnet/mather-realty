@@ -70,6 +70,24 @@ export const verification = sqliteTable(
   (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
+export const analyticsEvents = sqliteTable(
+  "analytics_events",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    event: text("event").notNull(), // 'car_view' | 'booking' | 'contact' | 'search'
+    path: text("path"),
+    brand: text("brand"),
+    model: text("model"),
+    meta: text("meta"), // JSON string extras
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (t) => [
+    index("ae_event_idx").on(t.event),
+    index("ae_created_idx").on(t.createdAt),
+    index("ae_brand_idx").on(t.brand),
+  ]
+);
+
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),

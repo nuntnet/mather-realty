@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2, Video } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2, Video, TrendingUp } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import {
   Avatar, AvatarFallback,
@@ -15,6 +15,7 @@ import {
 const menuItems = [
   // ── Content ───────────────────────────────
   { icon: BarChart3,            label: "ภาพรวม",        href: "/admin" },
+  { icon: TrendingUp,           label: "Analytics",      href: "/admin/analytics" },
   { icon: Car,                  label: "รถยนต์",         href: "/admin/cars" },
   { icon: BookOpen,             label: "บทความ",         href: "/admin/blog" },
   { icon: Tag,                  label: "โปรโมชั่น",      href: "/admin/promotions" },

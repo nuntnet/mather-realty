@@ -6,6 +6,8 @@ import { Toaster } from "sonner";
 import PublicLayoutServer from "@/components/PublicLayoutServer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 import { JsonLd, organizationGraph, websiteJsonLd } from "@/lib/seo";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -68,6 +70,8 @@ export default function RootLayout({
           {children}
         </PublicLayoutServer>
         <Toaster richColors position="top-right" />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
