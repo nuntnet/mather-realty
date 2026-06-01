@@ -4,7 +4,32 @@
 
 ---
 
-## After Optimize (2026-06-01) — Production
+## Round 2 (2026-06-01) — Local prod build (รอ deploy วัด prod จริง)
+
+หลังแก้ accessibility + image quality + browserslist + preconnect:
+
+| Category | Baseline | Round 1 (prod) | Round 2 (local) |
+|----------|:---:|:---:|:---:|
+| Performance | 71 | 79 | **85** 🎯 |
+| Accessibility | 83 | 89 | **96** |
+| Best Practices | 92 | 96 | **96** |
+| SEO | 100 | 100 | **100** |
+
+**Round 2 changes:**
+- Accessibility 89→96: brand tab contrast, /stories /blog link-name, text-gray-400→500, touch targets
+- Hero + brand images: `q_auto:best` → `q_auto:good` (image delivery −312KB target)
+- `<head>` preconnect + dns-prefetch to Cloudinary
+- Font: ตัด weight 300 (เหลือ 400-700)
+- `browserslist` modern targets → ลด legacy JS polyfills
+- LCP (local) 5.7s → **4.4s**, FCP → 1.2s, SI → 1.2s, TBT → 30ms
+
+> หมายเหตุ: ค่า local แม่นกว่าเรื่อง score/CWV เพราะ Notion/CDN เดียวกัน
+> แต่ TTFB จะต่างจาก prod (prod มี ISR cache). Accessibility 96 เหลือแค่
+> brand red #DD5259 (3.87:1) — เก็บไว้ตามแบรนด์ (ผู้ใช้ตัดสินใจ)
+
+---
+
+## After Optimize Round 1 (2026-06-01) — Production
 
 | Category | Score | เปลี่ยน |
 |----------|-------|--------|
