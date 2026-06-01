@@ -43,19 +43,19 @@ const AWARD_SLIDES: { url: string; caption: string }[] = [
 
 const heroSlides = [
   {
-    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good/v1780245610/ch-erawan/hero/mazda-cx5-hero-2026.jpg",
     brand: "Mazda", tagline: "FEEL ALIVE",
     thaiTitle: "ขับเคลื่อนด้วยแรงบันดาลใจ",
     desc: "Mazda CX-5 SUV สมรรถนะสมดุล ดีไซน์ Kodo เอกลักษณ์เฉพาะตัว พร้อม i-Activsense ช่วยเหลือผู้ขับขี่",
   },
   {
-    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245615/ch-erawan/hero/gwm-haval-h6-hero.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good/v1780245615/ch-erawan/hero/gwm-haval-h6-hero.jpg",
     brand: "GWM", tagline: "HAVAL H6 HEV",
     thaiTitle: "SUV ไฮบริดยอดนิยม",
     desc: "GWM HAVAL H6 HEV ประหยัดน้ำมัน ออพชั่นครบ ราคาเริ่มต้น 969,000 บาท จาก gwm.co.th",
   },
   {
-    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:best/v1780245617/ch-erawan/hero/kia-ev5-hero.jpg",
+    bg: "https://res.cloudinary.com/n5llrdnq/image/upload/f_auto,q_auto:good/v1780245617/ch-erawan/hero/kia-ev5-hero.jpg",
     brand: "Kia", tagline: "INSPIRATION DRIVEN",
     thaiTitle: "SUV ไฟฟ้าแห่งอนาคต",
     desc: "Kia EV5 ดีไซน์ Opposites United ห้องโดยสารกว้าง ราคาเริ่มต้น 1,399,000 บาท",
@@ -104,8 +104,7 @@ function AwardSlideshow() {
             fill
             className="object-cover"
             sizes="(max-width: 768px) 100vw, 50vw"
-            priority={i === 0}
-            loading={i === 0 ? undefined : "lazy"}
+            loading="lazy"
           />
           {/* Dark overlay + caption */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
@@ -137,9 +136,11 @@ function AwardSlideshow() {
           <button
             key={i}
             onClick={() => { go(i); resetTimer(); }}
-            className={`w-1.5 h-1.5 rounded-full transition-all ${i === current ? "bg-white w-4" : "bg-white/40"}`}
+            className="flex items-center justify-center w-6 h-6"
             aria-label={`สไลด์ ${i + 1}`}
-          />
+          >
+            <span className={`block rounded-full transition-all ${i === current ? "bg-white w-4 h-1.5" : "w-1.5 h-1.5 bg-white/40"}`} />
+          </button>
         ))}
       </div>
 
@@ -215,7 +216,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
 
               {/* Per-slide tagline (subtle, changes with slide) */}
               <p
-                className="text-white/35 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
+                className="text-white/60 text-xs font-medium uppercase tracking-[0.25em] transition-opacity duration-700"
                 key={heroSlide}
               >
                 {heroSlides[heroSlide].tagline} · {heroSlides[heroSlide].thaiTitle}
@@ -229,8 +230,10 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
           {heroSlides.map((slide, i) => (
             <button key={i} onClick={() => setHeroSlide(i)}
               aria-label={`สไลด์ ${slide.brand}`}
-              className={`rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`}
-            />
+              className="flex items-center justify-center w-8 h-8 -m-2"
+            >
+              <span className={`block rounded-full transition-all duration-300 ${i === heroSlide ? "w-8 h-2 bg-[#DD5259]" : "w-2 h-2 bg-white/30 hover:bg-white/60"}`} />
+            </button>
           ))}
         </div>
       </section>
@@ -301,13 +304,13 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
           <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
             {brandTabs.map((tab) => (
               <button key={tab} onClick={() => setActiveBrandTab(tab)}
-                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeBrandTab === tab ? "bg-[#0F172A] text-white shadow-md" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
+                className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${activeBrandTab === tab ? "bg-[#0F172A] text-white shadow-md" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}
               >{tab}</button>
             ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCars.length === 0 ? (
-              <div className="col-span-3 text-center py-16 text-gray-400">ไม่พบรุ่นรถในหมวดนี้</div>
+              <div className="col-span-3 text-center py-16 text-gray-500">ไม่พบรุ่นรถในหมวดนี้</div>
             ) : filteredCars.map((car) => (
               <div key={car.id} className="group bg-white rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden">
                 {/* Whole image area links to car detail */}
@@ -322,14 +325,14 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   )}
                 </Link>
                 <div className="p-5">
-                  <p className="text-xs text-gray-400 font-medium tracking-wider uppercase mb-1">{car.brand}</p>
+                  <p className="text-xs text-gray-500 font-medium tracking-wider uppercase mb-1">{car.brand}</p>
                   <Link href={`/cars/${car.slug || car.id}`}>
                     <h3 className="font-bold text-[#0F172A] text-lg mb-2 hover:text-[#334155] transition-colors">{car.model}</h3>
                   </Link>
                   {car.priceMin > 0 && (
                     <p className="text-lg font-bold text-[#0F172A] mb-4">
                       ฿{car.priceMin.toLocaleString()}
-                      <span className="text-xs font-normal text-gray-400 ml-1">เริ่มต้น</span>
+                      <span className="text-xs font-normal text-gray-500 ml-1">เริ่มต้น</span>
                     </p>
                   )}
                   <div className="flex gap-2">
@@ -371,7 +374,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                 {[["57+", "ปีแห่งประสบการณ์"], ["7", "สาขาทั่วนครปฐม"], ["6", "แบรนด์ชั้นนำ"]].map(([num, label]) => (
                   <div key={label} className="text-center">
                     <div className="text-3xl font-bold text-[#DD5259]">{num}</div>
-                    <div className="text-xs text-white/40 mt-1">{label}</div>
+                    <div className="text-xs text-white/65 mt-1">{label}</div>
                   </div>
                 ))}
               </div>
@@ -411,7 +414,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                         <span className="text-white font-semibold text-sm leading-snug">{item.title}</span>
                         <span className="text-[#DD5259] text-[10px] font-bold bg-[#DD5259]/15 px-1.5 py-0.5 rounded">{item.year}</span>
                       </div>
-                      <p className="text-white/45 text-xs leading-relaxed">{item.desc}</p>
+                      <p className="text-white/65 text-xs leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 </div>
@@ -516,8 +519,8 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-2">เสียงจากลูกค้าของเรา</h2>
               <p className="text-gray-500">เรื่องราวความประทับใจจากลูกค้าที่ไว้วางใจ ช.เอราวัณ</p>
             </div>
-            <Link href="/stories">
-              <Button variant="outline" className="hidden md:flex border-gray-200 text-gray-600 hover:border-[#0F172A]">
+            <Link href="/stories" aria-label="ดูรีวิวลูกค้าทั้งหมด" className="hidden md:block">
+              <Button variant="outline" className="flex border-gray-200 text-gray-600 hover:border-[#0F172A]">
                 ดูทั้งหมด <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -537,7 +540,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   </div>
                   <div>
                     <p className="font-semibold text-[#0F172A] text-sm">{story.customerName}</p>
-                    {story.carModel && <p className="text-xs text-gray-400 mt-0.5">{story.carModel}</p>}
+                    {story.carModel && <p className="text-xs text-gray-500 mt-0.5">{story.carModel}</p>}
                   </div>
                 </div>
               </div>
@@ -554,8 +557,8 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
               <h2 className="text-2xl lg:text-3xl font-bold text-[#0F172A] mb-2">ข่าวสารและกิจกรรมล่าสุด</h2>
               <p className="text-gray-500">ติดตามข่าวสาร โปรโมชั่น และกิจกรรมจาก ช.เอราวัณ</p>
             </div>
-            <Link href="/blog">
-              <Button variant="outline" className="hidden md:flex border-gray-200 text-gray-600 hover:border-[#0F172A]">
+            <Link href="/blog" aria-label="ดูบทความทั้งหมด" className="hidden md:block">
+              <Button variant="outline" className="flex border-gray-200 text-gray-600 hover:border-[#0F172A]">
                 ดูทั้งหมด <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
@@ -576,9 +579,9 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
                   <div className="p-5">
                     <Badge variant="secondary" className="mb-2 text-[10px] font-medium">{post.category}</Badge>
                     <h3 className="font-semibold text-[#0F172A] mb-2 line-clamp-2">{post.title}</h3>
-                    {post.excerpt && <p className="text-sm text-gray-400 line-clamp-2">{post.excerpt}</p>}
+                    {post.excerpt && <p className="text-sm text-gray-500 line-clamp-2">{post.excerpt}</p>}
                     {post.publishedAt && (
-                      <p className="text-xs text-gray-400 mt-3">
+                      <p className="text-xs text-gray-500 mt-3">
                         {format(new Date(post.publishedAt), "d MMM yyyy", { locale: th })}
                       </p>
                     )}
@@ -601,7 +604,7 @@ export default function HomeClient({ featuredCars, recentPosts, publicStories }:
       <section className="py-16 lg:py-20 bg-[#0F172A]">
         <div className="container text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">ติดต่อเราได้เลย ยินดีให้บริการ</h2>
-          <p className="text-white/40 max-w-lg mx-auto mb-8">ให้ทีมผู้เชี่ยวชาญของเราช่วยคุณค้นหารถยนต์ที่ตรงกับความต้องการและงบประมาณของคุณ</p>
+          <p className="text-white/65 max-w-lg mx-auto mb-8">ให้ทีมผู้เชี่ยวชาญของเราช่วยคุณค้นหารถยนต์ที่ตรงกับความต้องการและงบประมาณของคุณ</p>
           <div className="flex flex-wrap justify-center gap-4">
             <a href="tel:034305500">
               <Button size="lg" variant="outline" className="border-white/30 text-white hover:bg-white/10 font-semibold px-8 h-12">

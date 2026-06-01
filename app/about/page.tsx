@@ -683,7 +683,7 @@ export default function About() {
                     ))}
                   </div>
                   {!TEAM_GROUP_PHOTO_URL && (
-                    <p className="text-white/30 text-xs mt-4 italic">
+                    <p className="text-white/60 text-xs mt-4 italic">
                       * เพิ่มรูปหมู่ทีมบริหารได้ที่ TEAM_GROUP_PHOTO_URL ใน about/page.tsx
                     </p>
                   )}
@@ -780,7 +780,7 @@ export default function About() {
 
             <div className="grid md:grid-cols-2 gap-5 mb-10">
               <div className="bg-[#0F172A] text-white rounded-2xl p-8">
-                <div className="text-white/40 text-sm font-semibold uppercase tracking-wider mb-3">
+                <div className="text-white/65 text-sm font-semibold uppercase tracking-wider mb-3">
                   วิสัยทัศน์ (Vision)
                 </div>
                 <p className="text-white/80 leading-relaxed">

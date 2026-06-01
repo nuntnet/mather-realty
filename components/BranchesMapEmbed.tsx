@@ -22,8 +22,14 @@ const BRAND_HEX: Record<string, string> = {
   Kia:        "#0d1b2a",
 };
 
-/** Build a Google Maps embed URL from real coordinates — no API key needed */
+const GMAPS_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+
+/** Build a Google Maps Embed API URL using the API key */
 function embedUrl(lat: number, lng: number) {
+  if (GMAPS_KEY) {
+    return `https://www.google.com/maps/embed/v1/place?key=${GMAPS_KEY}&q=${lat},${lng}&zoom=16&language=th`;
+  }
+  // Fallback without key
   return `https://maps.google.com/maps?q=${lat},${lng}&z=16&output=embed&hl=th`;
 }
 

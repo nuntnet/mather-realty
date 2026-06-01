@@ -51,7 +51,7 @@ export default function Footer() {
               <CompanyLogo height={56} className="h-14 w-auto" />
             </Link>
 
-            <p className="text-white/50 text-sm leading-relaxed mb-6">
+            <p className="text-white/70 text-sm leading-relaxed mb-6">
               กลุ่มบริษัท ช.เอราวัณ ผู้จำหน่ายรถยนต์อย่างเป็นทางการ 6 แบรนด์ชั้นนำ ด้วยประสบการณ์กว่า 57 ปี ในจังหวัดนครปฐมและนครปฐม
             </p>
 
@@ -103,7 +103,7 @@ export default function Footer() {
           {/* Column 4: LINE OA */}
           <div>
             <h3 className="text-white font-semibold text-sm mb-2 tracking-wide uppercase">Line Official</h3>
-            <p className="text-white/40 text-xs mb-5">เพิ่มเพื่อนเพื่อรับโปรโมชั่นและข่าวสาร</p>
+            <p className="text-white/65 text-xs mb-5">เพิ่มเพื่อนเพื่อรับโปรโมชั่นและข่าวสาร</p>
             <div className="space-y-2.5">
               {LINE_ACCOUNTS.map((account) => (
                 <a
@@ -111,6 +111,7 @@ export default function Footer() {
                   href={account.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label={`เพิ่มเพื่อน LINE OA ${account.brand} (${account.lineId})`}
                   className="flex items-center justify-between gap-3 bg-white/5 hover:bg-[#06C755]/15 border border-white/10 hover:border-[#06C755]/40 rounded-xl px-3.5 py-2.5 transition-all group"
                 >
                   <div className="flex items-center gap-2.5 min-w-0">

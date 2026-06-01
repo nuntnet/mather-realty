@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Sans_Thai, Inter } from "next/font/google";
 import "./globals.css";
-import "maplibre-gl/dist/maplibre-gl.css";
 import { Toaster } from "sonner";
 import PublicLayoutServer from "@/components/PublicLayoutServer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
@@ -18,7 +17,7 @@ const inter = Inter({
 const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   variable: "--font-ibm-plex-thai",
   subsets: ["thai", "latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -63,6 +62,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
+      <head>
+        {/* Warm up the Cloudinary CDN connection early — hero image is served from here */}
+        <link rel="preconnect" href="https://res.cloudinary.com" />
+        <link rel="dns-prefetch" href="https://res.cloudinary.com" />
+      </head>
       <body className={`${inter.variable} ${ibmPlexSansThai.variable} font-sans antialiased`}>
         <JsonLd data={organizationGraph()} />
         <JsonLd data={websiteJsonLd()} />

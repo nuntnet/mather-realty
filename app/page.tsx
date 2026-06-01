@@ -7,10 +7,10 @@ import HomeClient from "./HomeClient";
 export const revalidate = 3600;
 
 const HOME_DESCRIPTION =
-  "ช.เอราวัณ ออโต้ กรุป — ตัวแทนจำหน่าย Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ในนครปฐม 7 สาขา ทดลองขับ นัดบริการ ประกันภัย และรถมือสอง";
+  "ดีลเลอร์รถยนต์ครบวงจร จ.นครปฐม กว่า 57 ปี — Mazda, Ford, Mitsubishi, GWM, Deepal, Kia ราคาดีที่สุด 7 สาขา ทดลองขับฟรี จองนัดออนไลน์ได้เลย";
 
 export const metadata: Metadata = pageMetadata({
-  title: `ตัวแทนจำหน่ายรถยนต์ นครปฐม | ${SITE_NAME}`,
+  title: `ดีลเลอร์รถยนต์นครปฐม Mazda Ford Mitsubishi GWM Deepal Kia | ${SITE_NAME}`,
   description: HOME_DESCRIPTION,
   path: "/",
 });
@@ -44,6 +44,11 @@ export default async function HomePage() {
           "/",
         )
       : null;
+
+  // NOTE: hero LCP image is preloaded automatically by next/image `priority`
+  // on the first slide in HomeClient — no manual <link rel="preload"> needed
+  // (it would duplicate the auto-generated one). preconnect to Cloudinary is
+  // handled in app/layout.tsx <head>.
 
   return (
     <>
