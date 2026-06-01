@@ -106,3 +106,23 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+// ── Audit Log ─────────────────────────────────────────
+export const auditLog = sqliteTable(
+  "audit_log",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    userId: text("user_id").notNull(),
+    userName: text("user_name"),
+    action: text("action").notNull(), // "create" | "update" | "delete" | "login" | "invite"
+    resource: text("resource").notNull(), // "car" | "blog" | "user" | "promotion" etc.
+    resourceId: text("resource_id"),
+    details: text("details"), // JSON string with before/after or extra info
+    createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  },
+  (t) => [
+    index("audit_user_idx").on(t.userId),
+    index("audit_resource_idx").on(t.resource),
+    index("audit_created_idx").on(t.createdAt),
+  ]
+);

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
-import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2, Video, TrendingUp } from "lucide-react";
+import { BarChart3, BookOpen, Calendar, Car, LogOut, Mail, MessageSquare, Tag, Wrench, MessageSquareWarning, Share2, Video, TrendingUp, Users, ScrollText } from "lucide-react";
 import CompanyLogo from "@/components/CompanyLogo";
 import {
   Avatar, AvatarFallback,
@@ -28,6 +28,9 @@ const menuItems = [
   { icon: MessageSquareWarning, label: "Feedback",        href: "/admin/feedback" },
   { icon: MessageSquare,        label: "รีวิวลูกค้า",    href: "/admin/stories" },
   { icon: Mail,                 label: "ข้อความติดต่อ",  href: "/admin/contacts" },
+  // ── System ────────────────────────────────
+  { icon: Users,                label: "จัดการผู้ใช้",    href: "/admin/users" },
+  { icon: ScrollText,           label: "Audit Log",       href: "/admin/audit" },
 ];
 
 
