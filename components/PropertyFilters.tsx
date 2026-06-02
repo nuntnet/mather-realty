@@ -90,13 +90,13 @@ export default function PropertyFilters({
         <Label className="text-sm font-semibold">{t("city")}</Label>
         <Select
           value={filters.city ?? ""}
-          onValueChange={(v) => update({ city: v || undefined })}
+          onValueChange={(v) => update({ city: v === "all" ? undefined : v || undefined })}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder={`— ${t("city")} —`} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">— {t("city")} —</SelectItem>
+            <SelectItem value="all">— All Cities —</SelectItem>
             {cities.map((city) => (
               <SelectItem key={city} value={city}>
                 {city}
