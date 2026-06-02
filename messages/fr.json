@@ -42,10 +42,47 @@
     "inquiry_message": "Message (optionnel)",
     "inquiry_submit": "Envoyer la demande",
     "inquiry_success": "Votre demande a été envoyée !",
-    "amenities": "Équipements",
+    "amenities": {
+      "Pool": "Piscine",
+      "Parking": "Parking",
+      "WiFi": "WiFi",
+      "EVCharger": "Borne EV",
+      "Furnished": "Meublé",
+      "PetFriendly": "Animaux",
+      "Gym": "Gym",
+      "Security": "Sécurité",
+      "Elevator": "Ascenseur",
+      "Balcony": "Balcon",
+      "Garden": "Jardin",
+      "AirCon": "Climatisation"
+    },
     "description": "Description",
     "location": "Emplacement",
-    "landlord": "Propriétaire"
+    "landlord": "Propriétaire",
+    "perMonth": "/mois",
+    "sqm": "m²",
+    "scheduleViewing": "Visiter",
+    "status": {
+      "available": "Disponible",
+      "rented": "Loué",
+      "coming_soon": "Bientôt",
+      "pending": "En attente",
+      "archived": "Archivé"
+    },
+    "amenities_map": {
+      "Pool": "Piscine",
+      "Parking": "Parking",
+      "WiFi": "WiFi",
+      "EVCharger": "Borne de recharge VE",
+      "Furnished": "Meublé",
+      "PetFriendly": "Animaux acceptés",
+      "Gym": "Salle de sport",
+      "Security": "Sécurité",
+      "Elevator": "Ascenseur",
+      "Balcony": "Balcon",
+      "Garden": "Jardin",
+      "AirCon": "Climatisation"
+    }
   },
   "search": {
     "title": "Parcourir les propriétés",

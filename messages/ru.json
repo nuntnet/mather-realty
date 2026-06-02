@@ -42,10 +42,47 @@
     "inquiry_message": "Сообщение (необязательно)",
     "inquiry_submit": "Отправить запрос",
     "inquiry_success": "Ваш запрос отправлен!",
-    "amenities": "Удобства",
+    "amenities": {
+      "Pool": "Бассейн",
+      "Parking": "Парковка",
+      "WiFi": "WiFi",
+      "EVCharger": "ЭЗС",
+      "Furnished": "Мебель",
+      "PetFriendly": "Питомцы",
+      "Gym": "Фитнес",
+      "Security": "Охрана",
+      "Elevator": "Лифт",
+      "Balcony": "Балкон",
+      "Garden": "Сад",
+      "AirCon": "Кондиционер"
+    },
     "description": "Описание",
     "location": "Расположение",
-    "landlord": "Арендодатель"
+    "landlord": "Арендодатель",
+    "perMonth": "/мес",
+    "sqm": "кв.м",
+    "scheduleViewing": "Записаться",
+    "status": {
+      "available": "Свободно",
+      "rented": "Занято",
+      "coming_soon": "Скоро",
+      "pending": "На рассмотрении",
+      "archived": "Снято"
+    },
+    "amenities_map": {
+      "Pool": "Бассейн",
+      "Parking": "Парковка",
+      "WiFi": "WiFi",
+      "EVCharger": "Зарядка для электромобилей",
+      "Furnished": "С мебелью",
+      "PetFriendly": "Можно с животными",
+      "Gym": "Тренажёрный зал",
+      "Security": "Охрана",
+      "Elevator": "Лифт",
+      "Balcony": "Балкон",
+      "Garden": "Сад",
+      "AirCon": "Кондиционер"
+    }
   },
   "search": {
     "title": "Поиск недвижимости",

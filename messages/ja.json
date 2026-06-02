@@ -42,10 +42,47 @@
     "inquiry_message": "メッセージ（任意）",
     "inquiry_submit": "お問い合わせを送る",
     "inquiry_success": "お問い合わせを送信しました！",
-    "amenities": "設備・サービス",
+    "amenities": {
+      "Pool": "プール",
+      "Parking": "駐車場",
+      "WiFi": "WiFi",
+      "EVCharger": "EV充電",
+      "Furnished": "家具付",
+      "PetFriendly": "ペット可",
+      "Gym": "ジム",
+      "Security": "セキュリティ",
+      "Elevator": "エレベーター",
+      "Balcony": "バルコニー",
+      "Garden": "庭",
+      "AirCon": "エアコン"
+    },
     "description": "物件説明",
     "location": "場所",
-    "landlord": "オーナー"
+    "landlord": "オーナー",
+    "perMonth": "/月",
+    "sqm": "㎡",
+    "scheduleViewing": "内覧予約",
+    "status": {
+      "available": "空き",
+      "rented": "賃貸中",
+      "coming_soon": "近日公開",
+      "pending": "審査中",
+      "archived": "クローズ"
+    },
+    "amenities_map": {
+      "Pool": "プール",
+      "Parking": "駐車場",
+      "WiFi": "WiFi",
+      "EVCharger": "EV充電器",
+      "Furnished": "家具付き",
+      "PetFriendly": "ペット可",
+      "Gym": "ジム",
+      "Security": "セキュリティ",
+      "Elevator": "エレベーター",
+      "Balcony": "バルコニー",
+      "Garden": "庭",
+      "AirCon": "エアコン"
+    }
   },
   "search": {
     "title": "物件を探す",

@@ -42,10 +42,47 @@
     "inquiry_message": "留言（选填）",
     "inquiry_submit": "发送询问",
     "inquiry_success": "您的询问已发送！",
-    "amenities": "配套设施",
+    "amenities": {
+      "Pool": "泳池",
+      "Parking": "停车",
+      "WiFi": "WiFi",
+      "EVCharger": "EV充电",
+      "Furnished": "家具齐全",
+      "PetFriendly": "允许宠物",
+      "Gym": "健身房",
+      "Security": "保安",
+      "Elevator": "电梯",
+      "Balcony": "阳台",
+      "Garden": "花园",
+      "AirCon": "空调"
+    },
     "description": "房源描述",
     "location": "位置",
-    "landlord": "房东"
+    "landlord": "房东",
+    "perMonth": "/月",
+    "sqm": "平米",
+    "scheduleViewing": "预约看房",
+    "status": {
+      "available": "可租",
+      "rented": "已租",
+      "coming_soon": "即将上市",
+      "pending": "待审核",
+      "archived": "已下架"
+    },
+    "amenities_map": {
+      "Pool": "游泳池",
+      "Parking": "停车位",
+      "WiFi": "WiFi",
+      "EVCharger": "电动车充电桩",
+      "Furnished": "带家具",
+      "PetFriendly": "允许宠物",
+      "Gym": "健身房",
+      "Security": "安保",
+      "Elevator": "电梯",
+      "Balcony": "阳台",
+      "Garden": "花园",
+      "AirCon": "空调"
+    }
   },
   "search": {
     "title": "浏览房产",

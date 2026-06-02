@@ -42,10 +42,47 @@
     "inquiry_message": "Meddelande (valfritt)",
     "inquiry_submit": "Skicka förfrågan",
     "inquiry_success": "Din förfrågan har skickats!",
-    "amenities": "Bekvämligheter",
+    "amenities": {
+      "Pool": "Pool",
+      "Parking": "Parkering",
+      "WiFi": "WiFi",
+      "EVCharger": "EV-laddning",
+      "Furnished": "Möblerad",
+      "PetFriendly": "Husdjur",
+      "Gym": "Gym",
+      "Security": "Säkerhet",
+      "Elevator": "Hiss",
+      "Balcony": "Balkong",
+      "Garden": "Trädgård",
+      "AirCon": "AC"
+    },
     "description": "Beskrivning",
     "location": "Läge",
-    "landlord": "Hyresvärd"
+    "landlord": "Hyresvärd",
+    "perMonth": "/mån",
+    "sqm": "m²",
+    "scheduleViewing": "Boka",
+    "status": {
+      "available": "Tillgänglig",
+      "rented": "Uthyrd",
+      "coming_soon": "Snart",
+      "pending": "Under granskning",
+      "archived": "Arkiverad"
+    },
+    "amenities_map": {
+      "Pool": "Swimmingpool",
+      "Parking": "Parkering",
+      "WiFi": "WiFi",
+      "EVCharger": "Laddstation för elbilar",
+      "Furnished": "Möblerad",
+      "PetFriendly": "Husdjur tillåtna",
+      "Gym": "Gym",
+      "Security": "Säkerhet",
+      "Elevator": "Hiss",
+      "Balcony": "Balkong",
+      "Garden": "Trädgård",
+      "AirCon": "Luftkonditionering"
+    }
   },
   "search": {
     "title": "Bläddra bland bostäder",

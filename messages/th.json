@@ -42,10 +42,47 @@
     "inquiry_message": "ข้อความ (ไม่บังคับ)",
     "inquiry_submit": "ส่งข้อความ",
     "inquiry_success": "ส่งข้อความของคุณเรียบร้อยแล้ว!",
-    "amenities": "สิ่งอำนวยความสะดวก",
+    "amenities": {
+      "Pool": "สระว่ายน้ำ",
+      "Parking": "ที่จอดรถ",
+      "WiFi": "WiFi",
+      "EVCharger": "ชาร์จ EV",
+      "Furnished": "เฟอร์นิเจอร์ครบ",
+      "PetFriendly": "เลี้ยงสัตว์ได้",
+      "Gym": "ฟิตเนส",
+      "Security": "รปภ",
+      "Elevator": "ลิฟต์",
+      "Balcony": "ระเบียง",
+      "Garden": "สวน",
+      "AirCon": "แอร์"
+    },
     "description": "รายละเอียด",
     "location": "ที่ตั้ง",
-    "landlord": "เจ้าของ"
+    "landlord": "เจ้าของ",
+    "perMonth": "/เดือน",
+    "sqm": "ตร.ม.",
+    "scheduleViewing": "นัดชมห้อง",
+    "status": {
+      "available": "ว่าง",
+      "rented": "ปล่อยเช่าแล้ว",
+      "coming_soon": "เร็วๆ นี้",
+      "pending": "รอดำเนินการ",
+      "archived": "ปิดแล้ว"
+    },
+    "amenities_map": {
+      "Pool": "สระว่ายน้ำ",
+      "Parking": "ที่จอดรถ",
+      "WiFi": "WiFi",
+      "EVCharger": "ที่ชาร์จรถไฟฟ้า",
+      "Furnished": "มีเฟอร์นิเจอร์",
+      "PetFriendly": "รับสัตว์เลี้ยง",
+      "Gym": "ห้องออกกำลังกาย",
+      "Security": "รักษาความปลอดภัย",
+      "Elevator": "ลิฟต์",
+      "Balcony": "ระเบียง",
+      "Garden": "สวน",
+      "AirCon": "เครื่องปรับอากาศ"
+    }
   },
   "search": {
     "title": "ค้นหาอสังหาริมทรัพย์",

@@ -42,10 +42,47 @@
     "inquiry_message": "संदेश (वैकल्पिक)",
     "inquiry_submit": "पूछताछ भेजें",
     "inquiry_success": "आपकी पूछताछ भेज दी गई है!",
-    "amenities": "सुविधाएँ",
+    "amenities": {
+      "Pool": "पूल",
+      "Parking": "पार्किंग",
+      "WiFi": "वाईफाई",
+      "EVCharger": "EV चार्जर",
+      "Furnished": "फर्नीचर सहित",
+      "PetFriendly": "पालतू जानवर",
+      "Gym": "जिम",
+      "Security": "सुरक्षा",
+      "Elevator": "लिफ्ट",
+      "Balcony": "बालकनी",
+      "Garden": "बगीचा",
+      "AirCon": "एयर कंडीशनर"
+    },
     "description": "विवरण",
     "location": "स्थान",
-    "landlord": "मकान मालिक"
+    "landlord": "मकान मालिक",
+    "perMonth": "/माह",
+    "sqm": "वर्गमीटर",
+    "scheduleViewing": "दौरा करें",
+    "status": {
+      "available": "उपलब्ध",
+      "rented": "किराए पर",
+      "coming_soon": "जल्द आ रहा है",
+      "pending": "समीक्षाधीन",
+      "archived": "संग्रहीत"
+    },
+    "amenities_map": {
+      "Pool": "तरण ताल",
+      "Parking": "पार्किंग",
+      "WiFi": "वाई-फ़ाई",
+      "EVCharger": "इलेक्ट्रिक वाहन चार्जर",
+      "Furnished": "फर्नीचर सहित",
+      "PetFriendly": "पालतू जानवर की अनुमति",
+      "Gym": "जिम",
+      "Security": "सुरक्षा",
+      "Elevator": "लिफ्ट",
+      "Balcony": "बालकनी",
+      "Garden": "बगीचा",
+      "AirCon": "वातानुकूलन"
+    }
   },
   "search": {
     "title": "संपत्तियाँ खोजें",

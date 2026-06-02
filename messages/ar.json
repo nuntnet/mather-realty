@@ -42,10 +42,47 @@
     "inquiry_message": "رسالة (اختياري)",
     "inquiry_submit": "إرسال الاستفسار",
     "inquiry_success": "تم إرسال استفسارك!",
-    "amenities": "المرافق والخدمات",
+    "amenities": {
+      "Pool": "مسبح",
+      "Parking": "موقف",
+      "WiFi": "واي فاي",
+      "EVCharger": "شحن EV",
+      "Furnished": "مفروش",
+      "PetFriendly": "الحيوانات",
+      "Gym": "صالة رياضية",
+      "Security": "أمن",
+      "Elevator": "مصعد",
+      "Balcony": "شرفة",
+      "Garden": "حديقة",
+      "AirCon": "مكيف"
+    },
     "description": "الوصف",
     "location": "الموقع",
-    "landlord": "المالك"
+    "landlord": "المالك",
+    "perMonth": "/شهر",
+    "sqm": "م²",
+    "scheduleViewing": "حجز زيارة",
+    "status": {
+      "available": "متاح",
+      "rented": "مؤجر",
+      "coming_soon": "قريباً",
+      "pending": "قيد المراجعة",
+      "archived": "مؤرشف"
+    },
+    "amenities_map": {
+      "Pool": "مسبح",
+      "Parking": "موقف سيارات",
+      "WiFi": "واي فاي",
+      "EVCharger": "شاحن السيارات الكهربائية",
+      "Furnished": "مفروش",
+      "PetFriendly": "مسموح بالحيوانات الأليفة",
+      "Gym": "صالة رياضية",
+      "Security": "حراسة أمنية",
+      "Elevator": "مصعد",
+      "Balcony": "شرفة",
+      "Garden": "حديقة",
+      "AirCon": "تكييف هواء"
+    }
   },
   "search": {
     "title": "استعراض العقارات",

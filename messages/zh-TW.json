@@ -42,10 +42,47 @@
     "inquiry_message": "留言（選填）",
     "inquiry_submit": "送出詢問",
     "inquiry_success": "您的詢問已送出！",
-    "amenities": "配套設施",
+    "amenities": {
+      "Pool": "泳池",
+      "Parking": "停車",
+      "WiFi": "WiFi",
+      "EVCharger": "EV充電",
+      "Furnished": "家具齊全",
+      "PetFriendly": "可養寵物",
+      "Gym": "健身房",
+      "Security": "保全",
+      "Elevator": "電梯",
+      "Balcony": "陽台",
+      "Garden": "花園",
+      "AirCon": "冷氣"
+    },
     "description": "房源描述",
     "location": "位置",
-    "landlord": "房東"
+    "landlord": "房東",
+    "perMonth": "/月",
+    "sqm": "平米",
+    "scheduleViewing": "預約看房",
+    "status": {
+      "available": "可租",
+      "rented": "已租",
+      "coming_soon": "即將上市",
+      "pending": "待審核",
+      "archived": "已下架"
+    },
+    "amenities_map": {
+      "Pool": "游泳池",
+      "Parking": "停車位",
+      "WiFi": "WiFi",
+      "EVCharger": "電動車充電樁",
+      "Furnished": "附傢俱",
+      "PetFriendly": "允許寵物",
+      "Gym": "健身房",
+      "Security": "保全",
+      "Elevator": "電梯",
+      "Balcony": "陽台",
+      "Garden": "花園",
+      "AirCon": "冷氣"
+    }
   },
   "search": {
     "title": "瀏覽房產",

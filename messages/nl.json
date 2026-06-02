@@ -42,10 +42,47 @@
     "inquiry_message": "Bericht (optioneel)",
     "inquiry_submit": "Aanvraag versturen",
     "inquiry_success": "Uw aanvraag is verzonden!",
-    "amenities": "Voorzieningen",
+    "amenities": {
+      "Pool": "Zwembad",
+      "Parking": "Parkeren",
+      "WiFi": "WiFi",
+      "EVCharger": "EV-laden",
+      "Furnished": "Gemeubileerd",
+      "PetFriendly": "Huisdieren",
+      "Gym": "Gym",
+      "Security": "Beveiliging",
+      "Elevator": "Lift",
+      "Balcony": "Balkon",
+      "Garden": "Tuin",
+      "AirCon": "Airco"
+    },
     "description": "Beschrijving",
     "location": "Locatie",
-    "landlord": "Verhuurder"
+    "landlord": "Verhuurder",
+    "perMonth": "/mnd",
+    "sqm": "m²",
+    "scheduleViewing": "Bezichtigen",
+    "status": {
+      "available": "Beschikbaar",
+      "rented": "Verhuurd",
+      "coming_soon": "Binnenkort",
+      "pending": "In behandeling",
+      "archived": "Gearchiveerd"
+    },
+    "amenities_map": {
+      "Pool": "Zwembad",
+      "Parking": "Parkeerplaats",
+      "WiFi": "WiFi",
+      "EVCharger": "EV-lader",
+      "Furnished": "Gemeubileerd",
+      "PetFriendly": "Huisdieren toegestaan",
+      "Gym": "Sportschool",
+      "Security": "Beveiliging",
+      "Elevator": "Lift",
+      "Balcony": "Balkon",
+      "Garden": "Tuin",
+      "AirCon": "Airconditioning"
+    }
   },
   "search": {
     "title": "Woningen bekijken",

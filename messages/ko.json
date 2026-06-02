@@ -42,10 +42,47 @@
     "inquiry_message": "메시지 (선택)",
     "inquiry_submit": "문의 보내기",
     "inquiry_success": "문의가 전송되었습니다!",
-    "amenities": "편의시설",
+    "amenities": {
+      "Pool": "수영장",
+      "Parking": "주차장",
+      "WiFi": "WiFi",
+      "EVCharger": "EV충전",
+      "Furnished": "가구포함",
+      "PetFriendly": "반려동물",
+      "Gym": "헬스장",
+      "Security": "보안",
+      "Elevator": "엘리베이터",
+      "Balcony": "발코니",
+      "Garden": "정원",
+      "AirCon": "에어컨"
+    },
     "description": "설명",
     "location": "위치",
-    "landlord": "집주인"
+    "landlord": "집주인",
+    "perMonth": "/월",
+    "sqm": "㎡",
+    "scheduleViewing": "관람 예약",
+    "status": {
+      "available": "가능",
+      "rented": "임대됨",
+      "coming_soon": "곧 출시",
+      "pending": "검토중",
+      "archived": "마감"
+    },
+    "amenities_map": {
+      "Pool": "수영장",
+      "Parking": "주차장",
+      "WiFi": "WiFi",
+      "EVCharger": "전기차 충전기",
+      "Furnished": "가구 포함",
+      "PetFriendly": "반려동물 허용",
+      "Gym": "헬스장",
+      "Security": "보안",
+      "Elevator": "엘리베이터",
+      "Balcony": "발코니",
+      "Garden": "정원",
+      "AirCon": "에어컨"
+    }
   },
   "search": {
     "title": "매물 검색",
