@@ -217,7 +217,9 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     status: (getPropString(page, 'status') || 'pending') as Property['status'],
     availableFrom: getPropDate(page, 'available_from'),
     coverImage: getPropCover(page),
-    gallery: getPropFiles(page, 'gallery'),
+    gallery: getPropFiles(page, 'gallery').length
+      ? getPropFiles(page, 'gallery')
+      : getPropString(page, 'gallery_urls').split(',').filter(Boolean),
     hasVirtualTour: getPropBoolean(page, 'has_virtual_tour'),
     virtualTourUrl: getPropString(page, 'virtual_tour_url') || null,
     verifiedAt: getPropDate(page, 'verified_at'),
