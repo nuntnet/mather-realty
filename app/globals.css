@@ -31,6 +31,10 @@
     --brand-red: 357 70% 55%;
     --brand-red-light: 357 85% 65%;
     --brand-gold: 45 85% 55%;
+
+    /* DoubleN Realty Brand Colors */
+    --brand-blue: #1a3c5e;
+    --brand-gold-dn: #c9a227;
   }
 
   .dark {
@@ -147,5 +151,51 @@
   @keyframes scaleIn {
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
+  }
+}
+
+/* Smooth scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus rings for accessibility */
+@layer base {
+  *:focus-visible {
+    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+  }
+}
+
+/* Hero gradient utility */
+@layer components {
+  .hero-gradient {
+    background:
+      linear-gradient(to bottom right, rgba(30, 58, 138, 0.82), rgba(30, 64, 175, 0.72), rgba(67, 56, 202, 0.62)),
+      url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80') center/cover no-repeat;
+  }
+
+  /* Property card hover lift */
+  .property-card-hover {
+    @apply transition-all duration-200 ease-out;
+    @apply hover:-translate-y-1 hover:shadow-xl;
+  }
+
+  /* Status top bar colors */
+  .status-bar-available {
+    @apply bg-green-500;
+  }
+  .status-bar-rented {
+    @apply bg-gray-400;
+  }
+  .status-bar-coming_soon {
+    @apply bg-orange-400;
+  }
+  .status-bar-pending {
+    @apply bg-yellow-400;
+  }
+
+  /* Glassmorphism search bar */
+  .hero-search-glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl;
   }
 }

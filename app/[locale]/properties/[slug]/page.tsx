@@ -8,8 +8,18 @@ import PropertyGallery from '@/components/PropertyGallery'
 import InquiryForm from '@/components/InquiryForm'
 import AvailabilityCalendar from '@/components/AvailabilityCalendar'
 import NearbyPanel from '@/components/NearbyPanel'
+import PropertyCard from '@/components/PropertyCard'
 import { Badge } from '@/components/ui/badge'
-import { Bed, Bath, Maximize2, CheckCircle2, CalendarDays, MapPin } from 'lucide-react'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
+import { Bed, Bath, Maximize2, CheckCircle2, CalendarDays, MapPin, ArrowLeft } from 'lucide-react'
+import PropertyDetailActions from './PropertyDetailActions'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -77,6 +87,12 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   const title = property.title[locale] ?? property.title.en ?? slug
   const description = property.description[locale] ?? property.description.en ?? ''
 
+  // Similar properties (same city, exclude self)
+  const allCityProps = await getProperties({ city: property.city }, locale).catch(() => [])
+  const similarProperties = allCityProps
+    .filter((p) => p.id !== property.id && p.status === 'available')
+    .slice(0, 3)
+
   const statusColors: Record<string, string> = {
     available: 'bg-green-100 text-green-800',
     rented: 'bg-red-100 text-red-800',
@@ -127,6 +143,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     },
   }
 
+  const propertiesHref = locale === 'en' ? '/properties' : `/${locale}/properties`
+  const homeHref = locale === 'en' ? '/' : `/${locale}`
+
   return (
     <>
       <script
@@ -135,6 +154,40 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
       />
 
       <div className="min-h-screen bg-white">
+        {/* Breadcrumb + back nav bar */}
+        <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
+            <a
+              href={propertiesHref}
+              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors shrink-0"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Back</span>
+            </a>
+
+            <Breadcrumb className="flex-1 min-w-0">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={homeHref}>Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink href={propertiesHref}>Properties</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem className="min-w-0">
+                  <BreadcrumbPage className="truncate max-w-[200px] sm:max-w-xs">
+                    {title}
+                  </BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
+            {/* Share button — client component */}
+            <PropertyDetailActions title={title} />
+          </div>
+        </div>
+
         {/* Gallery */}
         <PropertyGallery
           images={property.gallery}
@@ -238,11 +291,30 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                   />
                 </div>
               )}
+
+              {/* Similar Properties */}
+              {similarProperties.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                    Similar properties in {property.city}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    {similarProperties.map((similar) => (
+                      <PropertyCard
+                        key={similar.id}
+                        property={similar}
+                        locale={locale}
+                        view="grid"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Sidebar — Inquiry form (sticky) */}
             <div className="lg:col-span-1">
-              <div className="sticky top-6">
+              <div className="sticky top-24">
                 <InquiryForm
                   propertyId={property.id}
                   propertyTitle={title}

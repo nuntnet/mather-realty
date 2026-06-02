@@ -49,15 +49,36 @@ export async function generateMetadata({ params, searchParams }: PropertiesPageP
   const sp = await searchParams
   const city = getString(sp.city)
 
-  const titleSuffix = city ? ` in ${city}` : ' in Thailand'
-  const title = `Rental Properties${titleSuffix} | ${SITE_NAME}`
-  const description = `Browse verified rental properties${titleSuffix}. Filter by price, bedrooms, amenities and more.`
+  const title = city
+    ? `Rental Properties in ${city} | ${SITE_NAME}`
+    : `Rental Properties in Thailand | ${SITE_NAME}`
+  const description = city
+    ? `Browse verified rental properties in ${city} for expats. Filter by price, bedrooms, amenities and more.`
+    : `Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Filter by price, bedrooms, and amenities.`
+
+  const canonicalUrl = city
+    ? `${SITE_URL}/${locale}/properties?city=${encodeURIComponent(city)}`
+    : `${SITE_URL}/${locale}/properties`
 
   return {
     title,
     description,
-    alternates: { canonical: `${SITE_URL}/${locale}/properties` },
-    openGraph: { title, description, url: `${SITE_URL}/${locale}/properties`, siteName: SITE_NAME },
+    keywords: city
+      ? [`rental properties ${city}`, `expat housing ${city}`, `${city} rent Thailand`]
+      : ['rental properties Thailand', 'expat housing Thailand', 'Bangkok rent', 'Chiang Mai rent', 'Phuket rent'],
+    alternates: { canonical: canonicalUrl },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: SITE_NAME,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
   }
 }
 
@@ -79,13 +100,20 @@ export default async function PropertiesPage({ params, searchParams }: Propertie
   // Derive unique cities from results for filter dropdown
   const cities = Array.from(new Set(properties.map((p) => p.city).filter(Boolean))).sort()
 
+  const cityLabel = filters.city
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-6 px-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">Browse Properties</h1>
-          <p className="text-gray-500 text-sm">Verified rental properties for expats across Thailand</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            {cityLabel ? `Properties in ${cityLabel}` : 'Browse Properties'}
+          </h1>
+          <p className="text-gray-500 text-sm">
+            {properties.length} verified rental {properties.length === 1 ? 'property' : 'properties'} for expats
+            {cityLabel ? ` in ${cityLabel}` : ' across Thailand'}
+          </p>
         </div>
       </div>
 

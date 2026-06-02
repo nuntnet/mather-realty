@@ -23,6 +23,7 @@ interface PropertyCardProps {
     coverImage: string
     status: string
     amenities: string[]
+    tags?: string[]
     verifiedAt: string | null
     availableFrom: string | null
     listingScore: number
@@ -31,22 +32,26 @@ interface PropertyCardProps {
   view?: 'grid' | 'list'
 }
 
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
+const STATUS_CONFIG: Record<string, { label: string; className: string; barClass: string }> = {
   available: {
     label: 'Available',
     className: 'bg-green-100 text-green-800 border-green-200',
+    barClass: 'bg-green-500',
   },
   rented: {
     label: 'Rented',
     className: 'bg-gray-100 text-gray-700 border-gray-200',
+    barClass: 'bg-gray-400',
   },
   coming_soon: {
     label: 'Coming Soon',
     className: 'bg-orange-100 text-orange-800 border-orange-200',
+    barClass: 'bg-orange-400',
   },
   pending: {
     label: 'Pending',
     className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    barClass: 'bg-yellow-400',
   },
 }
 
@@ -105,13 +110,20 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
 
   const isList = view === 'list'
 
+  const typeBadge = property.tags?.[0] ?? null
+
   return (
     <article
       className={cn(
-        'group relative rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden transition-shadow hover:shadow-md',
+        'group relative rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden',
+        'transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-xl',
+        'w-full',
         isList ? 'flex flex-row' : 'flex flex-col',
       )}
     >
+      {/* Colored status bar at top */}
+      <div className={cn('h-1 w-full shrink-0', statusCfg.barClass)} />
+
       {/* Image container */}
       <Link
         href={`/properties/${property.slug}`}
@@ -123,7 +135,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         tabIndex={-1}
         aria-hidden
       >
-        <div className={cn('relative', isList ? 'h-full' : 'aspect-[16/10]')}>
+        <div className={cn('relative', isList ? 'h-full' : 'aspect-[4/3]')}>
           <Image
             src={property.coverImage}
             alt={title}
@@ -134,6 +146,13 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             height={undefined}
           />
         </div>
+
+        {/* Property type badge — top-left */}
+        {typeBadge && (
+          <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-2.5 py-1 rounded-full">
+            {typeBadge}
+          </span>
+        )}
 
         {/* Verified badge */}
         {property.verifiedAt && (
@@ -175,9 +194,9 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
           </p>
         </div>
 
-        {/* Price */}
+        {/* Price — more prominent */}
         <div className="flex items-baseline gap-1">
-          <span className="text-xl font-bold text-blue-700">
+          <span className="text-2xl font-bold text-blue-700">
             {formatPrice(property.priceTHB, locale)}
           </span>
           <span className="text-sm text-gray-500">{t('perMonth')}</span>
@@ -228,13 +247,13 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
           </p>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center gap-2 pt-1">
+        {/* Actions — schedule viewing full-width gradient + save */}
+        <div className="flex items-center gap-2 pt-1 mt-auto">
           <Button
             asChild
             size="sm"
             variant="gradient"
-            className="flex-1 text-xs h-8"
+            className="flex-1 h-11 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm"
           >
             <Link
               href={`/properties/${property.slug}#inquiry`}
@@ -247,13 +266,13 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             onClick={handleSave}
             aria-label={isSaved ? t('unsave') : t('save')}
             className={cn(
-              'size-8 rounded-md flex items-center justify-center border transition-colors',
+              'size-11 rounded-md flex items-center justify-center border transition-colors',
               isSaved
                 ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
                 : 'bg-white border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-red-400',
             )}
           >
-            <Heart className={cn('size-4', isSaved && 'fill-current')} />
+            <Heart className={cn('size-5', isSaved && 'fill-current')} />
           </button>
         </div>
       </div>
