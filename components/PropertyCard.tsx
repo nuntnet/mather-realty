@@ -136,15 +136,19 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         aria-hidden
       >
         <div className={cn('relative', isList ? 'h-full' : 'aspect-[4/3]')}>
-          <Image
-            src={property.coverImage}
-            alt={title}
-            fill
-            sizes={isList ? '256px' : '(max-width:768px) 100vw, 400px'}
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-            width={undefined}
-            height={undefined}
-          />
+          {property.coverImage ? (
+            <Image
+              src={property.coverImage}
+              alt={title}
+              fill
+              sizes={isList ? '256px' : '(max-width:768px) 100vw, 400px'}
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+              <span className="text-4xl">🏠</span>
+            </div>
+          )}
         </div>
 
         {/* Property type badge — top-left */}
@@ -190,7 +194,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             </h3>
           </Link>
           <p className="text-sm text-gray-500 mt-0.5 truncate">
-            {property.district}, {property.city}
+            {[property.district, property.city].filter(Boolean).join(', ')}
           </p>
         </div>
 

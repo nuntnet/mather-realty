@@ -431,7 +431,6 @@ export async function getProperty(
       filter: {
         and: [
           { property: 'slug', rich_text: { equals: slug } },
-          { property: 'status', select: { equals: 'available' } },
           { property: 'approved_at', date: { is_not_empty: true } },
         ],
       },

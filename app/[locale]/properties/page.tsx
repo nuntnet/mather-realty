@@ -3,7 +3,6 @@ import { setRequestLocale } from 'next-intl/server'
 import { getProperties } from '@/lib/notion'
 import type { PropertyFilters } from '@/lib/notion-types'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
-import PropertyFiltersComponent from '@/components/PropertyFilters'
 import PropertiesBrowser from './PropertiesBrowser'
 
 interface PropertiesPageProps {
@@ -118,16 +117,7 @@ export default async function PropertiesPage({ params, searchParams }: Propertie
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6">
-        {/* Sidebar filters (desktop) — client component with URL push */}
-        <aside className="hidden lg:block w-64 flex-shrink-0">
-          <PropertyFiltersComponent
-            filters={filters}
-            onChange={() => {}}
-            cities={cities}
-          />
-        </aside>
-
-        {/* Main browser (client) */}
+        {/* Main browser (client) — includes sidebar filters with URL sync */}
         <PropertiesBrowser
           properties={properties}
           locale={locale}

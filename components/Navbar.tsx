@@ -141,7 +141,7 @@ export default function Navbar({ locale }: NavbarProps) {
             size="sm"
             className="hidden sm:flex gap-1.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white border-0 shadow-sm"
           >
-            <Link href="/submit-listing">
+            <Link href="/submit">
               <Home className="h-3.5 w-3.5" />
               <span className="hidden lg:inline">{t("submitListing")}</span>
               <span className="lg:hidden">List</span>
@@ -292,7 +292,7 @@ export default function Navbar({ locale }: NavbarProps) {
           {/* CTA + Auth actions */}
           <div className="flex flex-col px-4 py-3 gap-2">
             <Link
-              href="/submit-listing"
+              href="/submit"
               onClick={() => setMobileOpen(false)}
               className="flex items-center gap-3 px-3 rounded-xl text-base font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 transition-colors min-h-[44px]"
             >

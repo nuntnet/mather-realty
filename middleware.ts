@@ -88,7 +88,7 @@ export const config = {
     '/admin/:path*',
     '/api/admin/:path*',
     '/api/auth/:path*',
-    // i18n paths: match all routes except _next internals, static files, and api
-    '/((?!_next|_vercel|.*\\..*).*)',
+    // i18n paths: match all routes except _next internals, static files, and api routes
+    '/((?!_next|_vercel|api|.*\\..*).*)',
   ],
 }

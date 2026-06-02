@@ -175,7 +175,17 @@ export default function PropertiesBrowser({
   const cityLabel = filters.city ?? null
 
   return (
-    <div className="flex-1 min-w-0">
+    <div className="flex-1 min-w-0 flex gap-6">
+      {/* Sidebar filters (desktop) */}
+      <aside className="hidden lg:block w-64 flex-shrink-0">
+        <PropertyFiltersComponent
+          filters={filters}
+          onChange={handleFiltersChange}
+          cities={cities}
+        />
+      </aside>
+
+      <div className="flex-1 min-w-0">
       {/* Search */}
       <div className="mb-4">
         <SearchBar onSearch={handleSearch} className="max-w-2xl" />
@@ -402,6 +412,7 @@ export default function PropertiesBrowser({
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
     </div>
   )
 }
