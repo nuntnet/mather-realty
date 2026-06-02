@@ -1,41 +1,57 @@
 import type { MetadataRoute } from "next";
-import { getBlogSitemapEntries, getCarSitemapEntries } from "@/lib/notion";
+import { getProperties, getBlogPosts } from "@/lib/notion";
 import { SITE_URL } from "@/lib/site";
 
+const LOCALES = [
+  "en", "th", "zh-CN", "zh-TW", "ja", "ko", "ru", "de", "fr", "es", "it", "nl", "sv", "ar", "hi",
+] as const;
+
+const STATIC_PATHS = [
+  { path: "", priority: 1.0, changeFrequency: "daily" as const },
+  { path: "/properties", priority: 0.9, changeFrequency: "daily" as const },
+  { path: "/blog", priority: 0.8, changeFrequency: "daily" as const },
+  { path: "/how-it-works", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/submit", priority: 0.7, changeFrequency: "monthly" as const },
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [blogEntries, carEntries] = await Promise.all([
-    getBlogSitemapEntries().catch(() => []),
-    getCarSitemapEntries().catch(() => []),
+  const [properties, blogPosts] = await Promise.all([
+    getProperties({ status: "available" }).catch(() => []),
+    getBlogPosts("en", 1000).catch(() => []),
   ]);
 
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: SITE_URL, lastModified: new Date(), changeFrequency: "daily", priority: 1 },
-    { url: `${SITE_URL}/cars`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/stories`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-    { url: `${SITE_URL}/branches`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/booking`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/career`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/awards`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/insurance`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/secondhand`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
-  ];
+  const now = new Date();
 
-  const blogPages: MetadataRoute.Sitemap = blogEntries.map(({ slug, lastModified }) => ({
-    url: `${SITE_URL}/blog/${slug}`,
-    lastModified,
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+  // Static pages × all locales
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.flatMap(
+    ({ path, priority, changeFrequency }) =>
+      LOCALES.map((locale) => ({
+        url: `${SITE_URL}/${locale}${path}`,
+        lastModified: now,
+        changeFrequency,
+        priority,
+      })),
+  );
 
-  const carPages: MetadataRoute.Sitemap = carEntries.map(({ slug, lastModified }) => ({
-    url: `${SITE_URL}/cars/${slug}`,
-    lastModified,
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+  // Properties × all locales
+  const propertyEntries: MetadataRoute.Sitemap = properties.flatMap((property) =>
+    LOCALES.map((locale) => ({
+      url: `${SITE_URL}/${locale}/properties/${property.slug}`,
+      lastModified: property.updatedAt ? new Date(property.updatedAt) : now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    })),
+  );
 
-  return [...staticPages, ...blogPages, ...carPages];
+  // Blog posts × all locales
+  const blogEntries: MetadataRoute.Sitemap = blogPosts.flatMap((post) =>
+    LOCALES.map((locale) => ({
+      url: `${SITE_URL}/${locale}/blog/${post.slug}`,
+      lastModified: post.publishedAt ? new Date(post.publishedAt) : now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  );
+
+  return [...staticEntries, ...propertyEntries, ...blogEntries];
 }

@@ -19,3 +19,11 @@ export {
   howToJsonLd, contactPageJsonLd, serviceJsonLd, videoObjectJsonLd,
   type HowToStep,
 } from "./how-to";
+
+// ── DoubleN Realty property-specific exports ──────────────────────────────────
+export {
+  generatePropertyJsonLd,
+  generateBreadcrumbJsonLd,
+  generateWebsiteJsonLd,
+} from "./property";
+export { generateArticleJsonLd } from "./blog-article";

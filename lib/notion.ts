@@ -1,1368 +1,915 @@
-import { cache } from "react";
-import { Client } from "@notionhq/client";
-import { NotionToMarkdown } from "notion-to-md";
-import { markdownToBlocks as martianMarkdownToBlocks } from "@tryfabric/martian";
+/**
+ * lib/notion.ts
+ * Server-side Notion API client for DoubleN Realty
+ * All functions are async and server-side only.
+ */
+
+import { Client } from '@notionhq/client'
 import type {
-  Car,
-  CarInput,
+  PageObjectResponse,
+  QueryDatabaseParameters,
+  RichTextItemResponse,
+} from '@notionhq/client/build/src/api-endpoints'
+import type {
+  Property,
   BlogPost,
-  BlogPostWithContent,
-  BlogMetaInput,
-  CustomerStory,
-  Appointment,
-  ContactSubmission,
-  Promotion,
-  FeedbackFormData,
-  InsurancePartner,
-  ServicePageSection,
-  BrandSocialLink,
-  VideoReview,
-  FAQItem,
-} from "./notion-types";
-import { isGwmLineSlug, matchCarToGwmLine } from "./brandConfig";
+  StaticPage,
+  PropertyFilters,
+} from './notion-types'
 
-// ─── Rate-limit aware fetch (429 + transient 5xx retry w/ backoff) ────────────
+// ---------------------------------------------------------------------------
+// Singleton client
+// ---------------------------------------------------------------------------
 
-const MAX_RETRIES = 4;
+let _notionClient: Client | null = null
 
-/** Backoff: honor Retry-After header if present, else exponential + jitter (capped 8s). */
-function backoffDelayMs(attempt: number, retryAfterHeader: string | null): number {
-  const retryAfter = retryAfterHeader ? Number(retryAfterHeader) : NaN;
-  if (!Number.isNaN(retryAfter) && retryAfter > 0) return Math.min(retryAfter * 1000, 15000);
-  return Math.min(500 * 2 ** attempt, 8000) + Math.floor(Math.random() * 250);
+function getNotionClient(): Client {
+  if (!_notionClient) {
+    _notionClient = new Client({
+      auth: process.env.NOTION_API_KEY,
+    })
+  }
+  return _notionClient
+}
+
+// ---------------------------------------------------------------------------
+// Database IDs
+// ---------------------------------------------------------------------------
+
+const PROPERTIES_DB_ID = process.env.NOTION_PROPERTIES_DB_ID ?? ''
+const BLOG_DB_ID = process.env.NOTION_BLOG_DB_ID ?? ''
+const PAGES_DB_ID = process.env.NOTION_PAGES_DB_ID ?? ''
+
+// ---------------------------------------------------------------------------
+// Supported locales
+// ---------------------------------------------------------------------------
+
+const LOCALES = ['en', 'th', 'zh-CN', 'zh-TW', 'ja', 'ko', 'ru', 'de', 'fr', 'es', 'it', 'nl', 'sv', 'ar', 'hi'] as const
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Convert a Notion rich_text array to a plain string.
+ */
+export function notionRichTextToString(
+  rich_text: RichTextItemResponse[] | undefined | null,
+): string {
+  if (!rich_text || rich_text.length === 0) return ''
+  return rich_text.map((r) => r.plain_text).join('')
 }
 
 /**
- * Drop-in fetch for the Notion client that retries on 429 (rate limit) and,
- * for idempotent GET reads, on transient 5xx. Non-GET writes are NOT retried on
- * 5xx to avoid duplicate page creation. 429s are always safe to retry (rejected
- * before processing).
+ * Read a multi-lang field from a Notion page.
+ * Tries `{field}_{locale}` first, falls back to `{field}_en`.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const notionFetchWithRetry = async (url: any, init?: any): Promise<Response> => {
-  const method = (init?.method ?? "GET").toUpperCase();
-  for (let attempt = 0; ; attempt++) {
-    const res: Response = await fetch(url, init);
-    const isRateLimited = res.status === 429;
-    const isServerError = res.status >= 500;
-    const retryable = isRateLimited || (isServerError && method === "GET");
+export function getMultiLang(
+  page: PageObjectResponse,
+  field: string,
+  locale: string,
+): string {
+  const props = page.properties
 
-    if (!retryable || attempt >= MAX_RETRIES) return res;
-
-    const delay = backoffDelayMs(attempt, res.headers.get("retry-after"));
-    console.warn(
-      `[notion] ${res.status} — retrying in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES})`
-    );
-    await new Promise((r) => setTimeout(r, delay));
+  // Try exact locale
+  const localeKey = `${field}_${locale}`
+  if (props[localeKey]) {
+    const p = props[localeKey] as any
+    if (p.type === 'rich_text') return notionRichTextToString(p.rich_text)
+    if (p.type === 'title') return notionRichTextToString(p.title)
   }
-};
 
-// ─── Client (server-side only) ───────────────────────────────────────────────
-
-const notion = new Client({
-  auth: process.env.NOTION_API_KEY,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetch: notionFetchWithRetry as any,
-});
-
-const n2m = new NotionToMarkdown({ notionClient: notion });
-
-// ─── Database IDs ─────────────────────────────────────────────────────────────
-
-const DB = {
-  cars: process.env.NOTION_CARS_DB_ID!,
-  blog: process.env.NOTION_BLOG_DB_ID!,
-  stories: process.env.NOTION_STORIES_DB_ID!,
-  appointments: process.env.NOTION_APPOINTMENTS_DB_ID!,
-  contacts: process.env.NOTION_CONTACTS_DB_ID!,
-  promotions: process.env.NOTION_PROMOTIONS_DB_ID!,
-  searchAnalytics: process.env.NOTION_SEARCH_ANALYTICS_DB_ID!,
-  feedback: process.env.NOTION_FEEDBACK_DB_ID!,
-  insurancePartners: process.env.NOTION_INSURANCE_PARTNERS_DB_ID!,
-  socialLinks: process.env.NOTION_SOCIAL_LINKS_DB_ID!,
-  videoReviews: process.env.NOTION_VIDEO_REVIEWS_DB_ID!,
-  faq: process.env.NOTION_FAQ_DB_ID!,
-  serviceContent: process.env.NOTION_SERVICE_CONTENT_DB_ID!,
-};
-
-// ─── Property Helpers ─────────────────────────────────────────────────────────
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type NotionPage = any;
-
-function propTitle(page: NotionPage, name: string): string {
-  return page.properties[name]?.title?.[0]?.plain_text ?? "";
-}
-
-function propText(page: NotionPage, name: string): string {
-  return page.properties[name]?.rich_text?.[0]?.plain_text ?? "";
-}
-
-function propNumber(page: NotionPage, name: string): number {
-  return page.properties[name]?.number ?? 0;
-}
-
-function propSelect(page: NotionPage, name: string): string {
-  return page.properties[name]?.select?.name ?? "";
-}
-
-function propMultiSelect(page: NotionPage, name: string): string[] {
-  return page.properties[name]?.multi_select?.map((o: { name: string }) => o.name) ?? [];
-}
-
-function propCheckbox(page: NotionPage, name: string): boolean {
-  return page.properties[name]?.checkbox ?? false;
-}
-
-function propDate(page: NotionPage, name: string): string | null {
-  return page.properties[name]?.date?.start ?? null;
-}
-
-function propUrl(page: NotionPage, name: string): string | null {
-  return page.properties[name]?.url ?? null;
-}
-
-function propCreatedTime(page: NotionPage): string {
-  return page.created_time ?? "";
-}
-
-function propPhone(page: NotionPage, name: string): string {
-  return page.properties[name]?.phone_number ?? "";
-}
-
-function propEmail(page: NotionPage, name: string): string {
-  return page.properties[name]?.email ?? "";
-}
-
-/** Parse newline-separated Cloudinary URLs from a text property */
-function propImageUrls(page: NotionPage, name: string): string[] {
-  const raw = propText(page, name);
-  if (!raw) return [];
-  return raw
-    .split("\n")
-    .map((u: string) => u.trim())
-    .filter(Boolean);
-}
-
-/** Parse JSON string from a text property, return empty object on failure */
-function propJson(page: NotionPage, name: string): Record<string, string> {
-  try {
-    return JSON.parse(propText(page, name));
-  } catch {
-    return {};
+  // Fallback to English
+  const enKey = `${field}_en`
+  if (props[enKey]) {
+    const p = props[enKey] as any
+    if (p.type === 'rich_text') return notionRichTextToString(p.rich_text)
+    if (p.type === 'title') return notionRichTextToString(p.title)
   }
+
+  return ''
 }
 
-// ─── Cars ─────────────────────────────────────────────────────────────────────
+/**
+ * Build a Record<locale, string> for a given field across all supported locales.
+ */
+function buildMultiLangRecord(
+  page: PageObjectResponse,
+  field: string,
+): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const locale of LOCALES) {
+    const value = getMultiLang(page, field, locale)
+    if (value) result[locale] = value
+  }
+  // Always ensure 'en' exists (even if empty)
+  if (!result['en']) result['en'] = ''
+  return result
+}
 
-function pageToCar(page: NotionPage): Car {
+function getPropString(page: PageObjectResponse, key: string): string {
+  const p = (page.properties as any)[key]
+  if (!p) return ''
+  if (p.type === 'rich_text') return notionRichTextToString(p.rich_text)
+  if (p.type === 'title') return notionRichTextToString(p.title)
+  if (p.type === 'select') return p.select?.name ?? ''
+  if (p.type === 'url') return p.url ?? ''
+  if (p.type === 'email') return p.email ?? ''
+  if (p.type === 'phone_number') return p.phone_number ?? ''
+  return ''
+}
+
+function getPropNumber(page: PageObjectResponse, key: string): number {
+  const p = (page.properties as any)[key]
+  if (!p || p.type !== 'number') return 0
+  return p.number ?? 0
+}
+
+function getPropBoolean(page: PageObjectResponse, key: string): boolean {
+  const p = (page.properties as any)[key]
+  if (!p || p.type !== 'checkbox') return false
+  return p.checkbox ?? false
+}
+
+function getPropDate(page: PageObjectResponse, key: string): string | null {
+  const p = (page.properties as any)[key]
+  if (!p || p.type !== 'date') return null
+  return p.date?.start ?? null
+}
+
+function getPropMultiSelect(page: PageObjectResponse, key: string): string[] {
+  const p = (page.properties as any)[key]
+  if (!p || p.type !== 'multi_select') return []
+  return (p.multi_select as Array<{ name: string }>).map((s) => s.name)
+}
+
+function getPropFiles(page: PageObjectResponse, key: string): string[] {
+  const p = (page.properties as any)[key]
+  if (!p || p.type !== 'files') return []
+  return (p.files as any[]).map((f: any) => {
+    if (f.type === 'external') return f.external?.url ?? ''
+    if (f.type === 'file') return f.file?.url ?? ''
+    return ''
+  }).filter(Boolean)
+}
+
+function getPropCover(page: PageObjectResponse): string {
+  // Try cover image from page cover first
+  if (page.cover) {
+    if (page.cover.type === 'external') return page.cover.external.url
+    if (page.cover.type === 'file') return (page.cover as any).file.url
+  }
+  // Fallback to a "cover_image" files property
+  const files = getPropFiles(page, 'cover_image')
+  return files[0] ?? ''
+}
+
+// ---------------------------------------------------------------------------
+// Listing score calculation
+// ---------------------------------------------------------------------------
+
+function calculateListingScore(page: PageObjectResponse): number {
+  const scoredFields: Array<() => boolean> = [
+    () => !!getPropString(page, 'slug'),
+    () => !!getMultiLang(page, 'title', 'en'),
+    () => !!getMultiLang(page, 'description', 'en'),
+    () => !!getPropString(page, 'address'),
+    () => !!getPropString(page, 'city'),
+    () => !!getPropString(page, 'district'),
+    () => getPropNumber(page, 'lat') !== 0,
+    () => getPropNumber(page, 'lng') !== 0,
+    () => getPropNumber(page, 'price_thb') > 0,
+    () => getPropNumber(page, 'bedrooms') > 0,
+    () => getPropNumber(page, 'bathrooms') > 0,
+    () => getPropNumber(page, 'size_sqm') > 0,
+    () => getPropMultiSelect(page, 'amenities').length > 0,
+    () => !!getPropCover(page),
+    () => getPropFiles(page, 'gallery').length > 0,
+    () => !!getPropDate(page, 'available_from'),
+    () => getPropBoolean(page, 'has_virtual_tour') ? !!getPropString(page, 'virtual_tour_url') : true,
+    () => getPropMultiSelect(page, 'tags').length > 0,
+  ]
+
+  const filled = scoredFields.filter((fn) => fn()).length
+  return Math.round((filled / scoredFields.length) * 100)
+}
+
+// ---------------------------------------------------------------------------
+// Mappers
+// ---------------------------------------------------------------------------
+
+function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
   return {
     id: page.id,
-    name: propTitle(page, "Name"),
-    brand: propSelect(page, "Brand") as Car["brand"],
-    model: propText(page, "Model"),
-    year: propNumber(page, "Year"),
-    // Lowercase enums — Notion may store "SUV"/"Pickup"/"EV"/"Sedan" mixed-case
-    type: (propSelect(page, "Type") || "other").toLowerCase() as Car["type"],
-    condition: (propSelect(page, "Condition") || "new").toLowerCase() as Car["condition"],
-    priceMin: propNumber(page, "Price Min"),
-    priceMax: propNumber(page, "Price Max"),
-    engineSize: propText(page, "Engine Size"),
-    transmission: (propSelect(page, "Transmission") || "auto").toLowerCase() as Car["transmission"],
-    fuelType: (propSelect(page, "Fuel Type") || "petrol").toLowerCase() as Car["fuelType"],
-    description: propText(page, "Description"),
-    specs: propJson(page, "Specs"),
-    imageUrls: propImageUrls(page, "Image URLs"),
-    videoUrl: propUrl(page, "Video URL"),
-    isActive: propCheckbox(page, "Is Active"),
-    isBestSeller: propCheckbox(page, "Is Best Seller"),
-    sortOrder: propNumber(page, "Sort Order"),
-    navFeatured: propCheckbox(page, "Nav Featured"),
-    navNew: propCheckbox(page, "Nav New"),
-    slug: propText(page, "Slug"),
-  };
-}
-
-export async function getActiveCars(filters?: {
-  brand?: string;
-  condition?: "new" | "used";
-  type?: string;
-}): Promise<Car[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filterConditions: any[] = [
-    { property: "Is Active", checkbox: { equals: true } },
-  ];
-
-  if (filters?.brand) {
-    filterConditions.push({
-      property: "Brand",
-      select: { equals: filters.brand },
-    });
+    slug: getPropString(page, 'slug'),
+    title: buildMultiLangRecord(page, 'title'),
+    description: buildMultiLangRecord(page, 'description'),
+    address: getPropString(page, 'address'),
+    city: getPropString(page, 'city'),
+    district: getPropString(page, 'district'),
+    lat: getPropNumber(page, 'lat'),
+    lng: getPropNumber(page, 'lng'),
+    priceTHB: getPropNumber(page, 'price_thb'),
+    bedrooms: getPropNumber(page, 'bedrooms'),
+    bathrooms: getPropNumber(page, 'bathrooms'),
+    sizeSqm: getPropNumber(page, 'size_sqm'),
+    amenities: getPropMultiSelect(page, 'amenities'),
+    status: (getPropString(page, 'status') || 'pending') as Property['status'],
+    availableFrom: getPropDate(page, 'available_from'),
+    coverImage: getPropCover(page),
+    gallery: getPropFiles(page, 'gallery'),
+    hasVirtualTour: getPropBoolean(page, 'has_virtual_tour'),
+    virtualTourUrl: getPropString(page, 'virtual_tour_url') || null,
+    verifiedAt: getPropDate(page, 'verified_at'),
+    approvedAt: getPropDate(page, 'approved_at'),
+    listingScore: calculateListingScore(page),
+    ownerId: getPropString(page, 'owner_id') || null,
+    tags: getPropMultiSelect(page, 'tags'),
+    createdAt: page.created_time,
+    updatedAt: page.last_edited_time,
   }
-  if (filters?.condition) {
-    filterConditions.push({
-      property: "Condition",
-      select: { equals: filters.condition },
-    });
-  }
-  if (filters?.type) {
-    filterConditions.push({
-      property: "Type",
-      select: { equals: filters.type },
-    });
-  }
-
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: { and: filterConditions },
-    sorts: [
-      { property: "Sort Order", direction: "ascending" },
-      { property: "Year", direction: "descending" },
-    ],
-  });
-
-  return response.results.map(pageToCar);
 }
 
-export async function getCarsByBrandLine(
-  brand: Car["brand"],
-  line?: string
-): Promise<Car[]> {
-  const cars = await getActiveCars({ brand });
-  if (!line || brand !== "GWM") return cars;
-  if (!isGwmLineSlug(line)) return cars;
-  return cars.filter((car) => matchCarToGwmLine(car, line));
-}
-
-export async function getFeaturedCars(): Promise<Car[]> {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: {
-      and: [
-        { property: "Is Active", checkbox: { equals: true } },
-        { property: "Is Best Seller", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [
-      { property: "Sort Order", direction: "ascending" },
-      { property: "Year", direction: "descending" },
-    ],
-    page_size: 60, // fetch all best sellers across all brands for client-side filtering
-  });
-  return response.results.map(pageToCar);
-}
-
-export const getCarById = cache(async (id: string): Promise<Car | null> => {
-  try {
-    const page = await notion.pages.retrieve({ page_id: id });
-    return pageToCar(page);
-  } catch {
-    return null;
-  }
-});
-
-/** True if `value` looks like a Notion page UUID (32 hex chars, with or without dashes). */
-function looksLikeNotionId(value: string): boolean {
-  return /^[0-9a-f]{32}$/i.test(value.replace(/-/g, ""));
-}
-
-/**
- * Fetch a car by its human-readable Slug. Falls back to `getCarById` when no
- * slug match is found AND the passed string looks like a Notion UUID — keeps
- * old `/cars/<uuid>` links working and covers cars with an empty Slug.
- */
-export const getCarBySlug = cache(async (slug: string): Promise<Car | null> => {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: { property: "Slug", rich_text: { equals: slug } },
-    page_size: 1,
-  });
-  if (response.results.length) return pageToCar(response.results[0]);
-  if (looksLikeNotionId(slug)) return getCarById(slug);
-  return null;
-});
-
-export async function getAllCarIds(): Promise<string[]> {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: { property: "Is Active", checkbox: { equals: true } },
-  });
-  return response.results.map((p) => p.id);
-}
-
-/** Slugs of all active cars (empty slugs filtered out). */
-export async function getAllCarSlugs(): Promise<string[]> {
-  const entries = await getCarSitemapEntries();
-  return entries.map((e) => e.slug);
-}
-
-export interface SitemapEntry {
-  slug: string;
-  lastModified: Date;
-}
-
-/** Active cars with slug + last edited time for sitemap. */
-export async function getCarSitemapEntries(): Promise<SitemapEntry[]> {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: { property: "Is Active", checkbox: { equals: true } },
-  });
-  return response.results
-    .map((page) => {
-      const car = pageToCar(page);
-      const p = page as NotionPage;
-      const edited = p.last_edited_time ?? p.created_time;
-      return {
-        slug: car.slug,
-        lastModified: edited ? new Date(edited) : new Date(),
-      };
-    })
-    .filter((e) => Boolean(e.slug));
-}
-
-/**
- * Bounded set of slugs to prerender at build time: the most recent active cars
- * by Year (descending). Keeps build time flat as the catalog grows; the rest
- * render on-demand thanks to `dynamicParams = true`.
- */
-export async function getCarSlugsForPrerender(limit = 40): Promise<string[]> {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    filter: { property: "Is Active", checkbox: { equals: true } },
-    sorts: [{ property: "Year", direction: "descending" }],
-    page_size: limit,
-  });
-  return response.results.map(pageToCar).map((c) => c.slug).filter(Boolean);
-}
-
-// ─── Cars (admin write) ─────────────────────────────────────────────────────
-
-/** Admin list: every car including inactive/archived. */
-export async function getAllCarsAdmin(): Promise<Car[]> {
-  const response = await notion.databases.query({
-    database_id: DB.cars,
-    sorts: [{ property: "Year", direction: "descending" }],
-    page_size: 100,
-  });
-  return response.results.map(pageToCar);
-}
-
-/** Map a (partial) Car into Notion property payload. Only included keys are written. */
-function carToProperties(data: Partial<CarInput>): Record<string, unknown> {
-  const p: Record<string, unknown> = {};
-  if (data.name !== undefined) p["Name"] = { title: [{ text: { content: data.name } }] };
-  if (data.brand !== undefined) p["Brand"] = { select: { name: data.brand } };
-  if (data.model !== undefined) p["Model"] = { rich_text: [{ text: { content: data.model } }] };
-  if (data.year !== undefined) p["Year"] = { number: data.year };
-  if (data.type !== undefined) p["Type"] = { select: { name: data.type } };
-  if (data.condition !== undefined) p["Condition"] = { select: { name: data.condition } };
-  if (data.priceMin !== undefined) p["Price Min"] = { number: data.priceMin };
-  if (data.priceMax !== undefined) p["Price Max"] = { number: data.priceMax };
-  if (data.engineSize !== undefined) p["Engine Size"] = { rich_text: [{ text: { content: data.engineSize } }] };
-  if (data.transmission !== undefined) p["Transmission"] = { select: { name: data.transmission } };
-  if (data.fuelType !== undefined) p["Fuel Type"] = { select: { name: data.fuelType } };
-  if (data.description !== undefined) p["Description"] = { rich_text: [{ text: { content: data.description } }] };
-  if (data.specs !== undefined) p["Specs"] = { rich_text: [{ text: { content: JSON.stringify(data.specs) } }] };
-  if (data.imageUrls !== undefined) p["Image URLs"] = { rich_text: [{ text: { content: data.imageUrls.join("\n") } }] };
-  if (data.videoUrl !== undefined) p["Video URL"] = { url: data.videoUrl || null };
-  if (data.isActive !== undefined) p["Is Active"] = { checkbox: data.isActive };
-  if (data.isBestSeller !== undefined) p["Is Best Seller"] = { checkbox: data.isBestSeller };
-  if (data.navFeatured !== undefined) p["Nav Featured"] = { checkbox: data.navFeatured };
-  if (data.navNew !== undefined) p["Nav New"] = { checkbox: data.navNew };
-  if (data.slug !== undefined) p["Slug"] = { rich_text: [{ text: { content: data.slug } }] };
-  return p;
-}
-
-export async function createCar(data: CarInput): Promise<Car> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.cars },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    properties: carToProperties(data) as any,
-  });
-  return pageToCar(page);
-}
-
-export async function updateCar(id: string, data: Partial<CarInput>): Promise<Car> {
-  const page = await notion.pages.update({
-    page_id: id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    properties: carToProperties(data) as any,
-  });
-  return pageToCar(page);
-}
-
-/** Toggle featured / active flags. */
-export async function setCarFlags(
-  id: string,
-  flags: {
-    isActive?: boolean;
-    isBestSeller?: boolean;
-    navFeatured?: boolean;
-    navNew?: boolean;
-  }
-): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (flags.isActive !== undefined) props["Is Active"] = { checkbox: flags.isActive };
-  if (flags.isBestSeller !== undefined) props["Is Best Seller"] = { checkbox: flags.isBestSeller };
-  if (flags.navFeatured !== undefined) props["Nav Featured"] = { checkbox: flags.navFeatured };
-  if (flags.navNew !== undefined) props["Nav New"] = { checkbox: flags.navNew };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-/** Update sort order of a single car. */
-export async function setCarSortOrder(id: string, sortOrder: number): Promise<void> {
-  await notion.pages.update({
-    page_id: id,
-    properties: { "Sort Order": { number: sortOrder } },
-  });
-}
-
-/** Bulk update sort orders (used after drag-and-drop reorder). */
-export async function bulkSetCarSortOrder(items: { id: string; sortOrder: number }[]): Promise<void> {
-  await Promise.all(items.map(({ id, sortOrder }) => setCarSortOrder(id, sortOrder)));
-}
-
-/** Soft delete: set Is Active = false. */
-export async function archiveCar(id: string): Promise<void> {
-  await notion.pages.update({
-    page_id: id,
-    properties: { "Is Active": { checkbox: false } },
-  });
-}
-
-// ─── Blog Posts ───────────────────────────────────────────────────────────────
-
-function pageToBlogPost(page: NotionPage): BlogPost {
+function mapBlogPost(page: PageObjectResponse): BlogPost {
   return {
     id: page.id,
-    title: propTitle(page, "Title"),
-    slug: propText(page, "Slug"),
-    excerpt: propText(page, "Excerpt"),
-    coverImageUrl: propText(page, "Cover Image URL") || null,
-    category: propSelect(page, "Category") as BlogPost["category"],
-    tags: propMultiSelect(page, "Tags"),
-    seoTitle: propText(page, "SEO Title"),
-    seoDescription: propText(page, "SEO Description"),
-    isPublished: propCheckbox(page, "Is Published"),
-    publishedAt: propDate(page, "Published At"),
-    authorName: propText(page, "Author Name"),
-  };
-}
-
-export async function getPublishedBlogPosts(limit?: number): Promise<BlogPost[]> {
-  const response = await notion.databases.query({
-    database_id: DB.blog,
-    filter: { property: "Is Published", checkbox: { equals: true } },
-    sorts: [{ property: "Published At", direction: "descending" }],
-    page_size: limit ?? 100,
-  });
-  return response.results.map(pageToBlogPost);
-}
-
-export async function getBlogPostBySlug(slug: string): Promise<BlogPost | null> {
-  const response = await notion.databases.query({
-    database_id: DB.blog,
-    filter: {
-      and: [
-        { property: "Slug", rich_text: { equals: slug } },
-        { property: "Is Published", checkbox: { equals: true } },
-      ],
-    },
-    page_size: 1,
-  });
-  if (!response.results.length) return null;
-  return pageToBlogPost(response.results[0]);
-}
-
-export const getBlogPostWithContent = cache(
-  async (slug: string): Promise<BlogPostWithContent | null> => {
-    const post = await getBlogPostBySlug(slug);
-    if (!post) return null;
-
-    const mdBlocks = await n2m.pageToMarkdown(post.id);
-    const contentMarkdown = n2m.toMarkdownString(mdBlocks).parent;
-
-    return { ...post, contentMarkdown };
+    slug: getPropString(page, 'slug'),
+    title: buildMultiLangRecord(page, 'title'),
+    excerpt: buildMultiLangRecord(page, 'excerpt'),
+    content: '', // populated separately via page block content if needed
+    category: (getPropString(page, 'category') || 'lifestyle') as BlogPost['category'],
+    coverImage: getPropCover(page),
+    published: getPropBoolean(page, 'published'),
+    publishedAt: getPropDate(page, 'published_at'),
+    tags: getPropMultiSelect(page, 'tags'),
+    locale: getPropString(page, 'locale') || 'en',
   }
-);
-
-export async function getAllBlogSlugs(): Promise<string[]> {
-  const entries = await getBlogSitemapEntries();
-  return entries.map((e) => e.slug);
 }
 
-/** Published blog posts with slug + last modified for sitemap. */
-export async function getBlogSitemapEntries(): Promise<SitemapEntry[]> {
-  const response = await notion.databases.query({
-    database_id: DB.blog,
-    filter: { property: "Is Published", checkbox: { equals: true } },
-  });
-  return response.results
-    .map((page) => {
-      const post = pageToBlogPost(page);
-      const p = page as NotionPage;
-      const published = post.publishedAt ? new Date(post.publishedAt) : null;
-      const edited = p.last_edited_time ? new Date(p.last_edited_time) : null;
-      return {
-        slug: post.slug,
-        lastModified: published ?? edited ?? new Date(),
-      };
+function mapStaticPage(page: PageObjectResponse, locale = 'en'): StaticPage {
+  return {
+    id: page.id,
+    pageKey: getPropString(page, 'page_key'),
+    title: buildMultiLangRecord(page, 'title'),
+    content: buildMultiLangRecord(page, 'content'),
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Filter builder for properties
+// ---------------------------------------------------------------------------
+
+function buildPropertyFilters(
+  filters?: PropertyFilters,
+  publicOnly = true,
+): QueryDatabaseParameters['filter'] {
+  const conditions: any[] = []
+
+  if (publicOnly) {
+    conditions.push({
+      property: 'status',
+      select: { equals: 'available' },
     })
-    .filter((e) => Boolean(e.slug));
-}
-
-// ─── Blog (admin write) ─────────────────────────────────────────────────────
-
-/** Convert markdown text into Notion block objects via martian. */
-export function markdownToBlocks(markdown: string) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return martianMarkdownToBlocks(markdown ?? "") as any[];
-}
-
-/** Admin list: every blog post including drafts. */
-export async function getAllBlogPostsAdmin(): Promise<BlogPost[]> {
-  const response = await notion.databases.query({
-    database_id: DB.blog,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    page_size: 100,
-  });
-  return response.results.map(pageToBlogPost);
-}
-
-/** Load a post's meta + content (as markdown) for the editor. */
-export async function getBlogPostForEdit(
-  id: string
-): Promise<BlogPostWithContent | null> {
-  try {
-    const page = await notion.pages.retrieve({ page_id: id });
-    const meta = pageToBlogPost(page);
-    const mdBlocks = await n2m.pageToMarkdown(id);
-    const contentMarkdown = n2m.toMarkdownString(mdBlocks).parent ?? "";
-    return { ...meta, contentMarkdown };
-  } catch (err) {
-    console.error("getBlogPostForEdit error:", err);
-    return null;
+    conditions.push({
+      property: 'approved_at',
+      date: { is_not_empty: true },
+    })
+  } else if (filters?.status) {
+    conditions.push({
+      property: 'status',
+      select: { equals: filters.status },
+    })
   }
-}
 
-function blogMetaToProperties(meta: Partial<BlogMetaInput>): Record<string, unknown> {
-  const p: Record<string, unknown> = {};
-  if (meta.title !== undefined) p["Title"] = { title: [{ text: { content: meta.title } }] };
-  if (meta.slug !== undefined) p["Slug"] = { rich_text: [{ text: { content: meta.slug } }] };
-  if (meta.excerpt !== undefined) p["Excerpt"] = { rich_text: [{ text: { content: meta.excerpt } }] };
-  if (meta.coverImageUrl !== undefined)
-    p["Cover Image URL"] = { rich_text: meta.coverImageUrl ? [{ text: { content: meta.coverImageUrl } }] : [] };
-  if (meta.category !== undefined) p["Category"] = { select: { name: meta.category } };
-  if (meta.tags !== undefined) p["Tags"] = { multi_select: meta.tags.map((name) => ({ name })) };
-  if (meta.seoTitle !== undefined) p["SEO Title"] = { rich_text: [{ text: { content: meta.seoTitle } }] };
-  if (meta.seoDescription !== undefined) p["SEO Description"] = { rich_text: [{ text: { content: meta.seoDescription } }] };
-  if (meta.authorName !== undefined) p["Author Name"] = { rich_text: [{ text: { content: meta.authorName } }] };
-  if (meta.isPublished !== undefined) p["Is Published"] = { checkbox: meta.isPublished };
-  if (meta.publishedAt !== undefined)
-    p["Published At"] = { date: meta.publishedAt ? { start: meta.publishedAt } : null };
-  return p;
-}
-
-/** Append markdown content as blocks (chunked to Notion's 100-block limit). */
-async function appendMarkdownBlocks(pageId: string, markdown: string) {
-  const blocks = markdownToBlocks(markdown);
-  for (let i = 0; i < blocks.length; i += 100) {
-    await notion.blocks.children.append({
-      block_id: pageId,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      children: blocks.slice(i, i + 100) as any,
-    });
+  if (filters?.city) {
+    conditions.push({
+      property: 'city',
+      rich_text: { equals: filters.city },
+    })
   }
-}
 
-/** Remove all existing child blocks of a page. */
-async function clearPageBlocks(pageId: string) {
-  const children = await notion.blocks.children.list({ block_id: pageId, page_size: 100 });
-  for (const block of children.results) {
-    await notion.blocks.delete({ block_id: block.id });
+  if (filters?.district) {
+    conditions.push({
+      property: 'district',
+      rich_text: { equals: filters.district },
+    })
   }
-}
 
-export async function createBlogPost(
-  meta: BlogMetaInput,
-  markdown: string
-): Promise<BlogPost> {
-  const blocks = markdownToBlocks(markdown);
-  const page = await notion.pages.create({
-    parent: { database_id: DB.blog },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    properties: blogMetaToProperties(meta) as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    children: blocks.slice(0, 100) as any,
-  });
-  // Append any overflow beyond the first 100 blocks
-  if (blocks.length > 100) {
-    for (let i = 100; i < blocks.length; i += 100) {
-      await notion.blocks.children.append({
-        block_id: page.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        children: blocks.slice(i, i + 100) as any,
-      });
+  if (filters?.minPrice != null) {
+    conditions.push({
+      property: 'price_thb',
+      number: { greater_than_or_equal_to: filters.minPrice },
+    })
+  }
+
+  if (filters?.maxPrice != null) {
+    conditions.push({
+      property: 'price_thb',
+      number: { less_than_or_equal_to: filters.maxPrice },
+    })
+  }
+
+  if (filters?.bedrooms != null) {
+    conditions.push({
+      property: 'bedrooms',
+      number: { equals: filters.bedrooms },
+    })
+  }
+
+  if (filters?.bathrooms != null) {
+    conditions.push({
+      property: 'bathrooms',
+      number: { equals: filters.bathrooms },
+    })
+  }
+
+  if (filters?.minSize != null) {
+    conditions.push({
+      property: 'size_sqm',
+      number: { greater_than_or_equal_to: filters.minSize },
+    })
+  }
+
+  if (filters?.maxSize != null) {
+    conditions.push({
+      property: 'size_sqm',
+      number: { less_than_or_equal_to: filters.maxSize },
+    })
+  }
+
+  if (filters?.amenities && filters.amenities.length > 0) {
+    for (const amenity of filters.amenities) {
+      conditions.push({
+        property: 'amenities',
+        multi_select: { contains: amenity },
+      })
     }
   }
-  return pageToBlogPost(page);
+
+  if (filters?.availableNow) {
+    conditions.push({
+      property: 'status',
+      select: { equals: 'available' },
+    })
+  }
+
+  if (filters?.availableFrom) {
+    conditions.push({
+      property: 'available_from',
+      date: { on_or_before: filters.availableFrom },
+    })
+  }
+
+  if (conditions.length === 0) return undefined
+  if (conditions.length === 1) return conditions[0]
+  return { and: conditions }
 }
 
+// ---------------------------------------------------------------------------
+// Pagination helper — fetches all pages from a database query
+// ---------------------------------------------------------------------------
+
+async function queryAllPages(
+  databaseId: string,
+  params: Omit<QueryDatabaseParameters, 'database_id'>,
+  maxPages = 10,
+): Promise<PageObjectResponse[]> {
+  const notion = getNotionClient()
+  const results: PageObjectResponse[] = []
+  let cursor: string | undefined
+
+  for (let i = 0; i < maxPages; i++) {
+    const response = await notion.databases.query({
+      database_id: databaseId,
+      ...params,
+      start_cursor: cursor,
+    })
+
+    for (const page of response.results) {
+      if (page.object === 'page') {
+        results.push(page as PageObjectResponse)
+      }
+    }
+
+    if (!response.has_more || !response.next_cursor) break
+    cursor = response.next_cursor
+  }
+
+  return results
+}
+
+// ---------------------------------------------------------------------------
+// Properties
+// ---------------------------------------------------------------------------
+
+export async function getProperties(
+  filters?: PropertyFilters,
+  locale = 'en',
+): Promise<Property[]> {
+  try {
+    const pages = await queryAllPages(PROPERTIES_DB_ID, {
+      filter: buildPropertyFilters(filters, true),
+      sorts: [{ property: 'approved_at', direction: 'descending' }],
+    })
+    return pages.map((p) => mapProperty(p, locale))
+  } catch (err) {
+    console.error('[notion] getProperties error:', err)
+    return []
+  }
+}
+
+export async function getProperty(
+  slug: string,
+  locale = 'en',
+): Promise<Property | null> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: PROPERTIES_DB_ID,
+      filter: {
+        and: [
+          { property: 'slug', rich_text: { equals: slug } },
+          { property: 'status', select: { equals: 'available' } },
+          { property: 'approved_at', date: { is_not_empty: true } },
+        ],
+      },
+      page_size: 1,
+    })
+
+    const page = response.results[0]
+    if (!page || page.object !== 'page') return null
+    return mapProperty(page as PageObjectResponse, locale)
+  } catch (err) {
+    console.error('[notion] getProperty error:', err)
+    return null
+  }
+}
+
+export async function getFeaturedProperties(
+  locale = 'en',
+  limit = 6,
+): Promise<Property[]> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: PROPERTIES_DB_ID,
+      filter: {
+        and: [
+          { property: 'status', select: { equals: 'available' } },
+          { property: 'approved_at', date: { is_not_empty: true } },
+          { property: 'tags', multi_select: { contains: 'featured' } },
+        ],
+      },
+      sorts: [{ property: 'approved_at', direction: 'descending' }],
+      page_size: limit,
+    })
+
+    return response.results
+      .filter((p) => p.object === 'page')
+      .map((p) => mapProperty(p as PageObjectResponse, locale))
+  } catch (err) {
+    console.error('[notion] getFeaturedProperties error:', err)
+    return []
+  }
+}
+
+export async function getPropertiesByCity(
+  city: string,
+  locale = 'en',
+): Promise<Property[]> {
+  try {
+    const pages = await queryAllPages(PROPERTIES_DB_ID, {
+      filter: {
+        and: [
+          { property: 'status', select: { equals: 'available' } },
+          { property: 'approved_at', date: { is_not_empty: true } },
+          { property: 'city', rich_text: { equals: city } },
+        ],
+      },
+      sorts: [{ property: 'approved_at', direction: 'descending' }],
+    })
+    return pages.map((p) => mapProperty(p, locale))
+  } catch (err) {
+    console.error('[notion] getPropertiesByCity error:', err)
+    return []
+  }
+}
+
+export async function searchProperties(
+  query: string,
+  filters?: PropertyFilters,
+  locale = 'en',
+): Promise<Property[]> {
+  try {
+    // Notion full-text search doesn't support property-level search well;
+    // we query with filters then client-filter by query string across title/city/address.
+    const pages = await queryAllPages(PROPERTIES_DB_ID, {
+      filter: buildPropertyFilters(filters, true),
+      sorts: [{ property: 'approved_at', direction: 'descending' }],
+    })
+
+    const q = query.toLowerCase()
+    const properties = pages.map((p) => mapProperty(p, locale))
+
+    if (!q) return properties
+
+    return properties.filter((prop) => {
+      const titleMatch = Object.values(prop.title).some((t) =>
+        t.toLowerCase().includes(q),
+      )
+      const cityMatch = prop.city.toLowerCase().includes(q)
+      const districtMatch = prop.district.toLowerCase().includes(q)
+      const addressMatch = prop.address.toLowerCase().includes(q)
+      const tagMatch = prop.tags.some((t) => t.toLowerCase().includes(q))
+      return titleMatch || cityMatch || districtMatch || addressMatch || tagMatch
+    })
+  } catch (err) {
+    console.error('[notion] searchProperties error:', err)
+    return []
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Admin property functions (no public filter)
+// ---------------------------------------------------------------------------
+
+export async function getPropertyForAdmin(id: string): Promise<Property | null> {
+  try {
+    const notion = getNotionClient()
+    const page = await notion.pages.retrieve({ page_id: id })
+    if (page.object !== 'page') return null
+    return mapProperty(page as PageObjectResponse, 'en')
+  } catch (err) {
+    console.error('[notion] getPropertyForAdmin error:', err)
+    return null
+  }
+}
+
+export async function updatePropertyStatus(
+  id: string,
+  status: string,
+): Promise<void> {
+  try {
+    const notion = getNotionClient()
+    await notion.pages.update({
+      page_id: id,
+      properties: {
+        status: { select: { name: status } },
+      },
+    })
+  } catch (err) {
+    console.error('[notion] updatePropertyStatus error:', err)
+  }
+}
+
+export async function updatePropertyApproval(
+  id: string,
+  approved: boolean,
+): Promise<void> {
+  try {
+    const notion = getNotionClient()
+    const now = new Date().toISOString().split('T')[0]
+    await notion.pages.update({
+      page_id: id,
+      properties: approved
+        ? { approved_at: { date: { start: now } } }
+        : { approved_at: { date: null } },
+    })
+  } catch (err) {
+    console.error('[notion] updatePropertyApproval error:', err)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Blog
+// ---------------------------------------------------------------------------
+
+export async function getBlogPosts(
+  locale = 'en',
+  limit = 20,
+): Promise<BlogPost[]> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: BLOG_DB_ID,
+      filter: { property: 'published', checkbox: { equals: true } },
+      sorts: [{ property: 'published_at', direction: 'descending' }],
+      page_size: limit,
+    })
+
+    return response.results
+      .filter((p) => p.object === 'page')
+      .map((p) => mapBlogPost(p as PageObjectResponse))
+  } catch (err) {
+    console.error('[notion] getBlogPosts error:', err)
+    return []
+  }
+}
+
+export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: BLOG_DB_ID,
+      filter: {
+        and: [
+          { property: 'slug', rich_text: { equals: slug } },
+          { property: 'published', checkbox: { equals: true } },
+        ],
+      },
+      page_size: 1,
+    })
+
+    const page = response.results[0]
+    if (!page || page.object !== 'page') return null
+
+    const post = mapBlogPost(page as PageObjectResponse)
+
+    // Fetch page content blocks and convert to markdown
+    try {
+      const blocks = await notion.blocks.children.list({ block_id: page.id })
+      post.content = blocksToMarkdown(blocks.results as any[])
+    } catch {
+      // content stays empty
+    }
+
+    return post
+  } catch (err) {
+    console.error('[notion] getBlogPost error:', err)
+    return null
+  }
+}
+
+export async function getBlogPostsByCategory(
+  category: string,
+  locale = 'en',
+): Promise<BlogPost[]> {
+  try {
+    const pages = await queryAllPages(BLOG_DB_ID, {
+      filter: {
+        and: [
+          { property: 'published', checkbox: { equals: true } },
+          { property: 'category', select: { equals: category } },
+        ],
+      },
+      sorts: [{ property: 'published_at', direction: 'descending' }],
+    })
+    return pages.map((p) => mapBlogPost(p))
+  } catch (err) {
+    console.error('[notion] getBlogPostsByCategory error:', err)
+    return []
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Static Pages
+// ---------------------------------------------------------------------------
+
+export async function getStaticPage(
+  pageKey: string,
+  locale = 'en',
+): Promise<StaticPage | null> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: PAGES_DB_ID,
+      filter: { property: 'page_key', rich_text: { equals: pageKey } },
+      page_size: 1,
+    })
+
+    const page = response.results[0]
+    if (!page || page.object !== 'page') return null
+    return mapStaticPage(page as PageObjectResponse, locale)
+  } catch (err) {
+    console.error('[notion] getStaticPage error:', err)
+    return null
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Minimal block -> markdown converter (for blog post content)
+// ---------------------------------------------------------------------------
+
+function richTextToMd(richText: any[]): string {
+  if (!richText) return ''
+  return richText
+    .map((r: any) => {
+      let text = r.plain_text ?? ''
+      if (r.annotations?.bold) text = `**${text}**`
+      if (r.annotations?.italic) text = `_${text}_`
+      if (r.annotations?.code) text = `\`${text}\``
+      if (r.href) text = `[${text}](${r.href})`
+      return text
+    })
+    .join('')
+}
+
+function blocksToMarkdown(blocks: any[]): string {
+  const lines: string[] = []
+
+  for (const block of blocks) {
+    const type: string = block.type
+    const data = block[type]
+
+    switch (type) {
+      case 'paragraph':
+        lines.push(richTextToMd(data?.rich_text) || '')
+        break
+      case 'heading_1':
+        lines.push(`# ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'heading_2':
+        lines.push(`## ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'heading_3':
+        lines.push(`### ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'bulleted_list_item':
+        lines.push(`- ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'numbered_list_item':
+        lines.push(`1. ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'quote':
+        lines.push(`> ${richTextToMd(data?.rich_text)}`)
+        break
+      case 'code':
+        lines.push(`\`\`\`${data?.language ?? ''}\n${richTextToMd(data?.rich_text)}\n\`\`\``)
+        break
+      case 'divider':
+        lines.push('---')
+        break
+      case 'image': {
+        const url =
+          data?.type === 'external'
+            ? data.external?.url
+            : data?.file?.url ?? ''
+        const caption = richTextToMd(data?.caption)
+        lines.push(`![${caption}](${url})`)
+        break
+      }
+      case 'callout':
+        lines.push(`> ${richTextToMd(data?.rich_text)}`)
+        break
+      default:
+        break
+    }
+  }
+
+  return lines.join('\n\n')
+}
+
+// ---------------------------------------------------------------------------
+// Aliases & additional blog helpers
+// ---------------------------------------------------------------------------
+
+/** Alias: published blog posts for public blog listing pages */
+export async function getPublishedBlogPosts(
+  locale = 'en',
+  limit = 50,
+): Promise<BlogPost[]> {
+  return getBlogPosts(locale, limit)
+}
+
+/** All blog post slugs for static generation */
+export async function getAllBlogSlugs(): Promise<string[]> {
+  try {
+    const posts = await getBlogPosts('en', 200)
+    return posts.map((p) => p.slug).filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
+/** Single blog post with full content (markdown) */
+export async function getBlogPostWithContent(
+  slug: string,
+): Promise<BlogPost | null> {
+  return getBlogPost(slug)
+}
+
+/** Admin listing — all blog posts regardless of published state */
+export async function getAllBlogPostsAdmin(): Promise<BlogPost[]> {
+  try {
+    const notion = getNotionClient()
+    const response = await notion.databases.query({
+      database_id: BLOG_DB_ID,
+      sorts: [{ property: 'created_time', direction: 'descending' }],
+      page_size: 100,
+    })
+    return response.results
+      .filter((p) => p.object === 'page')
+      .map((p) => mapBlogPost(p as PageObjectResponse))
+  } catch (err) {
+    console.error('[notion] getAllBlogPostsAdmin error:', err)
+    return []
+  }
+}
+
+/** Admin single post fetch for editing */
+export async function getBlogPostForEdit(
+  id: string,
+): Promise<BlogPost | null> {
+  try {
+    const notion = getNotionClient()
+    const page = await notion.pages.retrieve({ page_id: id })
+    if (page.object !== 'page') return null
+    return mapBlogPost(page as PageObjectResponse)
+  } catch (err) {
+    console.error('[notion] getBlogPostForEdit error:', err)
+    return null
+  }
+}
+
+/** Create a new blog post in Notion */
+export async function createBlogPost(data: {
+  title: string
+  slug: string
+  excerpt?: string
+  category?: string
+  coverImageUrl?: string | null
+  tags?: string[]
+  seoTitle?: string
+  seoDescription?: string
+  authorName?: string
+  isPublished?: boolean
+  publishedAt?: string | null
+  [key: string]: unknown
+}, markdown?: string): Promise<BlogPost | null> {
+  try {
+    const notion = getNotionClient()
+    const page = await notion.pages.create({
+      parent: { database_id: BLOG_DB_ID },
+      properties: {
+        title: { title: [{ text: { content: data.title } }] },
+        slug: { rich_text: [{ text: { content: data.slug } }] },
+        excerpt: { rich_text: [{ text: { content: data.excerpt ?? '' } }] },
+        ...(data.category ? { category: { select: { name: data.category } } } : {}),
+        published: { checkbox: data.isPublished ?? false },
+      },
+    })
+    return mapBlogPost(page as PageObjectResponse)
+  } catch (err) {
+    console.error('[notion] createBlogPost error:', err)
+    return null
+  }
+}
+
+/** Update blog post metadata */
 export async function updateBlogPost(
   id: string,
-  meta: Partial<BlogMetaInput>,
-  markdown?: string
-): Promise<BlogPost> {
-  const page = await notion.pages.update({
-    page_id: id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    properties: blogMetaToProperties(meta) as any,
-  });
-  if (markdown !== undefined) {
-    await clearPageBlocks(id);
-    await appendMarkdownBlocks(id, markdown);
-  }
-  return pageToBlogPost(page);
-}
-
-/** Toggle publish state, stamping Published At when publishing. */
-export async function setBlogPublished(id: string, isPublished: boolean): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {
-    "Is Published": { checkbox: isPublished },
-  };
-  if (isPublished) {
-    props["Published At"] = { date: { start: new Date().toISOString() } };
-  }
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-/** Soft delete: move the Notion page to trash. */
-export async function archiveBlogPost(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, archived: true });
-}
-
-// ─── Contacts ───────────────────────────────────────────────────────────────
-
-function pageToContact(page: NotionPage): ContactSubmission {
-  return {
-    id: page.id,
-    name: propTitle(page, "Name"),
-    email: propEmail(page, "Email"),
-    phone: propPhone(page, "Phone"),
-    message: propText(page, "Message"),
-    branch: propText(page, "Branch"),
-    submittedAt: propDate(page, "Submitted At") ?? propCreatedTime(page),
-  };
-}
-
-export async function getAllContacts(): Promise<ContactSubmission[]> {
-  const response = await notion.databases.query({
-    database_id: DB.contacts,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    page_size: 100,
-  });
-  return response.results.map(pageToContact);
-}
-
-// ─── Customer Stories ─────────────────────────────────────────────────────────
-
-function pageToStory(page: NotionPage): CustomerStory {
-  return {
-    id: page.id,
-    customerName: propText(page, "Customer Name") || propTitle(page, "Name"),
-    customerEmail: propEmail(page, "Email"),
-    customerPhone: propPhone(page, "Phone"),
-    story: propText(page, "Story"),
-    rating: propNumber(page, "Rating"),
-    carModel: propText(page, "Car Model"),
-    imageUrl: propUrl(page, "Image URL"),
-    status: propSelect(page, "Status") as CustomerStory["status"],
-    isPublic: propCheckbox(page, "Is Public"),
-    submittedAt: propCreatedTime(page),
-  };
-}
-
-export async function getPublicStories(limit?: number): Promise<CustomerStory[]> {
-  const response = await notion.databases.query({
-    database_id: DB.stories,
-    filter: {
-      and: [
-        { property: "Status", select: { equals: "approved" } },
-        { property: "Is Public", checkbox: { equals: true } },
-      ],
-    },
-    page_size: limit ?? 20,
-  });
-  return response.results.map(pageToStory);
-}
-
-export async function getAllStories(status?: CustomerStory["status"]): Promise<CustomerStory[]> {
-  const response = await notion.databases.query({
-    database_id: DB.stories,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    ...(status ? {
-      filter: { property: "Status", select: { equals: status } },
-    } : {}),
-  });
-  return response.results.map(pageToStory);
-}
-
-// ─── Appointments ─────────────────────────────────────────────────────────────
-
-function pageToAppointment(page: NotionPage): Appointment {
-  return {
-    id: page.id,
-    customerName: propText(page, "Customer Name") || propTitle(page, "Name"),
-    type: propSelect(page, "Type") as Appointment["type"],
-    status: (propSelect(page, "Status") || "pending") as Appointment["status"],
-    customerPhone: propPhone(page, "Phone"),
-    customerEmail: propEmail(page, "Email"),
-    carModel: propText(page, "Car Model"),
-    branch: propText(page, "Branch"),
-    preferredDate: propDate(page, "Preferred Date"),
-    preferredTime: propText(page, "Preferred Time"),
-    notes: propText(page, "Notes"),
-    damageDescription: propText(page, "Damage Description"),
-    insuranceCompany: propText(page, "Insurance Company"),
-    vehicleRegistration: propText(page, "Vehicle Registration"),
-    coverageType: propText(page, "Coverage Type"),
-    submittedAt: propCreatedTime(page),
-  };
-}
-
-export async function getAllAppointments(): Promise<Appointment[]> {
-  const response = await notion.databases.query({
-    database_id: DB.appointments,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-  });
-  return response.results.map(pageToAppointment);
-}
-
-export async function updateAppointmentStatus(
-  id: string,
-  status: Appointment["status"]
-): Promise<void> {
-  await notion.pages.update({
-    page_id: id,
-    properties: {
-      Status: { select: { name: status } },
-    },
-  });
-}
-
-export async function updateStoryStatus(
-  id: string,
-  status: CustomerStory["status"],
-  isPublic?: boolean
-): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {
-    Status: { select: { name: status } },
-  };
-  if (isPublic !== undefined) {
-    props["Is Public"] = { checkbox: isPublic };
-  }
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-// ─── Promotions ───────────────────────────────────────────────────────────────
-
-function pageToPromotion(page: NotionPage): Promotion {
-  return {
-    id: page.id,
-    title: propTitle(page, "Title"),
-    brand: propSelect(page, "Brand") as Promotion["brand"],
-    coverImageUrl: propText(page, "Cover Image URL") || null,
-    linkUrl: propUrl(page, "Link URL"),
-    startDate: propDate(page, "Start Date"),
-    endDate: propDate(page, "End Date"),
-    isActive: propCheckbox(page, "Is Active"),
-  };
-}
-
-export async function getPromotionsByBrand(brand: Promotion["brand"]): Promise<Promotion[]> {
-  if (!DB.promotions) return [];
-  const response = await notion.databases.query({
-    database_id: DB.promotions,
-    filter: {
-      and: [
-        { property: "Brand", select: { equals: brand } },
-        { property: "Is Active", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    page_size: 50,
-  });
-  return response.results.map(pageToPromotion);
-}
-
-/** Admin: all promotions (active + inactive). */
-export async function getAllPromotionsAdmin(): Promise<Promotion[]> {
-  if (!DB.promotions) return [];
-  const response = await notion.databases.query({
-    database_id: DB.promotions,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    page_size: 100,
-  });
-  return response.results.map(pageToPromotion);
-}
-
-/** Create a new promotion. */
-export async function createPromotion(data: Omit<Promotion, "id">): Promise<Promotion> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.promotions },
-    properties: {
-      Title: { title: [{ text: { content: data.title } }] },
-      Brand: { select: { name: data.brand } },
-      "Cover Image URL": data.coverImageUrl ? { rich_text: [{ text: { content: data.coverImageUrl } }] } : { rich_text: [] },
-      "Link URL": data.linkUrl ? { url: data.linkUrl } : { url: null },
-      "Start Date": data.startDate ? { date: { start: data.startDate } } : { date: null },
-      "End Date": data.endDate ? { date: { start: data.endDate } } : { date: null },
-      "Is Active": { checkbox: data.isActive },
-    },
-  });
-  return pageToPromotion(page);
-}
-
-/** Update a promotion's fields. */
-export async function updatePromotion(id: string, data: Partial<Omit<Promotion, "id">>): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
-  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
-  if (data.coverImageUrl !== undefined) props["Cover Image URL"] = data.coverImageUrl ? { rich_text: [{ text: { content: data.coverImageUrl } }] } : { rich_text: [] };
-  if (data.linkUrl !== undefined) props["Link URL"] = data.linkUrl ? { url: data.linkUrl } : { url: null };
-  if (data.startDate !== undefined) props["Start Date"] = data.startDate ? { date: { start: data.startDate } } : { date: null };
-  if (data.endDate !== undefined) props["End Date"] = data.endDate ? { date: { start: data.endDate } } : { date: null };
-  if (data.isActive !== undefined) props["Is Active"] = { checkbox: data.isActive };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-/** Soft-delete (archive) a promotion. */
-export async function archivePromotion(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, in_trash: true });
-}
-
-// ─── Blog filtered by brand tag ───────────────────────────────────────────────
-
-/** Published blog posts filtered by brand tag and optional category. */
-export async function getBlogPostsByBrand(
-  brand: string,
-  category?: BlogPost["category"],
-  limit = 12
-): Promise<BlogPost[]> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filterConditions: any[] = [
-    { property: "Is Published", checkbox: { equals: true } },
-    { property: "Tags", multi_select: { contains: brand } },
-  ];
-  if (category) {
-    filterConditions.push({ property: "Category", select: { equals: category } });
-  }
-  const response = await notion.databases.query({
-    database_id: DB.blog,
-    filter: { and: filterConditions },
-    sorts: [{ property: "Published At", direction: "descending" }],
-    page_size: limit,
-  });
-  return response.results.map(pageToBlogPost);
-}
-
-// ─── Search Analytics ──────────────────────────────────────────────────────────
-
-/**
- * Log a search query that returned no results.
- * Upserts by query: increments Count if exists, creates if not.
- */
-export async function logFailedSearch(query: string, page?: string): Promise<void> {
-  if (!DB.searchAnalytics || !query.trim()) return;
+  data: Partial<{
+    title: string
+    slug: string
+    excerpt: string
+    category: string
+    coverImage: string
+    isPublished: boolean
+  }>,
+): Promise<boolean> {
   try {
-    // Check if this query already exists
-    const existing = await notion.databases.query({
-      database_id: DB.searchAnalytics,
-      filter: { property: "Query", title: { equals: query.trim() } },
-      page_size: 1,
-    });
-
-    const now = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
-
-    if (existing.results.length > 0) {
-      // Increment count + update last searched
-      const existingPage = existing.results[0] as NotionPage;
-      const currentCount = existingPage.properties["Count"]?.number ?? 0;
-      await notion.pages.update({
-        page_id: existingPage.id,
-        properties: {
-          Count: { number: currentCount + 1 },
-          "Last Searched At": { date: { start: now } },
-        },
-      });
-    } else {
-      // Create new entry
-      await notion.pages.create({
-        parent: { database_id: DB.searchAnalytics },
-        properties: {
-          Query: { title: [{ text: { content: query.trim() } }] },
-          Count: { number: 1 },
-          "Last Searched At": { date: { start: now } },
-          ...(page ? { Page: { rich_text: [{ text: { content: page } }] } } : {}),
-        },
-      });
-    }
+    const notion = getNotionClient()
+    const props: Record<string, unknown> = {}
+    if (data.title !== undefined) props.title = { title: [{ text: { content: data.title } }] }
+    if (data.slug !== undefined) props.slug = { rich_text: [{ text: { content: data.slug } }] }
+    if (data.excerpt !== undefined) props.excerpt = { rich_text: [{ text: { content: data.excerpt } }] }
+    if (data.category !== undefined) props.category = { select: { name: data.category } }
+    if (data.isPublished !== undefined) props.published = { checkbox: data.isPublished }
+    await notion.pages.update({ page_id: id, properties: props as Parameters<typeof notion.pages.update>[0]['properties'] })
+    return true
   } catch (err) {
-    // Non-critical — don't throw, just log
-    console.warn("[search-analytics] failed to log:", err);
+    console.error('[notion] updateBlogPost error:', err)
+    return false
   }
 }
 
-// ─── Customer Feedback ────────────────────────────────────────────────────────
-
-export async function createFeedback(data: FeedbackFormData): Promise<void> {
-  const now = new Date().toISOString().split("T")[0];
-  await notion.pages.create({
-    parent: { database_id: DB.feedback },
-    properties: {
-      Name: { title: [{ text: { content: data.name } }] },
-      Type: { select: { name: data.type } },
-      Brand: { select: { name: data.brand } },
-      Branch: { rich_text: [{ text: { content: data.branch } }] },
-      Department: { select: { name: data.department } },
-      Phone: { phone_number: data.phone },
-      Email: { email: data.email || null },
-      LicensePlate: { rich_text: [{ text: { content: data.licensePlate } }] },
-      ServiceDate: data.serviceDate ? { date: { start: data.serviceDate } } : { date: null },
-      Message: { rich_text: [{ text: { content: data.message } }] },
-      Status: { select: { name: "ใหม่" } },
-      SubmittedAt: { date: { start: now } },
-    },
-  });
-}
-
-/** Admin: list all feedback, newest first. */
-export async function getAllFeedbackAdmin(): Promise<import("./notion-types").CustomerFeedback[]> {
-  const response = await notion.databases.query({
-    database_id: DB.feedback,
-    sorts: [{ timestamp: "created_time", direction: "descending" }],
-    page_size: 100,
-  });
-  return response.results.map((page) => {
-    const p = page as NotionPage;
-    return {
-      id: p.id,
-      name: propTitle(p, "Name"),
-      type: propSelect(p, "Type") as import("./notion-types").CustomerFeedback["type"],
-      brand: propSelect(p, "Brand"),
-      branch: propText(p, "Branch"),
-      department: propSelect(p, "Department"),
-      phone: propPhone(p, "Phone"),
-      email: propEmail(p, "Email"),
-      licensePlate: propText(p, "LicensePlate"),
-      serviceDate: propDate(p, "ServiceDate"),
-      message: propText(p, "Message"),
-      status: propSelect(p, "Status") as import("./notion-types").CustomerFeedback["status"],
-      submittedAt: propDate(p, "SubmittedAt") ?? propCreatedTime(p),
-    };
-  });
-}
-
-/** Update feedback status. */
-export async function updateFeedbackStatus(
+/** Toggle publish status for a blog post */
+export async function setBlogPublished(
   id: string,
-  status: import("./notion-types").CustomerFeedback["status"]
-): Promise<void> {
-  await notion.pages.update({
-    page_id: id,
-    properties: { Status: { select: { name: status } } },
-  });
+  published: boolean,
+): Promise<boolean> {
+  return updateBlogPost(id, { isPublished: published })
 }
 
-// ─── Insurance Partners ───────────────────────────────────────────────────────
-
-function pageToInsurancePartner(page: NotionPage): InsurancePartner {
-  return {
-    id: page.id,
-    name: propTitle(page, "Name"),
-    brand: propSelect(page, "Brand"),
-    isActive: propCheckbox(page, "IsActive"),
-    sortOrder: propNumber(page, "SortOrder"),
-  };
+/** Archive (soft-delete) a blog post */
+export async function archiveBlogPost(id: string): Promise<boolean> {
+  try {
+    const notion = getNotionClient()
+    await notion.pages.update({ page_id: id, archived: true })
+    return true
+  } catch (err) {
+    console.error('[notion] archiveBlogPost error:', err)
+    return false
+  }
 }
 
-/** All insurance partners sorted by order. */
-export async function getInsurancePartners(onlyActive = true): Promise<InsurancePartner[]> {
-  if (!DB.insurancePartners) return [];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filters: any[] = [];
-  if (onlyActive) filters.push({ property: "IsActive", checkbox: { equals: true } });
-  const response = await notion.databases.query({
-    database_id: DB.insurancePartners,
-    filter: filters.length ? { and: filters } : undefined,
-    sorts: [{ property: "SortOrder", direction: "ascending" }],
-    page_size: 100,
-  });
-  return response.results.map(pageToInsurancePartner);
-}
+// ---------------------------------------------------------------------------
+// Customer stories (public, approved)
+// ---------------------------------------------------------------------------
 
-export async function getAllInsurancePartnersAdmin(): Promise<InsurancePartner[]> {
-  return getInsurancePartners(false);
-}
-
-export async function createInsurancePartner(name: string, brand: string): Promise<InsurancePartner> {
-  // Get max sort order
-  const all = await getAllInsurancePartnersAdmin();
-  const maxSort = all.reduce((m, p) => Math.max(m, p.sortOrder), 0);
-  const page = await notion.pages.create({
-    parent: { database_id: DB.insurancePartners },
-    properties: {
-      Name: { title: [{ text: { content: name } }] },
-      Brand: { select: { name: brand } },
-      IsActive: { checkbox: true },
-      SortOrder: { number: maxSort + 1 },
-    },
-  });
-  return pageToInsurancePartner(page);
-}
-
-export async function updateInsurancePartner(
-  id: string,
-  data: Partial<Pick<InsurancePartner, "name" | "brand" | "isActive" | "sortOrder">>
-): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.name !== undefined) props.Name = { title: [{ text: { content: data.name } }] };
-  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
-  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
-  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-export async function archiveInsurancePartner(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, in_trash: true });
-}
-
-// ─── Service Page Sections ────────────────────────────────────────────────────
-
-function pageToServiceSection(page: NotionPage): ServicePageSection {
-  return {
-    id: page.id,
-    title: propTitle(page, "Title"),
-    page: propSelect(page, "Page") as ServicePageSection["page"],
-    brand: propSelect(page, "Brand"),
-    sectionKey: propText(page, "SectionKey"),
-    sortOrder: propNumber(page, "SortOrder"),
-    isPublished: propCheckbox(page, "IsPublished"),
-    notionUrl: (page as NotionPage).url ?? `https://www.notion.so/${page.id.replace(/-/g, "")}`,
-  };
-}
-
-export async function getAllServiceSectionsAdmin(): Promise<ServicePageSection[]> {
-  if (!DB.serviceContent) return [];
-  const response = await notion.databases.query({
-    database_id: DB.serviceContent,
-    sorts: [
-      { property: "Page", direction: "ascending" },
-      { property: "SortOrder", direction: "ascending" },
-    ],
-    page_size: 100,
-  });
-  return response.results.map(pageToServiceSection);
-}
-
-export async function getServiceSections(
-  brand: string,
-  pageName: ServicePageSection["page"]
-): Promise<ServicePageSection[]> {
-  if (!DB.serviceContent) return [];
-  const response = await notion.databases.query({
-    database_id: DB.serviceContent,
-    filter: {
-      and: [
-        { property: "Brand", select: { equals: brand } },
-        { property: "Page", select: { equals: pageName } },
-        { property: "IsPublished", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [{ property: "SortOrder", direction: "ascending" }],
-    page_size: 50,
-  });
-  return response.results.map(pageToServiceSection);
-}
-
-export async function createServiceSection(data: {
-  title: string;
-  page: ServicePageSection["page"];
-  brand: string;
-  sectionKey: string;
-  sortOrder: number;
-}): Promise<ServicePageSection> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.serviceContent },
-    properties: {
-      Title: { title: [{ text: { content: data.title } }] },
-      Page: { select: { name: data.page } },
-      Brand: { select: { name: data.brand } },
-      SectionKey: { rich_text: [{ text: { content: data.sectionKey } }] },
-      SortOrder: { number: data.sortOrder },
-      IsPublished: { checkbox: false },
-    },
-  });
-  return pageToServiceSection(page);
-}
-
-export async function updateServiceSection(
-  id: string,
-  data: Partial<Pick<ServicePageSection, "title" | "sectionKey" | "sortOrder" | "isPublished">>
-): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
-  if (data.sectionKey !== undefined) props.SectionKey = { rich_text: [{ text: { content: data.sectionKey } }] };
-  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
-  if (data.isPublished !== undefined) props.IsPublished = { checkbox: data.isPublished };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-/** Get rendered markdown content of a Notion page (for rendering on website). */
-export async function getServiceSectionContent(pageId: string): Promise<string> {
-  const mdBlocks = await n2m.pageToMarkdown(pageId);
-  return n2m.toMarkdownString(mdBlocks).parent ?? "";
-}
-
-// ─── Brand Social Links ───────────────────────────────────────────────────────
-
-function pageToSocialLink(page: NotionPage): BrandSocialLink {
-  return {
-    id: page.id,
-    label: propTitle(page, "Label"),
-    brand: propSelect(page, "Brand"),
-    platform: propSelect(page, "Platform") as BrandSocialLink["platform"],
-    url: propUrl(page, "URL") ?? "",
-    isActive: propCheckbox(page, "IsActive"),
-  };
-}
-
-export async function getSocialLinksByBrand(brand: string): Promise<BrandSocialLink[]> {
-  if (!DB.socialLinks) return [];
-  const response = await notion.databases.query({
-    database_id: DB.socialLinks,
-    filter: {
-      and: [
-        { property: "Brand", select: { equals: brand } },
-        { property: "IsActive", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [{ property: "Platform", direction: "ascending" }],
-    page_size: 20,
-  });
-  return response.results.map(pageToSocialLink);
-}
-
-export async function getAllSocialLinksAdmin(): Promise<BrandSocialLink[]> {
-  if (!DB.socialLinks) return [];
-  const response = await notion.databases.query({
-    database_id: DB.socialLinks,
-    sorts: [
-      { property: "Brand", direction: "ascending" },
-      { property: "Platform", direction: "ascending" },
-    ],
-    page_size: 100,
-  });
-  return response.results.map(pageToSocialLink);
-}
-
-export async function createSocialLink(
-  data: Omit<BrandSocialLink, "id">
-): Promise<BrandSocialLink> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.socialLinks },
-    properties: {
-      Label: { title: [{ text: { content: data.label || `${data.brand} ${data.platform}` } }] },
-      Brand: { select: { name: data.brand } },
-      Platform: { select: { name: data.platform } },
-      URL: { url: data.url },
-      IsActive: { checkbox: data.isActive },
-    },
-  });
-  return pageToSocialLink(page);
-}
-
-export async function updateSocialLink(
-  id: string,
-  data: Partial<Omit<BrandSocialLink, "id">>
-): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.label !== undefined) props.Label = { title: [{ text: { content: data.label } }] };
-  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
-  if (data.platform !== undefined) props.Platform = { select: { name: data.platform } };
-  if (data.url !== undefined) props.URL = { url: data.url || null };
-  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-export async function archiveSocialLink(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, in_trash: true });
-}
-
-
-// ─── Video Reviews ────────────────────────────────────────────────────────────
-
-function pageToVideoReview(page: NotionPage): VideoReview {
-  const src = propSelect(page, "Source");
-  return {
-    id: page.id,
-    title: propTitle(page, "Title"),
-    brand: propSelect(page, "Brand"),
-    platform: propSelect(page, "Platform") as VideoReview["platform"],
-    source: (src === "own" ? "own" : "external") as VideoReview["source"],
-    videoUrl: propUrl(page, "VideoURL") ?? "",
-    thumbnailUrl: propUrl(page, "ThumbnailURL"),
-    description: propText(page, "Description"),
-    isActive: propCheckbox(page, "IsActive"),
-    sortOrder: propNumber(page, "SortOrder"),
-  };
-}
-
-export async function getVideoReviewsByBrand(brand: string): Promise<VideoReview[]> {
-  if (!DB.videoReviews) return [];
-  const response = await notion.databases.query({
-    database_id: DB.videoReviews,
-    filter: {
-      and: [
-        { property: "Brand", select: { equals: brand } },
-        { property: "IsActive", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [{ property: "SortOrder", direction: "ascending" }],
-    page_size: 50,
-  });
-  return response.results.map(pageToVideoReview);
-}
-
-export async function getAllVideoReviewsAdmin(): Promise<VideoReview[]> {
-  if (!DB.videoReviews) return [];
-  const response = await notion.databases.query({
-    database_id: DB.videoReviews,
-    sorts: [
-      { property: "Brand", direction: "ascending" },
-      { property: "SortOrder", direction: "ascending" },
-    ],
-    page_size: 100,
-  });
-  return response.results.map(pageToVideoReview);
-}
-
-export async function createVideoReview(data: Omit<VideoReview, "id">): Promise<VideoReview> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.videoReviews },
-    properties: {
-      Title: { title: [{ text: { content: data.title } }] },
-      Brand: { select: { name: data.brand } },
-      Platform: { select: { name: data.platform } },
-      Source: { select: { name: data.source || "external" } },
-      VideoURL: { url: data.videoUrl || null },
-      ThumbnailURL: { url: data.thumbnailUrl || null },
-      Description: { rich_text: data.description ? [{ text: { content: data.description } }] : [] },
-      IsActive: { checkbox: data.isActive },
-      SortOrder: { number: data.sortOrder },
-    },
-  });
-  return pageToVideoReview(page);
-}
-
-export async function updateVideoReview(id: string, data: Partial<Omit<VideoReview, "id">>): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.title !== undefined) props.Title = { title: [{ text: { content: data.title } }] };
-  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
-  if (data.platform !== undefined) props.Platform = { select: { name: data.platform } };
-  if (data.source !== undefined) props.Source = { select: { name: data.source } };
-  if (data.videoUrl !== undefined) props.VideoURL = { url: data.videoUrl || null };
-  if (data.thumbnailUrl !== undefined) props.ThumbnailURL = { url: data.thumbnailUrl || null };
-  if (data.description !== undefined) props.Description = { rich_text: data.description ? [{ text: { content: data.description } }] : [] };
-  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
-  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-export async function archiveVideoReview(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, in_trash: true });
-}
-
-// ─── FAQ Items ────────────────────────────────────────────────────────────────
-
-function pageToFAQ(page: NotionPage): FAQItem {
-  return {
-    id: page.id,
-    question: propTitle(page, "Question"),
-    answer: propText(page, "Answer"),
-    page: propSelect(page, "Page"),
-    brand: propSelect(page, "Brand"),
-    isActive: propCheckbox(page, "IsActive"),
-    sortOrder: propNumber(page, "SortOrder"),
-  };
-}
-
-export async function getFAQItems(brand: string, page: string): Promise<FAQItem[]> {
-  if (!DB.faq) return [];
-  const response = await notion.databases.query({
-    database_id: DB.faq,
-    filter: {
-      and: [
-        { property: "Brand", select: { equals: brand } },
-        { property: "Page", select: { equals: page } },
-        { property: "IsActive", checkbox: { equals: true } },
-      ],
-    },
-    sorts: [{ property: "SortOrder", direction: "ascending" }],
-    page_size: 50,
-  });
-  return response.results.map(pageToFAQ);
-}
-
-export async function getAllFAQAdmin(): Promise<FAQItem[]> {
-  if (!DB.faq) return [];
-  const response = await notion.databases.query({
-    database_id: DB.faq,
-    sorts: [
-      { property: "Brand", direction: "ascending" },
-      { property: "Page", direction: "ascending" },
-      { property: "SortOrder", direction: "ascending" },
-    ],
-    page_size: 100,
-  });
-  return response.results.map(pageToFAQ);
-}
-
-export async function createFAQItem(data: Omit<FAQItem, "id">): Promise<FAQItem> {
-  const page = await notion.pages.create({
-    parent: { database_id: DB.faq },
-    properties: {
-      Question: { title: [{ text: { content: data.question } }] },
-      Answer: { rich_text: [{ text: { content: data.answer } }] },
-      Page: { select: { name: data.page } },
-      Brand: { select: { name: data.brand } },
-      IsActive: { checkbox: data.isActive },
-      SortOrder: { number: data.sortOrder },
-    },
-  });
-  return pageToFAQ(page);
-}
-
-export async function updateFAQItem(id: string, data: Partial<Omit<FAQItem, "id">>): Promise<void> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: Record<string, any> = {};
-  if (data.question !== undefined) props.Question = { title: [{ text: { content: data.question } }] };
-  if (data.answer !== undefined) props.Answer = { rich_text: [{ text: { content: data.answer } }] };
-  if (data.page !== undefined) props.Page = { select: { name: data.page } };
-  if (data.brand !== undefined) props.Brand = { select: { name: data.brand } };
-  if (data.isActive !== undefined) props.IsActive = { checkbox: data.isActive };
-  if (data.sortOrder !== undefined) props.SortOrder = { number: data.sortOrder };
-  await notion.pages.update({ page_id: id, properties: props });
-}
-
-export async function archiveFAQItem(id: string): Promise<void> {
-  await notion.pages.update({ page_id: id, in_trash: true });
+/** Public customer stories */
+export async function getPublicStories(): Promise<import('./notion-types').CustomerStory[]> {
+  // Stub: stories would typically come from Turso DB, not Notion.
+  // Returns empty array until the stories table is populated.
+  return []
 }

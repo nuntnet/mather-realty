@@ -1,32 +1,23 @@
-import { branches } from "@/lib/branchData";
-import { canonicalUrl, SITE_URL } from "@/lib/site";
-import { ORGANIZATION_NAME } from "./constants";
+import { canonicalUrl, SITE_URL, SITE_NAME } from "@/lib/site";
 
-/** AutoDealer / LocalBusiness nodes for each branch */
+/** RealEstateAgent / LocalBusiness node for DoubleN Realty */
 export function localBusinessGraph() {
   return {
     "@context": "https://schema.org",
-    "@graph": branches.map((branch) => ({
-      "@type": ["AutoDealer", "LocalBusiness"],
-      "@id": `${SITE_URL}/#branch-${branch.id}`,
-      name: branch.name,
-      branchOf: { "@id": `${SITE_URL}/#organization` },
-      brand: { "@type": "Brand", name: branch.brand },
-      address: {
-        "@type": "PostalAddress",
-        streetAddress: branch.address,
-        addressLocality: "นครปฐม",
-        addressCountry: "TH",
+    "@graph": [
+      {
+        "@type": ["RealEstateAgent", "LocalBusiness"],
+        "@id": `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        description:
+          "Premium rental properties in Thailand for expats and foreigners.",
+        address: {
+          "@type": "PostalAddress",
+          addressCountry: "TH",
+        },
+        email: "hello@doublen-realty.com",
+        url: canonicalUrl("/"),
       },
-      telephone: branch.phone,
-      openingHours: branch.hours,
-      geo: {
-        "@type": "GeoCoordinates",
-        latitude: branch.lat,
-        longitude: branch.lng,
-      },
-      url: canonicalUrl(`/branches#${branch.id}`),
-      ...(branch.isHQ ? { parentOrganization: { name: ORGANIZATION_NAME } } : {}),
-    })),
+    ],
   };
 }

@@ -32,10 +32,12 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
   const [activeCategory, setActiveCategory] = useState("ทั้งหมด");
 
   const filtered = posts.filter((p) => {
+    const pTitle = typeof p.title === 'string' ? p.title : (p.title as Record<string,string>).en ?? '';
+    const pExcerpt = typeof p.excerpt === 'string' ? p.excerpt : (p.excerpt as Record<string,string>).en ?? '';
     const matchSearch =
       !search ||
-      p.title.toLowerCase().includes(search.toLowerCase()) ||
-      p.excerpt.toLowerCase().includes(search.toLowerCase());
+      pTitle.toLowerCase().includes(search.toLowerCase()) ||
+      pExcerpt.toLowerCase().includes(search.toLowerCase());
     const matchCat =
       activeCategory === "ทั้งหมด" ||
       categoryMap[p.category] === activeCategory;
@@ -84,7 +86,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                 {featured.coverImageUrl && (
                   <img
                     src={cldUrl(featured.coverImageUrl, "full")}
-                    alt={featured.title}
+                    alt={typeof featured.title === 'string' ? featured.title : (featured.title as Record<string,string>).en ?? ''}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 )}
@@ -102,10 +104,10 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                   </span>
                 </div>
                 <h2 className="text-xl lg:text-2xl font-bold text-[#0F172A] mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
-                  {featured.title}
+                  {typeof featured.title === 'string' ? featured.title : (featured.title as Record<string,string>).en ?? ''}
                 </h2>
                 <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">
-                  {featured.excerpt}
+                  {typeof featured.excerpt === 'string' ? featured.excerpt : (featured.excerpt as Record<string,string>).en ?? ''}
                 </p>
                 <span className="text-[#0F172A] text-sm font-medium flex items-center gap-1">
                   อ่านต่อ <ChevronRight className="w-4 h-4" />
@@ -125,7 +127,7 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                 {post.coverImageUrl && (
                   <img
                     src={cldUrl(post.coverImageUrl)}
-                    alt={post.title}
+                    alt={typeof post.title === 'string' ? post.title : (post.title as Record<string,string>).en ?? ''}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -139,9 +141,9 @@ export default function BlogList({ posts }: { posts: BlogPost[] }) {
                   </span>
                 </div>
                 <h3 className="font-bold text-[#0F172A] mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {post.title}
+                  {typeof post.title === 'string' ? post.title : (post.title as Record<string,string>).en ?? ''}
                 </h3>
-                <p className="text-gray-500 text-sm line-clamp-2 flex-1">{post.excerpt}</p>
+                <p className="text-gray-500 text-sm line-clamp-2 flex-1">{typeof post.excerpt === 'string' ? post.excerpt : (post.excerpt as Record<string,string>).en ?? ''}</p>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
                   <span className="text-xs text-gray-400">
                     {post.publishedAt

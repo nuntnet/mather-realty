@@ -14,10 +14,9 @@ import { auth } from "./auth";
  */
 export async function requireAdmin(): Promise<NextResponse | null> {
   if (!auth) {
-    // Turso not configured — auth disabled. Fail closed.
     return NextResponse.json(
       { error: "Authentication not configured" },
-      { status: 503 }
+      { status: 503 },
     );
   }
 
@@ -34,4 +33,53 @@ export async function requireAdmin(): Promise<NextResponse | null> {
   }
 
   return null;
+}
+
+/**
+ * Server-side landlord guard for /api/landlord/* and dashboard route handlers.
+ *
+ * Allows both "landlord" and "admin" roles through.
+ * Returns the session on success (so callers can access session.user.id).
+ *
+ * Usage:
+ *   const result = await requireLandlord();
+ *   if (result instanceof NextResponse) return result;
+ *   const { session } = result;
+ */
+export async function requireLandlord(): Promise<
+  { session: NonNullable<Awaited<ReturnType<NonNullable<typeof auth>["api"]["getSession"]>>> } | NextResponse
+> {
+  if (!auth) {
+    return NextResponse.json(
+      { error: "Authentication not configured" },
+      { status: 503 },
+    );
+  }
+
+  const session = await auth.api
+    .getSession({ headers: await headers() })
+    .catch(() => null);
+
+  if (!session?.user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const role = session.user.role as string | undefined;
+  if (role !== "landlord" && role !== "admin") {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  return { session };
+}
+
+/**
+ * Lightweight boolean check — use inside Server Components / layout guards
+ * where you want to redirect rather than return a response.
+ */
+export async function getSessionUser() {
+  if (!auth) return null;
+  const session = await auth.api
+    .getSession({ headers: await headers() })
+    .catch(() => null);
+  return session?.user ?? null;
 }

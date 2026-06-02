@@ -31,8 +31,10 @@ export async function generateMetadata({
   const { slug } = await params;
   const post = await getBlogPostWithContent(slug);
   if (!post) return { title: "ไม่พบบทความ" };
-  const title = post.seoTitle || post.title;
-  const description = post.seoDescription || post.excerpt;
+  const titleStr = typeof post.title === 'string' ? post.title : (post.title as Record<string,string>).en ?? '';
+  const excerptStr = typeof post.excerpt === 'string' ? post.excerpt : (post.excerpt as Record<string,string>).en ?? '';
+  const title = post.seoTitle || titleStr;
+  const description = post.seoDescription || excerptStr;
   const path = `/blog/${post.slug || slug}`;
   return {
     title,
@@ -56,7 +58,10 @@ export default async function BlogPostPage({
   const post = await getBlogPostWithContent(slug);
   if (!post) notFound();
 
-  const recentPosts = await getPublishedBlogPosts(4);
+  const postTitle = typeof post.title === 'string' ? post.title : (post.title as Record<string,string>).en ?? '';
+  const postExcerpt = typeof post.excerpt === 'string' ? post.excerpt : (post.excerpt as Record<string,string>).en ?? '';
+
+  const recentPosts = await getPublishedBlogPosts('en', 4);
   const related = recentPosts.filter((p) => p.slug !== slug).slice(0, 3);
 
   const postPath = `/blog/${post.slug || slug}`;
@@ -64,7 +69,7 @@ export default async function BlogPostPage({
   const breadcrumbs = breadcrumbJsonLd([
     { name: "หน้าแรก", path: "/" },
     { name: "บทความ", path: "/blog" },
-    { name: post.title, path: postPath },
+    { name: postTitle, path: postPath },
   ]);
 
   return (
@@ -77,7 +82,7 @@ export default async function BlogPostPage({
         {post.coverImageUrl ? (
           <img
             src={cldUrl(post.coverImageUrl, "full")}
-            alt={post.title}
+            alt={postTitle}
             className="w-full h-full object-cover"
           />
         ) : (
@@ -89,10 +94,10 @@ export default async function BlogPostPage({
             <div className="flex items-center gap-2 text-white/60 text-sm mb-3">
               <Link href="/blog" className="hover:text-white transition-colors">บทความ</Link>
               <ChevronRight className="w-4 h-4" />
-              <span className="text-white">{post.title}</span>
+              <span className="text-white">{postTitle}</span>
             </div>
             <h1 className="text-2xl lg:text-4xl font-bold text-white leading-tight">
-              {post.title}
+              {postTitle}
             </h1>
             <div className="flex items-center gap-4 mt-4 text-white/60 text-sm">
               {post.authorName && <span>{post.authorName}</span>}
@@ -109,7 +114,7 @@ export default async function BlogPostPage({
       {/* Content */}
       <div className="container max-w-4xl py-12">
         <article className="prose prose-slate prose-lg max-w-none">
-          <ReactMarkdown>{post.contentMarkdown}</ReactMarkdown>
+          <ReactMarkdown>{post.content ?? ''}</ReactMarkdown>
         </article>
 
         {/* CTA after content */}
@@ -133,7 +138,7 @@ export default async function BlogPostPage({
                       {rp.coverImageUrl && (
                         <img
                           src={cldUrl(rp.coverImageUrl)}
-                          alt={rp.title}
+                          alt={typeof rp.title === 'string' ? rp.title : (rp.title as Record<string,string>).en ?? ''}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -142,7 +147,7 @@ export default async function BlogPostPage({
                     </div>
                     <div className="p-4">
                       <h3 className="font-semibold text-[#0F172A] text-sm line-clamp-2 group-hover:text-blue-600 transition-colors">
-                        {rp.title}
+                        {typeof rp.title === 'string' ? rp.title : (rp.title as Record<string,string>).en ?? ''}
                       </h3>
                       <p className="text-xs text-gray-400 mt-2">
                         {rp.publishedAt

@@ -66,6 +66,7 @@ export async function POST(req: NextRequest) {
       { ...meta, coverImageUrl: meta.coverImageUrl || null } as BlogMetaInput,
       markdown
     );
+    if (!post) return NextResponse.json({ error: "Create failed" }, { status: 500 });
     revalidateBlog(post.slug);
     return NextResponse.json(post);
   } catch (err) {
@@ -101,9 +102,9 @@ export async function PATCH(req: NextRequest) {
       ? { ...meta, ...(meta.coverImageUrl !== undefined ? { coverImageUrl: meta.coverImageUrl || null } : {}) }
       : undefined;
 
-    const post = await updateBlogPost(id, metaPayload ?? {}, markdown);
-    revalidateBlog(post.slug);
-    return NextResponse.json(post);
+    await updateBlogPost(id, metaPayload ?? {});
+    revalidateBlog();
+    return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Invalid data", issues: err.issues }, { status: 400 });

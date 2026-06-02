@@ -258,7 +258,7 @@ export default function AdminPromotionsPage() {
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-1.5 text-xs text-gray-500">
                       <Calendar className="w-3.5 h-3.5 text-gray-400" />
-                      {fmt(p.startDate)} – {fmt(p.endDate)}
+                      {fmt(p.startDate ?? null)} – {fmt(p.endDate ?? null)}
                     </div>
                   </td>
                   <td className="px-3 py-3.5 text-center">

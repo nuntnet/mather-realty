@@ -1,9 +1,20 @@
 import type { Metadata } from "next";
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://ch-erawan.com";
+export const site = {
+  name: 'DoubleN Realty',
+  tagline: 'Find Your Home in Thailand',
+  description: 'Premium rental properties in Thailand for expats and foreigners',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'https://doublen-realty.com',
+  email: 'hello@doublen-realty.com',
+  social: {
+    facebook: '',
+    instagram: '',
+    line: '',
+  },
+}
 
-export const SITE_NAME = "ช.เอราวัณ กรุป";
+export const SITE_URL = site.url;
+export const SITE_NAME = site.name;
 
 /** Build absolute canonical URL for a site path (no query string). */
 export function canonicalUrl(path: string): string {

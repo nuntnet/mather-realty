@@ -5,6 +5,14 @@ import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import * as schema from "@/lib/db/schema";
 
+/**
+ * Application roles:
+ *   "admin"    — full platform access (manages all listings, users, analytics)
+ *   "landlord" — owns property listings; can create/edit their own listings
+ *   "user"     — authenticated tenant / regular visitor
+ */
+export type UserRole = "admin" | "landlord" | "user";
+
 function createAuth() {
   const url = process.env.TURSO_DATABASE_URL;
   const authToken = process.env.TURSO_AUTH_TOKEN;
@@ -28,7 +36,15 @@ function createAuth() {
       enabled: true,
       minPasswordLength: 8,
     },
-    plugins: [admin()],
+    plugins: [
+      admin({
+        // Extend Better Auth's admin plugin with the landlord role.
+        // "admin" is the built-in privileged role; "landlord" and "user" are
+        // stored verbatim in user.role and checked manually in requireLandlord.
+        // The `as` cast satisfies the plugin's internal Role union type.
+        defaultRole: "user" as const,
+      }),
+    ],
     trustedOrigins: [
       "http://localhost:3002",
       process.env.BETTER_AUTH_URL ?? "",
