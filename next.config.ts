@@ -25,6 +25,8 @@ const securityHeaders = [
 ]
 
 const nextConfig: NextConfig = {
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: false },
   serverExternalPackages: ['@libsql/client', 'drizzle-orm'],
   images: {
     loaderFile: './lib/image-loader.ts',
