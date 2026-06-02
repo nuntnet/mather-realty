@@ -408,7 +408,7 @@ async function setupNotion(): Promise<Record<string, string>> {
   } else {
     // Create under workspace (use first found page's parent context)
     const parentPage = await notion.pages.create({
-      parent: { workspace: true } as any,
+      parent: { page_id: "3738b93caeb380b683a0f6cd78b0e1fa" } as any,
       properties: {
         title: {
           title: [{ text: { content: `[${prefix}] Ch.Erawan Databases` } }],
