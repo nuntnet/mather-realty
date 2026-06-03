@@ -61,7 +61,7 @@
     "landlord": "Verhuurder",
     "perMonth": "/mnd",
     "sqm": "m²",
-    "scheduleViewing": "Bezichtigen",
+    "scheduleViewing": "Bezichtiging plannen",
     "status": {
       "available": "Beschikbaar",
       "rented": "Verhuurd",
@@ -82,7 +82,17 @@
       "Balcony": "Balkon",
       "Garden": "Tuin",
       "AirCon": "Airconditioning"
-    }
+    },
+    "contactLandlord": "Contact opnemen met verhuurder",
+    "yourName": "Uw naam",
+    "yourNamePlaceholder": "Volledige naam",
+    "contactMethod": "Contactmethode",
+    "preferredDate": "Gewenste bezichtigingsdatum",
+    "message": "Bericht",
+    "optional": "optioneel",
+    "messagePlaceholder": "Vragen of speciale verzoeken?",
+    "sendInquiry": "Aanvraag versturen",
+    "inquirySuccess": "Verzonden! We nemen snel contact op."
   },
   "search": {
     "title": "Woningen bekijken",

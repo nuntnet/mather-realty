@@ -61,7 +61,7 @@
     "landlord": "Vermieter",
     "perMonth": "/Mon",
     "sqm": "qm",
-    "scheduleViewing": "Besichtigung",
+    "scheduleViewing": "Besichtigung buchen",
     "status": {
       "available": "Verfügbar",
       "rented": "Vermietet",
@@ -82,7 +82,17 @@
       "Balcony": "Balkon",
       "Garden": "Garten",
       "AirCon": "Klimaanlage"
-    }
+    },
+    "contactLandlord": "Vermieter kontaktieren",
+    "yourName": "Ihr Name",
+    "yourNamePlaceholder": "Vollständiger Name",
+    "contactMethod": "Kontaktmethode",
+    "preferredDate": "Besichtigungsdatum",
+    "message": "Nachricht",
+    "optional": "optional",
+    "messagePlaceholder": "Fragen oder Sonderwünsche?",
+    "sendInquiry": "Anfrage senden",
+    "inquirySuccess": "Gesendet! Wir melden uns bald."
   },
   "search": {
     "title": "Immobilien durchsuchen",

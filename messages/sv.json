@@ -61,7 +61,7 @@
     "landlord": "Hyresvärd",
     "perMonth": "/mån",
     "sqm": "m²",
-    "scheduleViewing": "Boka",
+    "scheduleViewing": "Boka visning",
     "status": {
       "available": "Tillgänglig",
       "rented": "Uthyrd",
@@ -82,7 +82,17 @@
       "Balcony": "Balkong",
       "Garden": "Trädgård",
       "AirCon": "Luftkonditionering"
-    }
+    },
+    "contactLandlord": "Kontakta hyresvärden",
+    "yourName": "Ditt namn",
+    "yourNamePlaceholder": "Fullständigt namn",
+    "contactMethod": "Kontaktmetod",
+    "preferredDate": "Föredragen visningsdatum",
+    "message": "Meddelande",
+    "optional": "valfritt",
+    "messagePlaceholder": "Frågor eller önskemål?",
+    "sendInquiry": "Skicka förfrågan",
+    "inquirySuccess": "Skickat! Vi hör av oss snart."
   },
   "search": {
     "title": "Bläddra bland bostäder",

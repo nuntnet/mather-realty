@@ -61,7 +61,7 @@
     "landlord": "Арендодатель",
     "perMonth": "/мес",
     "sqm": "кв.м",
-    "scheduleViewing": "Записаться",
+    "scheduleViewing": "Записаться на просмотр",
     "status": {
       "available": "Свободно",
       "rented": "Занято",
@@ -82,7 +82,17 @@
       "Balcony": "Балкон",
       "Garden": "Сад",
       "AirCon": "Кондиционер"
-    }
+    },
+    "contactLandlord": "Связаться с владельцем",
+    "yourName": "Ваше имя",
+    "yourNamePlaceholder": "Введите ваше имя",
+    "contactMethod": "Способ связи",
+    "preferredDate": "Дата просмотра",
+    "message": "Сообщение",
+    "optional": "необязательно",
+    "messagePlaceholder": "Вопросы или пожелания?",
+    "sendInquiry": "Отправить запрос",
+    "inquirySuccess": "Отправлено! Мы свяжемся с вами."
   },
   "search": {
     "title": "Поиск недвижимости",

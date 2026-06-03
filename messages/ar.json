@@ -61,7 +61,7 @@
     "landlord": "المالك",
     "perMonth": "/شهر",
     "sqm": "م²",
-    "scheduleViewing": "حجز زيارة",
+    "scheduleViewing": "جدولة معاينة",
     "status": {
       "available": "متاح",
       "rented": "مؤجر",
@@ -82,7 +82,17 @@
       "Balcony": "شرفة",
       "Garden": "حديقة",
       "AirCon": "تكييف هواء"
-    }
+    },
+    "contactLandlord": "التواصل مع المالك",
+    "yourName": "اسمك",
+    "yourNamePlaceholder": "أدخل اسمك الكامل",
+    "contactMethod": "طريقة التواصل",
+    "preferredDate": "تاريخ المعاينة المفضل",
+    "message": "رسالة",
+    "optional": "اختياري",
+    "messagePlaceholder": "أي أسئلة أو طلبات خاصة؟",
+    "sendInquiry": "إرسال الاستفسار",
+    "inquirySuccess": "تم الإرسال! سنتواصل معك قريباً."
   },
   "search": {
     "title": "استعراض العقارات",

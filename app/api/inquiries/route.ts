@@ -56,19 +56,21 @@ export async function POST(req: NextRequest) {
 
     // Fire-and-forget email notification
     if (property) {
-      const landlordEmail =
-        process.env.ADMIN_EMAIL || "admin@doublen-realty.com";
+      // Send to both owners
+      const recipients = ['janjiranui@gmail.com', 'nuntnet@gmail.com']
 
-      sendInquiryNotification({
-        landlordEmail,
-        propertyTitle: (property as { address?: string | null }).address ?? data.propertyId,
-        propertySlug: (property as { slug?: string | null }).slug ?? data.propertyId,
-        inquirerName: data.name,
-        contact: data.contact,
-        contactType: data.contactType,
-        preferredDate: data.preferredDate ?? null,
-        message: data.message ?? null,
-      }).catch((err) => console.error("Failed to send inquiry notification:", err));
+      recipients.forEach(landlordEmail => {
+        sendInquiryNotification({
+          landlordEmail,
+          propertyTitle: (property as { address?: string | null }).address ?? data.propertyId,
+          propertySlug: (property as { slug?: string | null }).slug ?? data.propertyId,
+          inquirerName: data.name,
+          contact: data.contact,
+          contactType: data.contactType,
+          preferredDate: data.preferredDate ?? null,
+          message: data.message ?? null,
+        }).catch((err) => console.error("Failed to send inquiry notification:", err))
+      })
     }
 
     return NextResponse.json({ success: true, inquiryId }, { status: 200 });

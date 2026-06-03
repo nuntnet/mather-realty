@@ -85,7 +85,7 @@ export default function Navbar({ locale }: NavbarProps) {
         "fixed top-0 z-50 w-full transition-all duration-300",
         scrolled
           ? "bg-white shadow-md"
-          : "bg-transparent"
+          : "bg-white/90 backdrop-blur-md border-b border-gray-100/80"
       )}
     >
       <div className="container mx-auto px-4 flex h-16 items-center justify-between gap-4">
@@ -99,9 +99,9 @@ export default function Navbar({ locale }: NavbarProps) {
             2N
           </span>
           <span className="text-2xl font-black tracking-tight hidden sm:block">
-            <span className={cn(scrolled ? "text-blue-900" : "text-white/90")}>Double</span>
-            <span className={cn(scrolled ? "text-blue-600" : "text-blue-400")}>N</span>
-            <span className={cn(scrolled ? "text-blue-900" : "text-white/90")}> Realty</span>
+            <span className="text-blue-900">Double</span>
+            <span className="text-blue-600">N</span>
+            <span className="text-blue-900"> Realty</span>
           </span>
         </Link>
 
@@ -114,10 +114,8 @@ export default function Navbar({ locale }: NavbarProps) {
               className={cn(
                 "relative px-3 py-2 text-sm font-medium transition-colors group",
                 isActive(href)
-                  ? scrolled ? "text-blue-600" : "text-white"
-                  : scrolled
-                    ? "text-gray-700 hover:text-blue-600"
-                    : "text-white/80 hover:text-white"
+                  ? "text-blue-600"
+                  : "text-gray-700 hover:text-blue-600"
               )}
             >
               {t(labelKey as "properties" | "blog" | "howItWorks")}
@@ -125,7 +123,7 @@ export default function Navbar({ locale }: NavbarProps) {
               <span
                 className={cn(
                   "absolute bottom-0 left-3 right-3 h-0.5 rounded-full transition-transform duration-200 origin-left",
-                  scrolled ? "bg-blue-600" : "bg-white",
+                  "bg-blue-600",
                   isActive(href) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                 )}
               />
@@ -210,7 +208,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    scrolled ? "text-gray-700 hover:text-blue-600" : "text-white/80 hover:text-white hover:bg-white/10"
+                    "text-gray-700 hover:text-blue-600"
                   )}
                 >
                   <Link href="/login" className="flex items-center gap-1.5">
@@ -229,7 +227,7 @@ export default function Navbar({ locale }: NavbarProps) {
             onClick={() => setMobileOpen((v) => !v)}
             className={cn(
               "md:hidden h-11 w-11",
-              scrolled ? "text-gray-700" : "text-white hover:bg-white/10"
+              "text-gray-700 hover:text-gray-900"
             )}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}

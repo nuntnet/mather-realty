@@ -132,12 +132,12 @@ export default function Footer({ locale: _locale }: FooterProps) {
                 </a>
               </p>
               <p className="text-sm text-gray-400">
-                <a href="tel:+66000000000" className="hover:text-white transition-colors">
-                  +66 000 000 000
+                <a href="tel:+66869902999" className="hover:text-white transition-colors">
+                  +66 86 990 2999
                 </a>
               </p>
               <p className="text-sm text-gray-400">
-                LINE ID: <span className="text-gray-300">@doublen</span>
+                LINE ID: <span className="text-gray-300">treasurenui</span>
               </p>
               <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-green-400 bg-green-400/10 px-3 py-1.5 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
@@ -151,18 +151,18 @@ export default function Footer({ locale: _locale }: FooterProps) {
         <div className="mt-12 pt-6 border-t border-gray-800 space-y-3">
           <p className="text-xs text-gray-500 text-center">
             For inquiries:{" "}
-            <a href="mailto:hello@doublen-realty.com" className="text-gray-400 hover:text-white transition-colors">
-              hello@doublen-realty.com
+            <a href="mailto:janjiranui@gmail.com" className="text-gray-400 hover:text-white transition-colors">
+              janjiranui@gmail.com
             </a>
             {" · "}
             LINE{" "}
             <a
-              href="https://line.me/R/ti/p/@doublen-realty"
+              href="https://line.me/R/ti/p/treasurenui"
               target="_blank"
               rel="noopener noreferrer"
               className="text-gray-400 hover:text-white transition-colors"
             >
-              @doublen-realty
+              treasurenui
             </a>
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">

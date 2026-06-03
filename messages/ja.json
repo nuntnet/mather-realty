@@ -82,7 +82,17 @@
       "Balcony": "バルコニー",
       "Garden": "庭",
       "AirCon": "エアコン"
-    }
+    },
+    "contactLandlord": "オーナーに連絡",
+    "yourName": "お名前",
+    "yourNamePlaceholder": "フルネームを入力",
+    "contactMethod": "連絡方法",
+    "preferredDate": "内覧希望日",
+    "message": "メッセージ",
+    "optional": "任意",
+    "messagePlaceholder": "ご質問や特別なご要望は？",
+    "sendInquiry": "問い合わせを送る",
+    "inquirySuccess": "送信しました！近日中にご連絡します。"
   },
   "search": {
     "title": "物件を探す",

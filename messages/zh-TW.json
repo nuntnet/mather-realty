@@ -82,7 +82,17 @@
       "Balcony": "陽台",
       "Garden": "花園",
       "AirCon": "冷氣"
-    }
+    },
+    "contactLandlord": "聯絡房東",
+    "yourName": "您的姓名",
+    "yourNamePlaceholder": "請輸入姓名",
+    "contactMethod": "聯絡方式",
+    "preferredDate": "預約看房日期",
+    "message": "留言",
+    "optional": "選填",
+    "messagePlaceholder": "有什麼問題或特殊需求？",
+    "sendInquiry": "發送詢問",
+    "inquirySuccess": "已送出！我們將盡快聯絡您。"
   },
   "search": {
     "title": "瀏覽房產",

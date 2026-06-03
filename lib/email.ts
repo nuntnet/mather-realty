@@ -162,7 +162,7 @@ export async function sendSubmissionNotification(params: {
   submitterEmail: string
   propertyTitle: string
 }): Promise<void> {
-  const adminEmail = params.adminEmail || process.env.ADMIN_EMAIL || 'admin@doublen-realty.com'
+  const adminEmail = params.adminEmail || process.env.ADMIN_EMAIL || 'janjiranui@gmail.com'
   const { submitterEmail, propertyTitle } = params
 
   const adminUrl = `${SITE_URL}/admin/properties`

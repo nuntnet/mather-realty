@@ -5,7 +5,7 @@ export const site = {
   tagline: 'Find Your Home in Thailand',
   description: 'Premium rental properties in Thailand for expats and foreigners',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://doublen-realty.com',
-  email: 'hello@doublen-realty.com',
+  email: 'janjiranui@gmail.com',
   social: {
     facebook: '',
     instagram: '',

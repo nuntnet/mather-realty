@@ -82,7 +82,17 @@
       "Balcony": "발코니",
       "Garden": "정원",
       "AirCon": "에어컨"
-    }
+    },
+    "contactLandlord": "집주인에게 연락",
+    "yourName": "이름",
+    "yourNamePlaceholder": "성함을 입력하세요",
+    "contactMethod": "연락 방법",
+    "preferredDate": "관람 희망일",
+    "message": "메시지",
+    "optional": "선택사항",
+    "messagePlaceholder": "질문이나 특별한 요청이 있으신가요?",
+    "sendInquiry": "문의 보내기",
+    "inquirySuccess": "전송 완료! 곧 연락드리겠습니다."
   },
   "search": {
     "title": "매물 검색",

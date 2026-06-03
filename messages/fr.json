@@ -61,7 +61,7 @@
     "landlord": "Propriétaire",
     "perMonth": "/mois",
     "sqm": "m²",
-    "scheduleViewing": "Visiter",
+    "scheduleViewing": "Planifier une visite",
     "status": {
       "available": "Disponible",
       "rented": "Loué",
@@ -82,7 +82,17 @@
       "Balcony": "Balcon",
       "Garden": "Jardin",
       "AirCon": "Climatisation"
-    }
+    },
+    "contactLandlord": "Contacter le propriétaire",
+    "yourName": "Votre nom",
+    "yourNamePlaceholder": "Entrez votre nom complet",
+    "contactMethod": "Méthode de contact",
+    "preferredDate": "Date de visite souhaitée",
+    "message": "Message",
+    "optional": "facultatif",
+    "messagePlaceholder": "Questions ou demandes spéciales ?",
+    "sendInquiry": "Envoyer ma demande",
+    "inquirySuccess": "Envoyé ! Nous vous contacterons bientôt."
   },
   "search": {
     "title": "Parcourir les propriétés",

@@ -61,7 +61,7 @@
     "landlord": "เจ้าของ",
     "perMonth": "/เดือน",
     "sqm": "ตร.ม.",
-    "scheduleViewing": "นัดชมห้อง",
+    "scheduleViewing": "นัดดูบ้าน",
     "status": {
       "available": "ว่าง",
       "rented": "ปล่อยเช่าแล้ว",
@@ -82,7 +82,17 @@
       "Balcony": "ระเบียง",
       "Garden": "สวน",
       "AirCon": "เครื่องปรับอากาศ"
-    }
+    },
+    "contactLandlord": "ติดต่อเจ้าของบ้าน",
+    "yourName": "ชื่อของคุณ",
+    "yourNamePlaceholder": "ชื่อ-นามสกุล",
+    "contactMethod": "ช่องทางการติดต่อ",
+    "preferredDate": "วันที่สะดวกดูบ้าน",
+    "message": "ข้อความ",
+    "optional": "ไม่บังคับ",
+    "messagePlaceholder": "คำถามหรือข้อมูลเพิ่มเติม",
+    "sendInquiry": "ส่งข้อความ",
+    "inquirySuccess": "ส่งข้อความแล้ว! เราจะติดต่อกลับเร็วๆ นี้"
   },
   "search": {
     "title": "ค้นหาอสังหาริมทรัพย์",

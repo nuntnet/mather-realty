@@ -82,7 +82,17 @@
       "Balcony": "阳台",
       "Garden": "花园",
       "AirCon": "空调"
-    }
+    },
+    "contactLandlord": "联系房东",
+    "yourName": "您的姓名",
+    "yourNamePlaceholder": "请输入姓名",
+    "contactMethod": "联系方式",
+    "preferredDate": "预约看房日期",
+    "message": "留言",
+    "optional": "可选",
+    "messagePlaceholder": "有什么问题或特殊要求？",
+    "sendInquiry": "发送咨询",
+    "inquirySuccess": "已发送！我们会尽快联系您。"
   },
   "search": {
     "title": "浏览房产",
