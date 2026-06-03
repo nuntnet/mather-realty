@@ -22,6 +22,9 @@ const patchSchema = z.object({
   bathrooms: z.number().int().optional(),
   sizeSqm: z.number().optional(),
   availableFrom: z.string().optional().nullable(),
+  // Photo management
+  cover_image: z.string().url().optional(),
+  gallery_urls: z.string().optional(),
 });
 
 function getDb() {
