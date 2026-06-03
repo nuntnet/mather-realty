@@ -24,6 +24,11 @@ export interface Property {
   listingScore: number                 // 0-100 completeness score
   ownerId: string | null
   tags: string[]
+  floors: number                       // number of floors/storeys
+  parkingSpots: number                 // number of parking spaces
+  highlights: string[]                 // bullet-point highlights (split by •)
+  contactLine: string | null           // LINE ID of owner
+  contactPhone: string | null          // Phone/WhatsApp of owner
   createdAt: string
   updatedAt: string
 }

@@ -227,6 +227,14 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     listingScore: calculateListingScore(page),
     ownerId: getPropString(page, 'owner_id') || null,
     tags: getPropMultiSelect(page, 'tags'),
+    floors: getPropNumber(page, 'floors') || 2,
+    parkingSpots: getPropNumber(page, 'parking_spots') || 0,
+    highlights: getPropString(page, 'highlights')
+      .split('•')
+      .map(s => s.trim())
+      .filter(Boolean),
+    contactLine: getPropString(page, 'contact_line') || null,
+    contactPhone: getPropString(page, 'contact_phone') || null,
     createdAt: page.created_time,
     updatedAt: page.last_edited_time,
   }
