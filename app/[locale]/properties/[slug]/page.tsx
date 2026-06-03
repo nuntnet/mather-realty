@@ -155,7 +155,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
       <div className="min-h-screen bg-white">
         {/* Breadcrumb + back nav bar */}
-        <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+        <div className="border-b border-gray-100 bg-white/90 backdrop-blur-sm sticky top-16 z-10">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
             <a
               href={propertiesHref}
