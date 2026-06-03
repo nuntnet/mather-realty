@@ -29,6 +29,10 @@ export interface Property {
   highlights: string[]                 // bullet-point highlights (split by •)
   contactLine: string | null           // LINE ID of owner
   contactPhone: string | null          // Phone/WhatsApp of owner
+  perfectFor: string[]                 // e.g. ['teacher', 'family', 'expat-couple']
+  personaDescriptions: Record<string, string> | null  // JSON: { teacher: "...", family: "..." }
+  faqJson: Array<{q: string, a: string}> | null       // FAQ items
+  seoDescription: string              // long-form SEO narrative
   createdAt: string
   updatedAt: string
 }

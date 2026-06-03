@@ -235,6 +235,18 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
       .filter(Boolean),
     contactLine: getPropString(page, 'contact_line') || null,
     contactPhone: getPropString(page, 'contact_phone') || null,
+    perfectFor: getPropMultiSelect(page, 'perfect_for'),
+    personaDescriptions: (() => {
+      const raw = getPropString(page, 'persona_descriptions')
+      if (!raw) return null
+      try { return JSON.parse(raw) } catch { return null }
+    })(),
+    faqJson: (() => {
+      const raw = getPropString(page, 'faq_json')
+      if (!raw) return null
+      try { return JSON.parse(raw) } catch { return null }
+    })(),
+    seoDescription: getPropString(page, 'seo_description'),
     createdAt: page.created_time,
     updatedAt: page.last_edited_time,
   }
@@ -478,6 +490,28 @@ export async function getFeaturedProperties(
       .map((p) => mapProperty(p as PageObjectResponse, locale))
   } catch (err) {
     console.error('[notion] getFeaturedProperties error:', err)
+    return []
+  }
+}
+
+export async function getPropertiesByPersona(
+  persona: string,
+  locale = 'en',
+): Promise<Property[]> {
+  try {
+    const pages = await queryAllPages(PROPERTIES_DB_ID, {
+      filter: {
+        and: [
+          { property: 'status', select: { equals: 'available' } },
+          { property: 'approved_at', date: { is_not_empty: true } },
+          { property: 'perfect_for', multi_select: { contains: persona } },
+        ],
+      },
+      sorts: [{ property: 'approved_at', direction: 'descending' }],
+    })
+    return pages.map((p) => mapProperty(p, locale))
+  } catch (err) {
+    console.error('[notion] getPropertiesByPersona error:', err)
     return []
   }
 }

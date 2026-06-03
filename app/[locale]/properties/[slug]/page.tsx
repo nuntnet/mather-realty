@@ -33,6 +33,8 @@ import {
   MessageCircle,
 } from 'lucide-react'
 import PropertyDetailActions from './PropertyDetailActions'
+import PersonaSection from '@/components/PersonaSection'
+import FAQSection from '@/components/FAQSection'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -60,7 +62,8 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
   }
 
   const title = property.title[locale] ?? property.title.en ?? slug
-  const description = property.description[locale] ?? property.description.en ?? ''
+  const description = property.seoDescription ||
+    (property.description[locale] ?? property.description.en ?? '')
   const image = property.coverImage
 
   const alternates: Record<string, string> = {}
@@ -75,6 +78,13 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
       canonical: `${SITE_URL}/${locale}/properties/${slug}`,
       languages: alternates,
     },
+    keywords: [
+      ...property.perfectFor.map(p => p + ' housing thailand'),
+      property.city,
+      'expat rental',
+      'rental property thailand',
+      property.tags.join(', '),
+    ].filter(Boolean),
     openGraph: {
       title,
       description,
@@ -145,6 +155,14 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         }
       : {}),
     ...(property.coverImage ? { image: property.coverImage } : {}),
+    ...(property.perfectFor.length > 0
+      ? {
+          audience: property.perfectFor.map(persona => ({
+            '@type': 'Audience',
+            audienceType: persona,
+          })),
+        }
+      : {}),
     offers: {
       '@type': 'Offer',
       price: property.priceTHB,
@@ -364,6 +382,15 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 </div>
               )}
 
+              {/* 2b. PERFECT FOR — persona section */}
+              {property.perfectFor.length > 0 && (
+                <PersonaSection
+                  perfectFor={property.perfectFor}
+                  personaDescriptions={property.personaDescriptions}
+                  propertySlug={property.slug}
+                />
+              )}
+
               {/* 3. DESCRIPTION */}
               {description && (
                 <div>
@@ -413,6 +440,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     lng={property.lng}
                   />
                 </div>
+              )}
+
+              {/* 7. FAQ */}
+              {property.faqJson && property.faqJson.length > 0 && (
+                <FAQSection faqItems={property.faqJson} propertyTitle={title} />
               )}
 
               {/* Similar Properties */}

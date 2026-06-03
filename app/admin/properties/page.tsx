@@ -348,6 +348,15 @@ export default function AdminPropertiesPage() {
                               </button>
                             </>
                           )}
+                          {(property.status === "available" || property.status === "rented") && (
+                            <Link
+                              href={`/admin/properties/${property.id}/generate-personas`}
+                              className="p-1.5 text-gray-500 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors"
+                              title="Generate AI Personas"
+                            >
+                              <span className="text-sm leading-none">🤖</span>
+                            </Link>
+                          )}
                           <Link
                             href={`/admin/properties/${property.id}/photos`}
                             className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
