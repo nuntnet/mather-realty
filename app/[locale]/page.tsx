@@ -189,10 +189,18 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">{t('featured_title')}</h2>
-          <Link href="/properties" className="flex items-center gap-1 text-[#297c3b] hover:text-[#46a758] font-medium">
-            {t('view_all')}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/discover"
+              className="flex items-center gap-1.5 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white px-3 py-1.5 rounded-full font-medium transition-colors md:hidden"
+            >
+              <span>↕</span> Swipe
+            </Link>
+            <Link href="/properties" className="flex items-center gap-1 text-[#297c3b] hover:text-[#46a758] font-medium">
+              {t('view_all')}
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         {featuredProperties.length > 0 ? (
