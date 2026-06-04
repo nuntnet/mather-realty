@@ -2,9 +2,9 @@
 
 import React, { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
+import useEmblaCarousel from 'embla-carousel-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X, Grid2X2, Video, ExternalLink } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 
@@ -20,137 +20,171 @@ export default function PropertyGallery({ images, coverImage, virtualTourUrl }: 
     return deduped
   }, [images, coverImage])
 
+  const [selectedIndex, setSelectedIndex] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
-  const [lightboxIndex, setLightboxIndex] = useState(0)
   const [tourOpen, setTourOpen] = useState(false)
-  const [direction, setDirection] = useState(0)
 
-  const openLightbox = (idx: number) => {
-    setLightboxIndex(idx)
-    setLightboxOpen(true)
-  }
+  // ── Carousel (mobile-first swipe) ──────────────────────────────────────────
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    dragFree: false,
+  })
 
-  const goTo = useCallback((idx: number) => {
-    const next = (idx + allImages.length) % allImages.length
-    setDirection(next > lightboxIndex ? 1 : -1)
-    setLightboxIndex(next)
-  }, [lightboxIndex, allImages.length])
+  const [lightboxEmblaRef, lightboxEmblaApi] = useEmblaCarousel({
+    loop: true,
+    startIndex: selectedIndex,
+  })
 
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return
+    setSelectedIndex(emblaApi.selectedScrollSnap())
+  }, [emblaApi])
+
+  useEffect(() => {
+    if (!emblaApi) return
+    emblaApi.on('select', onSelect)
+    onSelect()
+    return () => { emblaApi.off('select', onSelect) }
+  }, [emblaApi, onSelect])
+
+  // Sync lightbox to start image
+  useEffect(() => {
+    if (lightboxOpen && lightboxEmblaApi) {
+      lightboxEmblaApi.scrollTo(selectedIndex, true)
+    }
+  }, [lightboxOpen, lightboxEmblaApi, selectedIndex])
+
+  const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi])
+  const scrollNext = useCallback(() => emblaApi?.scrollNext(), [emblaApi])
+
+  const lightboxPrev = useCallback(() => lightboxEmblaApi?.scrollPrev(), [lightboxEmblaApi])
+  const lightboxNext = useCallback(() => lightboxEmblaApi?.scrollNext(), [lightboxEmblaApi])
+
+  // Lightbox index tracking
+  const [lightboxIndex, setLightboxIndex] = useState(0)
+  useEffect(() => {
+    if (!lightboxEmblaApi) return
+    const update = () => setLightboxIndex(lightboxEmblaApi.selectedScrollSnap())
+    lightboxEmblaApi.on('select', update)
+    return () => { lightboxEmblaApi.off('select', update) }
+  }, [lightboxEmblaApi])
+
+  // Keyboard nav for lightbox
   useEffect(() => {
     if (!lightboxOpen) return
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') goTo(lightboxIndex - 1)
-      if (e.key === 'ArrowRight') goTo(lightboxIndex + 1)
+      if (e.key === 'ArrowLeft') lightboxPrev()
+      if (e.key === 'ArrowRight') lightboxNext()
       if (e.key === 'Escape') setLightboxOpen(false)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [lightboxOpen, lightboxIndex, goTo])
-
-  // Grid slots: main (idx 0) + up to 4 side images
-  const main = allImages[0]
-  const side = allImages.slice(1, 5)
-  const remaining = allImages.length - 5
+  }, [lightboxOpen, lightboxPrev, lightboxNext])
 
   return (
     <>
-      {/* ── Airbnb-style photo grid ── */}
-      <div className="relative w-full">
-        {allImages.length === 1 ? (
-          /* Single image */
-          <div
-            className="relative w-full cursor-pointer overflow-hidden"
-            style={{ height: '60vh', minHeight: 340, maxHeight: 600 }}
-            onClick={() => openLightbox(0)}
-          >
-            <Image src={main} alt="Property" fill className="object-cover" priority sizes="100vw" />
-          </div>
-        ) : (
-          /* Multi-image grid */
-          <div
-            className={cn(
-              'grid w-full overflow-hidden',
-              side.length >= 4
-                ? 'grid-cols-2 grid-rows-2 gap-1 sm:gap-1.5'
-                : side.length >= 2
-                ? 'grid-cols-3 gap-1 sm:gap-1.5'
-                : 'grid-cols-2 gap-1 sm:gap-1.5',
-            )}
-            style={{ height: '60vh', minHeight: 340, maxHeight: 600 }}
-          >
-            {/* Main (large) image */}
-            <div
-              className={cn(
-                'relative cursor-pointer overflow-hidden',
-                side.length >= 4 ? 'col-span-1 row-span-2' : 'col-span-2 row-span-1',
-              )}
-              onClick={() => openLightbox(0)}
-            >
-              <Image
-                src={main}
-                alt="Property main photo"
-                fill
-                priority
-                className="object-cover hover:scale-105 transition-transform duration-500"
-                sizes="(max-width:768px) 100vw, 50vw"
-              />
-            </div>
-
-            {/* Side images */}
-            {side.map((img, idx) => (
+      {/* ── Swipe Carousel ───────────────────────────────────────────────────── */}
+      <div className="relative w-full select-none">
+        {/* Embla viewport */}
+        <div
+          ref={emblaRef}
+          className="overflow-hidden rounded-none"
+          style={{ cursor: 'grab' }}
+        >
+          <div className="flex">
+            {allImages.map((img, idx) => (
               <div
                 key={idx}
-                className="relative cursor-pointer overflow-hidden"
-                onClick={() => openLightbox(idx + 1)}
+                className="relative flex-shrink-0 w-full"
+                style={{ height: '65vw', maxHeight: 480, minHeight: 260 }}
+                onClick={() => { setSelectedIndex(idx); setLightboxOpen(true) }}
               >
                 <Image
                   src={img}
-                  alt={`Property photo ${idx + 2}`}
+                  alt={`Photo ${idx + 1}`}
                   fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                  sizes="(max-width:768px) 50vw, 25vw"
+                  priority={idx === 0}
+                  className="object-cover"
+                  sizes="100vw"
+                  draggable={false}
                 />
-                {/* "Show all" overlay on last visible */}
-                {idx === 3 && remaining > 0 && (
-                  <div className="absolute inset-0 bg-black/50 flex items-center justify-center gap-2 text-white font-semibold text-sm">
-                    <Grid2X2 className="w-5 h-5" />
-                    +{remaining} photos
-                  </div>
-                )}
               </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Prev / Next arrows (desktop only) */}
+        {allImages.length > 1 && (
+          <>
+            <button
+              onClick={scrollPrev}
+              aria-label="Previous"
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-10 hidden sm:flex size-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow hover:bg-white transition-colors"
+            >
+              <ChevronLeft className="size-5 text-gray-800" />
+            </button>
+            <button
+              onClick={scrollNext}
+              aria-label="Next"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-10 hidden sm:flex size-9 items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow hover:bg-white transition-colors"
+            >
+              <ChevronRight className="size-5 text-gray-800" />
+            </button>
+          </>
+        )}
+
+        {/* Counter top-right */}
+        <div className="absolute top-3 right-3 z-10 bg-black/50 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur-sm select-none">
+          {selectedIndex + 1} / {allImages.length}
+        </div>
+
+        {/* Dots indicator */}
+        {allImages.length > 1 && allImages.length <= 20 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-1">
+            {allImages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => emblaApi?.scrollTo(idx)}
+                className={cn(
+                  'rounded-full transition-all duration-200',
+                  idx === selectedIndex
+                    ? 'w-4 h-1.5 bg-white'
+                    : 'w-1.5 h-1.5 bg-white/50',
+                )}
+                aria-label={`Go to photo ${idx + 1}`}
+              />
             ))}
           </div>
         )}
 
-        {/* Buttons bottom-right */}
-        <div className="absolute bottom-3 right-3 flex gap-2 z-10">
+        {/* Action buttons bottom-right */}
+        <div className="absolute bottom-3 right-3 z-10 flex gap-2">
           {virtualTourUrl && (
             <button
               onClick={() => setTourOpen(true)}
-              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-3 py-2 rounded-lg shadow-md backdrop-blur-sm transition-colors border border-white/20"
+              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow backdrop-blur-sm border border-white/20"
             >
-              <Video className="w-4 h-4 text-blue-600" />
-              Virtual Tour
+              <Video className="w-3.5 h-3.5 text-[#46a758]" />
+              <span className="hidden sm:inline">Tour</span>
             </button>
           )}
-          {allImages.length > 1 && (
-            <button
-              onClick={() => openLightbox(0)}
-              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-3 py-2 rounded-lg shadow-md backdrop-blur-sm transition-colors border border-white/20"
-            >
-              <Grid2X2 className="w-4 h-4" />
-              All {allImages.length} photos
-            </button>
-          )}
+          <button
+            onClick={() => { setSelectedIndex(selectedIndex); setLightboxOpen(true) }}
+            className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow backdrop-blur-sm border border-white/20"
+          >
+            <Grid2X2 className="w-3.5 h-3.5" />
+            <span>All {allImages.length}</span>
+          </button>
         </div>
       </div>
 
-      {/* ── Lightbox ── */}
+      {/* ── Lightbox fullscreen carousel ─────────────────────────────────────── */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-screen-xl w-screen h-screen p-0 bg-black/95 border-0 rounded-none flex flex-col">
+        <DialogContent className="max-w-none w-screen h-dvh p-0 bg-black border-0 rounded-none flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 shrink-0">
-            <span className="text-white/70 text-sm">{lightboxIndex + 1} / {allImages.length}</span>
+          <div className="flex items-center justify-between px-4 py-3 shrink-0 z-10">
+            <span className="text-white/60 text-sm font-medium">{lightboxIndex + 1} / {allImages.length}</span>
             <button
               onClick={() => setLightboxOpen(false)}
               className="size-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
@@ -159,84 +193,68 @@ export default function PropertyGallery({ images, coverImage, virtualTourUrl }: 
             </button>
           </div>
 
-          {/* Main lightbox image */}
-          <div className="flex-1 relative overflow-hidden">
-            <AnimatePresence initial={false} custom={direction} mode="popLayout">
-              <motion.div
-                key={lightboxIndex}
-                custom={direction}
-                variants={{
-                  enter: (d: number) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0 }),
-                  center: { x: 0, opacity: 1 },
-                  exit: (d: number) => ({ x: d < 0 ? '100%' : '-100%', opacity: 0 }),
-                }}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{ type: 'tween', duration: 0.25, ease: 'easeInOut' }}
-                className="absolute inset-0 flex items-center justify-center p-4"
-              >
-                <div className="relative w-full h-full">
-                  <Image
-                    src={allImages[lightboxIndex]}
-                    alt={`Photo ${lightboxIndex + 1}`}
-                    fill
-                    className="object-contain"
-                    sizes="100vw"
-                  />
+          {/* Lightbox carousel */}
+          <div ref={lightboxEmblaRef} className="flex-1 overflow-hidden">
+            <div className="flex h-full">
+              {allImages.map((img, idx) => (
+                <div key={idx} className="relative flex-shrink-0 w-full h-full flex items-center justify-center px-2">
+                  <div className="relative w-full h-full">
+                    <Image
+                      src={img}
+                      alt={`Photo ${idx + 1}`}
+                      fill
+                      className="object-contain"
+                      sizes="100vw"
+                      draggable={false}
+                    />
+                  </div>
                 </div>
-              </motion.div>
-            </AnimatePresence>
-
-            {/* Arrows */}
-            {allImages.length > 1 && (
-              <>
-                <button
-                  onClick={() => goTo(lightboxIndex - 1)}
-                  className="absolute left-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                >
-                  <ChevronLeft className="w-6 h-6 text-white" />
-                </button>
-                <button
-                  onClick={() => goTo(lightboxIndex + 1)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-                >
-                  <ChevronRight className="w-6 h-6 text-white" />
-                </button>
-              </>
-            )}
+              ))}
+            </div>
           </div>
 
+          {/* Lightbox nav arrows */}
+          {allImages.length > 1 && (
+            <>
+              <button onClick={lightboxPrev} className="absolute left-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+              <button onClick={lightboxNext} className="absolute right-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+            </>
+          )}
+
           {/* Thumbnail strip */}
-          <div className="flex gap-2 overflow-x-auto px-4 py-3 shrink-0 scrollbar-hide">
+          <div className="flex gap-1.5 overflow-x-auto px-4 py-3 shrink-0 scrollbar-hide">
             {allImages.map((img, idx) => (
               <button
                 key={idx}
-                onClick={() => { setDirection(idx > lightboxIndex ? 1 : -1); setLightboxIndex(idx) }}
+                onClick={() => lightboxEmblaApi?.scrollTo(idx)}
                 className={cn(
-                  'relative shrink-0 rounded-md overflow-hidden border-2 transition-all',
+                  'relative shrink-0 rounded-lg overflow-hidden border-2 transition-all',
                   idx === lightboxIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-70',
                 )}
-                style={{ width: 64, height: 44 }}
+                style={{ width: 56, height: 40 }}
               >
-                <Image src={img} alt={`Thumb ${idx + 1}`} fill sizes="64px" className="object-cover" />
+                <Image src={img} alt={`Thumb ${idx + 1}`} fill sizes="56px" className="object-cover" />
               </button>
             ))}
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* ── Virtual Tour Modal ── */}
+      {/* ── Virtual Tour ─────────────────────────────────────────────────────── */}
       {virtualTourUrl && (
         <Dialog open={tourOpen} onOpenChange={setTourOpen}>
           <DialogContent className="max-w-4xl w-full p-0 overflow-hidden rounded-2xl">
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <span className="font-semibold text-sm">Virtual Tour</span>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => window.open(virtualTourUrl, '_blank')} className="gap-1.5 text-xs">
-                  <ExternalLink className="size-3.5" /> Open in new tab
-                </Button>
-                <button onClick={() => setTourOpen(false)} className="size-8 flex items-center justify-center rounded-md hover:bg-gray-100">
+              <div className="flex gap-2">
+                <button onClick={() => window.open(virtualTourUrl, '_blank')} className="flex items-center gap-1.5 text-xs border rounded-lg px-3 py-1.5 hover:bg-gray-50">
+                  <ExternalLink className="size-3.5" /> Open
+                </button>
+                <button onClick={() => setTourOpen(false)} className="size-8 flex items-center justify-center rounded-lg hover:bg-gray-100">
                   <X className="size-4 text-gray-600" />
                 </button>
               </div>
