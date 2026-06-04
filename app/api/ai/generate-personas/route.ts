@@ -4,6 +4,46 @@ import { getProperty } from '@/lib/notion'
 import { Client } from '@notionhq/client'
 import Anthropic from '@anthropic-ai/sdk'
 
+// Dual-mode: Hermes local adapter (dev) or Anthropic SDK (production)
+// - HERMES_URL set (e.g. http://127.0.0.1:8999) → use Hermes OpenAI-compatible adapter
+// - ANTHROPIC_API_KEY set → use Anthropic SDK directly
+async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
+  const hermesUrl = process.env.HERMES_URL
+  const anthropicKey = process.env.ANTHROPIC_API_KEY
+
+  if (hermesUrl) {
+    // Hermes adapter: OpenAI-compatible API from Hermes UI
+    const res = await fetch(`${hermesUrl}/v1/chat/completions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer no-key' },
+      body: JSON.stringify({
+        model: process.env.HERMES_MODEL ?? 'cc/sonnet',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.7,
+      }),
+    })
+    if (!res.ok) throw new Error(`Hermes error: ${await res.text()}`)
+    const data = await res.json()
+    return data.choices[0]?.message?.content ?? ''
+  }
+
+  if (anthropicKey) {
+    const anthropic = new Anthropic({ apiKey: anthropicKey })
+    const message = await anthropic.messages.create({
+      model: 'claude-3-5-haiku-20241022',
+      max_tokens: 2000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    })
+    return message.content[0]?.type === 'text' ? message.content[0].text : ''
+  }
+
+  throw new Error('No AI provider configured. Set HERMES_URL or ANTHROPIC_API_KEY.')
+}
+
 export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
@@ -14,10 +54,9 @@ export async function POST(req: NextRequest) {
   const property = slug ? await getProperty(slug, 'en') : null
   if (!property) return NextResponse.json({ error: 'Property not found' }, { status: 404 })
 
-  const anthropicKey = process.env.ANTHROPIC_API_KEY
-  if (!anthropicKey) return NextResponse.json({ error: 'ANTHROPIC_API_KEY not set' }, { status: 500 })
-
-  const anthropic = new Anthropic({ apiKey: anthropicKey })
+  if (!process.env.HERMES_URL && !process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'Set HERMES_URL (local) or ANTHROPIC_API_KEY (production)' }, { status: 500 })
+  }
 
   const ctx = {
     title: property.title.en,
@@ -63,15 +102,11 @@ Generate a JSON response with exactly this structure:
 
 Only output valid JSON. No markdown, no backticks, no explanation.`
 
-  const message = await anthropic.messages.create({
-    model: 'claude-3-5-haiku-20241022',
-    max_tokens: 2000,
-    messages: [{ role: 'user', content: userPrompt }],
-    system: systemPrompt,
+  const content = await callAI(systemPrompt, userPrompt).catch(e => {
+    return NextResponse.json({ error: e.message }, { status: 502 })
   })
-
-  const content = message.content[0]?.type === 'text' ? message.content[0].text : null
-  if (!content) return NextResponse.json({ error: 'No content from Claude' }, { status: 502 })
+  if (typeof content !== 'string') return content  // NextResponse error
+  if (!content) return NextResponse.json({ error: 'No content from AI' }, { status: 502 })
 
   let generated: {
     personaDescriptions: Record<string, string>
