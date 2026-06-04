@@ -137,7 +137,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto text-center w-full py-24">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-4xl md:text-6xl font-lexend font-extrabold tracking-tight mb-6 leading-tight drop-shadow-lg">
             {t('hero_title')}
           </h1>
           <p className="text-xl md:text-2xl text-green-100 mb-10 drop-shadow">
@@ -150,18 +150,16 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-sm text-green-100 mb-10">
-            <span className="flex items-center gap-1.5">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-green-100 mb-10">
+            <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] inline-block" />
               500+ Expats Helped
             </span>
-            <span className="text-white/30">·</span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#b2e5b4] inline-block" />
               Bangkok · Chiang Mai · Phuket
             </span>
-            <span className="text-white/30">·</span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] inline-block" />
               Verified Listings
             </span>
@@ -188,7 +186,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Featured Properties */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">{t('featured_title')}</h2>
+          <h2 className="text-3xl font-lexend font-bold text-gray-900">{t('featured_title')}</h2>
           <div className="flex items-center gap-3">
             <Link
               href="/discover"
@@ -250,7 +248,7 @@ export default async function HomePage({ params }: HomePageProps) {
             List your property and reach thousands of expats looking for rental homes in Thailand.
             It&apos;s free to get started.
           </p>
-          <Button asChild size="lg" className="bg-white text-[#1b512a] hover:bg-green-50 font-semibold">
+          <Button asChild size="lg" className="bg-white text-[#1b512a] hover:bg-green-50 font-semibold rounded-full">
             <Link href="/submit">List Your Property</Link>
           </Button>
         </div>

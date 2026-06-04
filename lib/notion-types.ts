@@ -33,6 +33,11 @@ export interface Property {
   personaDescriptions: Record<string, string> | null  // JSON: { teacher: "...", family: "..." }
   faqJson: Array<{q: string, a: string}> | null       // FAQ items
   seoDescription: string              // long-form SEO narrative
+  galleryCategories: {
+    exterior: string[]
+    interior: string[]
+    community: string[]
+  } | null
   createdAt: string
   updatedAt: string
 }

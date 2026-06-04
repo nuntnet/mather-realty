@@ -28,6 +28,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-ibm-plex-thai)", "var(--font-inter)", "system-ui", "sans-serif"],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
+        lexend: ["var(--font-lexend)", "system-ui", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -79,12 +80,14 @@ const config: Config = {
         },
       },
       borderRadius: {
-        lg: 'var(--radius)',                      // 0.75rem = 12px
+        lg: 'var(--radius)',                      // 1rem = 16px
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
-        xl: 'calc(var(--radius) + 4px)',          // 16px
-        '2xl': 'calc(var(--radius) + 8px)',       // 20px
-        '3xl': 'calc(var(--radius) + 16px)',      // 28px
+        xl: 'calc(var(--radius) + 4px)',          // 20px
+        '2xl': '1.5rem',
+        '3xl': '2rem',
+        '4xl': '3rem',
+        'pill': '9999px',
       },
     },
   },

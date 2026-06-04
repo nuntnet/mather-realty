@@ -121,7 +121,7 @@ function CardCarousel({
       locale={locale as Parameters<typeof Link>[0]['locale']}
       className={cn(
         'relative block shrink-0 overflow-hidden',
-        isList ? 'w-64 h-full min-h-[180px]' : 'w-full',
+        isList ? 'w-64 h-full min-h-[180px] max-h-[200px]' : 'w-full',
       )}
       tabIndex={-1}
       onMouseEnter={() => setHovering(true)}
@@ -245,8 +245,8 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
   return (
     <article
       className={cn(
-        'group relative rounded-2xl bg-white shadow-sm border border-[#e2e5e0] overflow-hidden',
-        'transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-[#46a758]/10',
+        'group relative rounded-3xl bg-white shadow-sm border border-[#e2e5e0] overflow-hidden',
+        'transition-all duration-200 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/8',
         'w-full',
         isList ? 'flex flex-row' : 'flex flex-col',
       )}
@@ -276,7 +276,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             className="block"
           >
             <h3
-              className="font-semibold text-[#1d211c] text-base leading-snug line-clamp-2 hover:text-[#297c3b] transition-colors"
+              className="font-lexend font-semibold text-[#1d211c] text-base leading-snug line-clamp-2 hover:text-[#297c3b] transition-colors"
               title={title}
             >
               {title}
@@ -289,7 +289,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
 
         {/* Price */}
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold text-[#297c3b]">
+          <span className="font-lexend text-2xl font-bold text-[#297c3b]">
             {formatPrice(property.priceTHB, locale)}
           </span>
           <span className="text-sm text-[#898e87]">{t('perMonth')}</span>
@@ -339,7 +339,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         <div className="flex items-center gap-2 pt-1 mt-auto">
           <Button
             asChild size="sm" variant="default"
-            className="flex-1 h-11 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white shadow-sm"
+            className="flex-1 h-11 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white shadow-sm rounded-full"
           >
             <Link href={`/properties/${property.slug}#inquiry`} locale={locale as Parameters<typeof Link>[0]['locale']}>
               {t('scheduleViewing')}
@@ -349,7 +349,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             onClick={handleSave}
             aria-label={isSaved ? t('saved') : t('save')}
             className={cn(
-              'size-11 rounded-xl flex items-center justify-center border transition-colors',
+              'size-11 rounded-full flex items-center justify-center border transition-colors',
               isSaved
                 ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
                 : 'bg-white border-[#d9ddd8] text-[#898e87] hover:bg-[#f1f4f0] hover:text-red-400',

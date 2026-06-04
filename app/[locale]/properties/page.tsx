@@ -106,7 +106,7 @@ export default async function PropertiesPage({ params, searchParams }: Propertie
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-6 px-4">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          <h1 className="text-2xl font-lexend font-bold text-gray-900 mb-1">
             {cityLabel ? `Properties in ${cityLabel}` : 'Browse Properties'}
           </h1>
           <p className="text-gray-500 text-sm">

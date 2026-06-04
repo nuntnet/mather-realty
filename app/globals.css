@@ -29,7 +29,10 @@
     --ring: 137 40% 47%;              /* grass focus ring */
 
     /* Large radius */
-    --radius: 0.75rem;
+    --radius: 1rem;
+
+    /* Fonts */
+    --font-lexend: var(--font-lexend);
 
     /* Brand tokens */
     --grass-9: 137 40% 47%;           /* #46a758 main green */
@@ -86,6 +89,12 @@
   :lang(th) {
     line-height: 1.7;
   }
+}
+
+/* Viberent heading utilities */
+@layer components {
+  .heading-display { @apply font-lexend font-bold tracking-tight; }
+  .heading-hero { @apply font-lexend font-extrabold tracking-tight; }
 }
 
 /* Glassmorphism Effects */

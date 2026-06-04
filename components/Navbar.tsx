@@ -98,7 +98,7 @@ export default function Navbar({ locale }: NavbarProps) {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#46a758] text-white font-black text-sm select-none shrink-0">
             2N
           </span>
-          <span className="text-2xl font-black tracking-tight hidden sm:block">
+          <span className="text-2xl font-lexend font-extrabold tracking-tight hidden sm:block">
             <span className="text-[#1d211c]">Double</span>
             <span className="text-[#46a758]">N</span>
             <span className="text-[#1d211c]"> Realty</span>
@@ -137,7 +137,7 @@ export default function Navbar({ locale }: NavbarProps) {
           <Button
             asChild
             size="sm"
-            className="hidden sm:flex gap-1.5 bg-[#46a758] hover:bg-[#3d9a4f] text-white border-0 shadow-sm transition-colors"
+            className="hidden sm:flex gap-1.5 bg-[#46a758] hover:bg-[#3d9a4f] text-white border-0 shadow-sm transition-colors rounded-full"
           >
             <Link href="/submit">
               <Home className="h-3.5 w-3.5" />
@@ -275,10 +275,10 @@ export default function Navbar({ locale }: NavbarProps) {
                 href={href as `/properties` | `/blog` | `/how-it-works`}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
-                  "flex items-center gap-3 px-3 rounded-xl text-base font-medium transition-colors min-h-[44px]",
+                  "flex items-center gap-3 px-4 py-2 text-base font-medium transition-colors min-h-[44px]",
                   isActive(href)
-                    ? "bg-[#46a758]/10 text-[#46a758]"
-                    : "text-[#5e6360] hover:text-[#1d211c] hover:bg-[#e2e5e0]/50"
+                    ? "bg-[#46a758]/10 text-[#46a758] rounded-full"
+                    : "text-[#5e6360] hover:text-[#1d211c] hover:bg-[#e2e5e0]/50 rounded-xl"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -292,7 +292,7 @@ export default function Navbar({ locale }: NavbarProps) {
             <Link
               href="/submit"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-3 rounded-xl text-base font-semibold bg-[#46a758] hover:bg-[#3d9a4f] text-white transition-colors min-h-[44px]"
+              className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-semibold bg-[#46a758] hover:bg-[#3d9a4f] text-white transition-colors min-h-[44px]"
             >
               <Home className="h-5 w-5 shrink-0" />
               {t("submitListing")}
@@ -302,7 +302,7 @@ export default function Navbar({ locale }: NavbarProps) {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 px-3 rounded-xl text-base font-medium border border-[#e2e5e0] text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
+                className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-medium border border-[#e2e5e0] text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
               >
                 <LogIn className="h-5 w-5 shrink-0" />
                 {t("login")}
@@ -315,7 +315,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   <Link
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
+                    className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-medium text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
                   >
                     <ShieldCheck className="h-5 w-5 shrink-0" />
                     {t("admin")}
@@ -332,7 +332,7 @@ export default function Navbar({ locale }: NavbarProps) {
                 <button
                   type="button"
                   onClick={() => { setMobileOpen(false); handleSignOut(); }}
-                  className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[44px] w-full text-left"
+                  className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[44px] w-full text-left"
                 >
                   <LogOut className="h-5 w-5 shrink-0" />
                   Logout

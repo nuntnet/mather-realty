@@ -36,6 +36,7 @@ import PropertyDetailActions from './PropertyDetailActions'
 import PersonaSection from '@/components/PersonaSection'
 import FAQSection from '@/components/FAQSection'
 import PropertyMap from '@/components/PropertyMap'
+import StickyPropertyCTA from '@/components/StickyPropertyCTA'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -187,7 +188,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-white pt-16">
+      <div className="min-h-screen bg-white pt-16 pb-28 lg:pb-0">
         {/* Breadcrumb bar — scrolls with page, not sticky */}
         <div className="border-b border-gray-100 bg-white/90 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
@@ -587,7 +588,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     )}
 
                     {/* INQUIRY FORM */}
-                    <div>
+                    <div id="inquiry">
                       <div className="flex items-center gap-2 mb-3">
                         <MessageCircle className="w-4 h-4 text-gray-500" />
                         <p className="text-sm font-semibold text-gray-700">Send an enquiry</p>
@@ -604,6 +605,15 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           </div>
         </div>
       </div>
+
+      <StickyPropertyCTA
+        propertySlug={property.slug}
+        propertyTitle={title}
+        priceTHB={property.priceTHB}
+        contactLine={property.contactLine ?? null}
+        contactPhone={property.contactPhone ?? null}
+        status={property.status}
+      />
     </>
   )
 }

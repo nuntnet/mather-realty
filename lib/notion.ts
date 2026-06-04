@@ -247,6 +247,11 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
       try { return JSON.parse(raw) } catch { return null }
     })(),
     seoDescription: getPropString(page, 'seo_description'),
+    galleryCategories: (() => {
+      const raw = getPropString(page, 'gallery_categories')
+      if (!raw) return null
+      try { return JSON.parse(raw) } catch { return null }
+    })(),
     createdAt: page.created_time,
     updatedAt: page.last_edited_time,
   }
