@@ -35,6 +35,7 @@ import {
 import PropertyDetailActions from './PropertyDetailActions'
 import PersonaSection from '@/components/PersonaSection'
 import FAQSection from '@/components/FAQSection'
+import PropertyMap from '@/components/PropertyMap'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -434,11 +435,21 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {property.lat > 0 && property.lng > 0 && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">Location</h2>
-                  <NearbyPanel
-                    propertyId={property.id}
+                  {/* Google Maps embed */}
+                  <PropertyMap
                     lat={property.lat}
                     lng={property.lng}
+                    title={title}
+                    address={[property.address, property.district, property.city].filter(Boolean).join(', ')}
                   />
+                  {/* Nearby POIs */}
+                  <div className="mt-4">
+                    <NearbyPanel
+                      propertyId={property.id}
+                      lat={property.lat}
+                      lng={property.lng}
+                    />
+                  </div>
                 </div>
               )}
 

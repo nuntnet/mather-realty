@@ -95,43 +95,77 @@ export default function AvailabilityCalendar({
           </h3>
         </div>
 
-        <div className="p-4">
+        <div className="px-4 pb-4 pt-2">
           <style>{`
-            /* Override react-day-picker for clean look */
-            .rdp { --rdp-cell-size: 38px; margin: 0; }
+            /* Compact DayPicker — fixed row heights */
+            .rdp {
+              --rdp-cell-size: 36px;
+              --rdp-accent-color: #46a758;
+              margin: 0;
+            }
+            .rdp-months { width: 100%; }
             .rdp-month { width: 100%; }
-            .rdp-table { width: 100%; }
-            .rdp-head_cell { color: #6b7280; font-size: 11px; font-weight: 600; text-transform: uppercase; padding-bottom: 8px; }
-            .rdp-button { border-radius: 8px; font-size: 13px; font-weight: 500; }
-            .rdp-day_today:not(.rdp-day_selected) { font-weight: 700; color: #2563eb; }
-            .rdp-nav_button { border-radius: 8px; }
-            .rdp-caption_label { font-size: 15px; font-weight: 700; color: #111827; }
+            .rdp-table { width: 100%; border-collapse: collapse; }
+            .rdp-tbody tr { height: 36px; }
+            .rdp-head_row { height: 28px; }
+            .rdp-head_cell {
+              color: #898e87;
+              font-size: 11px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.05em;
+              padding: 0;
+              text-align: center;
+            }
+            .rdp-cell { padding: 1px; text-align: center; }
+            .rdp-button {
+              width: 34px;
+              height: 34px;
+              border-radius: 8px;
+              font-size: 13px;
+              font-weight: 500;
+              line-height: 1;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .rdp-day_today:not(.rdp-day_selected) .rdp-button {
+              font-weight: 800;
+              color: #46a758;
+              border: 1.5px solid #46a758;
+            }
+            .rdp-nav_button { border-radius: 8px; width: 32px; height: 32px; }
+            .rdp-caption { margin-bottom: 8px; }
+            .rdp-caption_label { font-size: 14px; font-weight: 700; color: #1d211c; }
 
-            /* Blocked dates */
+            /* Available dates — green */
+            .rdp-day_available .rdp-button:not(:disabled) {
+              background: #daf6da !important;
+              color: #297c3b !important;
+            }
+            .rdp-day_available .rdp-button:not(:disabled):hover {
+              background: #c9f0ca !important;
+            }
+
+            /* Blocked dates — red */
             .rdp-day_blocked .rdp-button {
               background: #fee2e2 !important;
               color: #b91c1c !important;
               text-decoration: line-through;
-            }
-
-            /* Available dates */
-            .rdp-day_available .rdp-button:not(:disabled) {
-              background: #dcfce7 !important;
-              color: #15803d !important;
-            }
-            .rdp-day_available .rdp-button:not(:disabled):hover {
-              background: #bbf7d0 !important;
+              text-decoration-color: #ef4444;
+              opacity: 0.9;
             }
 
             /* Past dates */
             .rdp-day_past .rdp-button {
-              opacity: 0.35;
+              opacity: 0.3;
             }
 
-            /* Disabled (before available) */
-            .rdp-day_disabled .rdp-button {
-              background: #f9fafb;
-              color: #d1d5db;
+            /* Disabled — before available */
+            .rdp-day_disabled .rdp-button:not(.rdp-day_blocked .rdp-button) {
+              background: transparent;
+              color: #cdd1cb;
+              cursor: not-allowed;
             }
           `}</style>
 
