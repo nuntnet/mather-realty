@@ -461,13 +461,21 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
           {/* Swipe feed */}
           <div
             ref={containerRef}
-            className="h-full overflow-y-scroll snap-y snap-mandatory"
+            className={cn(
+              'h-full overflow-y-scroll snap-y snap-mandatory',
+              isDesktop && 'flex flex-col'
+            )}
             style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}
           >
             <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
             {properties.map((property, idx) => (
-              <div key={property.id} data-index={idx} style={{ scrollSnapAlign: 'start' }}>
+              <div
+                key={property.id}
+                data-index={idx}
+                className={isDesktop ? 'h-full' : 'h-dvh'}
+                style={{ scrollSnapAlign: 'start', flexShrink: 0 }}
+              >
                 <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} isDesktop={isDesktop} />
               </div>
             ))}
@@ -504,7 +512,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
 
         {/* ── RIGHT PANEL (desktop only) ─────────────── */}
         {activeProperty && (
-          <div className="hidden lg:flex flex-col w-72 xl:w-80 shrink-0 gap-4 py-8">
+          <div className="hidden lg:flex flex-col w-72 xl:w-80 shrink-0 gap-4 p-6 overflow-y-auto">
             {/* Property highlights */}
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 space-y-4">
               <h3 className="text-white font-bold text-lg leading-snug">
