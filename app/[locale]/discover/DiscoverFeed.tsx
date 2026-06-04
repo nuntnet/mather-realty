@@ -15,6 +15,9 @@ import {
   Maximize2,
   CheckCircle2,
   ChevronUp,
+  ChevronDown,
+  Home,
+  Compass,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -277,7 +280,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
       { threshold: 0.6, root: containerRef.current }
     )
 
-    const sections = containerRef.current.querySelectorAll('section[data-index]')
+    const sections = containerRef.current.querySelectorAll('[data-index]')
     sections.forEach(s => observerRef.current!.observe(s))
 
     return () => observerRef.current?.disconnect()
@@ -294,99 +297,256 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
     )
   }
 
+  const activeProperty = properties[activeIndex]
+
   return (
-    <div className="fixed inset-0 bg-black overflow-hidden">
-      {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 pt-safe-top py-3">
-        <button
-          onClick={() => router.back()}
-          className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center"
-          aria-label="Back"
-        >
-          <ArrowLeft className="w-5 h-5 text-white" />
-        </button>
+    <div className="fixed inset-0 z-[100] bg-[#0a0a0a] overflow-hidden flex">
 
-        <h1 className="text-white font-bold text-lg drop-shadow">
-          Double<span className="text-[#65c170]">N</span> Realty
-        </h1>
-
-        {/* Dots indicator */}
-        <div className="flex flex-col gap-1">
-          {properties.map((_, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                'w-1 rounded-full transition-all duration-300',
-                idx === activeIndex ? 'h-4 bg-[#46a758]' : 'h-1.5 bg-white/40'
-              )}
-            />
-          ))}
+      {/* ── DESKTOP: Left sidebar ─────────────────────────────────────── */}
+      <aside className="hidden lg:flex flex-col w-72 xl:w-80 shrink-0 border-r border-white/10 bg-black/40 backdrop-blur-xl overflow-hidden">
+        {/* Back + branding */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+          <button onClick={() => router.back()} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+            <ArrowLeft className="w-4 h-4 text-white" />
+          </button>
+          <span className="text-white font-bold text-base">
+            Double<span className="text-[#65c170]">N</span> Realty
+          </span>
         </div>
-      </header>
 
-      {/* Swipe feed */}
-      <div
-        ref={containerRef}
-        className="h-full overflow-y-scroll snap-y snap-mandatory"
-        style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}
-      >
-        {/* Scrollbar hide */}
-        <style>{`
-          div::-webkit-scrollbar { display: none; }
-        `}</style>
+        {/* Property list */}
+        <div className="flex-1 overflow-y-auto p-3 space-y-2">
+          <p className="text-xs text-white/40 uppercase tracking-wider px-2 pb-1">Properties</p>
+          {properties.map((p, idx) => {
+            const ptitle = p.title[locale] ?? p.title.en ?? p.slug
+            return (
+              <button
+                key={p.id}
+                onClick={() => {
+                  setActiveIndex(idx)
+                  containerRef.current?.querySelectorAll('[data-index]')[idx]?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className={cn(
+                  'w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all',
+                  idx === activeIndex ? 'bg-[#46a758]/20 border border-[#46a758]/40' : 'hover:bg-white/5'
+                )}
+              >
+                {p.coverImage && (
+                  <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                    <img src={p.coverImage} alt="" className="w-full h-full object-cover" />
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-white text-xs font-semibold line-clamp-2 leading-tight">{ptitle}</p>
+                  <p className="text-[#65c170] text-xs mt-0.5 font-medium">฿{p.priceTHB.toLocaleString()}/mo</p>
+                </div>
+                {idx === activeIndex && (
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#46a758] shrink-0" />
+                )}
+              </button>
+            )
+          })}
+        </div>
 
-        {properties.map((property, idx) => (
-          <div key={property.id} data-index={idx} style={{ scrollSnapAlign: 'start' }}>
-            <PropertyCard
-              property={property}
-              locale={locale}
-              isActive={idx === activeIndex}
-            />
-          </div>
-        ))}
+        {/* Bottom nav desktop */}
+        <div className="p-4 border-t border-white/10 flex gap-2">
+          <button
+            onClick={() => router.push('/properties')}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-medium transition-colors"
+          >
+            <Home className="w-4 h-4" />
+            Browse
+          </button>
+          <button
+            onClick={() => router.push('/discover' as '/')}
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#46a758]/20 text-[#65c170] text-xs font-medium"
+          >
+            <Compass className="w-4 h-4" />
+            Discover
+          </button>
+        </div>
+      </aside>
 
-        {/* End card */}
-        <div
-          className="h-dvh flex flex-col items-center justify-center bg-[#1d211c] snap-start"
-          style={{ scrollSnapAlign: 'start' }}
-        >
-          <div className="text-center space-y-4 px-8">
-            <p className="text-4xl">🏠</p>
-            <p className="text-white text-xl font-bold">That's all for now</p>
-            <p className="text-[#cdd1cb] text-sm">More properties coming soon</p>
+      {/* ── FEED (mobile: full, desktop: phone-frame centered) ─────────── */}
+      <div className="flex-1 flex items-center justify-center relative lg:gap-8">
+
+        {/* Phone frame on desktop */}
+        <div className={cn(
+          'relative overflow-hidden bg-black',
+          // Mobile: fill entire screen
+          'w-full h-full',
+          // Desktop: phone-sized frame centered with shadow
+          'lg:w-[420px] lg:h-[calc(100vh-48px)] lg:max-h-[860px] lg:rounded-[2.5rem] lg:shadow-[0_0_80px_rgba(0,0,0,0.8)] lg:border lg:border-white/10',
+        )}>
+          {/* Header */}
+          <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3">
+            {/* Mobile back btn only */}
             <button
-              onClick={() => router.push('/properties')}
-              className="bg-[#46a758] text-white font-semibold px-6 py-3 rounded-full mt-4"
+              onClick={() => router.back()}
+              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center lg:hidden"
+              aria-label="Back"
             >
-              Browse all properties
+              <ArrowLeft className="w-5 h-5 text-white" />
             </button>
-          </div>
-        </div>
-      </div>
+            {/* Desktop: just spacer */}
+            <div className="hidden lg:block w-10" />
 
-      {/* Bottom nav */}
-      <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/50 backdrop-blur-xl">
-        <button
-          onClick={() => router.push('/discover' as '/')}
-          className="flex flex-col items-center gap-0.5 bg-[#46a758]/20 text-[#65c170] px-6 py-2 rounded-full"
-        >
-          <span className="text-lg">🔍</span>
-          <span className="text-xs font-semibold">Explore</span>
-        </button>
-        <button
-          onClick={() => router.push('/properties' as '/')}
-          className="flex flex-col items-center gap-0.5 text-white/60 px-4 py-2"
-        >
-          <span className="text-lg">🏠</span>
-          <span className="text-xs">Browse</span>
-        </button>
-        <button
-          className="flex flex-col items-center gap-0.5 text-white/60 px-4 py-2"
-        >
-          <span className="text-lg">❤️</span>
-          <span className="text-xs">Saved</span>
-        </button>
-      </nav>
+            <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
+              Double<span className="text-[#65c170]">N</span> Realty
+            </h1>
+            {/* Desktop title */}
+            <p className="hidden lg:block text-white/60 text-xs font-medium">
+              {activeIndex + 1} / {properties.length}
+            </p>
+
+            {/* Dots indicator — mobile only */}
+            <div className="flex flex-col gap-1 lg:hidden">
+              {properties.slice(0, 8).map((_, idx) => (
+                <div
+                  key={idx}
+                  className={cn(
+                    'w-1 rounded-full transition-all duration-300',
+                    idx === activeIndex ? 'h-4 bg-[#46a758]' : 'h-1.5 bg-white/40'
+                  )}
+                />
+              ))}
+            </div>
+            {/* Desktop up/down nav */}
+            <div className="hidden lg:flex flex-col gap-1.5">
+              <button
+                onClick={() => {
+                  const prev = Math.max(0, activeIndex - 1)
+                  setActiveIndex(prev)
+                  containerRef.current?.querySelectorAll('[data-index]')[prev]?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                disabled={activeIndex === 0}
+              >
+                <ChevronUp className="w-4 h-4 text-white" />
+              </button>
+              <button
+                onClick={() => {
+                  const next = Math.min(properties.length - 1, activeIndex + 1)
+                  setActiveIndex(next)
+                  containerRef.current?.querySelectorAll('[data-index]')[next]?.scrollIntoView({ behavior: 'smooth' })
+                }}
+                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                disabled={activeIndex === properties.length - 1}
+              >
+                <ChevronDown className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </header>
+
+          {/* Swipe feed */}
+          <div
+            ref={containerRef}
+            className="h-full overflow-y-scroll snap-y snap-mandatory"
+            style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}
+          >
+            <style>{`div::-webkit-scrollbar { display: none; }`}</style>
+
+            {properties.map((property, idx) => (
+              <div key={property.id} data-index={idx} style={{ scrollSnapAlign: 'start' }}>
+                <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} />
+              </div>
+            ))}
+
+            {/* End card */}
+            <div className="h-dvh flex flex-col items-center justify-center bg-[#1d211c]" style={{ scrollSnapAlign: 'start' }}>
+              <div className="text-center space-y-4 px-8">
+                <Home className="w-12 h-12 text-[#46a758] mx-auto" />
+                <p className="text-white text-xl font-bold">That's all for now</p>
+                <p className="text-[#cdd1cb] text-sm">More properties coming soon</p>
+                <button onClick={() => router.push('/properties')} className="bg-[#46a758] text-white font-semibold px-6 py-3 rounded-full mt-4">
+                  Browse all properties
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom nav — mobile only */}
+          <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/60 backdrop-blur-xl lg:hidden">
+            <button onClick={() => router.push('/discover' as '/')} className="flex flex-col items-center gap-0.5 bg-[#46a758]/20 text-[#65c170] px-5 py-2 rounded-full">
+              <Compass className="w-5 h-5" />
+              <span className="text-xs font-semibold">Explore</span>
+            </button>
+            <button onClick={() => router.push('/properties' as '/')} className="flex flex-col items-center gap-0.5 text-white/60 px-4 py-2">
+              <Home className="w-5 h-5" />
+              <span className="text-xs">Browse</span>
+            </button>
+            <button className="flex flex-col items-center gap-0.5 text-white/60 px-4 py-2">
+              <Heart className="w-5 h-5" />
+              <span className="text-xs">Saved</span>
+            </button>
+          </nav>
+        </div>
+
+        {/* ── RIGHT PANEL (desktop only) ─────────────── */}
+        {activeProperty && (
+          <div className="hidden lg:flex flex-col w-72 xl:w-80 shrink-0 gap-4 py-8">
+            {/* Property highlights */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-5 space-y-4">
+              <h3 className="text-white font-bold text-lg leading-snug">
+                {activeProperty.title[locale] ?? activeProperty.title.en}
+              </h3>
+              <p className="text-[#65c170] text-2xl font-bold">
+                ฿{activeProperty.priceTHB.toLocaleString()}
+                <span className="text-white/50 text-sm font-normal">/mo</span>
+              </p>
+
+              {/* Specs */}
+              <div className="grid grid-cols-3 gap-2 text-center">
+                {[
+                  { icon: <Bed className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.bedrooms, label: 'Bed' },
+                  { icon: <Bath className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.bathrooms, label: 'Bath' },
+                  { icon: <Maximize2 className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.sizeSqm, label: 'sqm' },
+                ].map(s => (
+                  <div key={s.label} className="bg-white/5 rounded-xl py-2.5">
+                    {s.icon}
+                    <p className="text-white font-bold text-sm">{s.val}</p>
+                    <p className="text-white/40 text-xs">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Amenities */}
+              <div className="flex flex-wrap gap-1.5">
+                {activeProperty.amenities.slice(0, 4).map(a => (
+                  <span key={a} className="text-xs bg-white/10 text-white/70 px-2.5 py-1 rounded-full">
+                    {a}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* CTA buttons */}
+            <button
+              onClick={() => router.push(`/properties/${activeProperty.slug}#inquiry` as '/properties')}
+              className="w-full bg-[#46a758] hover:bg-[#3d9a4f] text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Schedule Viewing
+            </button>
+
+            <div className="flex gap-2">
+              <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm transition-colors">
+                <Heart className="w-4 h-4" />
+                Save
+              </button>
+              <button className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white/70 text-sm transition-colors">
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
+            </div>
+
+            {/* Progress */}
+            <p className="text-white/30 text-xs text-center">
+              {activeIndex + 1} of {properties.length} properties
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
