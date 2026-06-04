@@ -31,18 +31,7 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
         zoomControlOptions: {
           position: window.google.maps.ControlPosition.RIGHT_CENTER,
         },
-        styles: [
-          {
-            featureType: 'poi',
-            elementType: 'labels',
-            stylers: [{ visibility: 'off' }],
-          },
-          {
-            featureType: 'transit',
-            elementType: 'labels.icon',
-            stylers: [{ visibility: 'off' }],
-          },
-        ],
+        // Note: custom styles not supported with mapId (controlled via Cloud Console)
       })
 
       // Custom marker using AdvancedMarkerElement (new API)
