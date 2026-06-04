@@ -166,7 +166,7 @@
   }
 }
 
-/* Smooth scroll */
+/* Smooth scroll — data attribute required for Next.js 15 */
 html {
   scroll-behavior: smooth;
 }

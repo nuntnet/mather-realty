@@ -16,56 +16,65 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
   const mapInstanceRef = useRef<google.maps.Map | null>(null)
 
   useEffect(() => {
-    // Wait for Google Maps to be loaded by the Script tag in layout
-    const tryInit = async () => {
-      if (typeof window === 'undefined' || !window.google?.maps) return false
-      if (!mapRef.current) return false
+    let interval: ReturnType<typeof setInterval> | null = null
 
-      const map = new window.google.maps.Map(mapRef.current, {
-        center: { lat, lng },
-        zoom: 15,
-        mapId: 'DEMO_MAP_ID',
-        mapTypeControl: false,
-        streetViewControl: false,
-        fullscreenControl: false,
-        zoomControlOptions: {
-          position: window.google.maps.ControlPosition.RIGHT_CENTER,
-        },
-        // Note: custom styles not supported with mapId (controlled via Cloud Console)
-      })
+    const tryInit = async (): Promise<boolean> => {
+      try {
+        if (typeof window === 'undefined' || !window.google?.maps) return false
+        if (!mapRef.current) return false
+        if (mapInstanceRef.current) return true // already initialized
 
-      // Custom marker using AdvancedMarkerElement (new API)
-      const markerEl = document.createElement('div')
-      markerEl.style.cssText = `
-        width: 28px; height: 28px;
-        background: #46a758;
-        border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        cursor: pointer;
-      `
+        const map = new window.google.maps.Map(mapRef.current, {
+          center: { lat, lng },
+          zoom: 15,
+          mapId: 'DEMO_MAP_ID',
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+          zoomControlOptions: {
+            position: window.google.maps.ControlPosition.RIGHT_CENTER,
+          },
+        })
 
-      const { AdvancedMarkerElement } = (await window.google.maps.importLibrary('marker')) as google.maps.MarkerLibrary
-      new AdvancedMarkerElement({
-        position: { lat, lng },
-        map,
-        title,
-        content: markerEl,
-      })
+        const markerEl = document.createElement('div')
+        markerEl.style.cssText = `
+          width: 28px; height: 28px;
+          background: #46a758;
+          border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+          cursor: pointer;
+        `
 
-      mapInstanceRef.current = map
-      setMapLoaded(true)
-      return true
+        const { AdvancedMarkerElement } = (await window.google.maps.importLibrary('marker')) as google.maps.MarkerLibrary
+        new AdvancedMarkerElement({
+          position: { lat, lng },
+          map,
+          title,
+          content: markerEl,
+        })
+
+        mapInstanceRef.current = map
+        setMapLoaded(true)
+        return true
+      } catch {
+        return false
+      }
     }
 
     tryInit().then(ok => {
       if (!ok) {
-        const interval = setInterval(() => {
-          tryInit().then(done => { if (done) clearInterval(interval) })
+        interval = setInterval(() => {
+          tryInit().then(done => {
+            if (done && interval) clearInterval(interval)
+          })
         }, 300)
-        return () => clearInterval(interval)
       }
     })
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
   }, [lat, lng, title])
 
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`
@@ -73,11 +82,11 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
 
   return (
     <div className="rounded-2xl overflow-hidden border border-[#e2e5e0] shadow-sm">
-      {/* Map */}
       <div
         ref={mapRef}
         className="w-full bg-[#f1f4f0]"
         style={{ height: 280 }}
+        suppressHydrationWarning
       >
         {!mapLoaded && (
           <div className="w-full h-full flex items-center justify-center gap-2 text-[#898e87]">
@@ -87,7 +96,6 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
         )}
       </div>
 
-      {/* Address + action buttons */}
       <div className="px-4 py-3 bg-white flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-2 min-w-0">
           <MapPin className="w-4 h-4 text-[#46a758] shrink-0 mt-0.5" />
