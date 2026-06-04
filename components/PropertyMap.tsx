@@ -17,13 +17,14 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
 
   useEffect(() => {
     // Wait for Google Maps to be loaded by the Script tag in layout
-    const tryInit = () => {
+    const tryInit = async () => {
       if (typeof window === 'undefined' || !window.google?.maps) return false
       if (!mapRef.current) return false
 
       const map = new window.google.maps.Map(mapRef.current, {
         center: { lat, lng },
         zoom: 15,
+        mapId: 'DEMO_MAP_ID',
         mapTypeControl: false,
         streetViewControl: false,
         fullscreenControl: false,
@@ -44,19 +45,23 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
         ],
       })
 
-      // Custom marker
-      new window.google.maps.Marker({
+      // Custom marker using AdvancedMarkerElement (new API)
+      const markerEl = document.createElement('div')
+      markerEl.style.cssText = `
+        width: 28px; height: 28px;
+        background: #46a758;
+        border: 3px solid white;
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+      `
+
+      const { AdvancedMarkerElement } = (await window.google.maps.importLibrary('marker')) as google.maps.MarkerLibrary
+      new AdvancedMarkerElement({
         position: { lat, lng },
         map,
         title,
-        icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 12,
-          fillColor: '#46a758',
-          fillOpacity: 1,
-          strokeColor: '#ffffff',
-          strokeWeight: 3,
-        },
+        content: markerEl,
       })
 
       mapInstanceRef.current = map
@@ -64,13 +69,14 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
       return true
     }
 
-    if (!tryInit()) {
-      // Retry until Google Maps loads
-      const interval = setInterval(() => {
-        if (tryInit()) clearInterval(interval)
-      }, 300)
-      return () => clearInterval(interval)
-    }
+    tryInit().then(ok => {
+      if (!ok) {
+        const interval = setInterval(() => {
+          tryInit().then(done => { if (done) clearInterval(interval) })
+        }, 300)
+        return () => clearInterval(interval)
+      }
+    })
   }, [lat, lng, title])
 
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`

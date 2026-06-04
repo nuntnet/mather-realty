@@ -32,7 +32,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
     { label: tNav("properties"), href: "/properties" },
     { label: tNav("blog"), href: "/blog" },
     { label: tNav("howItWorks"), href: "/how-it-works" },
-    { label: tNav("submitListing"), href: "/submit-listing" },
+    { label: tNav("submitListing"), href: "/submit" },
     { label: "About", href: "/about" },
     { label: "Contact", href: "/contact" },
   ];
@@ -76,7 +76,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
                 </a>
               )}
               <a
-                href="https://wa.me/66000000000"
+                href="https://wa.me/66869902999"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-80 transition-opacity"
@@ -107,7 +107,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
               {quickLinks.map(({ label, href }) => (
                 <li key={href}>
                   <Link
-                    href={href as "/properties" | "/blog" | "/how-it-works" | "/submit-listing" | "/about" | "/contact"}
+                    href={href as "/properties" | "/blog" | "/how-it-works" | "/submit" | "/about" | "/contact"}
                     className="text-sm text-gray-400 hover:text-[#65c170] transition-colors"
                   >
                     {label}
