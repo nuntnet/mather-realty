@@ -35,9 +35,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       <Footer locale={locale} />
       <Analytics />
       <SpeedInsights />
+      {/* Load Maps only on pages that need it — defer well past hydration */}
       <Script
+        id="google-maps"
         src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,marker&loading=async`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
     </NextIntlClientProvider>
   )
