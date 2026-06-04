@@ -35,23 +35,23 @@ interface PropertyCardProps {
 const STATUS_CONFIG: Record<string, { label: string; className: string; barClass: string }> = {
   available: {
     label: 'Available',
-    className: 'bg-green-100 text-green-800 border-green-200',
-    barClass: 'bg-green-500',
+    className: 'bg-[#ebf9eb] text-[#297c3b] border border-[#b2e5b4]',
+    barClass: 'bg-[#46a758]',
   },
   rented: {
     label: 'Rented',
-    className: 'bg-gray-100 text-gray-700 border-gray-200',
-    barClass: 'bg-gray-400',
+    className: 'bg-[#f1f4f0] text-[#5e6360] border border-[#d9ddd8]',
+    barClass: 'bg-[#898e87]',
   },
   coming_soon: {
     label: 'Coming Soon',
-    className: 'bg-orange-100 text-orange-800 border-orange-200',
-    barClass: 'bg-orange-400',
+    className: 'bg-amber-50 text-amber-700 border border-amber-200',
+    barClass: 'bg-amber-400',
   },
   pending: {
     label: 'Pending',
     className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    barClass: 'bg-yellow-400',
+    barClass: 'bg-[#c9f0ca]',
   },
 }
 
@@ -116,7 +116,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
     <article
       className={cn(
         'group relative rounded-2xl bg-white shadow-sm border border-gray-100 overflow-hidden',
-        'transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-xl',
+        'transition-all duration-200 ease-out hover:-translate-y-1 hover:shadow-lg hover:shadow-[#46a758]/10',
         'w-full',
         isList ? 'flex flex-row' : 'flex flex-col',
       )}
@@ -160,8 +160,8 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
 
         {/* Verified badge */}
         {property.verifiedAt && (
-          <span className="absolute top-3 right-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm text-blue-700 text-xs font-semibold px-2 py-1 rounded-full border border-blue-200 shadow-sm">
-            <ShieldCheck className="size-3.5 text-blue-600" />
+          <span className="absolute top-3 right-3 flex items-center gap-1 bg-[#f3fcf3]/90 backdrop-blur-sm text-[#297c3b] text-xs font-semibold px-2 py-1 rounded-full border border-[#b2e5b4] shadow-sm">
+            <ShieldCheck className="size-3.5 text-[#297c3b]" />
             {t('verified')}
           </span>
         )}
@@ -187,7 +187,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             className="block"
           >
             <h3
-              className="font-semibold text-gray-900 text-base leading-snug line-clamp-2 hover:text-blue-700 transition-colors"
+              className="font-semibold text-gray-900 text-base leading-snug line-clamp-2 hover:text-[#297c3b] transition-colors"
               title={title}
             >
               {title}
@@ -200,7 +200,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
 
         {/* Price — more prominent */}
         <div className="flex items-baseline gap-1">
-          <span className="text-2xl font-bold text-blue-700">
+          <span className="text-2xl font-bold text-[#297c3b]">
             {formatPrice(property.priceTHB, locale)}
           </span>
           <span className="text-sm text-gray-500">{t('perMonth')}</span>
@@ -226,7 +226,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         {topAmenities.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {topAmenities.map((a) => (
-              <Badge key={a} variant="secondary" className="text-xs font-normal">
+              <Badge key={a} variant="secondary" className="text-xs font-normal text-[#5e6360]">
                 {t(`amenities.${a}`, { fallback: a })}
               </Badge>
             ))}
@@ -256,8 +256,8 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
           <Button
             asChild
             size="sm"
-            variant="gradient"
-            className="flex-1 h-11 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-sm"
+            variant="default"
+            className="flex-1 h-11 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white shadow-sm"
           >
             <Link
               href={`/properties/${property.slug}#inquiry`}

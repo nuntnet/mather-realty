@@ -5,58 +5,61 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Grass accent — Radix grass scale */
+    --primary: 137 40% 47%;           /* grass-9 #46a758 */
+    --primary-foreground: 0 0% 100%;
+
+    /* Olive neutrals — Radix olive scale */
+    --background: 90 14% 99%;         /* olive-1 #fcfdfc */
+    --foreground: 110 8% 12%;         /* olive-12 #1d211c */
+    --card: 90 14% 99%;
+    --card-foreground: 110 8% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --popover-foreground: 110 8% 12%;
+    --secondary: 90 7% 95%;           /* olive-3 */
+    --secondary-foreground: 110 8% 12%;
+    --muted: 90 7% 95%;               /* olive-3 */
+    --muted-foreground: 150 3% 37%;   /* olive-11 */
+    --accent: 137 30% 94%;            /* grass-2 tint */
+    --accent-foreground: 137 50% 21%; /* grass-12 */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
+    --border: 90 5% 89%;              /* olive-5 */
+    --input: 90 5% 89%;
+    --ring: 137 40% 47%;              /* grass focus ring */
 
-    /* CH.ERAWAN Brand Colors */
-    --brand-navy: 220 50% 16%;
-    --brand-red: 357 70% 55%;
-    --brand-red-light: 357 85% 65%;
-    --brand-gold: 45 85% 55%;
+    /* Large radius */
+    --radius: 0.75rem;
 
-    /* DoubleN Realty Brand Colors */
-    --brand-blue: #1a3c5e;
-    --brand-gold-dn: #c9a227;
+    /* Brand tokens */
+    --grass-9: 137 40% 47%;           /* #46a758 main green */
+    --grass-10: 137 42% 42%;          /* #3d9a4f hover */
+    --grass-11: 137 50% 32%;          /* #297c3b text on light */
+    --grass-12: 137 50% 21%;          /* #1b512a darkest */
+    --olive-11: 150 3% 37%;           /* #5e6360 secondary text */
+    --olive-12: 110 8% 12%;           /* #1d211c heading */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --background: 110 8% 8%;
+    --foreground: 90 7% 95%;
+    --card: 110 8% 10%;
+    --card-foreground: 90 7% 95%;
+    --popover: 110 8% 10%;
+    --popover-foreground: 90 7% 95%;
+    --primary: 137 40% 47%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 110 6% 17%;
+    --secondary-foreground: 90 7% 95%;
+    --muted: 110 6% 17%;
+    --muted-foreground: 90 5% 60%;
+    --accent: 137 20% 20%;
+    --accent-foreground: 137 30% 85%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 110 6% 20%;
+    --input: 110 6% 20%;
+    --ring: 137 40% 47%;
   }
   .maplibregl-popup-content {
     @apply bg-transparent! shadow-none! p-0! rounded-none!;
@@ -101,9 +104,9 @@
 
   /* Gradient Buttons */
   .btn-gradient {
-    @apply bg-gradient-to-r from-[#DD5259] to-[#FF7A6B] text-white font-semibold;
-    @apply hover:from-[#c94850] hover:to-[#f06d5f] transition-all duration-300;
-    @apply shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/35;
+    @apply bg-gradient-to-r from-[#46a758] to-[#65c170] text-white font-semibold;
+    @apply hover:from-[#3d9a4f] hover:to-[#46a758] transition-all duration-300;
+    @apply shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/35;
   }
 
   .btn-gradient-navy {
@@ -162,7 +165,7 @@ html {
 /* Better focus rings for accessibility */
 @layer base {
   *:focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+    @apply outline-none ring-2 ring-[#46a758] ring-offset-2;
   }
 }
 
@@ -170,7 +173,7 @@ html {
 @layer components {
   .hero-gradient {
     background:
-      linear-gradient(to bottom right, rgba(30, 58, 138, 0.82), rgba(30, 64, 175, 0.72), rgba(67, 56, 202, 0.62)),
+      linear-gradient(to bottom, rgba(27, 81, 42, 0.75), rgba(70, 167, 88, 0.45), rgba(0,0,0,0.3)),
       url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80') center/cover no-repeat;
   }
 

@@ -84,8 +84,8 @@ export default function Navbar({ locale }: NavbarProps) {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "bg-white shadow-md"
-          : "bg-white/90 backdrop-blur-md border-b border-gray-100/80"
+          ? "bg-white/95 shadow-sm border-b border-[#e2e5e0]"
+          : "bg-[#fcfdfc]/95 backdrop-blur-md border-b border-[#e2e5e0]"
       )}
     >
       <div className="container mx-auto px-4 flex h-16 items-center justify-between gap-4">
@@ -95,13 +95,13 @@ export default function Navbar({ locale }: NavbarProps) {
           className="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition-opacity"
           aria-label="DoubleN Realty — Home"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-sm select-none shrink-0">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#46a758] text-white font-black text-sm select-none shrink-0">
             2N
           </span>
           <span className="text-2xl font-black tracking-tight hidden sm:block">
-            <span className="text-blue-900">Double</span>
-            <span className="text-blue-600">N</span>
-            <span className="text-blue-900"> Realty</span>
+            <span className="text-[#1d211c]">Double</span>
+            <span className="text-[#46a758]">N</span>
+            <span className="text-[#1d211c]"> Realty</span>
           </span>
         </Link>
 
@@ -114,8 +114,8 @@ export default function Navbar({ locale }: NavbarProps) {
               className={cn(
                 "relative px-3 py-2 text-sm font-medium transition-colors group",
                 isActive(href)
-                  ? "text-blue-600"
-                  : "text-gray-700 hover:text-blue-600"
+                  ? "text-[#46a758]"
+                  : "text-[#5e6360] hover:text-[#46a758]"
               )}
             >
               {t(labelKey as "properties" | "blog" | "howItWorks")}
@@ -123,7 +123,7 @@ export default function Navbar({ locale }: NavbarProps) {
               <span
                 className={cn(
                   "absolute bottom-0 left-3 right-3 h-0.5 rounded-full transition-transform duration-200 origin-left",
-                  "bg-blue-600",
+                  "bg-[#46a758]",
                   isActive(href) ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"
                 )}
               />
@@ -137,7 +137,7 @@ export default function Navbar({ locale }: NavbarProps) {
           <Button
             asChild
             size="sm"
-            className="hidden sm:flex gap-1.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white border-0 shadow-sm"
+            className="hidden sm:flex gap-1.5 bg-[#46a758] hover:bg-[#3d9a4f] text-white border-0 shadow-sm transition-colors"
           >
             <Link href="/submit">
               <Home className="h-3.5 w-3.5" />
@@ -164,7 +164,7 @@ export default function Navbar({ locale }: NavbarProps) {
                           src={(user as { image?: string }).image ?? ""}
                           alt={user?.name ?? "User"}
                         />
-                        <AvatarFallback className="text-xs font-semibold bg-blue-600 text-white">
+                        <AvatarFallback className="text-xs font-semibold bg-[#46a758] text-white">
                           {user?.name?.slice(0, 2).toUpperCase() ?? "?"}
                         </AvatarFallback>
                       </Avatar>
@@ -208,7 +208,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "text-gray-700 hover:text-blue-600"
+                    "text-[#5e6360] hover:text-[#46a758]"
                   )}
                 >
                   <Link href="/login" className="flex items-center gap-1.5">
@@ -227,7 +227,7 @@ export default function Navbar({ locale }: NavbarProps) {
             onClick={() => setMobileOpen((v) => !v)}
             className={cn(
               "md:hidden h-11 w-11",
-              "text-gray-700 hover:text-gray-900"
+              "text-[#5e6360] hover:text-[#1d211c]"
             )}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -259,14 +259,14 @@ export default function Navbar({ locale }: NavbarProps) {
         aria-label="Navigation menu"
         className={cn(
           "fixed top-16 left-0 right-0 z-40 md:hidden",
-          "bg-white border-b border-gray-200 shadow-xl",
+          "bg-[#fcfdfc] border-b border-[#e2e5e0] shadow-xl",
           "transition-all duration-300 ease-out origin-top",
           mobileOpen
             ? "opacity-100 translate-y-0 pointer-events-auto"
             : "opacity-0 -translate-y-4 pointer-events-none"
         )}
       >
-        <nav className="flex flex-col divide-y divide-gray-100" aria-label="Mobile navigation">
+        <nav className="flex flex-col divide-y divide-[#e2e5e0]" aria-label="Mobile navigation">
           {/* Main links */}
           <div className="flex flex-col px-4 py-3 gap-1">
             {NAV_LINKS.map(({ labelKey, href, icon: Icon }) => (
@@ -277,8 +277,8 @@ export default function Navbar({ locale }: NavbarProps) {
                 className={cn(
                   "flex items-center gap-3 px-3 rounded-xl text-base font-medium transition-colors min-h-[44px]",
                   isActive(href)
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-[#46a758]/10 text-[#46a758]"
+                    : "text-[#5e6360] hover:text-[#1d211c] hover:bg-[#e2e5e0]/50"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -292,7 +292,7 @@ export default function Navbar({ locale }: NavbarProps) {
             <Link
               href="/submit"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 px-3 rounded-xl text-base font-semibold bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 transition-colors min-h-[44px]"
+              className="flex items-center gap-3 px-3 rounded-xl text-base font-semibold bg-[#46a758] hover:bg-[#3d9a4f] text-white transition-colors min-h-[44px]"
             >
               <Home className="h-5 w-5 shrink-0" />
               {t("submitListing")}
@@ -302,7 +302,7 @@ export default function Navbar({ locale }: NavbarProps) {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center gap-3 px-3 rounded-xl text-base font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors min-h-[44px]"
+                className="flex items-center gap-3 px-3 rounded-xl text-base font-medium border border-[#e2e5e0] text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
               >
                 <LogIn className="h-5 w-5 shrink-0" />
                 {t("login")}
@@ -315,7 +315,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   <Link
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors min-h-[44px]"
+                    className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
                   >
                     <ShieldCheck className="h-5 w-5 shrink-0" />
                     {t("admin")}
@@ -324,7 +324,7 @@ export default function Navbar({ locale }: NavbarProps) {
                 <Link
                   href="/dashboard"
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-gray-700 hover:bg-gray-50 transition-colors min-h-[44px]"
+                  className="flex items-center gap-3 px-3 rounded-xl text-base font-medium text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
                 >
                   <LayoutDashboard className="h-5 w-5 shrink-0" />
                   {t("dashboard")}
@@ -343,7 +343,7 @@ export default function Navbar({ locale }: NavbarProps) {
 
           {/* Language selector */}
           <div className="px-4 py-3 flex items-center gap-3">
-            <span className="text-sm text-gray-500 font-medium">Language</span>
+            <span className="text-sm text-[#5e6360] font-medium">Language</span>
             <LangSelector variant="outline" />
           </div>
         </nav>

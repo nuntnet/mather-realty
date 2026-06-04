@@ -49,14 +49,14 @@ export default function Footer({ locale: _locale }: FooterProps) {
               className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
               aria-label="DoubleN Realty"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white font-black text-sm select-none shrink-0">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#46a758] text-white font-black text-sm select-none shrink-0">
                 2N
               </span>
-              <span className="text-xl font-black tracking-tight">
-                Double<span className="text-blue-400">N</span> Realty
+              <span className="text-xl font-black tracking-tight text-white">
+                Double<span className="text-[#65c170]">N</span> Realty
               </span>
             </Link>
-            <p className="text-sm text-gray-400 leading-relaxed max-w-xs">
+            <p className="text-sm text-[#cdd1cb] leading-relaxed max-w-xs">
               {site.tagline} 🇹🇭
               <br />
               <span className="text-gray-500">{t("description")}</span>
@@ -108,7 +108,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
                 <li key={href}>
                   <Link
                     href={href as "/properties" | "/blog" | "/how-it-works" | "/submit-listing" | "/about" | "/contact"}
-                    className="text-sm text-gray-400 hover:text-white transition-colors"
+                    className="text-sm text-gray-400 hover:text-[#65c170] transition-colors"
                   >
                     {label}
                   </Link>
@@ -139,8 +139,8 @@ export default function Footer({ locale: _locale }: FooterProps) {
               <p className="text-sm text-gray-400">
                 LINE ID: <span className="text-gray-300">treasurenui</span>
               </p>
-              <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-green-400 bg-green-400/10 px-3 py-1.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+              <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#65c170] bg-[#46a758]/10 px-3 py-1.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] animate-pulse" />
                 Available 24/7 for expats
               </p>
             </address>
@@ -151,7 +151,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
         <div className="mt-12 pt-6 border-t border-gray-800 space-y-3">
           <p className="text-xs text-gray-500 text-center">
             For inquiries:{" "}
-            <a href="mailto:janjiranui@gmail.com" className="text-gray-400 hover:text-white transition-colors">
+            <a href="mailto:janjiranui@gmail.com" className="text-gray-400 hover:text-[#65c170] transition-colors">
               janjiranui@gmail.com
             </a>
             {" · "}
@@ -160,7 +160,7 @@ export default function Footer({ locale: _locale }: FooterProps) {
               href="https://line.me/R/ti/p/treasurenui"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-gray-400 hover:text-[#65c170] transition-colors"
             >
               treasurenui
             </a>
