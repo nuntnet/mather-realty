@@ -63,10 +63,12 @@ function PropertyCard({
   property,
   locale,
   isActive,
+  isDesktop = false,
 }: {
   property: Property
   locale: string
   isActive: boolean
+  isDesktop?: boolean
 }) {
   const router = useRouter()
   const { saved, toggle } = useSaved()
@@ -103,7 +105,12 @@ function PropertyCard({
   }
 
   return (
-    <section className="relative h-dvh w-full snap-start overflow-hidden flex flex-col justify-end flex-shrink-0">
+    <section className={cn(
+      'relative w-full snap-start overflow-hidden flex flex-col justify-end flex-shrink-0',
+      isDesktop
+        ? 'h-full' // desktop: fill the container height
+        : 'h-dvh'   // mobile: full viewport height
+    )}>
       {/* Background image */}
       {property.coverImage ? (
         <Image
@@ -124,8 +131,11 @@ function PropertyCard({
       {/* Dark gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-black/20 pointer-events-none" />
 
-      {/* Right side actions */}
-      <div className="absolute right-4 bottom-[220px] flex flex-col gap-5 z-20 items-center">
+      {/* Right side actions — mobile only */}
+      <div className={cn(
+        'absolute right-4 bottom-[220px] flex flex-col gap-5 z-20 items-center',
+        isDesktop && 'hidden'
+      )}>
         {/* Save / Heart */}
         <button
           onClick={handleSave}
@@ -181,7 +191,7 @@ function PropertyCard({
         </div>
       )}
 
-      {/* Property info card — tap anywhere to view detail */}
+      {/* Property info card — mobile only, tap to view detail */}
       <div
         onClick={handleView}
         role="button"
@@ -191,7 +201,8 @@ function PropertyCard({
         className={cn(
           'relative z-10 mx-4 mb-24 p-5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
           'bg-white/15 backdrop-blur-xl border border-white/20 active:scale-[0.98]',
-          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
+          isDesktop && 'hidden'  // hide on desktop — right panel shows info
         )}
       >
         {/* Title + verified */}
@@ -263,6 +274,21 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
   const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
   const observerRef = useRef<IntersectionObserver | null>(null)
+  const [isDesktop, setIsDesktop] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
+
+  // Reset scroll to top on mount
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0
+    }
+  }, [])
 
   // Track which card is active
   useEffect(() => {
@@ -367,17 +393,11 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
         </div>
       </aside>
 
-      {/* ── FEED (mobile: full, desktop: phone-frame centered) ─────────── */}
-      <div className="flex-1 flex items-center justify-center relative lg:gap-8">
+      {/* ── FEED ─────────────────────────────────────────────────────────── */}
+      <div className="flex-1 flex relative overflow-hidden">
 
-        {/* Phone frame on desktop */}
-        <div className={cn(
-          'relative overflow-hidden bg-black',
-          // Mobile: fill entire screen
-          'w-full h-full',
-          // Desktop: phone-sized frame centered with shadow
-          'lg:w-[420px] lg:h-[calc(100vh-48px)] lg:max-h-[860px] lg:rounded-[2.5rem] lg:shadow-[0_0_80px_rgba(0,0,0,0.8)] lg:border lg:border-white/10',
-        )}>
+        {/* Feed container — no phone frame, fills available space */}
+        <div className="relative overflow-hidden bg-black w-full h-full">
           {/* Header */}
           <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3">
             {/* Mobile back btn only */}
@@ -448,12 +468,12 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
 
             {properties.map((property, idx) => (
               <div key={property.id} data-index={idx} style={{ scrollSnapAlign: 'start' }}>
-                <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} />
+                <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} isDesktop={isDesktop} />
               </div>
             ))}
 
             {/* End card */}
-            <div className="h-dvh flex flex-col items-center justify-center bg-[#1d211c]" style={{ scrollSnapAlign: 'start' }}>
+            <div className={cn(isDesktop ? 'h-full' : 'h-dvh', 'flex flex-col items-center justify-center bg-[#1d211c]')} style={{ scrollSnapAlign: 'start' }}>
               <div className="text-center space-y-4 px-8">
                 <Home className="w-12 h-12 text-[#46a758] mx-auto" />
                 <p className="text-white text-xl font-bold">That's all for now</p>
