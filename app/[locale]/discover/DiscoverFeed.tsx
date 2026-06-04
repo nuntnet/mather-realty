@@ -178,11 +178,16 @@ function PropertyCard({
         </div>
       )}
 
-      {/* Property info card */}
+      {/* Property info card — tap anywhere to view detail */}
       <div
+        onClick={handleView}
+        role="button"
+        tabIndex={0}
+        onKeyDown={e => e.key === 'Enter' && handleView()}
+        aria-label={`View ${title}`}
         className={cn(
-          'relative z-10 mx-4 mb-24 p-5 rounded-2xl shadow-2xl transition-all duration-500',
-          'bg-white/15 backdrop-blur-xl border border-white/20',
+          'relative z-10 mx-4 mb-24 p-5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
+          'bg-white/15 backdrop-blur-xl border border-white/20 active:scale-[0.98]',
           isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         )}
       >
@@ -231,13 +236,10 @@ function PropertyCard({
             <p className="text-white/60 text-xs uppercase tracking-wider">Monthly Rent</p>
             <p className="text-white font-bold text-2xl">฿{property.priceTHB.toLocaleString()}</p>
           </div>
-          <button
-            onClick={handleView}
-            className="bg-[#46a758] hover:bg-[#3d9a4f] active:scale-95 text-white font-semibold px-5 py-2.5 rounded-full shadow-lg transition-all flex items-center gap-1.5"
-          >
-            View
+          <div className="flex items-center gap-1.5 text-[#65c170] text-sm font-semibold">
+            View detail
             <ChevronUp className="w-4 h-4 rotate-90" />
-          </button>
+          </div>
         </div>
       </div>
 
