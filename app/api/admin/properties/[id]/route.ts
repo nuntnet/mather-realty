@@ -78,6 +78,22 @@ function mapToForm(page: PageObjectResponse) {
     ? galleryFiles
     : richText(page, "gallery_urls").split(",").map((u) => u.trim()).filter(Boolean);
 
+  // Highlights stored as "• item1 • item2" — split into array
+  const highlightsRaw = richText(page, "highlights");
+  const highlights = highlightsRaw
+    ? highlightsRaw.split("•").map(s => s.trim()).filter(Boolean)
+    : [];
+
+  // FAQ stored as JSON string
+  let faqJson: Array<{q: string; a: string}> = [];
+  try { faqJson = JSON.parse(richText(page, "faq_json")) ?? []; } catch { faqJson = []; }
+
+  // Boolean helper
+  const propBool = (key: string) => {
+    const p = page.properties[key] as { type: string; checkbox?: boolean } | undefined;
+    return p?.type === "checkbox" ? (p.checkbox ?? false) : false;
+  };
+
   return {
     coverImage,
     titles,
@@ -91,10 +107,26 @@ function mapToForm(page: PageObjectResponse) {
     bedrooms: propNumber(page, "bedrooms"),
     bathrooms: propNumber(page, "bathrooms"),
     sizeSqm: propNumber(page, "size_sqm"),
+    floors: propNumber(page, "floors"),
+    parkingSpots: propNumber(page, "parking_spots"),
     amenities: propMultiSelect(page, "amenities"),
     status: propSelect(page, "status") || "pending",
+    availableFrom: propDate(page, "available_from"),
+    minLeaseTerm: propNumber(page, "min_lease_months"),
+    depositMonths: propNumber(page, "deposit_months"),
+    contactLine: richText(page, "contact_line"),
+    contactPhone: richText(page, "contact_phone"),
+    highlights,
+    perfectFor: propMultiSelect(page, "perfect_for"),
+    tags: propMultiSelect(page, "tags"),
+    faqJson,
+    seoDescription: richText(page, "seo_description"),
+    hasVirtualTour: propBool("has_virtual_tour"),
     gallery: galleryUrls,
     virtualTourUrl: richText(page, "virtual_tour_url") || null,
+    exteriorPhotos: richText(page, "exterior_photos"),
+    interiorPhotos: richText(page, "interior_photos"),
+    communityPhotos: richText(page, "community_photos"),
     verifiedAt: propDate(page, "verified_at"),
     approvedAt: propDate(page, "approved_at"),
     slug: richText(page, "slug"),
@@ -115,10 +147,26 @@ const patchSchema = z.object({
   bedrooms: z.number().int().nullable().optional(),
   bathrooms: z.number().int().nullable().optional(),
   sizeSqm: z.number().nullable().optional(),
+  floors: z.number().int().nullable().optional(),
+  parkingSpots: z.number().int().nullable().optional(),
   amenities: z.array(z.string()).optional(),
   status: z.enum(["available","rented","coming_soon","pending","archived"]).optional(),
+  availableFrom: z.string().nullable().optional(),
+  minLeaseTerm: z.number().int().nullable().optional(),
+  depositMonths: z.number().int().nullable().optional(),
+  contactLine: z.string().nullable().optional(),
+  contactPhone: z.string().nullable().optional(),
+  highlights: z.array(z.string()).optional(),
+  perfectFor: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(),
+  faqJson: z.string().optional(),            // JSON string
+  seoDescription: z.string().optional(),
+  hasVirtualTour: z.boolean().optional(),
   gallery: z.array(z.string()).optional(),
   virtualTourUrl: z.string().nullable().optional(),
+  exteriorPhotos: z.string().optional(),     // comma-separated
+  interiorPhotos: z.string().optional(),
+  communityPhotos: z.string().optional(),
   verified: z.boolean().optional(),
   approvedAt: z.string().nullable().optional(),
   coverImage: z.string().nullable().optional(),
@@ -216,11 +264,70 @@ export async function PATCH(
       ["bedrooms", "bedrooms"],
       ["bathrooms", "bathrooms"],
       ["sizeSqm", "size_sqm"],
+      ["floors", "floors"],
+      ["parkingSpots", "parking_spots"],
+      ["minLeaseTerm", "min_lease_months"],
+      ["depositMonths", "deposit_months"],
     ];
     for (const [formKey, notionKey] of numFields) {
       if (data[formKey] !== undefined) {
         updates[notionKey] = { number: data[formKey] ?? null };
       }
+    }
+
+    // Available from (date)
+    if (data.availableFrom !== undefined) {
+      updates["available_from"] = data.availableFrom
+        ? { date: { start: data.availableFrom } }
+        : { date: null };
+    }
+
+    // Contact fields (text)
+    if (data.contactLine !== undefined) {
+      updates["contact_line"] = { rich_text: [{ text: { content: data.contactLine ?? "" } }] };
+    }
+    if (data.contactPhone !== undefined) {
+      updates["contact_phone"] = { rich_text: [{ text: { content: data.contactPhone ?? "" } }] };
+    }
+
+    // Highlights: array → bullet string
+    if (data.highlights !== undefined) {
+      const bullet = data.highlights.filter(Boolean).join(" • ");
+      updates["highlights"] = { rich_text: [{ text: { content: bullet } }] };
+    }
+
+    // Perfect For / Tags (multi_select)
+    if (data.perfectFor !== undefined) {
+      updates["perfect_for"] = { multi_select: data.perfectFor.map(name => ({ name })) };
+    }
+    if (data.tags !== undefined) {
+      updates["tags"] = { multi_select: data.tags.map(name => ({ name })) };
+    }
+
+    // FAQ (JSON string)
+    if (data.faqJson !== undefined) {
+      updates["faq_json"] = { rich_text: [{ text: { content: data.faqJson } }] };
+    }
+
+    // SEO description
+    if (data.seoDescription !== undefined) {
+      updates["seo_description"] = { rich_text: [{ text: { content: data.seoDescription } }] };
+    }
+
+    // Has virtual tour (checkbox)
+    if (data.hasVirtualTour !== undefined) {
+      updates["has_virtual_tour"] = { checkbox: data.hasVirtualTour };
+    }
+
+    // Gallery category photo URL strings
+    if (data.exteriorPhotos !== undefined) {
+      updates["exterior_photos"] = { rich_text: [{ text: { content: data.exteriorPhotos } }] };
+    }
+    if (data.interiorPhotos !== undefined) {
+      updates["interior_photos"] = { rich_text: [{ text: { content: data.interiorPhotos } }] };
+    }
+    if (data.communityPhotos !== undefined) {
+      updates["community_photos"] = { rich_text: [{ text: { content: data.communityPhotos } }] };
     }
 
     // Status (select or status type)

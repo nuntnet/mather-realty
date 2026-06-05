@@ -227,7 +227,13 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
   const handleSave = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsSaved(toggleSaved(property.id))
+    const nowSaved = toggleSaved(property.id)
+    setIsSaved(nowSaved)
+    // Brief visual pulse on the button via re-render — toast gives confirmation
+    if (typeof window !== 'undefined') {
+      const evt = new CustomEvent('doublen:saved', { detail: { id: property.id, saved: nowSaved } })
+      window.dispatchEvent(evt)
+    }
   }, [property.id])
 
   const title = property.title[locale] ?? property.title['en'] ?? ''

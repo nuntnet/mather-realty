@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronLeft, Loader2, Save } from "lucide-react";
+import { ChevronLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
 import ImageUploader from "@/components/admin/ImageUploader";
 import { Switch } from "@/components/ui/switch";
@@ -72,9 +72,22 @@ const AMENITY_LABELS: Record<string, string> = {
   concierge: "Concierge",
 };
 
+const PERFECT_FOR_OPTIONS = [
+  "family",
+  "couple",
+  "remote-worker",
+  "teacher",
+  "retiree",
+  "expat-couple",
+  "solo-expat",
+  "student",
+];
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type LocaleText = Record<string, string>;
+
+type FaqItem = { q: string; a: string };
 
 type PropertyForm = {
   titles: LocaleText;
@@ -94,6 +107,23 @@ type PropertyForm = {
   gallery: string[];
   virtualTourUrl: string;
   verified: boolean;
+  // New fields
+  availableFrom: string;
+  minLeaseTerm: string;
+  depositMonths: string;
+  floors: string;
+  parkingSpots: string;
+  hasVirtualTour: boolean;
+  contactLine: string;
+  contactPhone: string;
+  highlights: string;       // newline-separated in UI, joined with " • " for Notion
+  perfectFor: string[];
+  tags: string;             // comma-separated in UI
+  faq: FaqItem[];
+  seoDescription: string;
+  exteriorPhotos: string;   // comma-separated Cloudinary URLs
+  interiorPhotos: string;
+  communityPhotos: string;
 };
 
 function emptyForm(): PropertyForm {
@@ -115,6 +145,22 @@ function emptyForm(): PropertyForm {
     gallery: [],
     virtualTourUrl: "",
     verified: false,
+    availableFrom: "",
+    minLeaseTerm: "",
+    depositMonths: "",
+    floors: "",
+    parkingSpots: "",
+    hasVirtualTour: false,
+    contactLine: "",
+    contactPhone: "",
+    highlights: "",
+    perfectFor: [],
+    tags: "",
+    faq: [],
+    seoDescription: "",
+    exteriorPhotos: "",
+    interiorPhotos: "",
+    communityPhotos: "",
   };
 }
 
@@ -153,6 +199,14 @@ const INPUT_CLS =
 const TEXTAREA_CLS =
   "w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#131F3C]/20 bg-white resize-none";
 
+/** Convert "remote-worker" → "Remote Worker" */
+function labelify(s: string) {
+  return s
+    .split("-")
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function PropertyEditPage() {
@@ -165,6 +219,7 @@ export default function PropertyEditPage() {
   const [activeLocale, setActiveLocale] = useState("en");
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
+  const [tagInput, setTagInput] = useState("");
 
   // Load existing property
   useEffect(() => {
@@ -174,6 +229,25 @@ export default function PropertyEditPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!data) { toast.error("Property not found"); router.push("/admin/properties"); return; }
+
+        // Parse highlights: may be a string joined with " • ", or an array
+        let highlightsStr = "";
+        if (Array.isArray(data.highlights)) {
+          highlightsStr = data.highlights.join("\n");
+        } else if (typeof data.highlights === "string" && data.highlights) {
+          highlightsStr = data.highlights.split(" • ").join("\n");
+        }
+
+        // Parse faq: stored as JSON string or array
+        let faqArr: FaqItem[] = [];
+        if (Array.isArray(data.faq)) {
+          faqArr = data.faq;
+        } else if (Array.isArray(data.faqJson)) {
+          faqArr = data.faqJson;
+        } else if (typeof data.faqJson === "string" && data.faqJson) {
+          try { faqArr = JSON.parse(data.faqJson); } catch { faqArr = []; }
+        }
+
         setForm({
           titles: data.titles ?? {},
           descriptions: data.descriptions ?? {},
@@ -192,6 +266,29 @@ export default function PropertyEditPage() {
           gallery: data.gallery ?? [],
           virtualTourUrl: data.virtualTourUrl ?? "",
           verified: !!data.verifiedAt,
+          // New fields
+          availableFrom: data.availableFrom ?? "",
+          minLeaseTerm: data.minLeaseTerm != null ? String(data.minLeaseTerm) : "",
+          depositMonths: data.depositMonths != null ? String(data.depositMonths) : "",
+          floors: data.floors != null ? String(data.floors) : "",
+          parkingSpots: data.parkingSpots != null ? String(data.parkingSpots) : "",
+          hasVirtualTour: !!data.hasVirtualTour,
+          contactLine: data.contactLine ?? "",
+          contactPhone: data.contactPhone ?? "",
+          highlights: highlightsStr,
+          perfectFor: data.perfectFor ?? [],
+          tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
+          faq: faqArr,
+          seoDescription: data.seoDescription ?? "",
+          exteriorPhotos: Array.isArray(data.exteriorPhotos)
+            ? data.exteriorPhotos.join(", ")
+            : (data.exteriorPhotos ?? ""),
+          interiorPhotos: Array.isArray(data.interiorPhotos)
+            ? data.interiorPhotos.join(", ")
+            : (data.interiorPhotos ?? ""),
+          communityPhotos: Array.isArray(data.communityPhotos)
+            ? data.communityPhotos.join(", ")
+            : (data.communityPhotos ?? ""),
         });
       })
       .finally(() => setLoading(false));
@@ -210,6 +307,57 @@ export default function PropertyEditPage() {
     }));
   };
 
+  const togglePerfectFor = (opt: string) => {
+    setForm((f) => ({
+      ...f,
+      perfectFor: f.perfectFor.includes(opt)
+        ? f.perfectFor.filter((x) => x !== opt)
+        : [...f.perfectFor, opt],
+    }));
+  };
+
+  const addFaqItem = () => {
+    setForm((f) => ({ ...f, faq: [...f.faq, { q: "", a: "" }] }));
+  };
+
+  const removeFaqItem = (idx: number) => {
+    setForm((f) => ({ ...f, faq: f.faq.filter((_, i) => i !== idx) }));
+  };
+
+  const updateFaqItem = (idx: number, field: "q" | "a", value: string) => {
+    setForm((f) => ({
+      ...f,
+      faq: f.faq.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
+    }));
+  };
+
+  const addTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    const tag = tagInput.trim();
+    if (!tag) return;
+    const existing = form.tags
+      ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+      : [];
+    if (!existing.includes(tag)) {
+      setForm((f) => ({
+        ...f,
+        tags: [...existing, tag].join(", "),
+      }));
+    }
+    setTagInput("");
+  };
+
+  const removeTag = (tag: string) => {
+    const existing = form.tags
+      ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+      : [];
+    setForm((f) => ({
+      ...f,
+      tags: existing.filter((t) => t !== tag).join(", "),
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.titles["en"]?.trim()) {
@@ -218,6 +366,21 @@ export default function PropertyEditPage() {
     }
     setSaving(true);
     try {
+      // Parse highlights: each non-empty line becomes a bullet
+      const highlightsArray = form.highlights
+        .split("\n")
+        .map((l) => l.trim())
+        .filter(Boolean);
+
+      // Parse tags
+      const tagsArray = form.tags
+        ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+        : [];
+
+      // Parse exterior/interior/community photos
+      const toUrlArray = (s: string) =>
+        s ? s.split(",").map((u) => u.trim()).filter(Boolean) : [];
+
       const body = {
         titles: form.titles,
         descriptions: form.descriptions,
@@ -236,6 +399,23 @@ export default function PropertyEditPage() {
         gallery: form.gallery,
         virtualTourUrl: form.virtualTourUrl || null,
         verified: form.verified,
+        // New fields
+        availableFrom: form.availableFrom || null,
+        minLeaseTerm: form.minLeaseTerm ? parseInt(form.minLeaseTerm, 10) : null,
+        depositMonths: form.depositMonths ? parseInt(form.depositMonths, 10) : null,
+        floors: form.floors ? parseInt(form.floors, 10) : null,
+        parkingSpots: form.parkingSpots ? parseInt(form.parkingSpots, 10) : null,
+        hasVirtualTour: form.hasVirtualTour,
+        contactLine: form.contactLine || null,
+        contactPhone: form.contactPhone || null,
+        highlights: highlightsArray,
+        perfectFor: form.perfectFor,
+        tags: tagsArray,
+        faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : null,
+        seoDescription: form.seoDescription || null,
+        exteriorPhotos: toUrlArray(form.exteriorPhotos),
+        interiorPhotos: toUrlArray(form.interiorPhotos),
+        communityPhotos: toUrlArray(form.communityPhotos),
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
@@ -262,6 +442,10 @@ export default function PropertyEditPage() {
       </div>
     );
   }
+
+  const tagList = form.tags
+    ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -389,6 +573,42 @@ export default function PropertyEditPage() {
           </div>
         </div>
 
+        {/* ── Availability & Rental Terms ───────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <SectionTitle>Availability &amp; Rental Terms</SectionTitle>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <Field label="Available From">
+              <input
+                type="date"
+                value={form.availableFrom}
+                onChange={(e) => setForm((f) => ({ ...f, availableFrom: e.target.value }))}
+                className={INPUT_CLS}
+              />
+            </Field>
+            <Field label="Min Lease Term (months)">
+              <input
+                type="number"
+                min={0}
+                value={form.minLeaseTerm}
+                onChange={(e) => setForm((f) => ({ ...f, minLeaseTerm: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="12"
+              />
+            </Field>
+            <Field label="Deposit (months of rent)">
+              <input
+                type="number"
+                min={0}
+                value={form.depositMonths}
+                onChange={(e) => setForm((f) => ({ ...f, depositMonths: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="2"
+              />
+            </Field>
+          </div>
+        </div>
+
         {/* ── Details ──────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
           <SectionTitle>Property Details</SectionTitle>
@@ -475,6 +695,48 @@ export default function PropertyEditPage() {
           </div>
         </div>
 
+        {/* ── Additional Details ────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <SectionTitle>Additional Details</SectionTitle>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Floors">
+              <input
+                type="number"
+                min={0}
+                value={form.floors}
+                onChange={(e) => setForm((f) => ({ ...f, floors: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="1"
+              />
+            </Field>
+            <Field label="Parking Spots">
+              <input
+                type="number"
+                min={0}
+                value={form.parkingSpots}
+                onChange={(e) => setForm((f) => ({ ...f, parkingSpots: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="0"
+              />
+            </Field>
+          </div>
+
+          {/* Has Virtual Tour toggle */}
+          <div className="flex items-center justify-between rounded-xl border border-gray-100 px-4 py-3 bg-gray-50/50">
+            <div>
+              <p className="text-sm font-medium text-[#131F3C]">Has Virtual Tour</p>
+              <p className="text-xs text-gray-400">
+                Mark this property as having a virtual tour available
+              </p>
+            </div>
+            <Switch
+              checked={form.hasVirtualTour}
+              onCheckedChange={(v) => setForm((f) => ({ ...f, hasVirtualTour: v }))}
+            />
+          </div>
+        </div>
+
         {/* ── Amenities ────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
           <SectionTitle>Amenities</SectionTitle>
@@ -513,6 +775,210 @@ export default function PropertyEditPage() {
           </div>
         </div>
 
+        {/* ── Contact ──────────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <SectionTitle>Contact</SectionTitle>
+
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="LINE ID">
+              <input
+                type="text"
+                value={form.contactLine}
+                onChange={(e) => setForm((f) => ({ ...f, contactLine: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="@lineid"
+              />
+            </Field>
+            <Field label="Phone / WhatsApp">
+              <input
+                type="text"
+                value={form.contactPhone}
+                onChange={(e) => setForm((f) => ({ ...f, contactPhone: e.target.value }))}
+                className={INPUT_CLS}
+                placeholder="0812345678"
+              />
+            </Field>
+          </div>
+        </div>
+
+        {/* ── Highlights ───────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <SectionTitle>Highlights</SectionTitle>
+          <p className="text-xs text-gray-400">
+            One highlight per line. These are displayed as bullet points on the property page.
+          </p>
+          <Field label="Highlights">
+            <textarea
+              rows={5}
+              value={form.highlights}
+              onChange={(e) => setForm((f) => ({ ...f, highlights: e.target.value }))}
+              className={TEXTAREA_CLS}
+              placeholder={"Great location\nFurnished\nPet friendly"}
+            />
+          </Field>
+        </div>
+
+        {/* ── Perfect For ──────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <SectionTitle>Perfect For</SectionTitle>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            {PERFECT_FOR_OPTIONS.map((opt) => (
+              <label
+                key={opt}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border cursor-pointer transition-all text-sm ${
+                  form.perfectFor.includes(opt)
+                    ? "border-[#131F3C] bg-[#131F3C]/5 text-[#131F3C] font-medium"
+                    : "border-gray-200 text-gray-600 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  className="sr-only"
+                  checked={form.perfectFor.includes(opt)}
+                  onChange={() => togglePerfectFor(opt)}
+                />
+                <span
+                  className={`w-4 h-4 rounded flex items-center justify-center shrink-0 ${
+                    form.perfectFor.includes(opt)
+                      ? "bg-[#131F3C] text-white"
+                      : "border border-gray-300"
+                  }`}
+                >
+                  {form.perfectFor.includes(opt) && (
+                    <svg viewBox="0 0 10 8" className="w-2.5 h-2.5 fill-current">
+                      <path d="M1 4l3 3L9 1" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </span>
+                {labelify(opt)}
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Tags ─────────────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <SectionTitle>Tags</SectionTitle>
+          <p className="text-xs text-gray-400">
+            Type a tag and press Enter to add. Click a tag to remove it.
+          </p>
+
+          {/* Chips */}
+          {tagList.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {tagList.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => removeTag(tag)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131F3C]/8 text-[#131F3C] text-xs font-medium hover:bg-red-50 hover:text-red-600 transition-colors"
+                >
+                  {tag}
+                  <span className="text-current opacity-60">&times;</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={addTag}
+            className={INPUT_CLS}
+            placeholder="Type a tag and press Enter…"
+          />
+        </div>
+
+        {/* ── FAQ ──────────────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <SectionTitle>FAQ</SectionTitle>
+            <button
+              type="button"
+              onClick={addFaqItem}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#131F3C] text-white text-xs font-medium hover:bg-[#1f2d52] transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Q&amp;A
+            </button>
+          </div>
+
+          {form.faq.length === 0 && (
+            <p className="text-sm text-gray-400 text-center py-4">
+              No FAQ items yet. Click &ldquo;Add Q&amp;A&rdquo; to add one.
+            </p>
+          )}
+
+          <div className="space-y-4">
+            {form.faq.map((item, idx) => (
+              <div key={idx} className="rounded-xl border border-gray-100 p-4 space-y-3 bg-gray-50/40">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Q&amp;A #{idx + 1}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeFaqItem(idx)}
+                    className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <Field label="Question">
+                  <input
+                    type="text"
+                    value={item.q}
+                    onChange={(e) => updateFaqItem(idx, "q", e.target.value)}
+                    className={INPUT_CLS}
+                    placeholder="e.g. Is the property pet-friendly?"
+                  />
+                </Field>
+                <Field label="Answer">
+                  <textarea
+                    rows={3}
+                    value={item.a}
+                    onChange={(e) => updateFaqItem(idx, "a", e.target.value)}
+                    className={TEXTAREA_CLS}
+                    placeholder="e.g. Yes, small pets are welcome with a refundable deposit."
+                  />
+                </Field>
+              </div>
+            ))}
+          </div>
+
+          {form.faq.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-medium text-gray-500">JSON Preview (read-only)</p>
+              <textarea
+                rows={4}
+                readOnly
+                value={JSON.stringify(form.faq, null, 2)}
+                className={`${TEXTAREA_CLS} font-mono text-xs text-gray-500 bg-gray-50`}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* ── SEO ──────────────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <SectionTitle>SEO</SectionTitle>
+
+          <Field label="SEO Description">
+            <textarea
+              rows={4}
+              maxLength={500}
+              value={form.seoDescription}
+              onChange={(e) => setForm((f) => ({ ...f, seoDescription: e.target.value }))}
+              className={TEXTAREA_CLS}
+              placeholder="Short description for search engines (max 500 characters)"
+            />
+            <p className="text-xs text-gray-400 text-right mt-1">
+              {form.seoDescription.length} / 500
+            </p>
+          </Field>
+        </div>
+
         {/* ── Cover Image ──────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
           <SectionTitle>Cover Image</SectionTitle>
@@ -539,6 +1005,44 @@ export default function PropertyEditPage() {
             multiple
             label="Upload gallery photos"
           />
+        </div>
+
+        {/* ── Gallery Categories ────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
+          <SectionTitle>Gallery Categories</SectionTitle>
+          <p className="text-xs text-gray-400">
+            Comma-separated Cloudinary URLs for each photo category.
+          </p>
+
+          <Field label="Exterior Photos">
+            <textarea
+              rows={3}
+              value={form.exteriorPhotos}
+              onChange={(e) => setForm((f) => ({ ...f, exteriorPhotos: e.target.value }))}
+              className={TEXTAREA_CLS}
+              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+            />
+          </Field>
+
+          <Field label="Interior Photos">
+            <textarea
+              rows={3}
+              value={form.interiorPhotos}
+              onChange={(e) => setForm((f) => ({ ...f, interiorPhotos: e.target.value }))}
+              className={TEXTAREA_CLS}
+              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+            />
+          </Field>
+
+          <Field label="Community Photos">
+            <textarea
+              rows={3}
+              value={form.communityPhotos}
+              onChange={(e) => setForm((f) => ({ ...f, communityPhotos: e.target.value }))}
+              className={TEXTAREA_CLS}
+              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+            />
+          </Field>
         </div>
 
         {/* ── Submit ───────────────────────────────────────────────────── */}
