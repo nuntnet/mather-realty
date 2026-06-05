@@ -345,7 +345,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 3. HIGHLIGHTS */}
               {property.highlights.length > 0 && (
                 <div className="bg-gradient-to-r from-[#EEF9F9] to-[#E0F4F4] border border-[#92D4D3] rounded-2xl p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Property Highlights</h2>
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-4">Property Highlights</h2>
                   <ul className="space-y-2.5">
                     {property.highlights.map((highlight, index) => (
                       <li key={index} className="flex items-start gap-3">
@@ -369,7 +369,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 5. DESCRIPTION — collapsible */}
               {description && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-3">
                     About this property
                   </h2>
                   <DescriptionExpander text={description} />
@@ -379,7 +379,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 6. GALLERY — after description so readers are engaged first */}
               {(property.gallery.length > 0 || property.coverImage) && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-4">Photos</h2>
                   <PropertyGallery
                     images={property.gallery}
                     coverImage={property.coverImage}
@@ -392,7 +392,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 8. AMENITIES */}
               {property.amenities.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Amenities</h2>
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-3">Amenities</h2>
                   <div className="flex flex-wrap gap-2">
                     {property.amenities.map((amenity) => (
                       <Badge key={amenity} variant="secondary" className="text-sm px-3 py-1">
@@ -405,7 +405,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
               {/* 9. AVAILABILITY CALENDAR */}
               <div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-[#1E6B69] mb-3 flex items-center gap-2">
                   <CalendarDays className="w-5 h-5 text-[#1E6B69]" />
                   {t('availability')}
                 </h2>
@@ -419,7 +419,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 10. MAP + NEARBY */}
               {property.lat > 0 && property.lng > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-3">Location</h2>
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-3">Location</h2>
                   {/* Google Maps embed */}
                   <PropertyMap
                     lat={property.lat}
@@ -446,7 +446,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* Similar Properties */}
               {similarProperties.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-xl font-semibold text-[#1E6B69] mb-4">
                     Similar properties in {property.city}
                   </h2>
                   <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">

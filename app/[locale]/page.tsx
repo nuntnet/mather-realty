@@ -127,20 +127,23 @@ export default async function HomePage({ params }: HomePageProps) {
         className="relative min-h-[75vh] flex items-center text-white px-4"
         style={{
           backgroundImage:
-            "linear-gradient(to bottom right, rgba(12,56,54,0.82), rgba(30,107,105,0.5), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
+            "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }}
       >
-        {/* Subtle animated overlay shimmer */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/30 pointer-events-none" />
+        {/* Neutral dark overlay — lets the photo breathe, teal branding comes from UI elements */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/55 pointer-events-none" />
+        {/* Subtle teal tint at bottom for brand cohesion */}
+        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0C3837]/40 to-transparent pointer-events-none" />
 
         <div className="relative max-w-4xl mx-auto text-center w-full py-24">
-          <h1 className="text-4xl md:text-6xl font-lexend font-extrabold tracking-tight mb-6 leading-tight drop-shadow-lg">
+          {/* text-white overrides the base h1 teal rule */}
+          <h1 className="text-white text-4xl md:text-6xl font-lexend font-extrabold tracking-tight mb-6 leading-tight drop-shadow-lg">
             {t('hero_title')}
           </h1>
-          <p className="text-xl md:text-2xl text-green-100 mb-10 drop-shadow">
+          <p className="text-xl md:text-2xl text-white/80 mb-10 drop-shadow">
             {t('hero_subtitle')}
           </p>
 
@@ -150,13 +153,13 @@ export default async function HomePage({ params }: HomePageProps) {
           </div>
 
           {/* Trust badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-green-100 mb-10">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-white/80 mb-10">
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4DB5B2] inline-block" />
               500+ Expats Helped
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#b2e5b4] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#F4581A] inline-block" />
               Bangkok · Chiang Mai · Phuket
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
@@ -167,17 +170,17 @@ export default async function HomePage({ params }: HomePageProps) {
 
           {/* Stats row */}
           <div className="flex flex-wrap justify-center gap-4">
-            <div className="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl px-6 py-3 text-center min-w-[120px]">
-              <p className="text-2xl font-bold">2</p>
-              <p className="text-xs text-green-200 mt-0.5">Active Listings</p>
+            <div className="bg-white/12 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-3 text-center min-w-[120px]">
+              <p className="text-2xl font-bold text-white">2</p>
+              <p className="text-xs text-white/60 mt-0.5">Active Listings</p>
             </div>
-            <div className="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl px-6 py-3 text-center min-w-[120px]">
-              <p className="text-2xl font-bold">Bangkok</p>
-              <p className="text-xs text-green-200 mt-0.5">Top Location</p>
+            <div className="bg-white/12 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-3 text-center min-w-[120px]">
+              <p className="text-2xl font-bold text-white">Bangkok</p>
+              <p className="text-xs text-white/60 mt-0.5">Top Location</p>
             </div>
-            <div className="bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl px-6 py-3 text-center min-w-[120px]">
-              <p className="text-2xl font-bold">100%</p>
-              <p className="text-xs text-green-200 mt-0.5">Verified</p>
+            <div className="bg-white/12 backdrop-blur-sm border border-white/20 rounded-2xl px-6 py-3 text-center min-w-[120px]">
+              <p className="text-2xl font-bold text-white">100%</p>
+              <p className="text-xs text-white/60 mt-0.5">Verified</p>
             </div>
           </div>
         </div>
@@ -187,13 +190,21 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="bg-[#0C1A1A] py-12 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-8">
 
-          {/* Stacked-cards visual */}
-          <div className="relative shrink-0 w-36 h-48 sm:order-last">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#124E4C] to-[#0C3837] rounded-2xl shadow-lg rotate-6 opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#18605E] to-[#124E4C] rounded-2xl shadow-lg rotate-3 opacity-70" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1E6B69] to-[#124E4C] rounded-2xl shadow-xl flex flex-col items-center justify-center text-white gap-2">
-              <Home className="w-10 h-10 opacity-90" />
-              <span className="text-xs font-bold opacity-70 tracking-wide">SWIPE →</span>
+          {/* Stacked-cards visual — three depth layers with teal/orange accent */}
+          <div className="relative shrink-0 w-36 h-52 sm:order-last">
+            {/* Back card — orange accent */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#F4581A] to-[#B43E10] rounded-2xl shadow-lg rotate-6 opacity-50" />
+            {/* Mid card — muted teal */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#18605E] to-[#0C3837] rounded-2xl shadow-lg rotate-2 opacity-80" />
+            {/* Front card — primary teal */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1E6B69] to-[#124E4C] rounded-2xl shadow-2xl flex flex-col items-center justify-center text-white gap-3">
+              <div className="w-12 h-12 rounded-full bg-white/15 flex items-center justify-center">
+                <Home className="w-6 h-6" />
+              </div>
+              <div className="text-center">
+                <p className="text-xs font-bold tracking-widest opacity-60 uppercase">Swipe</p>
+                <p className="text-lg font-black leading-none">→</p>
+              </div>
             </div>
           </div>
 
@@ -224,7 +235,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Featured Properties */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-lexend font-bold text-gray-900">{t('featured_title')}</h2>
+          <h2 className="text-3xl font-lexend font-bold text-[#1E6B69]">{t('featured_title')}</h2>
           <Link href="/properties" className="flex items-center gap-1 text-[#124E4C] hover:text-[#1E6B69] font-medium">
             {t('view_all')}
             <ArrowRight className="w-4 h-4" />
@@ -248,7 +259,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* How It Works */}
       <section className="bg-gray-50 py-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+          <h2 className="text-3xl font-bold text-[#1E6B69] mb-4">How It Works</h2>
           <p className="text-gray-500 mb-12">
             Finding your next home in Thailand is easy with DoubleN Realty
           </p>
@@ -273,7 +284,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="bg-gradient-to-r from-[#0C3837] to-[#1E6B69] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <Building2 className="w-12 h-12 mx-auto mb-4 text-green-200" />
-          <h2 className="text-3xl font-bold mb-4">Are you a landlord?</h2>
+          <h2 className="text-3xl font-bold text-white mb-4">Are you a landlord?</h2>
           <p className="text-green-100 text-lg mb-8">
             List your property and reach thousands of expats looking for rental homes in Thailand.
             It&apos;s free to get started.
