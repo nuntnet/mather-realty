@@ -238,15 +238,16 @@ export default function PropertyEditPage() {
           highlightsStr = data.highlights.split(" • ").join("\n");
         }
 
-        // Parse faq: stored as JSON string or array
+        // Parse faq: stored as JSON string or array — always result in FaqItem[]
         let faqArr: FaqItem[] = [];
-        if (Array.isArray(data.faq)) {
-          faqArr = data.faq;
-        } else if (Array.isArray(data.faqJson)) {
-          faqArr = data.faqJson;
-        } else if (typeof data.faqJson === "string" && data.faqJson) {
-          try { faqArr = JSON.parse(data.faqJson); } catch { faqArr = []; }
-        }
+        const tryParseFaq = (v: unknown): FaqItem[] => {
+          if (Array.isArray(v)) return v as FaqItem[];
+          if (typeof v === "string" && v) {
+            try { const p = JSON.parse(v); return Array.isArray(p) ? p : []; } catch { return []; }
+          }
+          return [];
+        };
+        faqArr = tryParseFaq(data.faqJson) || tryParseFaq(data.faq);
 
         setForm({
           titles: data.titles ?? {},
@@ -411,11 +412,12 @@ export default function PropertyEditPage() {
         highlights: highlightsArray,
         perfectFor: form.perfectFor,
         tags: tagsArray,
-        faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : null,
-        seoDescription: form.seoDescription || null,
-        exteriorPhotos: toUrlArray(form.exteriorPhotos),
-        interiorPhotos: toUrlArray(form.interiorPhotos),
-        communityPhotos: toUrlArray(form.communityPhotos),
+        faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : "",
+        seoDescription: form.seoDescription || "",
+        // Keep as comma-separated strings — the API stores them as Notion rich_text
+        exteriorPhotos: form.exteriorPhotos,
+        interiorPhotos: form.interiorPhotos,
+        communityPhotos: form.communityPhotos,
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
