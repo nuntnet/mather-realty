@@ -18,7 +18,9 @@
     "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
     "db:push": "dotenv -e .env.local -- drizzle-kit push",
     "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
-    "algolia:index": "bun run scripts/algolia-index.ts"
+    "algolia:index": "bun run scripts/algolia-index.ts",
+    "make:admin": "dotenv -e .env.local -- bun run scripts/make-admin.ts",
+    "sync:notion": "dotenv -e .env.local -- bun run scripts/sync-notion-to-turso.ts"
   },
   "browserslist": [
     "chrome >= 90",
