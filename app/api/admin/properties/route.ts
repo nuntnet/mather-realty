@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { drizzle } from "drizzle-orm/libsql";
-import { createClient } from "@libsql/client";
-import { properties } from "@/lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { Client } from "@notionhq/client";
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import { getProperties } from "@/lib/notion";
 import { requireAdmin } from "@/lib/admin-auth";
 
-const PAGE_SIZE = 20;
+const PROPERTIES_DB_ID = process.env.NOTION_PROPERTIES_DB_ID ?? "";
+
+function getNotionClient() {
+  return new Client({ auth: process.env.NOTION_API_KEY });
+}
 
 const patchSchema = z.object({
   id: z.string().min(1),
@@ -15,82 +18,39 @@ const patchSchema = z.object({
     .optional(),
   approvedAt: z.string().optional().nullable(),
   verifiedAt: z.string().optional().nullable(),
+  syncAlgolia: z.boolean().optional(),
 });
 
-function getDb() {
-  const url = process.env.TURSO_DATABASE_URL;
-  if (!url) throw new Error("TURSO_DATABASE_URL is not set");
-  const client = createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN });
-  return drizzle(client, { schema: { properties } });
-}
-
+// ── GET — list all properties straight from Notion ────────────────────────────
 export async function GET(req: NextRequest) {
   const denied = await requireAdmin();
   if (denied) return denied;
 
   try {
-    const { searchParams } = new URL(req.url);
-    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
-    const status = searchParams.get("status") ?? null;
+    const props = await getProperties(undefined, "en");
 
-    const db = getDb();
+    const items = props.map((p) => ({
+      id: p.id,
+      slug: p.slug ?? null,
+      titleEn: p.title.en ?? null,
+      city: p.city ?? null,
+      district: p.district ?? null,
+      priceTHB: p.priceTHB ?? null,
+      bedrooms: p.bedrooms ?? null,
+      status: p.status ?? null,
+      verifiedAt: p.verifiedAt ?? null,
+      approvedAt: p.approvedAt ?? null,
+      createdAt: p.createdAt ?? null,
+    }));
 
-    // Build base query
-    const base = db.select().from(properties);
-    const countBase = db
-      .select({ count: sql<number>`count(*)` })
-      .from(properties);
-
-    const [rows, totals] = await Promise.all([
-      (status
-        ? base.where(
-            eq(
-              properties.status,
-              status as
-                | "available"
-                | "rented"
-                | "coming_soon"
-                | "pending"
-                | "archived"
-            )
-          )
-        : base
-      )
-        .limit(PAGE_SIZE)
-        .offset((page - 1) * PAGE_SIZE),
-      (status
-        ? countBase.where(
-            eq(
-              properties.status,
-              status as
-                | "available"
-                | "rented"
-                | "coming_soon"
-                | "pending"
-                | "archived"
-            )
-          )
-        : countBase
-      ).get(),
-    ]);
-
-    const total = Number(totals?.count ?? 0);
-
-    return NextResponse.json({
-      data: rows,
-      pagination: {
-        page,
-        pageSize: PAGE_SIZE,
-        total,
-        totalPages: Math.ceil(total / PAGE_SIZE),
-      },
-    });
+    return NextResponse.json({ items, total: items.length });
   } catch (err) {
     console.error("GET /api/admin/properties error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch properties" }, { status: 500 });
   }
 }
 
+// ── PATCH — update a property directly in Notion ──────────────────────────────
 export async function PATCH(req: NextRequest) {
   const denied = await requireAdmin();
   if (denied) return denied;
@@ -99,26 +59,46 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const data = patchSchema.parse(body);
 
-    const db = getDb();
+    const notion = getNotionClient();
 
-    const updateValues: Partial<typeof properties.$inferInsert> = {
-      updatedAt: new Date().toISOString(),
-    };
-    if (data.status !== undefined) updateValues.status = data.status;
-    if (data.approvedAt !== undefined) updateValues.approvedAt = data.approvedAt;
-    if (data.verifiedAt !== undefined) updateValues.verifiedAt = data.verifiedAt;
+    // Retrieve current page to detect property types (select vs status)
+    const page = await notion.pages.retrieve({ page_id: data.id }) as PageObjectResponse;
+    const props = page.properties as Record<string, { type: string }>;
 
-    const updated = await db
-      .update(properties)
-      .set(updateValues)
-      .where(eq(properties.id, data.id))
-      .returning();
+    const updateProperties: Record<string, unknown> = {};
 
-    if (updated.length === 0) {
-      return NextResponse.json({ error: "Property not found" }, { status: 404 });
+    // Status — Notion can be either a "select" or "status" type property
+    if (data.status) {
+      const statusProp = props["status"];
+      if (statusProp?.type === "select") {
+        updateProperties["status"] = { select: { name: data.status } };
+      } else if (statusProp?.type === "status") {
+        updateProperties["status"] = { status: { name: data.status } };
+      }
     }
 
-    return NextResponse.json({ success: true, property: updated[0] });
+    // verified_at date
+    if (data.verifiedAt !== undefined) {
+      updateProperties["verified_at"] = data.verifiedAt
+        ? { date: { start: data.verifiedAt } }
+        : { date: null };
+    }
+
+    // approved_at date
+    if (data.approvedAt !== undefined) {
+      updateProperties["approved_at"] = data.approvedAt
+        ? { date: { start: data.approvedAt } }
+        : { date: null };
+    }
+
+    if (Object.keys(updateProperties).length > 0) {
+      await notion.pages.update({
+        page_id: data.id,
+        properties: updateProperties as Parameters<typeof notion.pages.update>[0]["properties"],
+      });
+    }
+
+    return NextResponse.json({ success: true, id: data.id });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json(
@@ -127,6 +107,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
     console.error("PATCH /api/admin/properties error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to update property" }, { status: 500 });
   }
 }
