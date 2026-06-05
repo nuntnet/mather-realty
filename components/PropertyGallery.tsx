@@ -185,8 +185,7 @@ export default function PropertyGallery({
               {displayImages.map((img, idx) => (
                 <div
                   key={idx}
-                  className="relative flex-shrink-0 w-full"
-                  style={{ height: '65vw', maxHeight: 480, minHeight: 260 }}
+                  className="relative flex-shrink-0 w-full h-[65vw] max-h-[480px] min-h-[260px] landscape:h-[55vh] landscape:max-h-[420px] landscape:min-h-0"
                   onClick={() => { setSelectedIndex(idx); setLightboxOpen(true) }}
                 >
                   <Image
@@ -315,8 +314,8 @@ export default function PropertyGallery({
             </>
           )}
 
-          {/* Thumbnail strip */}
-          <div className="flex gap-1.5 overflow-x-auto px-4 py-3 shrink-0 scrollbar-hide">
+          {/* Thumbnail strip — hidden in landscape to maximise image area */}
+          <div className="landscape:hidden flex gap-1.5 overflow-x-auto px-4 py-3 shrink-0 scrollbar-hide">
             {displayImages.map((img, idx) => (
               <button
                 key={idx}
