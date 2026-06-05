@@ -250,6 +250,17 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     })(),
     seoDescription: getPropString(page, 'seo_description'),
     galleryCategories: (() => {
+      // Primary: three separate text fields — easy to fill in Notion
+      // Add "exterior_photos", "interior_photos", "community_photos" as
+      // Text properties in Notion, each containing comma-separated Cloudinary URLs.
+      const split = (s: string) => s.split(',').map(u => u.trim()).filter(Boolean)
+      const exterior  = split(getPropString(page, 'exterior_photos'))
+      const interior  = split(getPropString(page, 'interior_photos'))
+      const community = split(getPropString(page, 'community_photos'))
+      if (exterior.length || interior.length || community.length) {
+        return { exterior, interior, community }
+      }
+      // Fallback: legacy JSON blob in "gallery_categories" field
       const raw = getPropString(page, 'gallery_categories')
       if (!raw) return null
       try { return JSON.parse(raw) } catch { return null }

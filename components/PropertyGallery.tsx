@@ -24,9 +24,9 @@ interface PropertyGalleryProps {
 type CategoryKey = 'exterior' | 'interior' | 'community'
 
 const CATEGORY_LABELS: Record<CategoryKey, string> = {
-  exterior: '🏠 Exterior',
-  interior: '🛋️ Interior',
-  community: '🏘️ Community',
+  exterior: 'Exterior',
+  interior: 'Interior',
+  community: 'Community',
 }
 
 export default function PropertyGallery({
@@ -48,23 +48,23 @@ export default function PropertyGallery({
     )
   }, [galleryCategories])
 
-  // Default tab: exterior if available, otherwise first available
-  const defaultTab = useMemo<CategoryKey | null>(() => {
+  // 'all' | CategoryKey — null means no categories configured
+  type Tab = 'all' | CategoryKey
+  const defaultTab = useMemo<Tab | null>(() => {
     if (availableTabs.length === 0) return null
-    return availableTabs.includes('exterior') ? 'exterior' : availableTabs[0]
+    return 'all'
   }, [availableTabs])
 
-  const [activeTab, setActiveTab] = useState<CategoryKey | null>(defaultTab)
+  const [activeTab, setActiveTab] = useState<Tab | null>(defaultTab)
 
-  // Update activeTab when defaultTab resolves
   useEffect(() => {
     setActiveTab(defaultTab)
   }, [defaultTab])
 
-  // Images to display in carousel (filtered by tab, or all if no categories)
+  // Images shown in carousel based on active tab
   const displayImages = useMemo(() => {
-    if (!galleryCategories || !activeTab) return allImages
-    const catImages = galleryCategories[activeTab] ?? []
+    if (!galleryCategories || !activeTab || activeTab === 'all') return allImages
+    const catImages = galleryCategories[activeTab as CategoryKey] ?? []
     return catImages.length > 0 ? catImages : allImages
   }, [galleryCategories, activeTab, allImages])
 
@@ -146,8 +146,20 @@ export default function PropertyGallery({
   return (
     <>
       {/* ── Category Tabs ────────────────────────────────────────────────────── */}
-      {availableTabs.length > 1 && (
-        <div className="flex gap-2 px-4 pt-3 pb-1 overflow-x-auto scrollbar-hide">
+      {availableTabs.length > 0 && (
+        <div className="flex gap-2 px-4 pt-4 pb-1 overflow-x-auto scrollbar-hide">
+          {/* All tab */}
+          <button
+            onClick={() => setActiveTab('all')}
+            className={cn(
+              'shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+              activeTab === 'all'
+                ? 'bg-[#1d211c] text-white shadow-sm'
+                : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+            )}
+          >
+            All {allImages.length}
+          </button>
           {availableTabs.map((tab) => (
             <button
               key={tab}
@@ -160,6 +172,9 @@ export default function PropertyGallery({
               )}
             >
               {CATEGORY_LABELS[tab]}
+              <span className="ml-1.5 text-xs opacity-60">
+                {galleryCategories?.[tab]?.length ?? 0}
+              </span>
             </button>
           ))}
         </div>

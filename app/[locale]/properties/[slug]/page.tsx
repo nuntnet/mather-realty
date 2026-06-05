@@ -194,12 +194,19 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
       <div className="min-h-screen bg-[#f1f4f0] pt-16 pb-28 lg:pb-0">
 
-        {/* HERO — swipeable photo carousel */}
+        {/* HERO — swipeable photo carousel (cover + all gallery/category photos) */}
         <HeroCarousel
-          images={[
-            property.coverImage,
-            ...property.gallery.filter(img => img !== property.coverImage),
-          ].filter(Boolean)}
+          images={(() => {
+            const all = new Set<string>()
+            if (property.coverImage) all.add(property.coverImage)
+            property.gallery.forEach(u => all.add(u))
+            // Also include any photos from category fields not already in gallery
+            if (property.galleryCategories) {
+              const cats = property.galleryCategories
+              ;[...cats.exterior, ...cats.interior, ...cats.community].forEach(u => all.add(u))
+            }
+            return [...all].filter(Boolean)
+          })()}
           title={title}
           statusLabel={statusLabel[property.status] ?? property.status}
           statusClassName={statusColors[property.status] ?? 'bg-gray-100 text-gray-700'}
@@ -377,6 +384,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     images={property.gallery}
                     coverImage={property.coverImage}
                     virtualTourUrl={property.virtualTourUrl ?? undefined}
+                    galleryCategories={property.galleryCategories}
                   />
                 </div>
               )}
