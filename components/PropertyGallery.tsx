@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import useEmblaCarousel from 'embla-carousel-react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight, X, Grid2X2, Video, ExternalLink } from 'lucide-react'
-import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog' // still used for virtual tour
 import { cn } from '@/lib/utils'
 
 interface GalleryCategories {
@@ -284,22 +285,20 @@ export default function PropertyGallery({
       </AnimatePresence>
 
       {/* ── Lightbox fullscreen carousel ─────────────────────────────────────── */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        {/*
-          Override every shadcn positioning class (left-50%, top-50%,
-          translate, max-w-lg, etc.) with explicit inline styles so the
-          lightbox is truly edge-to-edge on all orientations.
-        */}
-        <DialogContent
-          className="max-w-none p-0 bg-black border-0 rounded-none overflow-hidden"
-          style={{
-            position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            width: '100vw', height: '100dvh',
-            transform: 'none', margin: 0,
+      {/* ── Lightbox — portal to body, bypasses all Dialog CSS constraints ── */}
+      {lightboxOpen && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] bg-black"
+          style={{ width: '100vw', height: '100dvh' }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setLightboxOpen(false)
+            if (e.key === 'ArrowLeft') lightboxPrev()
+            if (e.key === 'ArrowRight') lightboxNext()
           }}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
+          tabIndex={0}
         >
-          {/* ── Carousel fills the entire dialog ── */}
+          {/* Carousel — fills the entire viewport */}
           <div ref={lightboxEmblaRef} className="w-full h-full overflow-hidden">
             <div className="flex h-full">
               {displayImages.map((img, idx) => (
@@ -314,50 +313,49 @@ export default function PropertyGallery({
                     className="object-contain"
                     sizes="100vw"
                     draggable={false}
+                    priority={idx === lightboxIndex}
                   />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* ── Overlaid controls ── */}
-
           {/* Counter — top left */}
-          <span className="absolute top-4 left-4 z-20 bg-black/50 backdrop-blur-sm text-white text-sm font-medium px-3 py-1 rounded-full select-none pointer-events-none">
+          <span className="absolute top-4 left-4 z-10 bg-black/50 backdrop-blur-sm text-white text-sm font-medium px-3 py-1 rounded-full select-none pointer-events-none">
             {lightboxIndex + 1} / {displayImages.length}
           </span>
 
-          {/* Close — top right, overlays the image */}
+          {/* Close — top right */}
           <button
             onClick={() => setLightboxOpen(false)}
-            className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
-            aria-label="Close"
+            className="absolute top-4 right-4 z-10 size-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            aria-label="Close lightbox"
           >
             <X className="w-5 h-5 text-white" />
           </button>
 
-          {/* Prev / Next arrows */}
+          {/* Prev / Next */}
           {displayImages.length > 1 && (
             <>
               <button
                 onClick={lightboxPrev}
-                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
-                aria-label="Previous"
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-10 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
+                aria-label="Previous photo"
               >
                 <ChevronLeft className="w-6 h-6 text-white" />
               </button>
               <button
                 onClick={lightboxNext}
-                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
-                aria-label="Next"
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-10 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
+                aria-label="Next photo"
               >
                 <ChevronRight className="w-6 h-6 text-white" />
               </button>
             </>
           )}
 
-          {/* Thumbnail strip — bottom overlay, hidden in landscape */}
-          <div className="landscape:hidden absolute bottom-0 left-0 right-0 z-20 flex gap-1.5 overflow-x-auto px-4 py-3 bg-gradient-to-t from-black/70 to-transparent scrollbar-hide">
+          {/* Thumbnail strip — hidden in landscape */}
+          <div className="landscape:hidden absolute bottom-0 left-0 right-0 z-10 flex gap-1.5 overflow-x-auto px-4 py-3 bg-gradient-to-t from-black/70 to-transparent scrollbar-hide">
             {displayImages.map((img, idx) => (
               <button
                 key={idx}
@@ -374,9 +372,9 @@ export default function PropertyGallery({
               </button>
             ))}
           </div>
-
-        </DialogContent>
-      </Dialog>
+        </div>,
+        document.body
+      )}
 
       {/* ── Virtual Tour ─────────────────────────────────────────────────────── */}
       {virtualTourUrl && (
