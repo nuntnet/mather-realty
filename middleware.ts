@@ -25,6 +25,11 @@ async function validateAdminSession(req: NextRequest) {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
 
+  // ── Standalone auth pages — not localized, bypass i18n middleware ──────────
+  if (pathname === '/login' || pathname === '/register') {
+    return NextResponse.next()
+  }
+
   // ── Auth rate limiting ─────────────────────────────────────────────────────
   if (pathname.startsWith('/api/auth')) {
     if (
