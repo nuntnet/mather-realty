@@ -1,4 +1,3 @@
-import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/lib/site";
 
@@ -20,96 +19,96 @@ const INSTAGRAM_SVG = (
   </svg>
 );
 
-interface FooterProps {
-  locale?: string;
-}
-
-export default function Footer({ locale: _locale }: FooterProps) {
-  const t = useTranslations("footer");
-  const tNav = useTranslations("nav");
-
-  const quickLinks = [
-    { label: tNav("properties"), href: "/properties" },
-    { label: tNav("blog"), href: "/blog" },
-    { label: tNav("howItWorks"), href: "/how-it-works" },
-    { label: tNav("submitListing"), href: "/submit" },
-    { label: "About", href: "/about" },
-    { label: "Contact", href: "/contact" },
-  ];
+export default function Footer() {
+  const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white border-t border-gray-800">
-      <div className="container mx-auto px-4 py-14">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+    <footer className="bg-[#0f1a0f] text-white">
 
-          {/* Col 1: Brand + tagline + socials */}
-          <div className="space-y-5">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
-              aria-label="DoubleN Realty"
+      {/* ── Top CTA band ─────────────────────────────────────────────────── */}
+      <div className="border-b border-white/8">
+        <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div>
+            <p className="text-lg font-bold text-white leading-snug">
+              Looking for your perfect home in Thailand?
+            </p>
+            <p className="text-sm text-white/50 mt-1">
+              We&apos;re here 24/7 — reach us on LINE or WhatsApp.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <a
+              href="https://wa.me/66869902999"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#25D366] hover:bg-[#1dbd57] text-white text-sm font-semibold px-4 py-2.5 rounded-full transition-colors"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#46a758] text-white font-black text-sm select-none shrink-0">
-                2N
-              </span>
-              <span className="text-xl font-black tracking-tight text-white">
-                Double<span className="text-[#65c170]">N</span> Realty
+              {WHATSAPP_SVG}
+              WhatsApp
+            </a>
+            <a
+              href="https://line.me/R/ti/p/treasurenui"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 bg-[#00B900] hover:bg-[#009900] text-white text-sm font-semibold px-4 py-2.5 rounded-full transition-colors"
+            >
+              {LINE_SVG}
+              LINE
+            </a>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Main grid ────────────────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6 py-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          {/* Col 1: Brand */}
+          <div className="lg:col-span-1 space-y-5">
+            <Link href="/" aria-label="DoubleN Realty" className="inline-block hover:opacity-80 transition-opacity">
+              <span className="font-extrabold tracking-tight text-2xl leading-none">
+                <span className="text-white">Double</span>
+                <span className="text-[#65c170]">N</span>
+                <span className="text-white"> Realty</span>
               </span>
             </Link>
-            <p className="text-sm text-[#cdd1cb] leading-relaxed max-w-xs">
-              {site.tagline} 🇹🇭
-              <br />
-              <span className="text-gray-500">{t("description")}</span>
+            <p className="text-sm text-white/45 leading-relaxed">
+              {site.description}.<br />
+              Bangkok &amp; beyond 🇹🇭
             </p>
-
-            {/* Social icons */}
-            <div className="flex items-center gap-3">
+            {/* Socials */}
+            <div className="flex items-center gap-2.5">
+              <a href="https://wa.me/66869902999" target="_blank" rel="noopener noreferrer"
+                 className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all" aria-label="WhatsApp">
+                {WHATSAPP_SVG}
+              </a>
               {site.social.line && (
-                <a
-                  href={site.social.line}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-[#00B900] text-white hover:opacity-80 transition-opacity"
-                  aria-label="LINE"
-                >
+                <a href={site.social.line} target="_blank" rel="noopener noreferrer"
+                   className="flex h-9 w-9 items-center justify-center rounded-full bg-[#00B900]/15 text-[#00B900] hover:bg-[#00B900] hover:text-white transition-all" aria-label="LINE">
                   {LINE_SVG}
                 </a>
               )}
-              <a
-                href="https://wa.me/66869902999"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white hover:opacity-80 transition-opacity"
-                aria-label="WhatsApp"
-              >
-                {WHATSAPP_SVG}
-              </a>
               {site.social.instagram && (
-                <a
-                  href={`https://instagram.com/${site.social.instagram}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white hover:opacity-80 transition-opacity"
-                  aria-label="Instagram"
-                >
+                <a href={`https://instagram.com/${site.social.instagram}`} target="_blank" rel="noopener noreferrer"
+                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-white/60 hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 hover:text-white transition-all" aria-label="Instagram">
                   {INSTAGRAM_SVG}
                 </a>
               )}
             </div>
           </div>
 
-          {/* Col 2: Quick Links */}
+          {/* Col 2: Explore */}
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-500">
-              Quick Links
-            </h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Explore</h3>
             <ul className="space-y-2.5">
-              {quickLinks.map(({ label, href }) => (
+              {[
+                { label: 'Properties', href: '/properties' as const },
+                { label: 'Blog', href: '/blog' as const },
+                { label: 'How It Works', href: '/how-it-works' as const },
+                { label: 'List Your Property', href: '/submit' as const },
+              ].map(({ label, href }) => (
                 <li key={href}>
-                  <Link
-                    href={href as "/properties" | "/blog" | "/how-it-works" | "/submit" | "/about" | "/contact"}
-                    className="text-sm text-gray-400 hover:text-[#65c170] transition-colors"
-                  >
+                  <Link href={href} className="text-sm text-white/50 hover:text-[#65c170] transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -117,69 +116,62 @@ export default function Footer({ locale: _locale }: FooterProps) {
             </ul>
           </div>
 
-          {/* Col 3: Contact */}
+          {/* Col 3: Company */}
           <div className="space-y-4">
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-gray-500">
-              Contact
-            </h3>
-            <address className="not-italic space-y-2.5">
-              <p className="text-sm text-gray-400">
-                <a
-                  href={`mailto:${site.email}`}
-                  className="hover:text-white transition-colors"
-                >
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Company</h3>
+            <ul className="space-y-2.5">
+              {[
+                { label: 'About Us', href: '/about' as const },
+                { label: 'Contact', href: '/contact' as const },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-white/50 hover:text-[#65c170] transition-colors">
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4: Contact */}
+          <div className="space-y-4">
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Contact</h3>
+            <address className="not-italic space-y-2.5 text-sm text-white/50">
+              <p>
+                <a href={`mailto:${site.email}`} className="hover:text-[#65c170] transition-colors">
                   {site.email}
                 </a>
               </p>
-              <p className="text-sm text-gray-400">
-                <a href="tel:+66869902999" className="hover:text-white transition-colors">
+              <p>
+                <a href="tel:+66869902999" className="hover:text-[#65c170] transition-colors">
                   +66 86 990 2999
                 </a>
               </p>
-              <p className="text-sm text-gray-400">
-                LINE ID: <span className="text-gray-300">treasurenui</span>
-              </p>
-              <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-[#65c170] bg-[#46a758]/10 px-3 py-1.5 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] animate-pulse" />
-                Available 24/7 for expats
-              </p>
+              <p>LINE: <span className="text-white/70">treasurenui</span></p>
             </address>
-          </div>
-        </div>
-
-        {/* Bottom bar */}
-        <div className="mt-12 pt-6 border-t border-gray-800 space-y-3">
-          <p className="text-xs text-gray-500 text-center">
-            For inquiries:{" "}
-            <a href="mailto:janjiranui@gmail.com" className="text-gray-400 hover:text-[#65c170] transition-colors">
-              janjiranui@gmail.com
-            </a>
-            {" · "}
-            LINE{" "}
-            <a
-              href="https://line.me/R/ti/p/treasurenui"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gray-400 hover:text-[#65c170] transition-colors"
-            >
-              treasurenui
-            </a>
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-xs text-gray-500 text-center sm:text-left">
-              © 2025 DoubleN Realty · All rights reserved
-            </p>
-            <div className="flex items-center gap-4">
-              <Link href="/privacy" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                Privacy
-              </Link>
-              <Link href="/terms" className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                Terms
-              </Link>
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#65c170] bg-[#46a758]/12 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] animate-pulse" />
+              Available 24/7
             </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* ── Bottom bar ───────────────────────────────────────────────────── */}
+      <div className="border-t border-white/8">
+        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <p className="text-xs text-white/30">
+            © {year} DoubleN Realty · All rights reserved
+          </p>
+          <div className="flex items-center gap-5">
+            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/60 transition-colors">Privacy</Link>
+            <Link href="/terms" className="text-xs text-white/30 hover:text-white/60 transition-colors">Terms</Link>
+            <a href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">Cookies</a>
           </div>
         </div>
       </div>
+
     </footer>
   );
 }

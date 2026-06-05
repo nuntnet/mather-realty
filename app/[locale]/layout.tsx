@@ -32,7 +32,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Navbar locale={locale} />
       <main>{children}</main>
-      <Footer locale={locale} />
+      <Footer />
       <Analytics />
       <SpeedInsights />
       {/* Load Maps only on pages that need it — defer well past hydration */}

@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   CalendarDays,
   MapPin,
-  ArrowLeft,
   Layers,
   ParkingSquare,
   Phone,
@@ -26,12 +25,12 @@ import {
   ScrollText,
   Banknote,
 } from 'lucide-react'
-import PropertyDetailActions from './PropertyDetailActions'
 import PersonaSection from '@/components/PersonaSection'
 import FAQSection from '@/components/FAQSection'
 import PropertyMap from '@/components/PropertyMap'
 import StickyPropertyCTA from '@/components/StickyPropertyCTA'
 import DescriptionExpander from '@/components/DescriptionExpander'
+import HeroCarousel from './HeroCarousel'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -195,76 +194,21 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
       <div className="min-h-screen bg-[#f1f4f0] pt-16 pb-28 lg:pb-0">
 
-        {/* HERO — full-bleed with floating nav buttons */}
-        <section
-          className="relative w-full"
-          style={{ height: '72vh', minHeight: '500px', maxHeight: '820px' }}
-        >
-          {/* Background: photo or gradient fallback */}
-          {property.coverImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={property.coverImage}
-              alt={title}
-              className="absolute inset-0 w-full h-full object-cover"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-[#1b512a] via-[#297c3b] to-[#46a758]" />
-          )}
-
-          {/* Top vignette — makes floating buttons legible on bright photos */}
-          <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
-
-          {/* Bottom vignette */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
-
-          {/* Floating nav bar */}
-          <div className="absolute top-3 left-0 right-0 px-4 flex items-center justify-between z-10">
-            <Link
-              href="/properties"
-              className="flex items-center justify-center h-10 w-10 rounded-full bg-black/25 backdrop-blur-sm border border-white/20 text-white hover:bg-black/40 transition-colors"
-              aria-label="Back to properties"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <PropertyDetailActions title={title} variant="glass" />
-          </div>
-
-          {/* Bottom overlay: badges · title · location · price + photos */}
-          <div className="absolute bottom-0 left-0 right-0 px-5 md:px-10 pb-16">
-            <div className="max-w-7xl mx-auto">
-              {/* Badges */}
-              <div className="flex items-center gap-2 mb-3">
-                <span
-                  className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                    statusColors[property.status] ?? 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {statusLabel[property.status] ?? property.status}
-                </span>
-                {property.verifiedAt && (
-                  <span className="flex items-center gap-1 text-xs font-semibold text-white bg-blue-600/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    {t('verified')}
-                  </span>
-                )}
-              </div>
-
-              {/* Title */}
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 leading-tight [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
-                {title}
-              </h1>
-
-              {/* Price */}
-              <p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
-                ฿{property.priceTHB.toLocaleString()}
-                <span className="text-base font-normal text-white/70 ml-1">
-                  {t('price_per_month')}
-                </span>
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* HERO — swipeable photo carousel */}
+        <HeroCarousel
+          images={[
+            property.coverImage,
+            ...property.gallery.filter(img => img !== property.coverImage),
+          ].filter(Boolean)}
+          title={title}
+          statusLabel={statusLabel[property.status] ?? property.status}
+          statusClassName={statusColors[property.status] ?? 'bg-gray-100 text-gray-700'}
+          verified={!!property.verifiedAt}
+          verifiedLabel={t('verified')}
+          priceTHB={property.priceTHB}
+          pricePerMonthLabel={t('price_per_month')}
+          backHref={`/${locale}/properties`}
+        />
 
         {/* CONTENT CARD — slides up over the hero bottom */}
         <div className="relative z-10 -mt-10 rounded-t-[2rem] bg-white shadow-[0_-8px_40px_rgba(0,0,0,0.18)]">
