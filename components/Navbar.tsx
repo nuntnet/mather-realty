@@ -143,9 +143,6 @@ export default function Navbar({ locale }: NavbarProps) {
             </Link>
           </Button>
 
-          {/* Lang selector */}
-          <LangSelector variant="ghost" />
-
           {/* Auth */}
           {!isPending && (
             <>

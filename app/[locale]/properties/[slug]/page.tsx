@@ -254,50 +254,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 {title}
               </h1>
 
-              {/* Location */}
-              <div className="flex items-center gap-1.5 text-white/80 mb-4">
-                <MapPin className="w-4 h-4 shrink-0" />
-                <span className="text-sm md:text-base">
-                  {property.address}
-                  {property.district ? `, ${property.district}` : ''}, {property.city}
+              {/* Price */}
+              <p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
+                ฿{property.priceTHB.toLocaleString()}
+                <span className="text-base font-normal text-white/70 ml-1">
+                  {t('price_per_month')}
                 </span>
-              </div>
-
-              {/* Price row + All-photos pill */}
-              <div className="flex items-center justify-between gap-4">
-                <p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
-                  ฿{property.priceTHB.toLocaleString()}
-                  <span className="text-base font-normal text-white/70 ml-1">
-                    {t('price_per_month')}
-                  </span>
-                </p>
-                {(property.gallery.length > 0 || property.coverImage) && (
-                  <button
-                    className="flex items-center gap-2 bg-white/15 hover:bg-white/28 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-full border border-white/30 transition-colors shrink-0"
-                    aria-label="View all photos"
-                    id="open-gallery-btn"
-                    type="button"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="15"
-                      height="15"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <polyline points="21 15 16 10 5 21" />
-                    </svg>
-                    All photos
-                  </button>
-                )}
-              </div>
+              </p>
             </div>
           </div>
         </section>
