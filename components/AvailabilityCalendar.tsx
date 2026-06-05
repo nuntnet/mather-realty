@@ -117,10 +117,15 @@ export default function AvailabilityCalendar({
                   --rdp-cell-size: 36px;
                   --rdp-accent-color: #46a758;
                   margin: 0;
+                  width: 100%;
                 }
                 .rdp-months { width: 100%; }
                 .rdp-month { width: 100%; }
-                .rdp-table { width: 100%; border-collapse: collapse; }
+                .rdp-table {
+                  width: 100%;
+                  table-layout: fixed;
+                  border-collapse: collapse;
+                }
                 .rdp-tbody tr { height: 36px; }
                 .rdp-head_row { height: 28px; }
                 .rdp-head_cell {
@@ -132,7 +137,7 @@ export default function AvailabilityCalendar({
                   padding: 0;
                   text-align: center;
                 }
-                .rdp-cell { padding: 2px; text-align: center; width: calc(100% / 7); }
+                .rdp-cell { padding: 2px; text-align: center; }
                 .rdp-button {
                   width: 100%;
                   height: 36px;
