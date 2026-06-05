@@ -14,7 +14,6 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import CompanyLogo from "@/components/CompanyLogo";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -106,9 +105,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className="w-56 shrink-0 bg-white border-r border-gray-100 flex flex-col fixed inset-y-0">
         {/* Logo */}
         <div className="h-14 border-b border-gray-100 px-4 flex items-center gap-2.5">
-          <CompanyLogo height={36} className="h-9 w-auto" />
-          <div className="text-[9px] text-gray-400 uppercase tracking-wider leading-tight">
-            Admin Panel
+          <div>
+            <span className="font-lexend font-extrabold tracking-tight text-base leading-none">
+              <span className="text-[#1d211c]">Double</span>
+              <span className="text-[#F4581A]">N</span>
+            </span>
+            <div className="text-[9px] text-gray-400 uppercase tracking-widest leading-tight mt-0.5">
+              Admin Panel
+            </div>
           </div>
         </div>
 
