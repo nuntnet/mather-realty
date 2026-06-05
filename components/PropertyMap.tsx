@@ -82,14 +82,14 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
 
   return (
     <div className="rounded-2xl overflow-hidden border border-[#e2e5e0] shadow-sm">
-      <div
-        ref={mapRef}
-        className="w-full bg-[#f1f4f0]"
-        style={{ height: 280 }}
-        suppressHydrationWarning
-      >
+      <div className="relative" style={{ height: 280 }}>
+        {/* mapRef is Google Maps territory — never put React children inside it */}
+        <div
+          ref={mapRef}
+          className="w-full h-full bg-[#f1f4f0]"
+        />
         {!mapLoaded && (
-          <div className="w-full h-full flex items-center justify-center gap-2 text-[#898e87]">
+          <div className="absolute inset-0 flex items-center justify-center gap-2 text-[#898e87]">
             <div className="w-5 h-5 border-2 border-[#46a758] border-t-transparent rounded-full animate-spin" />
             <span className="text-sm">Loading map...</span>
           </div>

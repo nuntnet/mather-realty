@@ -25,6 +25,15 @@ type PlaceResult = {
   types: string[];
 };
 
+type NearbyPlace = {
+  name: string;
+  category: string;
+  distanceKm: number;
+  lat: number;
+  lng: number;
+  placeId: string;
+};
+
 function getDb() {
   const url = process.env.TURSO_DATABASE_URL;
   if (!url) throw new Error("TURSO_DATABASE_URL is not set");
@@ -57,80 +66,87 @@ export async function GET(
 ) {
   const { propertyId } = await params;
 
-  try {
-    const db = getDb();
+  // DB is optional — all DB operations are best-effort so a missing table or
+  // unavailable Turso never causes a 500.
+  let db: ReturnType<typeof getDb> | null = null;
+  try { db = getDb(); } catch { /* no DB available */ }
 
-    // Check cache (within 30 days)
-    const cached = await db
-      .select()
-      .from(nearbyPlaces)
-      .where(eq(nearbyPlaces.propertyId, propertyId));
+  // 1. Check cache
+  if (db) {
+    try {
+      const cached = await db
+        .select()
+        .from(nearbyPlaces)
+        .where(eq(nearbyPlaces.propertyId, propertyId));
 
-    if (cached.length > 0) {
-      const cachedAt = cached[0]?.cachedAt;
-      if (cachedAt) {
-        const age = Date.now() - new Date(cachedAt).getTime();
-        const maxAge = CACHE_DAYS * 24 * 60 * 60 * 1000;
-        if (age < maxAge) {
-          return NextResponse.json(
-            cached.map((p) => ({
-              name: p.name,
-              category: p.category,
-              distanceKm: p.distanceKm,
-              lat: p.lat,
-              lng: p.lng,
-            }))
-          );
+      if (cached.length > 0) {
+        const cachedAt = cached[0]?.cachedAt;
+        if (cachedAt) {
+          const age = Date.now() - new Date(cachedAt).getTime();
+          const maxAge = CACHE_DAYS * 24 * 60 * 60 * 1000;
+          if (age < maxAge) {
+            return NextResponse.json(
+              cached.map((p) => ({
+                name: p.name,
+                category: p.category,
+                distanceKm: p.distanceKm,
+                lat: p.lat,
+                lng: p.lng,
+              }))
+            );
+          }
         }
       }
+    } catch {
+      // Cache table may not exist yet — proceed to live fetch
     }
+  }
 
-    // Get property coordinates — Turso cache first, fallback to query params
-    const dbProperty = await db
-      .select({ lat: properties.lat, lng: properties.lng })
-      .from(properties)
-      .where(eq(properties.id, propertyId))
-      .get();
+  // 2. Resolve coordinates: Turso first, then query params
+  let coordLat: number | null = null;
+  let coordLng: number | null = null;
 
-    let coordLat: number | null = dbProperty?.lat ?? null;
-    let coordLng: number | null = dbProperty?.lng ?? null;
+  if (db) {
+    try {
+      const dbProperty = await db
+        .select({ lat: properties.lat, lng: properties.lng })
+        .from(properties)
+        .where(eq(properties.id, propertyId))
+        .get();
+      coordLat = dbProperty?.lat ?? null;
+      coordLng = dbProperty?.lng ?? null;
+    } catch { /* properties table unavailable */ }
+  }
 
-    if (coordLat == null || coordLng == null) {
-      const qLat = parseFloat(req.nextUrl.searchParams.get("lat") ?? "");
-      const qLng = parseFloat(req.nextUrl.searchParams.get("lng") ?? "");
-      if (!isNaN(qLat) && !isNaN(qLng)) {
-        coordLat = qLat;
-        coordLng = qLng;
-      }
+  if (coordLat == null || coordLng == null) {
+    const qLat = parseFloat(req.nextUrl.searchParams.get("lat") ?? "");
+    const qLng = parseFloat(req.nextUrl.searchParams.get("lng") ?? "");
+    if (!isNaN(qLat) && !isNaN(qLng)) {
+      coordLat = qLat;
+      coordLng = qLng;
     }
+  }
 
-    if (coordLat == null || coordLng == null) {
-      return NextResponse.json(
-        { error: "Property not found or missing coordinates" },
-        { status: 404 }
-      );
-    }
+  if (coordLat == null || coordLng == null) {
+    return NextResponse.json(
+      { error: "Property not found or missing coordinates" },
+      { status: 404 }
+    );
+  }
 
-    const property = { lat: coordLat, lng: coordLng };
+  // 3. Google Places API key required
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) {
+    return NextResponse.json([], { status: 200 });
+  }
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "Google Maps API key not configured" }, { status: 503 });
-    }
+  // 4. Fetch each place type
+  const allPlaces: NearbyPlace[] = [];
 
-    const allPlaces: {
-      name: string;
-      category: string;
-      distanceKm: number;
-      lat: number;
-      lng: number;
-      placeId: string;
-    }[] = [];
-
-    // Fetch each type separately for better coverage
-    for (const type of PLACE_TYPES) {
+  for (const type of PLACE_TYPES) {
+    try {
       const url = new URL(PLACES_API);
-      url.searchParams.set("location", `${property.lat},${property.lng}`);
+      url.searchParams.set("location", `${coordLat},${coordLng}`);
       url.searchParams.set("radius", String(RADIUS_METERS));
       url.searchParams.set("type", type);
       url.searchParams.set("key", apiKey);
@@ -143,8 +159,8 @@ export async function GET(
 
       for (const place of (json.results ?? []).slice(0, 3)) {
         const distanceKm = haversineKm(
-          property.lat,
-          property.lng,
+          coordLat,
+          coordLng,
           place.geometry.location.lat,
           place.geometry.location.lng
         );
@@ -157,28 +173,29 @@ export async function GET(
           lng: place.geometry.location.lng,
         });
       }
-    }
+    } catch { /* skip this place type on network error */ }
+  }
 
-    // Deduplicate by placeId
-    const seen = new Set<string>();
-    const unique = allPlaces.filter((p) => {
-      if (seen.has(p.placeId)) return false;
-      seen.add(p.placeId);
-      return true;
-    });
+  // 5. Deduplicate
+  const seen = new Set<string>();
+  const unique = allPlaces.filter((p) => {
+    if (seen.has(p.placeId)) return false;
+    seen.add(p.placeId);
+    return true;
+  });
 
-    // Clear old cache entries
-    if (cached.length > 0) {
-      // Delete old entries and re-insert fresh ones
-      // Use raw delete since drizzle sqlite doesn't have a simple deleteAll by column without eq
-      for (const old of cached) {
+  // 6. Persist cache (best-effort — ignore FK violations or missing tables)
+  if (db && unique.length > 0) {
+    try {
+      const existing = await db
+        .select({ id: nearbyPlaces.id })
+        .from(nearbyPlaces)
+        .where(eq(nearbyPlaces.propertyId, propertyId));
+
+      for (const old of existing) {
         await db.delete(nearbyPlaces).where(eq(nearbyPlaces.id, old.id));
       }
-    }
 
-    const now = new Date().toISOString();
-
-    if (unique.length > 0) {
       await db.insert(nearbyPlaces).values(
         unique.map((p) => ({
           propertyId,
@@ -188,22 +205,19 @@ export async function GET(
           distanceKm: p.distanceKm,
           lat: p.lat,
           lng: p.lng,
-          cachedAt: now,
+          cachedAt: new Date().toISOString(),
         }))
       );
-    }
-
-    return NextResponse.json(
-      unique.map((p) => ({
-        name: p.name,
-        category: p.category,
-        distanceKm: p.distanceKm,
-        lat: p.lat,
-        lng: p.lng,
-      }))
-    );
-  } catch (err) {
-    console.error(`GET /api/nearby/${propertyId} error:`, err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    } catch { /* cache write failed — not critical */ }
   }
+
+  return NextResponse.json(
+    unique.map((p) => ({
+      name: p.name,
+      category: p.category,
+      distanceKm: p.distanceKm,
+      lat: p.lat,
+      lng: p.lng,
+    }))
+  );
 }
