@@ -39,14 +39,36 @@ export default function Navbar({ locale }: NavbarProps) {
   const { data: session, isPending } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [visible, setVisible] = useState(true);
+  const lastScrollY = useRef(0);
   const drawerRef = useRef<HTMLDivElement>(null);
 
+  // Scroll-direction-aware visibility
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 10);
+    const onScroll = () => {
+      const current = window.scrollY;
+      setScrolled(current > 10);
+
+      if (mobileOpen) { lastScrollY.current = current; return; }
+
+      if (current < 80) {
+        setVisible(true);
+      } else if (current < lastScrollY.current - 4) {
+        setVisible(true);   // scrolling up
+      } else if (current > lastScrollY.current + 4) {
+        setVisible(false);  // scrolling down
+      }
+      lastScrollY.current = current;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [mobileOpen]);
+
+  // Always keep navbar visible when drawer is open
+  useEffect(() => {
+    if (mobileOpen) setVisible(true);
+  }, [mobileOpen]);
 
   // Close mobile menu on outside click
   useEffect(() => {
@@ -83,6 +105,7 @@ export default function Navbar({ locale }: NavbarProps) {
     <header
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
+        visible ? "translate-y-0" : "-translate-y-full",
         scrolled
           ? "bg-white/95 shadow-sm border-b border-[#e2e5e0]"
           : "bg-[#fcfdfc]/95 backdrop-blur-md border-b border-[#e2e5e0]"
@@ -143,75 +166,57 @@ export default function Navbar({ locale }: NavbarProps) {
             </Link>
           </Button>
 
-          {/* Auth */}
-          {!isPending && (
-            <>
-              {isLoggedIn ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <button
-                      className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      aria-label="User menu"
-                    >
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage
-                          src={(user as { image?: string }).image ?? ""}
-                          alt={user?.name ?? "User"}
-                        />
-                        <AvatarFallback className="text-xs font-semibold bg-[#46a758] text-white">
-                          {user?.name?.slice(0, 2).toUpperCase() ?? "?"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <div className="px-3 py-2 border-b">
-                      <p className="text-sm font-semibold truncate">{user?.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                    </div>
-                    {isAdmin && (
-                      <>
-                        <DropdownMenuItem asChild>
-                          <Link href="/admin" className="flex items-center gap-2">
-                            <ShieldCheck className="h-4 w-4" />
-                            {t("admin")}
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
+          {/* Avatar — only when logged in; login/logout live in hamburger menu */}
+          {!isPending && isLoggedIn && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  aria-label="User menu"
+                >
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage
+                      src={(user as { image?: string }).image ?? ""}
+                      alt={user?.name ?? "User"}
+                    />
+                    <AvatarFallback className="text-xs font-semibold bg-[#46a758] text-white">
+                      {user?.name?.slice(0, 2).toUpperCase() ?? "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <div className="px-3 py-2 border-b">
+                  <p className="text-sm font-semibold truncate">{user?.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+                </div>
+                {isAdmin && (
+                  <>
                     <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="flex items-center gap-2">
-                        <LayoutDashboard className="h-4 w-4" />
-                        {t("dashboard")}
+                      <Link href="/admin" className="flex items-center gap-2">
+                        <ShieldCheck className="h-4 w-4" />
+                        {t("admin")}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={handleSignOut}
-                      className="text-destructive flex items-center gap-2 cursor-pointer"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "text-[#5e6360] hover:text-[#46a758]"
-                  )}
-                >
-                  <Link href="/login" className="flex items-center gap-1.5">
-                    <LogIn className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("login")}</span>
+                  </>
+                )}
+                <DropdownMenuItem asChild>
+                  <Link href="/dashboard" className="flex items-center gap-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    {t("dashboard")}
                   </Link>
-                </Button>
-              )}
-            </>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleSignOut}
+                  className="text-destructive flex items-center gap-2 cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
 
           {/* Mobile hamburger */}
