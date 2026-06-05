@@ -5,28 +5,29 @@
 
 @layer base {
   :root {
-    /* Grass accent — Radix grass scale */
-    --primary: 137 40% 47%;           /* grass-9 #46a758 */
+    /* ── Brand: Pantone 19-4922 TCX "Teal Green" as primary ── */
+    --primary: 181 55% 27%;             /* #1E6B69 teal */
     --primary-foreground: 0 0% 100%;
 
-    /* Olive neutrals — Radix olive scale */
-    --background: 90 14% 99%;         /* olive-1 #fcfdfc */
-    --foreground: 110 8% 12%;         /* olive-12 #1d211c */
-    --card: 90 14% 99%;
-    --card-foreground: 110 8% 12%;
+    /* ── Neutral backgrounds ── */
+    --background: 180 14% 99%;
+    --foreground: 181 15% 12%;          /* near-black with teal undertone */
+    --card: 180 14% 99%;
+    --card-foreground: 181 15% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 110 8% 12%;
-    --secondary: 90 7% 95%;           /* olive-3 */
-    --secondary-foreground: 110 8% 12%;
-    --muted: 90 7% 95%;               /* olive-3 */
-    --muted-foreground: 150 3% 37%;   /* olive-11 */
-    --accent: 137 30% 94%;            /* grass-2 tint */
-    --accent-foreground: 137 50% 21%; /* grass-12 */
+    --popover-foreground: 181 15% 12%;
+    --secondary: 180 7% 95%;
+    --secondary-foreground: 181 15% 12%;
+    --muted: 180 7% 95%;
+    --muted-foreground: 181 5% 40%;
+    --accent: 181 30% 92%;              /* teal tint */
+    --accent-foreground: 181 55% 20%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
-    --border: 90 5% 89%;              /* olive-5 */
-    --input: 90 5% 89%;
-    --ring: 137 40% 47%;              /* grass focus ring */
+    --border: 180 5% 88%;
+    --input: 180 5% 88%;
+    --ring: 181 55% 27%;
 
     /* Large radius */
     --radius: 1rem;
@@ -34,35 +35,60 @@
     /* Fonts */
     --font-lexend: var(--font-lexend);
 
-    /* Brand tokens */
-    --grass-9: 137 40% 47%;           /* #46a758 main green */
-    --grass-10: 137 42% 42%;          /* #3d9a4f hover */
-    --grass-11: 137 50% 32%;          /* #297c3b text on light */
-    --grass-12: 137 50% 21%;          /* #1b512a darkest */
-    --olive-11: 150 3% 37%;           /* #5e6360 secondary text */
-    --olive-12: 110 8% 12%;           /* #1d211c heading */
+    /* ── Brand tokens ── */
+    /* Teal scale (Pantone 19-4922 TCX) */
+    --teal-1: 181 55% 97%;              /* #EEF9F9 */
+    --teal-2: 181 50% 93%;              /* #E0F4F4 */
+    --teal-3: 181 45% 85%;              /* #C2E8E7 */
+    --teal-4: 181 45% 72%;              /* #92D4D3 */
+    --teal-5: 181 45% 60%;              /* #62C0BE */
+    --teal-6: 181 50% 48%;              /* #3BA9A7 */
+    --teal-7: 181 52% 38%;              /* #2D8E8C */
+    --teal-8: 181 54% 32%;              /* #247D7B */
+    --teal-9: 181 55% 27%;              /* #1E6B69 ← Pantone 19-4922 */
+    --teal-10: 181 55% 23%;             /* #18605E hover */
+    --teal-11: 181 58% 18%;             /* #124E4C text on light */
+    --teal-12: 181 60% 12%;             /* #0C3837 darkest */
+
+    /* Orange scale (Pantone Orange 021 U) */
+    --orange-1: 16 100% 97%;            /* #FEF1EC */
+    --orange-2: 16 100% 92%;            /* #FDD4C2 */
+    --orange-3: 16 95% 82%;             /* #FAB09A */
+    --orange-4: 16 90% 72%;             /* #F78D72 */
+    --orange-5: 16 88% 62%;             /* #F46A4A */
+    --orange-6: 16 87% 53%;             /* #F1502A */
+    --orange-7: 16 88% 46%;             /* #EF3F17 */
+    --orange-8: 16 87% 40%;             /* #D4380F */
+    --orange-9: 16 90% 52%;             /* #F4581A ← Pantone Orange 021 U */
+    --orange-10: 16 87% 44%;            /* #D84C14 hover */
+    --orange-11: 16 88% 36%;            /* #B43E10 text on light */
+    --orange-12: 16 90% 22%;            /* #6E2508 darkest */
+
+    /* Legacy aliases for smooth migration */
+    --olive-11: 181 5% 37%;
+    --olive-12: 181 8% 12%;
   }
 
   .dark {
-    --background: 110 8% 8%;
-    --foreground: 90 7% 95%;
-    --card: 110 8% 10%;
-    --card-foreground: 90 7% 95%;
-    --popover: 110 8% 10%;
-    --popover-foreground: 90 7% 95%;
-    --primary: 137 40% 47%;
+    --background: 181 15% 8%;
+    --foreground: 180 7% 95%;
+    --card: 181 15% 10%;
+    --card-foreground: 180 7% 95%;
+    --popover: 181 15% 10%;
+    --popover-foreground: 180 7% 95%;
+    --primary: 181 55% 40%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 110 6% 17%;
-    --secondary-foreground: 90 7% 95%;
-    --muted: 110 6% 17%;
-    --muted-foreground: 90 5% 60%;
-    --accent: 137 20% 20%;
-    --accent-foreground: 137 30% 85%;
+    --secondary: 181 10% 17%;
+    --secondary-foreground: 180 7% 95%;
+    --muted: 181 10% 17%;
+    --muted-foreground: 180 5% 60%;
+    --accent: 181 20% 20%;
+    --accent-foreground: 181 30% 85%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 110 6% 20%;
-    --input: 110 6% 20%;
-    --ring: 137 40% 47%;
+    --border: 181 10% 20%;
+    --input: 181 10% 20%;
+    --ring: 181 55% 40%;
   }
   .maplibregl-popup-content {
     @apply bg-transparent! shadow-none! p-0! rounded-none!;
@@ -89,12 +115,38 @@
   :lang(th) {
     line-height: 1.7;
   }
+
+  /* ── Heading colour system ──────────────────────────────────────────────── */
+  /* H1: teal — main brand authority. Override with text-white on dark BG.   */
+  h1:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
+    color: #1E6B69;
+  }
+  /* H2: teal — section identity */
+  h2:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
+    color: #1E6B69;
+  }
+  /* H3: orange — subsection accent draws the eye */
+  h3:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
+    color: #F4581A;
+  }
 }
 
-/* Viberent heading utilities */
+/* Brand heading utilities */
 @layer components {
   .heading-display { @apply font-lexend font-bold tracking-tight; }
   .heading-hero { @apply font-lexend font-extrabold tracking-tight; }
+
+  /* Explicit teal heading (use when background is dark and auto-detect fails) */
+  .heading-teal { color: #1E6B69; }
+  .heading-orange { color: #F4581A; }
+
+  /* Teal-to-orange gradient text for hero H1 */
+  .heading-gradient {
+    background: linear-gradient(135deg, #1E6B69 0%, #F4581A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 /* Glassmorphism Effects */
@@ -111,17 +163,30 @@
     @apply transition-all duration-300 hover:bg-white/90 dark:hover:bg-gray-800/90 hover:shadow-xl hover:shadow-gray-200/30 dark:hover:shadow-black/30;
   }
 
-  /* Gradient Buttons */
+  /* Primary teal button gradient */
   .btn-gradient {
-    @apply bg-gradient-to-r from-[#46a758] to-[#65c170] text-white font-semibold;
-    @apply hover:from-[#3d9a4f] hover:to-[#46a758] transition-all duration-300;
-    @apply shadow-lg shadow-green-600/25 hover:shadow-xl hover:shadow-green-600/35;
+    background: linear-gradient(135deg, #1E6B69, #2D8E8C);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(30, 107, 105, 0.3);
+    transition: all 0.3s ease;
+  }
+  .btn-gradient:hover {
+    background: linear-gradient(135deg, #18605E, #247D7B);
+    box-shadow: 0 6px 20px rgba(30, 107, 105, 0.4);
   }
 
-  .btn-gradient-navy {
-    @apply bg-gradient-to-r from-[#131F3C] to-[#2E5EA8] text-white font-semibold;
-    @apply hover:from-[#0f1830] hover:to-[#264d8c] transition-all duration-300;
-    @apply shadow-lg shadow-blue-900/25 hover:shadow-xl hover:shadow-blue-900/35;
+  /* Orange CTA gradient */
+  .btn-gradient-orange {
+    background: linear-gradient(135deg, #F4581A, #E8461A);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 14px rgba(244, 88, 26, 0.3);
+    transition: all 0.3s ease;
+  }
+  .btn-gradient-orange:hover {
+    background: linear-gradient(135deg, #D84C14, #C84010);
+    box-shadow: 0 6px 20px rgba(244, 88, 26, 0.4);
   }
 
   /* Card Hover Effects */
@@ -166,15 +231,16 @@
   }
 }
 
-/* Smooth scroll — data attribute required for Next.js 15 */
+/* Smooth scroll */
 html {
   scroll-behavior: smooth;
 }
 
-/* Better focus rings for accessibility */
+/* Focus rings */
 @layer base {
   *:focus-visible {
-    @apply outline-none ring-2 ring-[#46a758] ring-offset-2;
+    @apply outline-none ring-2 ring-offset-2;
+    ring-color: #1E6B69;
   }
 }
 
@@ -182,31 +248,20 @@ html {
 @layer components {
   .hero-gradient {
     background:
-      linear-gradient(to bottom, rgba(27, 81, 42, 0.75), rgba(70, 167, 88, 0.45), rgba(0,0,0,0.3)),
+      linear-gradient(to bottom right, rgba(12, 56, 54, 0.82), rgba(30, 107, 105, 0.5), rgba(0,0,0,0.3)),
       url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80') center/cover no-repeat;
   }
 
-  /* Property card hover lift */
   .property-card-hover {
     @apply transition-all duration-200 ease-out;
     @apply hover:-translate-y-1 hover:shadow-xl;
   }
 
-  /* Status top bar colors */
-  .status-bar-available {
-    @apply bg-green-500;
-  }
-  .status-bar-rented {
-    @apply bg-gray-400;
-  }
-  .status-bar-coming_soon {
-    @apply bg-orange-400;
-  }
-  .status-bar-pending {
-    @apply bg-yellow-400;
-  }
+  .status-bar-available { @apply bg-[#1E6B69]; }
+  .status-bar-rented    { @apply bg-gray-400; }
+  .status-bar-coming_soon { @apply bg-[#F4581A]; }
+  .status-bar-pending   { @apply bg-yellow-400; }
 
-  /* Glassmorphism search bar */
   .hero-search-glass {
     @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl;
   }

@@ -26,7 +26,7 @@ export default function DescriptionExpander({ text }: DescriptionExpanderProps) 
       {isLong && (
         <button
           onClick={() => setExpanded(v => !v)}
-          className="mt-2.5 flex items-center gap-1 text-sm font-semibold text-[#46a758] hover:text-[#297c3b] transition-colors"
+          className="mt-2.5 flex items-center gap-1 text-sm font-semibold text-[#1E6B69] hover:text-[#124E4C] transition-colors"
         >
           {expanded ? (
             <><ChevronUp className="w-4 h-4" />Show less</>

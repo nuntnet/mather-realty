@@ -168,7 +168,7 @@ export default function PropertyGallery({
               className={cn(
                 'shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
                 tab === activeTab
-                  ? 'bg-[#46a758] text-white shadow-sm'
+                  ? 'bg-[#1E6B69] text-white shadow-sm'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
               )}
             >
@@ -269,7 +269,7 @@ export default function PropertyGallery({
                 onClick={() => setTourOpen(true)}
                 className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow backdrop-blur-sm border border-white/20"
               >
-                <Video className="w-3.5 h-3.5 text-[#46a758]" />
+                <Video className="w-3.5 h-3.5 text-[#1E6B69]" />
                 <span className="hidden sm:inline">Tour</span>
               </button>
             )}

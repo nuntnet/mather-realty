@@ -23,7 +23,7 @@ export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0f1a0f] text-white">
+    <footer className="bg-[#0C1A1A] text-white">
 
       {/* ── Top CTA band ─────────────────────────────────────────────────── */}
       <div className="border-b border-white/8">
@@ -68,7 +68,7 @@ export default function Footer() {
             <Link href="/" aria-label="DoubleN Realty" className="inline-block hover:opacity-80 transition-opacity">
               <span className="font-extrabold tracking-tight text-2xl leading-none">
                 <span className="text-white">Double</span>
-                <span className="text-[#65c170]">N</span>
+                <span className="text-[#F4581A]">N</span>
                 <span className="text-white"> Realty</span>
               </span>
             </Link>
@@ -108,7 +108,7 @@ export default function Footer() {
                 { label: 'List Your Property', href: '/submit' as const },
               ].map(({ label, href }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-white/50 hover:text-[#65c170] transition-colors">
+                  <Link href={href} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -125,7 +125,7 @@ export default function Footer() {
                 { label: 'Contact', href: '/contact' as const },
               ].map(({ label, href }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-white/50 hover:text-[#65c170] transition-colors">
+                  <Link href={href} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -138,19 +138,19 @@ export default function Footer() {
             <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Contact</h3>
             <address className="not-italic space-y-2.5 text-sm text-white/50">
               <p>
-                <a href={`mailto:${site.email}`} className="hover:text-[#65c170] transition-colors">
+                <a href={`mailto:${site.email}`} className="hover:text-[#4DB5B2] transition-colors">
                   {site.email}
                 </a>
               </p>
               <p>
-                <a href="tel:+66869902999" className="hover:text-[#65c170] transition-colors">
+                <a href="tel:+66869902999" className="hover:text-[#4DB5B2] transition-colors">
                   +66 86 990 2999
                 </a>
               </p>
               <p>LINE: <span className="text-white/70">treasurenui</span></p>
             </address>
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#65c170] bg-[#46a758]/12 px-3 py-1.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] animate-pulse" />
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#4DB5B2] bg-[#1E6B69]/12 px-3 py-1.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4DB5B2] animate-pulse" />
               Available 24/7
             </div>
           </div>

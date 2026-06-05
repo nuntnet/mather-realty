@@ -68,7 +68,7 @@ export default function HeroCarousel({
           </div>
         </div>
       ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1b512a] via-[#297c3b] to-[#46a758]" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0C3837] via-[#124E4C] to-[#1E6B69]" />
       )}
 
       {/* ── Vignettes ──────────────────────────────────────── */}

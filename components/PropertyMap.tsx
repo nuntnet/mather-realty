@@ -39,7 +39,7 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
         const markerEl = document.createElement('div')
         markerEl.style.cssText = `
           width: 28px; height: 28px;
-          background: #46a758;
+          background: #1E6B69;
           border: 3px solid white;
           border-radius: 50%;
           box-shadow: 0 2px 8px rgba(0,0,0,0.3);
@@ -90,7 +90,7 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
         />
         {!mapLoaded && (
           <div className="absolute inset-0 flex items-center justify-center gap-2 text-[#898e87]">
-            <div className="w-5 h-5 border-2 border-[#46a758] border-t-transparent rounded-full animate-spin" />
+            <div className="w-5 h-5 border-2 border-[#1E6B69] border-t-transparent rounded-full animate-spin" />
             <span className="text-sm">Loading map...</span>
           </div>
         )}
@@ -98,7 +98,7 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
 
       <div className="px-4 py-3 bg-white flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-start gap-2 min-w-0">
-          <MapPin className="w-4 h-4 text-[#46a758] shrink-0 mt-0.5" />
+          <MapPin className="w-4 h-4 text-[#1E6B69] shrink-0 mt-0.5" />
           <p className="text-sm text-[#5e6360] leading-snug truncate">{address}</p>
         </div>
         <div className="flex gap-2 shrink-0">
@@ -106,7 +106,7 @@ export default function PropertyMap({ lat, lng, title, address }: PropertyMapPro
             href={directionsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-medium text-white bg-[#46a758] hover:bg-[#3d9a4f] px-3 py-1.5 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium text-white bg-[#1E6B69] hover:bg-[#18605E] px-3 py-1.5 rounded-lg transition-colors"
           >
             Directions
           </a>

@@ -109,7 +109,7 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
               />
             </div>
           )) : (
-            <div className="relative flex-shrink-0 w-full h-full bg-gradient-to-br from-[#297c3b] to-[#1d211c]" />
+            <div className="relative flex-shrink-0 w-full h-full bg-gradient-to-br from-[#124E4C] to-[#1d211c]" />
           )}
         </div>
       </div>
@@ -201,7 +201,7 @@ function PropertyCard({
       {/* Status badge */}
       {property.status === 'available' && (
         <div className="absolute top-20 left-4 z-20">
-          <span className="bg-[#46a758]/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+          <span className="bg-[#1E6B69]/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
             ● Available
           </span>
         </div>
@@ -259,7 +259,7 @@ function PropertyCard({
       >
         <div className="flex items-start justify-between gap-2 mb-1">
           <h2 className="text-white font-bold text-xl leading-tight flex-1">{title}</h2>
-          {property.verifiedAt && <CheckCircle2 className="w-5 h-5 text-[#65c170] shrink-0 mt-0.5" />}
+          {property.verifiedAt && <CheckCircle2 className="w-5 h-5 text-[#4DB5B2] shrink-0 mt-0.5" />}
         </div>
 
         <div className="flex items-center gap-1 text-white/80 text-sm mb-3">
@@ -295,7 +295,7 @@ function PropertyCard({
             <p className="text-white/60 text-xs uppercase tracking-wider">Monthly Rent</p>
             <p className="text-white font-bold text-2xl">฿{property.priceTHB.toLocaleString()}</p>
           </div>
-          <div className="flex items-center gap-1.5 text-[#65c170] text-sm font-semibold">
+          <div className="flex items-center gap-1.5 text-[#4DB5B2] text-sm font-semibold">
             View detail
             <ChevronUp className="w-4 h-4 rotate-90" />
           </div>
@@ -352,7 +352,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
       <div className="h-dvh flex items-center justify-center bg-black text-white">
         <div className="text-center space-y-4">
           <p className="text-xl font-semibold">No properties available</p>
-          <button onClick={() => router.back()} className="text-[#46a758] underline">Go back</button>
+          <button onClick={() => router.back()} className="text-[#1E6B69] underline">Go back</button>
         </div>
       </div>
     )
@@ -370,7 +370,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
           <span className="text-white font-bold text-base">
-            Double<span className="text-[#65c170]">N</span> Realty
+            Double<span className="text-[#4DB5B2]">N</span> Realty
           </span>
         </div>
 
@@ -381,7 +381,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             return (
               <button key={p.id} onClick={() => scrollTo(idx)}
                 className={cn('w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all',
-                  idx === activeIndex ? 'bg-[#46a758]/20 border border-[#46a758]/40' : 'hover:bg-white/5'
+                  idx === activeIndex ? 'bg-[#1E6B69]/20 border border-[#1E6B69]/40' : 'hover:bg-white/5'
                 )}>
                 {p.coverImage && (
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
@@ -390,9 +390,9 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
                 )}
                 <div className="min-w-0 flex-1">
                   <p className="text-white text-xs font-semibold line-clamp-2 leading-tight">{ptitle}</p>
-                  <p className="text-[#65c170] text-xs mt-0.5 font-medium">฿{p.priceTHB.toLocaleString()}/mo</p>
+                  <p className="text-[#4DB5B2] text-xs mt-0.5 font-medium">฿{p.priceTHB.toLocaleString()}/mo</p>
                 </div>
-                {idx === activeIndex && <div className="w-1.5 h-1.5 rounded-full bg-[#46a758] shrink-0" />}
+                {idx === activeIndex && <div className="w-1.5 h-1.5 rounded-full bg-[#1E6B69] shrink-0" />}
               </button>
             )
           })}
@@ -404,7 +404,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <Home className="w-4 h-4" /> Browse
           </button>
           <button onClick={() => router.push('/discover' as '/')}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#46a758]/20 text-[#65c170] text-xs font-medium">
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#1E6B69]/20 text-[#4DB5B2] text-xs font-medium">
             <Compass className="w-4 h-4" /> Discover
           </button>
         </div>
@@ -424,7 +424,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <div className="hidden lg:block w-10" />
 
             <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
-              Double<span className="text-[#65c170]">N</span> Realty
+              Double<span className="text-[#4DB5B2]">N</span> Realty
             </h1>
             <p className="hidden lg:block text-white/60 text-xs font-medium">
               {activeIndex + 1} / {properties.length}
@@ -435,7 +435,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
               {properties.slice(0, 8).map((_, idx) => (
                 <div key={idx} onClick={() => scrollTo(idx)}
                   className={cn('w-1 rounded-full transition-all duration-300 cursor-pointer',
-                    idx === activeIndex ? 'h-4 bg-[#46a758]' : 'h-1.5 bg-white/40'
+                    idx === activeIndex ? 'h-4 bg-[#1E6B69]' : 'h-1.5 bg-white/40'
                   )} />
               ))}
             </div>
@@ -473,11 +473,11 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <div className={cn(isDesktop ? 'h-full' : 'h-dvh', 'flex flex-col items-center justify-center bg-[#1d211c]')}
               style={{ scrollSnapAlign: 'start' }}>
               <div className="text-center space-y-4 px-8">
-                <Home className="w-12 h-12 text-[#46a758] mx-auto" />
+                <Home className="w-12 h-12 text-[#1E6B69] mx-auto" />
                 <p className="text-white text-xl font-bold">That&apos;s all for now</p>
                 <p className="text-[#cdd1cb] text-sm">More properties coming soon</p>
                 <button onClick={() => router.push('/properties')}
-                  className="bg-[#46a758] text-white font-semibold px-6 py-3 rounded-full mt-4">
+                  className="bg-[#1E6B69] text-white font-semibold px-6 py-3 rounded-full mt-4">
                   Browse all properties
                 </button>
               </div>
@@ -487,7 +487,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
           {/* Bottom nav — mobile */}
           <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/60 backdrop-blur-xl lg:hidden">
             <button onClick={() => router.push('/discover' as '/')}
-              className="flex flex-col items-center gap-0.5 bg-[#46a758]/20 text-[#65c170] px-5 py-2 rounded-full">
+              className="flex flex-col items-center gap-0.5 bg-[#1E6B69]/20 text-[#4DB5B2] px-5 py-2 rounded-full">
               <Compass className="w-5 h-5" />
               <span className="text-xs font-semibold">Explore</span>
             </button>
@@ -510,15 +510,15 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
               <h3 className="text-white font-bold text-lg leading-snug">
                 {activeProperty.title[locale] ?? activeProperty.title.en}
               </h3>
-              <p className="text-[#65c170] text-2xl font-bold">
+              <p className="text-[#4DB5B2] text-2xl font-bold">
                 ฿{activeProperty.priceTHB.toLocaleString()}
                 <span className="text-white/50 text-sm font-normal">/mo</span>
               </p>
               <div className="grid grid-cols-3 gap-2 text-center">
                 {[
-                  { icon: <Bed className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.bedrooms, label: 'Bed' },
-                  { icon: <Bath className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.bathrooms, label: 'Bath' },
-                  { icon: <Maximize2 className="w-4 h-4 mx-auto mb-1 text-[#65c170]" />, val: activeProperty.sizeSqm, label: 'sqm' },
+                  { icon: <Bed className="w-4 h-4 mx-auto mb-1 text-[#4DB5B2]" />, val: activeProperty.bedrooms, label: 'Bed' },
+                  { icon: <Bath className="w-4 h-4 mx-auto mb-1 text-[#4DB5B2]" />, val: activeProperty.bathrooms, label: 'Bath' },
+                  { icon: <Maximize2 className="w-4 h-4 mx-auto mb-1 text-[#4DB5B2]" />, val: activeProperty.sizeSqm, label: 'sqm' },
                 ].map(s => (
                   <div key={s.label} className="bg-white/5 rounded-xl py-2.5">
                     {s.icon}
@@ -536,7 +536,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
 
             <button
               onClick={() => router.push(`/properties/${activeProperty.slug}#inquiry` as '/properties')}
-              className="w-full bg-[#46a758] hover:bg-[#3d9a4f] text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
+              className="w-full bg-[#1E6B69] hover:bg-[#18605E] text-white font-semibold py-3 rounded-xl transition-colors flex items-center justify-center gap-2">
               <MessageCircle className="w-4 h-4" />
               Schedule Viewing
             </button>

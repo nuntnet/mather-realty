@@ -90,7 +90,7 @@ export default async function TermsPage({
           service fee for using our Platform or submitting inquiries. If anyone claims to be
           representing DoubleN Realty and requests payment from you as a tenant, please report
           this to us immediately at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
             janjiranui@gmail.com
           </a>.
         </p>
@@ -209,7 +209,7 @@ export default async function TermsPage({
         </h2>
         <p>
           Our collection and use of your personal data is governed by our{' '}
-          <Link href={`/${locale}/privacy`} className="text-[#46a758] hover:underline">
+          <Link href={`/${locale}/privacy`} className="text-[#1E6B69] hover:underline">
             Privacy Policy
           </Link>
           , which forms part of these Terms.
@@ -248,7 +248,7 @@ export default async function TermsPage({
           <p>Bangkok, Thailand</p>
           <p>
             Email:{' '}
-            <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+            <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
               janjiranui@gmail.com
             </a>
           </p>
@@ -257,7 +257,7 @@ export default async function TermsPage({
       </div>
 
       <div className="mt-12 pt-8 border-t border-gray-100">
-        <Link href="/" className="text-[#46a758] hover:underline text-sm font-medium">
+        <Link href="/" className="text-[#1E6B69] hover:underline text-sm font-medium">
           &larr; Back to home
         </Link>
       </div>

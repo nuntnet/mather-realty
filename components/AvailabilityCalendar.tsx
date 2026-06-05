@@ -116,7 +116,7 @@ export default function AvailabilityCalendar({
 
                 /* Root: accent colour, no margin */
                 .rdp-root {
-                  --rdp-accent-color: #46a758;
+                  --rdp-accent-color: #1E6B69;
                   width: 100%;
                   margin: 0;
                 }
@@ -172,8 +172,8 @@ export default function AvailabilityCalendar({
                 /* Today highlight */
                 .rdp-today:not(.rdp-selected) .rdp-day_button {
                   font-weight: 800;
-                  color: #46a758;
-                  border: 1.5px solid #46a758;
+                  color: #1E6B69;
+                  border: 1.5px solid #1E6B69;
                 }
 
                 /* Nav buttons */
@@ -196,11 +196,11 @@ export default function AvailabilityCalendar({
 
                 /* Available — green */
                 .rdp-day_available .rdp-day_button {
-                  background: #daf6da !important;
-                  color: #297c3b !important;
+                  background: #C2E8E7 !important;
+                  color: #124E4C !important;
                 }
                 .rdp-day_available .rdp-day_button:hover {
-                  background: #c9f0ca !important;
+                  background: #92D4D3 !important;
                 }
 
                 /* Blocked — red strikethrough */

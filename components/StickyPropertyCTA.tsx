@@ -66,7 +66,7 @@ export default function StickyPropertyCTA({
         <button
           type="button"
           onClick={handleScheduleViewing}
-          className="min-w-0 flex items-center justify-center gap-1.5 bg-[#46a758] hover:bg-[#297c3b] text-white font-semibold rounded-full h-11 flex-[2] text-sm transition-colors overflow-hidden"
+          className="min-w-0 flex items-center justify-center gap-1.5 bg-[#F4581A] hover:bg-[#D84C14] text-white font-semibold rounded-full h-11 flex-[2] text-sm transition-colors overflow-hidden"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />

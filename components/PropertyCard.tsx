@@ -37,8 +37,8 @@ interface PropertyCardProps {
 const STATUS_CONFIG: Record<string, { label: string; className: string; barClass: string }> = {
   available: {
     label: 'Available',
-    className: 'bg-[#ebf9eb] text-[#297c3b] border border-[#b2e5b4]',
-    barClass: 'bg-[#46a758]',
+    className: 'bg-[#E0F4F4] text-[#124E4C] border border-[#b2e5b4]',
+    barClass: 'bg-[#1E6B69]',
   },
   rented: {
     label: 'Rented',
@@ -53,7 +53,7 @@ const STATUS_CONFIG: Record<string, { label: string; className: string; barClass
   pending: {
     label: 'Pending',
     className: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    barClass: 'bg-[#c9f0ca]',
+    barClass: 'bg-[#92D4D3]',
   },
 }
 
@@ -276,7 +276,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             className="block"
           >
             <h3
-              className="font-lexend font-semibold text-[#1d211c] text-base leading-snug line-clamp-2 hover:text-[#297c3b] transition-colors"
+              className="font-lexend font-semibold text-[#1d211c] text-base leading-snug line-clamp-2 hover:text-[#124E4C] transition-colors"
               title={title}
             >
               {title}
@@ -289,7 +289,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
 
         {/* Price */}
         <div className="flex items-baseline gap-1">
-          <span className="font-lexend text-2xl font-bold text-[#297c3b]">
+          <span className="font-lexend text-2xl font-bold text-[#124E4C]">
             {formatPrice(property.priceTHB, locale)}
           </span>
           <span className="text-sm text-[#898e87]">{t('perMonth')}</span>
@@ -339,7 +339,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         <div className="flex items-center gap-2 pt-1 mt-auto">
           <Button
             asChild size="sm" variant="default"
-            className="flex-1 h-11 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white shadow-sm rounded-full"
+            className="flex-1 h-11 text-sm bg-[#1E6B69] hover:bg-[#18605E] text-white shadow-sm rounded-full"
           >
             <Link href={`/properties/${property.slug}#inquiry`} locale={locale as Parameters<typeof Link>[0]['locale']}>
               {t('scheduleViewing')}

@@ -113,7 +113,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     .slice(0, 3)
 
   const statusColors: Record<string, string> = {
-    available: 'bg-[#daf6da] text-[#297c3b]',
+    available: 'bg-[#C2E8E7] text-[#124E4C]',
     rented: 'bg-red-100 text-red-800',
     coming_soon: 'bg-yellow-100 text-yellow-800',
     pending: 'bg-gray-100 text-gray-700',
@@ -243,7 +243,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
               {/* Location */}
               <div className="flex items-start gap-3 flex-1">
-                <MapPin className="w-4 h-4 text-[#46a758] shrink-0 mt-1" />
+                <MapPin className="w-4 h-4 text-[#1E6B69] shrink-0 mt-1" />
                 <div>
                   <p className="text-[10px] font-bold text-[#898e87] uppercase tracking-widest mb-0.5">Location</p>
                   <p className="text-base font-semibold text-[#1d211c] leading-snug">
@@ -264,8 +264,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <div className="grid grid-cols-3 gap-3">
                 {/* Bedrooms */}
                 <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
-                    <Bed className="w-5 h-5 text-[#46a758]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#EEF9F9] flex items-center justify-center mb-2.5">
+                    <Bed className="w-5 h-5 text-[#1E6B69]" />
                   </div>
                   <span className="text-2xl font-black text-[#1d211c] leading-none">{property.bedrooms}</span>
                   <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">{t('bedrooms')}</span>
@@ -273,8 +273,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
                 {/* Bathrooms */}
                 <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
-                    <Bath className="w-5 h-5 text-[#46a758]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#EEF9F9] flex items-center justify-center mb-2.5">
+                    <Bath className="w-5 h-5 text-[#1E6B69]" />
                   </div>
                   <span className="text-2xl font-black text-[#1d211c] leading-none">{property.bathrooms}</span>
                   <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">{t('bathrooms')}</span>
@@ -282,8 +282,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
                 {/* Size */}
                 <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
-                    <Maximize2 className="w-5 h-5 text-[#46a758]" />
+                  <div className="w-10 h-10 rounded-xl bg-[#EEF9F9] flex items-center justify-center mb-2.5">
+                    <Maximize2 className="w-5 h-5 text-[#1E6B69]" />
                   </div>
                   <span className="text-2xl font-black text-[#1d211c] leading-none">{property.sizeSqm}</span>
                   <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">sqm</span>
@@ -292,8 +292,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 {/* Floors */}
                 {property.floors > 0 && (
                   <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
-                    <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
-                      <Layers className="w-5 h-5 text-[#46a758]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#EEF9F9] flex items-center justify-center mb-2.5">
+                      <Layers className="w-5 h-5 text-[#1E6B69]" />
                     </div>
                     <span className="text-2xl font-black text-[#1d211c] leading-none">{property.floors}</span>
                     <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">Floors</span>
@@ -303,8 +303,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 {/* Parking */}
                 {property.parkingSpots > 0 && (
                   <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
-                    <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
-                      <ParkingSquare className="w-5 h-5 text-[#46a758]" />
+                    <div className="w-10 h-10 rounded-xl bg-[#EEF9F9] flex items-center justify-center mb-2.5">
+                      <ParkingSquare className="w-5 h-5 text-[#1E6B69]" />
                     </div>
                     <span className="text-2xl font-black text-[#1d211c] leading-none">{property.parkingSpots}</span>
                     <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">Parking</span>
@@ -316,13 +316,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {(property.minLeaseTerm || property.depositMonths) && (
                 <div className="rounded-2xl border border-[#e8ebe7] bg-[#f8faf8] px-5 py-4">
                   <h3 className="flex items-center gap-2 text-sm font-bold text-[#1d211c] mb-3">
-                    <ScrollText className="w-4 h-4 text-[#46a758]" />
+                    <ScrollText className="w-4 h-4 text-[#1E6B69]" />
                     Rental Terms
                   </h3>
                   <div className="flex flex-wrap gap-x-8 gap-y-3">
                     {property.minLeaseTerm && (
                       <div className="flex items-center gap-2">
-                        <CalendarDays className="w-4 h-4 text-[#46a758] shrink-0" />
+                        <CalendarDays className="w-4 h-4 text-[#1E6B69] shrink-0" />
                         <div>
                           <p className="text-[11px] text-[#898e87] font-medium leading-none mb-0.5">Min. contract</p>
                           <p className="text-sm font-bold text-[#1d211c]">{property.minLeaseTerm} month{property.minLeaseTerm > 1 ? 's' : ''}</p>
@@ -331,7 +331,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     )}
                     {property.depositMonths && (
                       <div className="flex items-center gap-2">
-                        <Banknote className="w-4 h-4 text-[#46a758] shrink-0" />
+                        <Banknote className="w-4 h-4 text-[#1E6B69] shrink-0" />
                         <div>
                           <p className="text-[11px] text-[#898e87] font-medium leading-none mb-0.5">Security deposit</p>
                           <p className="text-sm font-bold text-[#1d211c]">{property.depositMonths} months&apos; rent</p>
@@ -344,12 +344,12 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
               {/* 3. HIGHLIGHTS */}
               {property.highlights.length > 0 && (
-                <div className="bg-gradient-to-r from-[#f3fcf3] to-[#ebf9eb] border border-[#c9f0ca] rounded-2xl p-6">
+                <div className="bg-gradient-to-r from-[#EEF9F9] to-[#E0F4F4] border border-[#92D4D3] rounded-2xl p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Property Highlights</h2>
                   <ul className="space-y-2.5">
                     {property.highlights.map((highlight, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-[#46a758] shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-5 h-5 text-[#1E6B69] shrink-0 mt-0.5" />
                         <span className="text-gray-700 leading-relaxed">{highlight}</span>
                       </li>
                     ))}
@@ -406,7 +406,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 9. AVAILABILITY CALENDAR */}
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  <CalendarDays className="w-5 h-5 text-[#46a758]" />
+                  <CalendarDays className="w-5 h-5 text-[#1E6B69]" />
                   {t('availability')}
                 </h2>
                 <AvailabilityCalendar
@@ -469,7 +469,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 <div className="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
 
                   {/* Card header — price + status */}
-                  <div className="bg-gradient-to-br from-[#1b512a] via-[#297c3b] to-[#46a758] px-6 py-5 text-white">
+                  <div className="bg-gradient-to-br from-[#0C3837] via-[#124E4C] to-[#1E6B69] px-6 py-5 text-white">
                     <div className="flex items-center justify-between gap-2">
                       <div>
                         <p className="text-2xl font-bold">

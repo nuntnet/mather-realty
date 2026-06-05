@@ -69,17 +69,17 @@ export default async function HomePage({ params }: HomePageProps) {
 
   const steps = [
     {
-      icon: <Search className="w-8 h-8 text-[#46a758]" />,
+      icon: <Search className="w-8 h-8 text-[#1E6B69]" />,
       title: 'Browse',
       description: 'Search thousands of verified rental properties across Thailand',
     },
     {
-      icon: <MessageCircle className="w-8 h-8 text-[#46a758]" />,
+      icon: <MessageCircle className="w-8 h-8 text-[#1E6B69]" />,
       title: 'Inquire',
       description: 'Contact landlords directly via LINE, WhatsApp, or email',
     },
     {
-      icon: <Home className="w-8 h-8 text-[#46a758]" />,
+      icon: <Home className="w-8 h-8 text-[#1E6B69]" />,
       title: 'Move In',
       description: 'Sign your lease and move into your new Thai home',
     },
@@ -127,7 +127,7 @@ export default async function HomePage({ params }: HomePageProps) {
         className="relative min-h-[75vh] flex items-center text-white px-4"
         style={{
           backgroundImage:
-            "linear-gradient(to bottom right, rgba(27,81,42,0.82), rgba(70,167,88,0.5), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
+            "linear-gradient(to bottom right, rgba(12,56,54,0.82), rgba(30,107,105,0.5), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -152,7 +152,7 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Trust badges */}
           <div className="flex flex-wrap items-center justify-center gap-3 text-sm text-green-100 mb-10">
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4DB5B2] inline-block" />
               500+ Expats Helped
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
@@ -160,7 +160,7 @@ export default async function HomePage({ params }: HomePageProps) {
               Bangkok · Chiang Mai · Phuket
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#65c170] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#4DB5B2] inline-block" />
               Verified Listings
             </span>
           </div>
@@ -184,14 +184,14 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* ── Discover Mode Banner ─────────────────────────────────────────── */}
-      <section className="bg-[#0f1a0f] py-12 px-4">
+      <section className="bg-[#0C1A1A] py-12 px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-8">
 
           {/* Stacked-cards visual */}
           <div className="relative shrink-0 w-36 h-48 sm:order-last">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#297c3b] to-[#1b512a] rounded-2xl shadow-lg rotate-6 opacity-40" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#3d9a4f] to-[#297c3b] rounded-2xl shadow-lg rotate-3 opacity-70" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#46a758] to-[#297c3b] rounded-2xl shadow-xl flex flex-col items-center justify-center text-white gap-2">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#124E4C] to-[#0C3837] rounded-2xl shadow-lg rotate-6 opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#18605E] to-[#124E4C] rounded-2xl shadow-lg rotate-3 opacity-70" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1E6B69] to-[#124E4C] rounded-2xl shadow-xl flex flex-col items-center justify-center text-white gap-2">
               <Home className="w-10 h-10 opacity-90" />
               <span className="text-xs font-bold opacity-70 tracking-wide">SWIPE →</span>
             </div>
@@ -199,7 +199,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
           {/* Text + CTA */}
           <div className="flex-1 text-center sm:text-left">
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#65c170] bg-[#65c170]/15 px-3 py-1 rounded-full mb-4">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#4DB5B2] bg-[#4DB5B2]/15 px-3 py-1 rounded-full mb-4">
               ✨ New feature
             </span>
             <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
@@ -211,7 +211,7 @@ export default async function HomePage({ params }: HomePageProps) {
             </p>
             <Link
               href="/discover"
-              className="inline-flex items-center gap-2 bg-[#46a758] hover:bg-[#3d9a4f] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#46a758]/20"
+              className="inline-flex items-center gap-2 bg-[#F4581A] hover:bg-[#D84C14] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#F4581A]/20"
             >
               <Compass className="w-5 h-5" />
               Try Discover Mode
@@ -225,7 +225,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-lexend font-bold text-gray-900">{t('featured_title')}</h2>
-          <Link href="/properties" className="flex items-center gap-1 text-[#297c3b] hover:text-[#46a758] font-medium">
+          <Link href="/properties" className="flex items-center gap-1 text-[#124E4C] hover:text-[#1E6B69] font-medium">
             {t('view_all')}
             <ArrowRight className="w-4 h-4" />
           </Link>
@@ -255,10 +255,10 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step, i) => (
               <div key={i} className="flex flex-col items-center bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <div className="w-16 h-16 rounded-full bg-[#46a758]/10 flex items-center justify-center mb-4">
+                <div className="w-16 h-16 rounded-full bg-[#1E6B69]/10 flex items-center justify-center mb-4">
                   {step.icon}
                 </div>
-                <div className="w-8 h-8 rounded-full bg-[#46a758] text-white text-sm font-bold flex items-center justify-center mb-3">
+                <div className="w-8 h-8 rounded-full bg-[#1E6B69] text-white text-sm font-bold flex items-center justify-center mb-3">
                   {i + 1}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
@@ -270,7 +270,7 @@ export default async function HomePage({ params }: HomePageProps) {
       </section>
 
       {/* CTA Banner */}
-      <section className="bg-gradient-to-r from-[#1b512a] to-[#46a758] text-white py-16 px-4">
+      <section className="bg-gradient-to-r from-[#0C3837] to-[#1E6B69] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <Building2 className="w-12 h-12 mx-auto mb-4 text-green-200" />
           <h2 className="text-3xl font-bold mb-4">Are you a landlord?</h2>
@@ -278,7 +278,7 @@ export default async function HomePage({ params }: HomePageProps) {
             List your property and reach thousands of expats looking for rental homes in Thailand.
             It&apos;s free to get started.
           </p>
-          <Button asChild size="lg" className="bg-white text-[#1b512a] hover:bg-green-50 font-semibold rounded-full">
+          <Button asChild size="lg" className="bg-white text-[#0C3837] hover:bg-green-50 font-semibold rounded-full">
             <Link href="/submit">List Your Property</Link>
           </Button>
         </div>

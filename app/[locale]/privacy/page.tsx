@@ -41,7 +41,7 @@ export default async function PrivacyPage({
         <p>
           DoubleN Realty is the data controller responsible for your personal data. You can contact
           us at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
             janjiranui@gmail.com
           </a>{' '}
           with any data-related requests or questions.
@@ -94,7 +94,7 @@ export default async function PrivacyPage({
         </ul>
         <p className="mt-3">
           This data is collected via cookies and analytics tools. See our{' '}
-          <Link href="/cookie-policy" className="text-[#46a758] hover:underline">
+          <Link href="/cookie-policy" className="text-[#1E6B69] hover:underline">
             Cookie Policy
           </Link>{' '}
           for details.
@@ -223,7 +223,7 @@ export default async function PrivacyPage({
         <p>
           We use cookies for session management, analytics, and functional preferences. For a full
           explanation of which cookies we use and how to control them, please see our{' '}
-          <Link href="/cookie-policy" className="text-[#46a758] hover:underline">
+          <Link href="/cookie-policy" className="text-[#1E6B69] hover:underline">
             Cookie Policy
           </Link>.
         </p>
@@ -268,7 +268,7 @@ export default async function PrivacyPage({
         </ul>
         <p className="mt-3">
           To exercise any of these rights, please contact us at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
             janjiranui@gmail.com
           </a>. We will respond within 30 days.
         </p>
@@ -328,7 +328,7 @@ export default async function PrivacyPage({
           <p>Bangkok, Thailand</p>
           <p>
             Email:{' '}
-            <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+            <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
               janjiranui@gmail.com
             </a>
           </p>
@@ -337,7 +337,7 @@ export default async function PrivacyPage({
       </div>
 
       <div className="mt-12 pt-8 border-t border-gray-100">
-        <Link href="/" className="text-[#46a758] hover:underline text-sm font-medium">
+        <Link href="/" className="text-[#1E6B69] hover:underline text-sm font-medium">
           &larr; Back to home
         </Link>
       </div>

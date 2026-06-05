@@ -94,7 +94,7 @@ export default function CookiePolicyPage() {
             href="https://policies.google.com/technologies/cookies"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#46a758] hover:underline"
+            className="text-[#1E6B69] hover:underline"
           >
             policies.google.com/technologies/cookies
           </a>.
@@ -149,7 +149,7 @@ export default function CookiePolicyPage() {
             href="https://tools.google.com/dlpage/gaoptout"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#46a758] hover:underline"
+            className="text-[#1E6B69] hover:underline"
           >
             Google Analytics Opt-out Browser Add-on
           </a>.
@@ -172,14 +172,14 @@ export default function CookiePolicyPage() {
         <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">6. Contact Us</h2>
         <p>
           If you have any questions about our use of cookies, please contact us at:{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#46a758] hover:underline">
+          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
             janjiranui@gmail.com
           </a>
         </p>
 
         <p className="mt-6">
           For more information on how we handle your personal data, please see our{' '}
-          <Link href="/en/privacy" className="text-[#46a758] hover:underline">
+          <Link href="/en/privacy" className="text-[#1E6B69] hover:underline">
             Privacy Policy
           </Link>.
         </p>
@@ -187,7 +187,7 @@ export default function CookiePolicyPage() {
       </div>
 
       <div className="mt-12 pt-8 border-t border-gray-100">
-        <Link href="/" className="text-[#46a758] hover:underline text-sm font-medium">
+        <Link href="/" className="text-[#1E6B69] hover:underline text-sm font-medium">
           &larr; Back to home
         </Link>
       </div>

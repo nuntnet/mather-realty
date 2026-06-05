@@ -65,11 +65,19 @@ const config: Config = {
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         brand: {
-          grass: {
-            1: '#fbfefb', 2: '#f3fcf3', 3: '#ebf9eb', 4: '#daf6da',
-            5: '#c9f0ca', 6: '#b2e5b4', 7: '#94d69a', 8: '#65c170',
-            9: '#46a758', 10: '#3d9a4f', 11: '#297c3b', 12: '#1b512a',
-            DEFAULT: '#46a758',
+          /* Pantone 19-4922 TCX "Teal Green" */
+          teal: {
+            1: '#EEF9F9', 2: '#E0F4F4', 3: '#C2E8E7', 4: '#92D4D3',
+            5: '#62C0BE', 6: '#3BA9A7', 7: '#2D8E8C', 8: '#247D7B',
+            9: '#1E6B69', 10: '#18605E', 11: '#124E4C', 12: '#0C3837',
+            DEFAULT: '#1E6B69',
+          },
+          /* Pantone Orange 021 U */
+          orange: {
+            1: '#FEF1EC', 2: '#FDD4C2', 3: '#FAB09A', 4: '#F78D72',
+            5: '#F46A4A', 6: '#F1502A', 7: '#EF3F17', 8: '#D4380F',
+            9: '#F4581A', 10: '#D84C14', 11: '#B43E10', 12: '#6E2508',
+            DEFAULT: '#F4581A',
           },
           olive: {
             1: '#fcfdfc', 2: '#f8faf8', 3: '#f1f4f0', 4: '#e9ece8',
