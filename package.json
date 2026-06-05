@@ -15,9 +15,9 @@
     "sync:galleries": "bun run scripts/sync-car-galleries.ts",
     "audit:galleries": "bun run scripts/sync-car-galleries.ts --audit",
     "infra:setup": "bun run scripts/infra-setup.ts",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
+    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
+    "db:push": "dotenv -e .env.local -- drizzle-kit push",
+    "db:studio": "dotenv -e .env.local -- drizzle-kit studio",
     "algolia:index": "bun run scripts/algolia-index.ts"
   },
   "browserslist": [
@@ -124,6 +124,7 @@
     "@vitejs/plugin-react": "^6.0.2",
     "bcryptjs": "^3.0.3",
     "dotenv": "^16.6.1",
+    "dotenv-cli": "^11.0.0",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "15.2.3",
