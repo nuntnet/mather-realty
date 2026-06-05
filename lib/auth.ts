@@ -48,6 +48,11 @@ function createAuth() {
     trustedOrigins: [
       "http://localhost:3002",
       process.env.BETTER_AUTH_URL ?? "",
+      // Vercel sets VERCEL_URL for every deployment (preview + production)
+      // e.g. "double-n-realty-git-staging-nunt-s-projects.vercel.app"
+      process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "",
+      // Escape hatch: comma-separated list of extra origins in env
+      ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",").map(s => s.trim()) ?? []),
     ].filter(Boolean),
   });
 }
