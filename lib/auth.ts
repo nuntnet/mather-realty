@@ -48,9 +48,12 @@ function createAuth() {
     trustedOrigins: [
       "http://localhost:3002",
       process.env.BETTER_AUTH_URL ?? "",
-      // Vercel sets VERCEL_URL for every deployment (preview + production)
-      // e.g. "double-n-realty-git-staging-nunt-s-projects.vercel.app"
+      // VERCEL_URL  = deployment-specific URL (unique per deploy)
       process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "",
+      // VERCEL_BRANCH_URL = stable branch alias (e.g. myapp-git-staging-org.vercel.app)
+      process.env.VERCEL_BRANCH_URL ? `https://${process.env.VERCEL_BRANCH_URL}` : "",
+      // Trust all Vercel preview/staging deployments with a wildcard
+      "https://*.vercel.app",
       // Escape hatch: comma-separated list of extra origins in env
       ...(process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",").map(s => s.trim()) ?? []),
     ].filter(Boolean),
