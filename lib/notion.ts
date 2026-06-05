@@ -229,6 +229,8 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     tags: getPropMultiSelect(page, 'tags'),
     floors: getPropNumber(page, 'floors') || 2,
     parkingSpots: getPropNumber(page, 'parking_spots') || 0,
+    minLeaseTerm: getPropNumber(page, 'min_lease_months') || null,
+    depositMonths: getPropNumber(page, 'deposit_months') || null,
     highlights: getPropString(page, 'highlights')
       .split('•')
       .map(s => s.trim())

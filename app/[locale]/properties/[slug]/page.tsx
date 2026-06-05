@@ -23,6 +23,8 @@ import {
   ParkingSquare,
   Phone,
   MessageCircle,
+  ScrollText,
+  Banknote,
 } from 'lucide-react'
 import PropertyDetailActions from './PropertyDetailActions'
 import PersonaSection from '@/components/PersonaSection'
@@ -123,6 +125,16 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     coming_soon: t('coming_soon'),
     pending: 'Pending',
   }
+
+  // Availability display text (server-side safe — no hydration concerns)
+  const availabilityText = (() => {
+    if (property.status !== 'available') return statusLabel[property.status] ?? property.status
+    if (!property.availableFrom) return 'Available Now'
+    const d = new Date(property.availableFrom)
+    if (d <= new Date()) return 'Available Now'
+    return `From ${d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}`
+  })()
+  const isAvailableNow = property.status === 'available'
 
   // JSON-LD Accommodation schema
   const jsonLd = {
@@ -293,6 +305,40 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         {/* CONTENT CARD — slides up over the hero bottom */}
         <div className="relative z-10 -mt-10 rounded-t-[2rem] bg-white shadow-[0_-8px_40px_rgba(0,0,0,0.18)]">
 
+          {/* ── Availability + Location strip ── */}
+          <div className="px-5 sm:px-8 pt-7 pb-6 border-b border-[#eaece9]">
+            <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-start gap-5">
+
+              {/* Availability */}
+              <div className="flex items-start gap-3">
+                <div className={`mt-1 w-2.5 h-2.5 rounded-full shrink-0 ${
+                  isAvailableNow ? 'bg-green-500 shadow-[0_0_0_4px_rgba(34,197,94,0.18)]' :
+                  property.status === 'coming_soon' ? 'bg-yellow-400 shadow-[0_0_0_4px_rgba(250,204,21,0.2)]' :
+                  'bg-red-400'
+                }`} />
+                <div>
+                  <p className="text-[10px] font-bold text-[#898e87] uppercase tracking-widest mb-0.5">Availability</p>
+                  <p className={`text-base font-bold leading-snug ${isAvailableNow ? 'text-green-700' : 'text-[#1d211c]'}`}>
+                    {availabilityText}
+                  </p>
+                </div>
+              </div>
+
+              <div className="hidden sm:block w-px self-stretch bg-[#eaece9]" />
+
+              {/* Location */}
+              <div className="flex items-start gap-3 flex-1">
+                <MapPin className="w-4 h-4 text-[#46a758] shrink-0 mt-1" />
+                <div>
+                  <p className="text-[10px] font-bold text-[#898e87] uppercase tracking-widest mb-0.5">Location</p>
+                  <p className="text-base font-semibold text-[#1d211c] leading-snug">
+                    {property.address}{property.district ? `, ${property.district}` : ''}, {property.city}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Gallery strip */}
           {(property.gallery.length > 0 || property.coverImage) && (
             <section className="max-w-7xl mx-auto px-4 pt-8 pb-2">
@@ -362,7 +408,37 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 )}
               </div>
 
-              {/* 2. HIGHLIGHTS */}
+              {/* 2. RENTAL TERMS */}
+              {(property.minLeaseTerm || property.depositMonths) && (
+                <div className="rounded-2xl border border-[#e8ebe7] bg-[#f8faf8] px-5 py-4">
+                  <h3 className="flex items-center gap-2 text-sm font-bold text-[#1d211c] mb-3">
+                    <ScrollText className="w-4 h-4 text-[#46a758]" />
+                    Rental Terms
+                  </h3>
+                  <div className="flex flex-wrap gap-x-8 gap-y-3">
+                    {property.minLeaseTerm && (
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="w-4 h-4 text-[#46a758] shrink-0" />
+                        <div>
+                          <p className="text-[11px] text-[#898e87] font-medium leading-none mb-0.5">Min. contract</p>
+                          <p className="text-sm font-bold text-[#1d211c]">{property.minLeaseTerm} month{property.minLeaseTerm > 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    )}
+                    {property.depositMonths && (
+                      <div className="flex items-center gap-2">
+                        <Banknote className="w-4 h-4 text-[#46a758] shrink-0" />
+                        <div>
+                          <p className="text-[11px] text-[#898e87] font-medium leading-none mb-0.5">Security deposit</p>
+                          <p className="text-sm font-bold text-[#1d211c]">{property.depositMonths} months&apos; rent</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* 3. HIGHLIGHTS */}
               {property.highlights.length > 0 && (
                 <div className="bg-gradient-to-r from-[#f3fcf3] to-[#ebf9eb] border border-[#c9f0ca] rounded-2xl p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-4">Property Highlights</h2>
