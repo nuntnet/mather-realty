@@ -12,14 +12,6 @@ import NearbyPanel from '@/components/NearbyPanel'
 import PropertyCard from '@/components/PropertyCard'
 import { Badge } from '@/components/ui/badge'
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
-import {
   Bed,
   Bath,
   Maximize2,
@@ -188,141 +180,132 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="min-h-screen bg-white pt-16 pb-28 lg:pb-0">
-        {/* Breadcrumb bar — scrolls with page, not sticky */}
-        <div className="border-b border-gray-100 bg-white/90 backdrop-blur-sm">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-4">
-            <Link
-              href="/properties"
-              className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors shrink-0"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back</span>
-            </Link>
+      <div className="min-h-screen bg-[#f1f4f0] pt-16 pb-28 lg:pb-0">
 
-            <Breadcrumb className="flex-1 min-w-0">
-              <BreadcrumbList>
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/" className="text-[#46a758] hover:text-[#297c3b]">Home</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbLink href="/properties" className="text-[#46a758] hover:text-[#297c3b]">Properties</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem className="min-w-0">
-                  <BreadcrumbPage className="truncate max-w-[200px] sm:max-w-xs">
-                    {title}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
-
-            {/* Share / actions — client component */}
-            <PropertyDetailActions title={title} />
-          </div>
-        </div>
-
-        {/* HERO SECTION — 65vh full-width cover image with gradient overlay */}
-        {property.coverImage && (
-          <section className="relative w-full" style={{ height: '65vh', minHeight: '400px', maxHeight: '720px' }}>
-            {/* Cover image */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* HERO — full-bleed with floating nav buttons */}
+        <section
+          className="relative w-full"
+          style={{ height: '72vh', minHeight: '500px', maxHeight: '820px' }}
+        >
+          {/* Background: photo or gradient fallback */}
+          {property.coverImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={property.coverImage}
               alt={title}
               className="absolute inset-0 w-full h-full object-cover"
             />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1b512a] via-[#297c3b] to-[#46a758]" />
+          )}
 
-            {/* Dark gradient overlay at bottom */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          {/* Top vignette — makes floating buttons legible on bright photos */}
+          <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 to-transparent pointer-events-none" />
 
-            {/* Overlay content — title, location, price, badges */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
-              <div className="max-w-7xl mx-auto">
-                {/* Badges row */}
-                <div className="flex items-center gap-2 mb-3">
-                  <span
-                    className={`text-xs font-semibold px-3 py-1 rounded-full ${
-                      statusColors[property.status] ?? 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {statusLabel[property.status] ?? property.status}
+          {/* Bottom vignette */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+
+          {/* Floating nav bar */}
+          <div className="absolute top-3 left-0 right-0 px-4 flex items-center justify-between z-10">
+            <Link
+              href="/properties"
+              className="flex items-center justify-center h-10 w-10 rounded-full bg-black/25 backdrop-blur-sm border border-white/20 text-white hover:bg-black/40 transition-colors"
+              aria-label="Back to properties"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Link>
+            <PropertyDetailActions title={title} variant="glass" />
+          </div>
+
+          {/* Bottom overlay: badges · title · location · price + photos */}
+          <div className="absolute bottom-0 left-0 right-0 px-5 md:px-10 pb-16">
+            <div className="max-w-7xl mx-auto">
+              {/* Badges */}
+              <div className="flex items-center gap-2 mb-3">
+                <span
+                  className={`text-xs font-semibold px-3 py-1 rounded-full ${
+                    statusColors[property.status] ?? 'bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  {statusLabel[property.status] ?? property.status}
+                </span>
+                {property.verifiedAt && (
+                  <span className="flex items-center gap-1 text-xs font-semibold text-white bg-blue-600/80 backdrop-blur-sm px-3 py-1 rounded-full">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {t('verified')}
                   </span>
-                  {property.verifiedAt && (
-                    <span className="flex items-center gap-1 text-xs font-semibold text-white bg-blue-600/80 backdrop-blur-sm px-3 py-1 rounded-full">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      {t('verified')}
-                    </span>
-                  )}
-                </div>
+                )}
+              </div>
 
-                {/* Title */}
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 leading-tight drop-shadow-md">
-                  {title}
-                </h1>
+              {/* Title */}
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-2 leading-tight [text-shadow:0_2px_16px_rgba(0,0,0,0.45)]">
+                {title}
+              </h1>
 
-                {/* Location */}
-                <div className="flex items-center gap-1.5 text-white/80 mb-3">
-                  <MapPin className="w-4 h-4 shrink-0" />
-                  <span className="text-sm md:text-base">
-                    {property.address}
-                    {property.district ? `, ${property.district}` : ''}, {property.city}
-                  </span>
-                </div>
+              {/* Location */}
+              <div className="flex items-center gap-1.5 text-white/80 mb-4">
+                <MapPin className="w-4 h-4 shrink-0" />
+                <span className="text-sm md:text-base">
+                  {property.address}
+                  {property.district ? `, ${property.district}` : ''}, {property.city}
+                </span>
+              </div>
 
-                {/* Price */}
-                <p className="text-2xl md:text-3xl font-bold text-white drop-shadow">
+              {/* Price row + All-photos pill */}
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-2xl md:text-3xl font-bold text-white [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
                   ฿{property.priceTHB.toLocaleString()}
                   <span className="text-base font-normal text-white/70 ml-1">
                     {t('price_per_month')}
                   </span>
                 </p>
+                {(property.gallery.length > 0 || property.coverImage) && (
+                  <button
+                    className="flex items-center gap-2 bg-white/15 hover:bg-white/28 backdrop-blur-sm text-white text-sm font-semibold px-4 py-2.5 rounded-full border border-white/30 transition-colors shrink-0"
+                    aria-label="View all photos"
+                    id="open-gallery-btn"
+                    type="button"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="15"
+                      height="15"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
+                    </svg>
+                    All photos
+                  </button>
+                )}
               </div>
             </div>
-
-            {/* "All photos" button — bottom right */}
-            {(property.gallery.length > 0 || property.coverImage) && (
-              <button
-                className="absolute bottom-6 right-6 flex items-center gap-2 bg-white/90 hover:bg-white text-gray-900 text-sm font-semibold px-4 py-2 rounded-xl shadow-lg backdrop-blur-sm transition-colors"
-                aria-label="View all photos"
-                id="open-gallery-btn"
-                type="button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                  <circle cx="8.5" cy="8.5" r="1.5" />
-                  <polyline points="21 15 16 10 5 21" />
-                </svg>
-                All photos
-              </button>
-            )}
-          </section>
-        )}
-
-        {/* GALLERY SECTION — Airbnb-style grid, below hero */}
-        <section className="max-w-7xl mx-auto px-4 pt-8 pb-2">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
-          <PropertyGallery
-            images={property.gallery}
-            coverImage={property.coverImage}
-            virtualTourUrl={property.virtualTourUrl ?? undefined}
-          />
+          </div>
         </section>
 
-        {/* MAIN CONTENT GRID */}
-        <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* CONTENT CARD — slides up over the hero bottom */}
+        <div className="relative z-10 -mt-10 rounded-t-[2rem] bg-white shadow-[0_-8px_40px_rgba(0,0,0,0.18)]">
+
+          {/* Gallery strip */}
+          {(property.gallery.length > 0 || property.coverImage) && (
+            <section className="max-w-7xl mx-auto px-4 pt-8 pb-2">
+              <PropertyGallery
+                images={property.gallery}
+                coverImage={property.coverImage}
+                virtualTourUrl={property.virtualTourUrl ?? undefined}
+              />
+            </section>
+          )}
+
+          {/* MAIN CONTENT GRID */}
+          <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* ── LEFT COLUMN ── */}
             <div className="lg:col-span-2 space-y-10">
@@ -604,6 +587,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             </div>
           </div>
         </div>
+        </div>{/* /content card */}
       </div>
 
       <StickyPropertyCTA

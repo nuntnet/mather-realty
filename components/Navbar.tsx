@@ -89,19 +89,16 @@ export default function Navbar({ locale }: NavbarProps) {
       )}
     >
       <div className="container mx-auto px-4 flex h-16 items-center justify-between gap-4">
-        {/* Logo */}
+        {/* Logo — wordmark only */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 shrink-0 hover:opacity-90 transition-opacity"
+          className="flex items-center shrink-0 hover:opacity-80 transition-opacity"
           aria-label="DoubleN Realty — Home"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#46a758] text-white font-black text-sm select-none shrink-0">
-            2N
-          </span>
-          <span className="text-2xl font-lexend font-extrabold tracking-tight hidden sm:block">
+          <span className="font-lexend font-extrabold tracking-tight leading-none text-[1.35rem]">
             <span className="text-[#1d211c]">Double</span>
             <span className="text-[#46a758]">N</span>
-            <span className="text-[#1d211c]"> Realty</span>
+            <span className="hidden sm:inline text-[#1d211c]"> Realty</span>
           </span>
         </Link>
 

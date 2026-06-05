@@ -5,9 +5,14 @@ import { Share2, Check } from 'lucide-react'
 
 interface PropertyDetailActionsProps {
   title: string
+  /** glass — circular frosted button for use over hero images */
+  variant?: 'default' | 'glass'
 }
 
-export default function PropertyDetailActions({ title }: PropertyDetailActionsProps) {
+export default function PropertyDetailActions({
+  title,
+  variant = 'default',
+}: PropertyDetailActionsProps) {
   const [copied, setCopied] = useState(false)
 
   const handleShare = useCallback(async () => {
@@ -20,7 +25,6 @@ export default function PropertyDetailActions({ title }: PropertyDetailActionsPr
       }
       return
     }
-    // Fallback: copy to clipboard
     try {
       await navigator.clipboard.writeText(url)
       setCopied(true)
@@ -29,6 +33,22 @@ export default function PropertyDetailActions({ title }: PropertyDetailActionsPr
       // ignore
     }
   }, [title])
+
+  if (variant === 'glass') {
+    return (
+      <button
+        onClick={handleShare}
+        className="flex items-center justify-center h-10 w-10 rounded-full bg-black/25 backdrop-blur-sm border border-white/20 text-white hover:bg-black/40 transition-colors"
+        aria-label="Share this property"
+      >
+        {copied ? (
+          <Check className="w-4.5 h-4.5 text-green-300" />
+        ) : (
+          <Share2 className="w-4.5 h-4.5" />
+        )}
+      </button>
+    )
+  }
 
   return (
     <button
