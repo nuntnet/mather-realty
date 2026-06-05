@@ -1,9 +1,10 @@
 'use client'
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { DayPicker } from 'react-day-picker'
 import { addDays, isBefore, isAfter, isWithinInterval, parseISO, startOfDay, format } from 'date-fns'
-import { CalendarDays, CheckCircle, XCircle } from 'lucide-react'
+import { CalendarDays, CheckCircle } from 'lucide-react'
+import { Skeleton } from '@/components/ui/skeleton'
 import 'react-day-picker/dist/style.css'
 
 interface BlockedRange {
@@ -27,7 +28,10 @@ export default function AvailabilityCalendar({
   blockedRanges,
   availableFrom,
 }: AvailabilityCalendarProps) {
-  const today = startOfDay(new Date())
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  const today = useMemo(() => startOfDay(new Date()), [mounted]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const availableFromDate = useMemo(
     () => (availableFrom ? parseDateSafe(availableFrom) : today),
@@ -71,9 +75,11 @@ export default function AvailabilityCalendar({
           <div>
             <p className="text-xs font-semibold text-green-800">Available from</p>
             <p className="text-sm font-bold text-green-700">
-              {isAfter(availableFromDate, today)
-                ? format(availableFromDate, 'dd MMM yyyy')
-                : 'Now'}
+              {!mounted
+                ? '—'
+                : isAfter(availableFromDate, today)
+                  ? format(availableFromDate, 'dd MMM yyyy')
+                  : 'Now'}
             </p>
           </div>
         </div>
@@ -96,92 +102,103 @@ export default function AvailabilityCalendar({
         </div>
 
         <div className="px-4 pb-4 pt-2">
-          <style>{`
-            /* Compact DayPicker — fixed row heights */
-            .rdp {
-              --rdp-cell-size: 36px;
-              --rdp-accent-color: #46a758;
-              margin: 0;
-            }
-            .rdp-months { width: 100%; }
-            .rdp-month { width: 100%; }
-            .rdp-table { width: 100%; border-collapse: collapse; }
-            .rdp-tbody tr { height: 36px; }
-            .rdp-head_row { height: 28px; }
-            .rdp-head_cell {
-              color: #898e87;
-              font-size: 11px;
-              font-weight: 600;
-              text-transform: uppercase;
-              letter-spacing: 0.05em;
-              padding: 0;
-              text-align: center;
-            }
-            .rdp-cell { padding: 1px; text-align: center; }
-            .rdp-button {
-              width: 34px;
-              height: 34px;
-              border-radius: 8px;
-              font-size: 13px;
-              font-weight: 500;
-              line-height: 1;
-              display: inline-flex;
-              align-items: center;
-              justify-content: center;
-            }
-            .rdp-day_today:not(.rdp-day_selected) .rdp-button {
-              font-weight: 800;
-              color: #46a758;
-              border: 1.5px solid #46a758;
-            }
-            .rdp-nav_button { border-radius: 8px; width: 32px; height: 32px; }
-            .rdp-caption { margin-bottom: 8px; }
-            .rdp-caption_label { font-size: 14px; font-weight: 700; color: #1d211c; }
+          {!mounted ? (
+            <div className="space-y-2 py-2">
+              <Skeleton className="h-7 w-40 mb-3" />
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-full rounded-lg" />
+              ))}
+            </div>
+          ) : (
+            <>
+              <style>{`
+                /* Compact DayPicker — fixed row heights */
+                .rdp {
+                  --rdp-cell-size: 36px;
+                  --rdp-accent-color: #46a758;
+                  margin: 0;
+                }
+                .rdp-months { width: 100%; }
+                .rdp-month { width: 100%; }
+                .rdp-table { width: 100%; border-collapse: collapse; }
+                .rdp-tbody tr { height: 36px; }
+                .rdp-head_row { height: 28px; }
+                .rdp-head_cell {
+                  color: #898e87;
+                  font-size: 11px;
+                  font-weight: 600;
+                  text-transform: uppercase;
+                  letter-spacing: 0.05em;
+                  padding: 0;
+                  text-align: center;
+                }
+                .rdp-cell { padding: 1px; text-align: center; }
+                .rdp-button {
+                  width: 34px;
+                  height: 34px;
+                  border-radius: 8px;
+                  font-size: 13px;
+                  font-weight: 500;
+                  line-height: 1;
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+                .rdp-day_today:not(.rdp-day_selected) .rdp-button {
+                  font-weight: 800;
+                  color: #46a758;
+                  border: 1.5px solid #46a758;
+                }
+                .rdp-nav_button { border-radius: 8px; width: 32px; height: 32px; }
+                .rdp-caption { margin-bottom: 8px; }
+                .rdp-caption_label { font-size: 14px; font-weight: 700; color: #1d211c; }
 
-            /* Available dates — green */
-            .rdp-day_available .rdp-button:not(:disabled) {
-              background: #daf6da !important;
-              color: #297c3b !important;
-            }
-            .rdp-day_available .rdp-button:not(:disabled):hover {
-              background: #c9f0ca !important;
-            }
+                /* Available dates — green */
+                .rdp-day_available .rdp-button:not(:disabled) {
+                  background: #daf6da !important;
+                  color: #297c3b !important;
+                }
+                .rdp-day_available .rdp-button:not(:disabled):hover {
+                  background: #c9f0ca !important;
+                }
 
-            /* Blocked dates — red */
-            .rdp-day_blocked .rdp-button {
-              background: #fee2e2 !important;
-              color: #b91c1c !important;
-              text-decoration: line-through;
-              text-decoration-color: #ef4444;
-              opacity: 0.9;
-            }
+                /* Blocked dates — red */
+                .rdp-day_blocked .rdp-button {
+                  background: #fee2e2 !important;
+                  color: #b91c1c !important;
+                  text-decoration: line-through;
+                  text-decoration-color: #ef4444;
+                  opacity: 0.9;
+                }
 
-            /* Past dates */
-            .rdp-day_past .rdp-button {
-              opacity: 0.3;
-            }
+                /* Past dates */
+                .rdp-day_past .rdp-button {
+                  opacity: 0.3;
+                }
 
-            /* Disabled — before available */
-            .rdp-day_disabled .rdp-button:not(.rdp-day_blocked .rdp-button) {
-              background: transparent;
-              color: #cdd1cb;
-              cursor: not-allowed;
-            }
-          `}</style>
+                /* Disabled — before available */
+                .rdp-day_disabled .rdp-button:not(.rdp-day_blocked .rdp-button) {
+                  background: transparent;
+                  color: #cdd1cb;
+                  cursor: not-allowed;
+                }
+              `}</style>
 
-          <DayPicker
-            mode="single"
-            disabled={disabled}
-            modifiers={modifiers}
-            modifiersClassNames={{
-              blocked: 'rdp-day_blocked',
-              available: 'rdp-day_available',
-              past: 'rdp-day_past',
-            }}
-            fromDate={today}
-            defaultMonth={nextAvailable}
-            showOutsideDays={false}
-          />
+              <DayPicker
+                mode="single"
+                disabled={disabled}
+                modifiers={modifiers}
+                modifiersClassNames={{
+                  blocked: 'rdp-day_blocked',
+                  available: 'rdp-day_available',
+                  past: 'rdp-day_past',
+                }}
+                fromDate={today}
+                defaultMonth={nextAvailable}
+                showOutsideDays={false}
+              />
+            </>
+          )}
         </div>
 
         {/* Legend */}

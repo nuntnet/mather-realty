@@ -52,7 +52,7 @@ function primaryType(types: string[]): string {
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ propertyId: string }> }
 ) {
   const { propertyId } = await params;
@@ -85,19 +85,33 @@ export async function GET(
       }
     }
 
-    // Get property coordinates
-    const property = await db
+    // Get property coordinates — Turso cache first, fallback to query params
+    const dbProperty = await db
       .select({ lat: properties.lat, lng: properties.lng })
       .from(properties)
       .where(eq(properties.id, propertyId))
       .get();
 
-    if (!property || property.lat == null || property.lng == null) {
+    let coordLat: number | null = dbProperty?.lat ?? null;
+    let coordLng: number | null = dbProperty?.lng ?? null;
+
+    if (coordLat == null || coordLng == null) {
+      const qLat = parseFloat(req.nextUrl.searchParams.get("lat") ?? "");
+      const qLng = parseFloat(req.nextUrl.searchParams.get("lng") ?? "");
+      if (!isNaN(qLat) && !isNaN(qLng)) {
+        coordLat = qLat;
+        coordLng = qLng;
+      }
+    }
+
+    if (coordLat == null || coordLng == null) {
       return NextResponse.json(
         { error: "Property not found or missing coordinates" },
         { status: 404 }
       );
     }
+
+    const property = { lat: coordLat, lng: coordLng };
 
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
