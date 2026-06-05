@@ -270,7 +270,12 @@ export default function PropertyGallery({
 
       {/* ── Lightbox fullscreen carousel ─────────────────────────────────────── */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        <DialogContent className="max-w-none w-screen h-dvh p-0 bg-black border-0 rounded-none flex flex-col">
+        {/* style overrides shadcn's default left-50%/top-50%/translate-(-50%,-50%)
+            which breaks in landscape where dvh ≠ vh */}
+        <DialogContent
+          className="max-w-none p-0 bg-black border-0 rounded-none flex flex-col"
+          style={{ position: 'fixed', inset: 0, transform: 'none', width: '100%', height: '100%' }}
+        >
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 shrink-0 z-10">
             <span className="text-white/60 text-sm font-medium">{lightboxIndex + 1} / {displayImages.length}</span>
