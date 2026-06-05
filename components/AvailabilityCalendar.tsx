@@ -112,80 +112,112 @@ export default function AvailabilityCalendar({
           ) : (
             <>
               <style>{`
-                /* Compact DayPicker — fixed row heights */
-                .rdp {
-                  --rdp-cell-size: 36px;
+                /* ── react-day-picker v9 full-width override ── */
+
+                /* Root: accent colour, no margin */
+                .rdp-root {
                   --rdp-accent-color: #46a758;
+                  width: 100%;
                   margin: 0;
-                  width: 100%;
                 }
-                .rdp-months { width: 100%; }
-                .rdp-month { width: 100%; }
-                .rdp-table {
+
+                /* Kill the fit-content cap that causes the right gap */
+                .rdp-months {
                   width: 100%;
-                  max-width: none;
+                  max-width: 100%;
+                }
+                .rdp-month { width: 100%; }
+
+                /* Table stretches to fill its container */
+                .rdp-month_grid {
+                  width: 100%;
                   table-layout: fixed;
                   border-collapse: collapse;
                 }
-                .rdp-tbody tr { height: 36px; }
-                .rdp-head_row { height: 28px; }
-                .rdp-head_cell {
+
+                /* Weekday header row */
+                .rdp-weekday {
+                  opacity: 1;
                   color: #898e87;
                   font-size: 11px;
                   font-weight: 600;
                   text-transform: uppercase;
                   letter-spacing: 0.05em;
-                  padding: 0;
+                  padding: 4px 0;
                   text-align: center;
                 }
-                .rdp-cell { padding: 2px; text-align: center; }
-                .rdp-button {
+
+                /* Day cells — let table-layout:fixed size the columns */
+                .rdp-day {
+                  width: auto;
+                  height: 40px;
+                  padding: 2px;
+                  text-align: center;
+                }
+
+                /* Day buttons fill the cell */
+                .rdp-day_button {
                   width: 100%;
                   height: 36px;
                   border-radius: 8px;
                   font-size: 13px;
                   font-weight: 500;
-                  line-height: 1;
                   display: flex;
                   align-items: center;
                   justify-content: center;
+                  border: none;
+                  background: none;
                 }
-                .rdp-day_today:not(.rdp-day_selected) .rdp-button {
+
+                /* Today highlight */
+                .rdp-today:not(.rdp-selected) .rdp-day_button {
                   font-weight: 800;
                   color: #46a758;
                   border: 1.5px solid #46a758;
                 }
-                .rdp-nav_button { border-radius: 8px; width: 32px; height: 32px; }
-                .rdp-caption { margin-bottom: 8px; }
-                .rdp-caption_label { font-size: 14px; font-weight: 700; color: #1d211c; }
 
-                /* Available dates — green */
-                .rdp-day_available .rdp-button:not(:disabled) {
+                /* Nav buttons */
+                .rdp-button_previous,
+                .rdp-button_next {
+                  border-radius: 8px;
+                  width: 32px;
+                  height: 32px;
+                }
+
+                /* Caption */
+                .rdp-month_caption { margin-bottom: 8px; }
+                .rdp-caption_label {
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: #1d211c;
+                }
+
+                /* ── Custom day-state colours ── */
+
+                /* Available — green */
+                .rdp-day_available .rdp-day_button {
                   background: #daf6da !important;
                   color: #297c3b !important;
                 }
-                .rdp-day_available .rdp-button:not(:disabled):hover {
+                .rdp-day_available .rdp-day_button:hover {
                   background: #c9f0ca !important;
                 }
 
-                /* Blocked dates — red */
-                .rdp-day_blocked .rdp-button {
+                /* Blocked — red strikethrough */
+                .rdp-day_blocked .rdp-day_button {
                   background: #fee2e2 !important;
                   color: #b91c1c !important;
                   text-decoration: line-through;
                   text-decoration-color: #ef4444;
-                  opacity: 0.9;
                 }
 
-                /* Past dates */
-                .rdp-day_past .rdp-button {
-                  opacity: 0.3;
-                }
+                /* Past — faded */
+                .rdp-day_past .rdp-day_button { opacity: 0.3; }
 
-                /* Disabled — before available */
-                .rdp-day_disabled .rdp-button:not(.rdp-day_blocked .rdp-button) {
-                  background: transparent;
-                  color: #cdd1cb;
+                /* Disabled (before available-from) */
+                .rdp-disabled .rdp-day_button {
+                  background: transparent !important;
+                  color: #cdd1cb !important;
                   cursor: not-allowed;
                 }
               `}</style>
