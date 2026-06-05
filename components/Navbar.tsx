@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { Menu, X, Building2, BookOpen, Info, Home, LayoutDashboard, LogIn, LogOut, ShieldCheck } from "lucide-react";
+import { Menu, X, Building2, BookOpen, Info, Home, LayoutDashboard, LogIn, LogOut, ShieldCheck, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,12 +23,15 @@ interface NavbarProps {
 
 interface NavLink {
   labelKey: string;
+  label?: string; // static override (no translation needed)
   href: string;
   icon: React.ElementType;
+  highlight?: boolean; // shows a subtle accent treatment
 }
 
 const NAV_LINKS: NavLink[] = [
   { labelKey: "properties", href: "/properties", icon: Building2 },
+  { labelKey: "discover", label: "Discover", href: "/discover", icon: Compass, highlight: true },
   { labelKey: "blog", href: "/blog", icon: BookOpen },
   { labelKey: "howItWorks", href: "/how-it-works", icon: Info },
 ];
@@ -127,19 +130,21 @@ export default function Navbar({ locale }: NavbarProps) {
 
         {/* Desktop nav */}
         <nav className="hidden md:flex items-center gap-1" aria-label="Main navigation">
-          {NAV_LINKS.map(({ labelKey, href }) => (
+          {NAV_LINKS.map(({ labelKey, label, href, highlight }) => (
             <Link
               key={href}
-              href={href as `/properties` | `/blog` | `/how-it-works`}
+              href={href as `/properties` | `/discover` | `/blog` | `/how-it-works`}
               className={cn(
-                "relative px-3 py-2 text-sm font-medium transition-colors group",
-                isActive(href)
+                "relative px-3 py-2 text-sm font-medium transition-colors group flex items-center gap-1.5",
+                highlight && !isActive(href)
+                  ? "text-[#46a758] font-semibold"
+                  : isActive(href)
                   ? "text-[#46a758]"
                   : "text-[#5e6360] hover:text-[#46a758]"
               )}
             >
-              {t(labelKey as "properties" | "blog" | "howItWorks")}
-              {/* Underline animation */}
+              {highlight && <Compass className="w-3.5 h-3.5" />}
+              {label ?? t(labelKey as "properties" | "blog" | "howItWorks")}
               <span
                 className={cn(
                   "absolute bottom-0 left-3 right-3 h-0.5 rounded-full transition-transform duration-200 origin-left",
@@ -268,20 +273,22 @@ export default function Navbar({ locale }: NavbarProps) {
         <nav className="flex flex-col divide-y divide-[#e2e5e0]" aria-label="Mobile navigation">
           {/* Main links */}
           <div className="flex flex-col px-4 py-3 gap-1">
-            {NAV_LINKS.map(({ labelKey, href, icon: Icon }) => (
+            {NAV_LINKS.map(({ labelKey, label, href, icon: Icon, highlight }) => (
               <Link
                 key={href}
-                href={href as `/properties` | `/blog` | `/how-it-works`}
+                href={href as `/properties` | `/discover` | `/blog` | `/how-it-works`}
                 onClick={() => setMobileOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-4 py-2 text-base font-medium transition-colors min-h-[44px]",
                   isActive(href)
                     ? "bg-[#46a758]/10 text-[#46a758] rounded-full"
+                    : highlight
+                    ? "text-[#46a758] font-semibold hover:bg-[#46a758]/8 rounded-xl"
                     : "text-[#5e6360] hover:text-[#1d211c] hover:bg-[#e2e5e0]/50 rounded-xl"
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
-                {t(labelKey as "properties" | "blog" | "howItWorks")}
+                {label ?? t(labelKey as "properties" | "blog" | "howItWorks")}
               </Link>
             ))}
           </div>

@@ -7,7 +7,7 @@ import { HERO_IMAGE } from '@/lib/images'
 import PropertyCard from '@/components/PropertyCard'
 import HomeSearchBar from './HomeSearchBar'
 import { Link } from '@/i18n/navigation'
-import { Building2, Search, MessageCircle, Home, ArrowRight } from 'lucide-react'
+import { Building2, Search, MessageCircle, Home, ArrowRight, Compass } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface HomePageProps {
@@ -183,22 +183,52 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      {/* ── Discover Mode Banner ─────────────────────────────────────────── */}
+      <section className="bg-[#0f1a0f] py-12 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-8">
+
+          {/* Stacked-cards visual */}
+          <div className="relative shrink-0 w-36 h-48 sm:order-last">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#297c3b] to-[#1b512a] rounded-2xl shadow-lg rotate-6 opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#3d9a4f] to-[#297c3b] rounded-2xl shadow-lg rotate-3 opacity-70" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#46a758] to-[#297c3b] rounded-2xl shadow-xl flex flex-col items-center justify-center text-white gap-2">
+              <Home className="w-10 h-10 opacity-90" />
+              <span className="text-xs font-bold opacity-70 tracking-wide">SWIPE →</span>
+            </div>
+          </div>
+
+          {/* Text + CTA */}
+          <div className="flex-1 text-center sm:text-left">
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#65c170] bg-[#65c170]/15 px-3 py-1 rounded-full mb-4">
+              ✨ New feature
+            </span>
+            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
+              Swipe to find<br className="hidden sm:block" /> your dream home
+            </h2>
+            <p className="text-white/50 text-sm sm:text-base mb-6 max-w-sm mx-auto sm:mx-0">
+              Browse properties like you&apos;d swipe through a feed — fast, visual, and fun.
+              Tap ♡ to save, skip what doesn&apos;t fit.
+            </p>
+            <Link
+              href="/discover"
+              className="inline-flex items-center gap-2 bg-[#46a758] hover:bg-[#3d9a4f] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#46a758]/20"
+            >
+              <Compass className="w-5 h-5" />
+              Try Discover Mode
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
       {/* Featured Properties */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-lexend font-bold text-gray-900">{t('featured_title')}</h2>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/discover"
-              className="flex items-center gap-1.5 text-sm bg-[#46a758] hover:bg-[#3d9a4f] text-white px-3 py-1.5 rounded-full font-medium transition-colors md:hidden"
-            >
-              <span>↕</span> Swipe
-            </Link>
-            <Link href="/properties" className="flex items-center gap-1 text-[#297c3b] hover:text-[#46a758] font-medium">
-              {t('view_all')}
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <Link href="/properties" className="flex items-center gap-1 text-[#297c3b] hover:text-[#46a758] font-medium">
+            {t('view_all')}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
 
         {featuredProperties.length > 0 ? (
