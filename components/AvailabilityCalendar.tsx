@@ -123,6 +123,7 @@ export default function AvailabilityCalendar({
                 .rdp-month { width: 100%; }
                 .rdp-table {
                   width: 100%;
+                  max-width: none;
                   table-layout: fixed;
                   border-collapse: collapse;
                 }
