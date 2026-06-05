@@ -31,6 +31,7 @@ import PersonaSection from '@/components/PersonaSection'
 import FAQSection from '@/components/FAQSection'
 import PropertyMap from '@/components/PropertyMap'
 import StickyPropertyCTA from '@/components/StickyPropertyCTA'
+import DescriptionExpander from '@/components/DescriptionExpander'
 
 interface PropertyDetailPageProps {
   params: Promise<{ locale: string; slug: string }>
@@ -302,17 +303,6 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             </div>
           </div>
 
-          {/* Gallery strip */}
-          {(property.gallery.length > 0 || property.coverImage) && (
-            <section className="max-w-7xl mx-auto px-4 pt-8 pb-2">
-              <PropertyGallery
-                images={property.gallery}
-                coverImage={property.coverImage}
-                virtualTourUrl={property.virtualTourUrl ?? undefined}
-              />
-            </section>
-          )}
-
           {/* MAIN CONTENT GRID */}
           <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -425,19 +415,29 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 />
               )}
 
-              {/* 3. DESCRIPTION */}
+              {/* 5. DESCRIPTION — collapsible */}
               {description && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">
                     About this property
                   </h2>
-                  <p className="text-gray-600 leading-relaxed whitespace-pre-line prose prose-gray max-w-none">
-                    {description}
-                  </p>
+                  <DescriptionExpander text={description} />
                 </div>
               )}
 
-              {/* 4. AMENITIES */}
+              {/* 6. GALLERY — after description so readers are engaged first */}
+              {(property.gallery.length > 0 || property.coverImage) && (
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-4">Photos</h2>
+                  <PropertyGallery
+                    images={property.gallery}
+                    coverImage={property.coverImage}
+                    virtualTourUrl={property.virtualTourUrl ?? undefined}
+                  />
+                </div>
+              )}
+
+              {/* 8. AMENITIES */}
               {property.amenities.length > 0 && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">Amenities</h2>
@@ -451,7 +451,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 </div>
               )}
 
-              {/* 5. AVAILABILITY CALENDAR */}
+              {/* 9. AVAILABILITY CALENDAR */}
               <div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <CalendarDays className="w-5 h-5 text-[#46a758]" />
@@ -464,7 +464,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 />
               </div>
 
-              {/* 6. MAP + NEARBY */}
+              {/* 10. MAP + NEARBY */}
               {property.lat > 0 && property.lng > 0 && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900 mb-3">Location</h2>
@@ -486,7 +486,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 </div>
               )}
 
-              {/* 7. FAQ */}
+              {/* 11. FAQ */}
               {property.faqJson && property.faqJson.length > 0 && (
                 <FAQSection faqItems={property.faqJson} propertyTitle={title} />
               )}
