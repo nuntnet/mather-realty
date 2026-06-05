@@ -90,6 +90,7 @@ type PropertyForm = {
   sizeSqm: string;
   amenities: string[];
   status: string;
+  coverImage: string;
   gallery: string[];
   virtualTourUrl: string;
   verified: boolean;
@@ -110,6 +111,7 @@ function emptyForm(): PropertyForm {
     sizeSqm: "",
     amenities: [],
     status: "pending",
+    coverImage: "",
     gallery: [],
     virtualTourUrl: "",
     verified: false,
@@ -186,6 +188,7 @@ export default function PropertyEditPage() {
           sizeSqm: data.sizeSqm != null ? String(data.sizeSqm) : "",
           amenities: data.amenities ?? [],
           status: data.status ?? "pending",
+          coverImage: data.coverImage ?? "",
           gallery: data.gallery ?? [],
           virtualTourUrl: data.virtualTourUrl ?? "",
           verified: !!data.verifiedAt,
@@ -229,6 +232,7 @@ export default function PropertyEditPage() {
         sizeSqm: form.sizeSqm ? parseFloat(form.sizeSqm) : null,
         amenities: form.amenities,
         status: form.status,
+        coverImage: form.coverImage || null,
         gallery: form.gallery,
         virtualTourUrl: form.virtualTourUrl || null,
         verified: form.verified,
@@ -509,14 +513,31 @@ export default function PropertyEditPage() {
           </div>
         </div>
 
+        {/* ── Cover Image ──────────────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <SectionTitle>Cover Image</SectionTitle>
+          <p className="text-xs text-gray-400">
+            Shown as the hero image on the property listing. Stored as the Notion page cover.
+          </p>
+          <ImageUploader
+            value={form.coverImage ? [form.coverImage] : []}
+            onChange={(urls) => setForm((f) => ({ ...f, coverImage: urls[0] ?? "" }))}
+            multiple={false}
+            label="Upload cover photo"
+          />
+        </div>
+
         {/* ── Gallery ──────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-          <SectionTitle>Gallery</SectionTitle>
+          <SectionTitle>Gallery Photos</SectionTitle>
+          <p className="text-xs text-gray-400">
+            Additional photos shown in the gallery carousel on the property page.
+          </p>
           <ImageUploader
             value={form.gallery}
             onChange={(urls) => setForm((f) => ({ ...f, gallery: urls }))}
             multiple
-            label="Property photos (first image = cover)"
+            label="Upload gallery photos"
           />
         </div>
 

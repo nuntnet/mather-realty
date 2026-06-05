@@ -64,6 +64,14 @@ function mapToForm(page: PageObjectResponse) {
     if (d) descriptions[loc] = d;
   }
 
+  // Cover image from the Notion page cover (not a database property)
+  let coverImage = "";
+  const cover = (page as PageObjectResponse & {
+    cover?: { type: string; external?: { url: string }; file?: { url: string } } | null
+  }).cover;
+  if (cover?.type === "external") coverImage = cover.external?.url ?? "";
+  else if (cover?.type === "file") coverImage = cover.file?.url ?? "";
+
   // Gallery: try files property first, fall back to comma-separated URL text
   const galleryFiles = propFiles(page, "gallery");
   const galleryUrls = galleryFiles.length
@@ -71,6 +79,7 @@ function mapToForm(page: PageObjectResponse) {
     : richText(page, "gallery_urls").split(",").map((u) => u.trim()).filter(Boolean);
 
   return {
+    coverImage,
     titles,
     descriptions,
     address: richText(page, "address"),
@@ -112,6 +121,7 @@ const patchSchema = z.object({
   virtualTourUrl: z.string().nullable().optional(),
   verified: z.boolean().optional(),
   approvedAt: z.string().nullable().optional(),
+  coverImage: z.string().nullable().optional(),
 });
 
 // ── GET ────────────────────────────────────────────────────────────────────────
@@ -256,11 +266,24 @@ export async function PATCH(
         : { date: null };
     }
 
+    // Build the full pages.update call — combine properties + optional cover
+    const updatePayload: Parameters<typeof client.pages.update>[0] = {
+      page_id: id,
+    };
+
     if (Object.keys(updates).length > 0) {
-      await client.pages.update({
-        page_id: id,
-        properties: updates as Parameters<typeof client.pages.update>[0]["properties"],
-      });
+      updatePayload.properties = updates as Parameters<typeof client.pages.update>[0]["properties"];
+    }
+
+    // Cover image lives on the Notion page itself, not a property field
+    if (data.coverImage !== undefined) {
+      (updatePayload as Record<string, unknown>).cover = data.coverImage
+        ? { type: "external", external: { url: data.coverImage } }
+        : null;
+    }
+
+    if (Object.keys(updatePayload).length > 1) {
+      await client.pages.update(updatePayload);
     }
 
     return NextResponse.json({ success: true, id });
