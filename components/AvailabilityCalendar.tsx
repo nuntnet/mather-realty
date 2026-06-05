@@ -132,15 +132,15 @@ export default function AvailabilityCalendar({
                   padding: 0;
                   text-align: center;
                 }
-                .rdp-cell { padding: 1px; text-align: center; }
+                .rdp-cell { padding: 2px; text-align: center; width: calc(100% / 7); }
                 .rdp-button {
-                  width: 34px;
-                  height: 34px;
+                  width: 100%;
+                  height: 36px;
                   border-radius: 8px;
                   font-size: 13px;
                   font-weight: 500;
                   line-height: 1;
-                  display: inline-flex;
+                  display: flex;
                   align-items: center;
                   justify-content: center;
                 }
