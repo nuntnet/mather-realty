@@ -270,64 +270,88 @@ export default function PropertyGallery({
 
       {/* ── Lightbox fullscreen carousel ─────────────────────────────────────── */}
       <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-        {/* style overrides shadcn's default left-50%/top-50%/translate-(-50%,-50%)
-            which breaks in landscape where dvh ≠ vh */}
+        {/*
+          Override every shadcn positioning class (left-50%, top-50%,
+          translate, max-w-lg, etc.) with explicit inline styles so the
+          lightbox is truly edge-to-edge on all orientations.
+        */}
         <DialogContent
-          className="max-w-none p-0 bg-black border-0 rounded-none flex flex-col"
-          style={{ position: 'fixed', inset: 0, transform: 'none', width: '100%', height: '100%' }}
+          className="max-w-none p-0 bg-black border-0 rounded-none overflow-hidden"
+          style={{
+            position: 'fixed',
+            top: 0, left: 0, right: 0, bottom: 0,
+            width: '100vw', height: '100dvh',
+            transform: 'none', margin: 0,
+          }}
         >
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 shrink-0 z-10">
-            <span className="text-white/60 text-sm font-medium">{lightboxIndex + 1} / {displayImages.length}</span>
-            <button
-              onClick={() => setLightboxOpen(false)}
-              className="size-9 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
-          </div>
-
-          {/* Lightbox carousel */}
-          <div ref={lightboxEmblaRef} className="flex-1 overflow-hidden">
+          {/* ── Carousel fills the entire dialog ── */}
+          <div ref={lightboxEmblaRef} className="w-full h-full overflow-hidden">
             <div className="flex h-full">
               {displayImages.map((img, idx) => (
-                <div key={idx} className="relative flex-shrink-0 w-full h-full flex items-center justify-center px-2">
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={img}
-                      alt={`Photo ${idx + 1}`}
-                      fill
-                      className="object-contain"
-                      sizes="100vw"
-                      draggable={false}
-                    />
-                  </div>
+                <div
+                  key={idx}
+                  className="relative flex-shrink-0 w-full h-full flex items-center justify-center"
+                >
+                  <Image
+                    src={img}
+                    alt={`Photo ${idx + 1}`}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    draggable={false}
+                  />
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Lightbox nav arrows */}
+          {/* ── Overlaid controls ── */}
+
+          {/* Counter — top left */}
+          <span className="absolute top-4 left-4 z-20 bg-black/50 backdrop-blur-sm text-white text-sm font-medium px-3 py-1 rounded-full select-none pointer-events-none">
+            {lightboxIndex + 1} / {displayImages.length}
+          </span>
+
+          {/* Close — top right, overlays the image */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-4 right-4 z-20 size-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5 text-white" />
+          </button>
+
+          {/* Prev / Next arrows */}
           {displayImages.length > 1 && (
             <>
-              <button onClick={lightboxPrev} className="absolute left-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
+              <button
+                onClick={lightboxPrev}
+                className="absolute left-3 top-1/2 -translate-y-1/2 z-20 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
+                aria-label="Previous"
+              >
                 <ChevronLeft className="w-6 h-6 text-white" />
               </button>
-              <button onClick={lightboxNext} className="absolute right-3 top-1/2 -translate-y-1/2 size-11 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors z-10">
+              <button
+                onClick={lightboxNext}
+                className="absolute right-3 top-1/2 -translate-y-1/2 z-20 size-11 flex items-center justify-center rounded-full bg-black/40 backdrop-blur-sm hover:bg-black/60 transition-colors"
+                aria-label="Next"
+              >
                 <ChevronRight className="w-6 h-6 text-white" />
               </button>
             </>
           )}
 
-          {/* Thumbnail strip — hidden in landscape to maximise image area */}
-          <div className="landscape:hidden flex gap-1.5 overflow-x-auto px-4 py-3 shrink-0 scrollbar-hide">
+          {/* Thumbnail strip — bottom overlay, hidden in landscape */}
+          <div className="landscape:hidden absolute bottom-0 left-0 right-0 z-20 flex gap-1.5 overflow-x-auto px-4 py-3 bg-gradient-to-t from-black/70 to-transparent scrollbar-hide">
             {displayImages.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => lightboxEmblaApi?.scrollTo(idx)}
                 className={cn(
                   'relative shrink-0 rounded-lg overflow-hidden border-2 transition-all',
-                  idx === lightboxIndex ? 'border-white opacity-100' : 'border-transparent opacity-40 hover:opacity-70',
+                  idx === lightboxIndex
+                    ? 'border-white opacity-100'
+                    : 'border-transparent opacity-40 hover:opacity-70',
                 )}
                 style={{ width: 56, height: 40 }}
               >
@@ -335,6 +359,7 @@ export default function PropertyGallery({
               </button>
             ))}
           </div>
+
         </DialogContent>
       </Dialog>
 
