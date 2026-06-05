@@ -310,44 +310,54 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             {/* ── LEFT COLUMN ── */}
             <div className="lg:col-span-2 space-y-10">
 
-              {/* 1. SPECS ROW */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* 1. SPECS GRID — 3 per row */}
+              <div className="grid grid-cols-3 gap-3">
                 {/* Bedrooms */}
-                <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4 text-center">
-                  <Bed className="w-6 h-6 text-[#46a758] mb-1.5" />
-                  <span className="text-xl font-bold text-gray-900">{property.bedrooms}</span>
-                  <span className="text-xs text-gray-500 mt-0.5">{t('bedrooms')}</span>
+                <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
+                    <Bed className="w-5 h-5 text-[#46a758]" />
+                  </div>
+                  <span className="text-2xl font-black text-[#1d211c] leading-none">{property.bedrooms}</span>
+                  <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">{t('bedrooms')}</span>
                 </div>
 
                 {/* Bathrooms */}
-                <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4 text-center">
-                  <Bath className="w-6 h-6 text-[#46a758] mb-1.5" />
-                  <span className="text-xl font-bold text-gray-900">{property.bathrooms}</span>
-                  <span className="text-xs text-gray-500 mt-0.5">{t('bathrooms')}</span>
+                <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
+                    <Bath className="w-5 h-5 text-[#46a758]" />
+                  </div>
+                  <span className="text-2xl font-black text-[#1d211c] leading-none">{property.bathrooms}</span>
+                  <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">{t('bathrooms')}</span>
                 </div>
 
                 {/* Size */}
-                <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4 text-center">
-                  <Maximize2 className="w-6 h-6 text-[#46a758] mb-1.5" />
-                  <span className="text-xl font-bold text-gray-900">{property.sizeSqm}</span>
-                  <span className="text-xs text-gray-500 mt-0.5">sqm</span>
+                <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
+                    <Maximize2 className="w-5 h-5 text-[#46a758]" />
+                  </div>
+                  <span className="text-2xl font-black text-[#1d211c] leading-none">{property.sizeSqm}</span>
+                  <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">sqm</span>
                 </div>
 
                 {/* Floors */}
                 {property.floors > 0 && (
-                  <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4 text-center">
-                    <Layers className="w-6 h-6 text-[#46a758] mb-1.5" />
-                    <span className="text-xl font-bold text-gray-900">{property.floors}</span>
-                    <span className="text-xs text-gray-500 mt-0.5">Floors</span>
+                  <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
+                      <Layers className="w-5 h-5 text-[#46a758]" />
+                    </div>
+                    <span className="text-2xl font-black text-[#1d211c] leading-none">{property.floors}</span>
+                    <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">Floors</span>
                   </div>
                 )}
 
-                {/* Parking — only if > 0 */}
+                {/* Parking */}
                 {property.parkingSpots > 0 && (
-                  <div className="flex flex-col items-center bg-gray-50 rounded-xl p-4 text-center">
-                    <ParkingSquare className="w-6 h-6 text-[#46a758] mb-1.5" />
-                    <span className="text-xl font-bold text-gray-900">{property.parkingSpots}</span>
-                    <span className="text-xs text-gray-500 mt-0.5">Parking</span>
+                  <div className="flex flex-col items-center bg-white rounded-2xl px-2 py-4 text-center border border-[#e8ebe7] shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#edf9ee] flex items-center justify-center mb-2.5">
+                      <ParkingSquare className="w-5 h-5 text-[#46a758]" />
+                    </div>
+                    <span className="text-2xl font-black text-[#1d211c] leading-none">{property.parkingSpots}</span>
+                    <span className="text-[11px] font-medium text-[#898e87] mt-1 leading-tight">Parking</span>
                   </div>
                 )}
               </div>
