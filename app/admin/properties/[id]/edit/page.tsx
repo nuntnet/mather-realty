@@ -190,6 +190,8 @@ export default function PropertyEditPage() {
   const [saving, setSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
   const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
+  const [isDirty, setIsDirty] = useState(false);
+  const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
 
   // Load existing property
   useEffect(() => {
@@ -271,12 +273,33 @@ export default function PropertyEditPage() {
       .finally(() => setLoading(false));
   }, [isNew, propertyId, router]);
 
+  // ── Unsaved-changes guard ────────────────────────────────────────────────────
+  // Browser refresh / tab close
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Mark form dirty on any change (after initial load)
+  const dirtySetForm: typeof setForm = (updater) => {
+    if (!loading) setIsDirty(true);
+    setForm(updater as Parameters<typeof setForm>[0]);
+  };
+
+  // Navigate away safely — shows confirm dialog if dirty
+  function navigateSafely(href: string) {
+    if (isDirty) { setLeaveTarget(href); return; }
+    router.push(href);
+  }
+
   const setLocaleField = (field: "titles" | "descriptions", value: string) => {
-    setForm((f) => ({ ...f, [field]: { ...f[field], [activeLocale]: value } }));
+    dirtySetForm((f) => ({ ...f, [field]: { ...f[field], [activeLocale]: value } }));
   };
 
   const toggleAmenity = (a: string) => {
-    setForm((f) => ({
+    dirtySetForm((f) => ({
       ...f,
       amenities: f.amenities.includes(a)
         ? f.amenities.filter((x) => x !== a)
@@ -285,7 +308,7 @@ export default function PropertyEditPage() {
   };
 
   const togglePerfectFor = (opt: string) => {
-    setForm((f) => ({
+    dirtySetForm((f) => ({
       ...f,
       perfectFor: f.perfectFor.includes(opt)
         ? f.perfectFor.filter((x) => x !== opt)
@@ -294,15 +317,15 @@ export default function PropertyEditPage() {
   };
 
   const addFaqItem = () => {
-    setForm((f) => ({ ...f, faq: [...f.faq, { q: "", a: "" }] }));
+    dirtySetForm((f) => ({ ...f, faq: [...f.faq, { q: "", a: "" }] }));
   };
 
   const removeFaqItem = (idx: number) => {
-    setForm((f) => ({ ...f, faq: f.faq.filter((_, i) => i !== idx) }));
+    dirtySetForm((f) => ({ ...f, faq: f.faq.filter((_, i) => i !== idx) }));
   };
 
   const updateFaqItem = (idx: number, field: "q" | "a", value: string) => {
-    setForm((f) => ({
+    dirtySetForm((f) => ({
       ...f,
       faq: f.faq.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
     }));
@@ -317,7 +340,7 @@ export default function PropertyEditPage() {
       ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
     if (!existing.includes(tag)) {
-      setForm((f) => ({
+      dirtySetForm((f) => ({
         ...f,
         tags: [...existing, tag].join(", "),
       }));
@@ -329,7 +352,7 @@ export default function PropertyEditPage() {
     const existing = form.tags
       ? form.tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
-    setForm((f) => ({
+    dirtySetForm((f) => ({
       ...f,
       tags: existing.filter((t) => t !== tag).join(", "),
     }));
@@ -399,6 +422,7 @@ export default function PropertyEditPage() {
         body: JSON.stringify(body),
       });
       if (!res.ok) throw new Error(String(res.status));
+      setIsDirty(false);
       toast.success(isNew ? "Property created." : "Property saved.");
       router.push("/admin/properties");
     } catch {
@@ -431,6 +455,7 @@ export default function PropertyEditPage() {
     try {
       const data = await aiPost({ propertyId, action: "generate-field", field, locale });
       const val = data.value;
+      setIsDirty(true);
       if (field === "title_en")       setForm((f) => ({ ...f, titles: { ...f.titles, en: val } }));
       if (field === "description_en") setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } }));
       if (field === "seo")            setForm((f) => ({ ...f, seoDescription: val }));
@@ -549,12 +574,13 @@ export default function PropertyEditPage() {
     <div className="max-w-4xl space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link
-          href="/admin/properties"
+        <button
+          type="button"
+          onClick={() => navigateSafely("/admin/properties")}
           className="p-2 text-gray-500 hover:text-[#131F3C] hover:bg-gray-100 rounded-lg transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
-        </Link>
+        </button>
         <div>
           <h1 className="text-2xl font-bold text-[#131F3C]">
             {isNew ? "Add Property" : "Edit Property"}
@@ -1153,12 +1179,13 @@ export default function PropertyEditPage() {
 
         {/* ── Submit ───────────────────────────────────────────────────── */}
         <div className="flex items-center justify-end gap-3 pb-8">
-          <Link
-            href="/admin/properties"
+          <button
+            type="button"
+            onClick={() => navigateSafely("/admin/properties")}
             className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-colors"
           >
             Cancel
-          </Link>
+          </button>
           <button
             type="submit"
             disabled={saving}
@@ -1173,6 +1200,51 @@ export default function PropertyEditPage() {
           </button>
         </div>
       </form>
+
+      {/* ── Unsaved changes confirm dialog ──────────────────────────────── */}
+      {leaveTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setLeaveTarget(null)}
+          />
+          {/* Dialog */}
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-sm w-full mx-4 p-6 space-y-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+                <span className="text-amber-600 text-lg">⚠</span>
+              </div>
+              <div>
+                <h2 className="text-base font-semibold text-gray-900">Unsaved changes</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  You have unsaved changes. If you leave now, all edits will be lost.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setLeaveTarget(null)}
+                className="px-4 py-2 rounded-xl border border-gray-200 text-sm font-medium hover:bg-gray-50 transition-colors"
+              >
+                Keep editing
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDirty(false);
+                  router.push(leaveTarget);
+                  setLeaveTarget(null);
+                }}
+                className="px-4 py-2 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 transition-colors"
+              >
+                Leave without saving
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
