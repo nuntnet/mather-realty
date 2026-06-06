@@ -148,7 +148,7 @@ function PropertyCard({
       )}
 
       {/* Mobile right-side actions */}
-      <div className={cn('absolute right-4 bottom-[340px] flex flex-col gap-4 z-20 items-center', isDesktop && 'hidden')}>
+      <div className={cn('absolute right-4 bottom-[280px] flex flex-col gap-4 z-20 items-center', isDesktop && 'hidden')}>
         <button onClick={handleSave} className="flex flex-col items-center gap-1">
           <div className={cn('w-12 h-12 rounded-full flex items-center justify-center shadow-lg backdrop-blur-md transition-all active:scale-90',
             isSaved ? 'bg-red-500/90' : 'bg-white/20 border border-white/30')}>
@@ -180,7 +180,7 @@ function PropertyCard({
       <div onClick={handleView} role="button" tabIndex={0}
         onKeyDown={e => e.key === 'Enter' && handleView(e as unknown as React.MouseEvent)}
         className={cn(
-          'relative z-20 mx-3 mb-24 px-4 py-3.5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
+          'relative z-20 mx-3 mb-[68px] px-4 py-3 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
           'bg-black/55 backdrop-blur-xl border border-white/15 active:scale-[0.98]',
           isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
           isDesktop && 'hidden'
@@ -418,8 +418,9 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             </div>
           </div>
 
-          {/* Mobile bottom nav */}
-          <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/60 backdrop-blur-xl lg:hidden">
+          {/* Mobile bottom nav — slim height, safe-area aware */}
+          <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 py-2 bg-black/60 backdrop-blur-xl lg:hidden"
+            style={{ paddingBottom: 'max(8px, env(safe-area-inset-bottom))' }}>
             <button onClick={e => { e.stopPropagation(); router.push('/discover' as '/') }}
               className="flex flex-col items-center gap-0.5 bg-[#1E6B69]/20 text-[#4DB5B2] px-5 py-2 rounded-full">
               <Compass className="w-5 h-5" /><span className="text-xs font-semibold">Explore</span>
