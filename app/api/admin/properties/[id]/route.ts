@@ -52,6 +52,34 @@ function propFiles(page: PageObjectResponse, key: string): string[] {
   return (p.files ?? []).map((f) => f.file?.url ?? f.external?.url ?? "").filter(Boolean);
 }
 
+/** Read exterior/interior/community from new separate fields,
+ *  falling back to the legacy gallery_categories JSON blob if needed. */
+function getCategoryPhotos(page: PageObjectResponse) {
+  const extRaw  = richText(page, "exterior_photos");
+  const intRaw  = richText(page, "interior_photos");
+  const comRaw  = richText(page, "community_photos");
+
+  // If all three new fields are populated, use them directly
+  if (extRaw || intRaw || comRaw) {
+    return { exteriorPhotos: extRaw, interiorPhotos: intRaw, communityPhotos: comRaw };
+  }
+
+  // Fallback: parse legacy gallery_categories JSON
+  const gcRaw = richText(page, "gallery_categories");
+  if (gcRaw) {
+    try {
+      const cats = JSON.parse(gcRaw) as { exterior?: string[]; interior?: string[]; community?: string[] };
+      return {
+        exteriorPhotos:  (cats.exterior  ?? []).join(","),
+        interiorPhotos:  (cats.interior  ?? []).join(","),
+        communityPhotos: (cats.community ?? []).join(","),
+      };
+    } catch { /* fall through */ }
+  }
+
+  return { exteriorPhotos: "", interiorPhotos: "", communityPhotos: "" };
+}
+
 /** Map a raw Notion page to the admin edit form shape */
 function mapToForm(page: PageObjectResponse) {
   // Multilingual titles & descriptions
@@ -125,30 +153,7 @@ function mapToForm(page: PageObjectResponse) {
     gallery: galleryUrls,
     virtualTourUrl: richText(page, "virtual_tour_url") || null,
     // New separate fields — fallback to legacy gallery_categories JSON if empty
-    exteriorPhotos: (() => {
-      const v = richText(page, "exterior_photos");
-      if (v) return v;
-      try {
-        const legacy = JSON.parse(richText(page, "gallery_categories"));
-        return (legacy?.exterior ?? []).join(",");
-      } catch { return ""; }
-    })(),
-    interiorPhotos: (() => {
-      const v = richText(page, "interior_photos");
-      if (v) return v;
-      try {
-        const legacy = JSON.parse(richText(page, "gallery_categories"));
-        return (legacy?.interior ?? []).join(",");
-      } catch { return ""; }
-    })(),
-    communityPhotos: (() => {
-      const v = richText(page, "community_photos");
-      if (v) return v;
-      try {
-        const legacy = JSON.parse(richText(page, "gallery_categories"));
-        return (legacy?.community ?? []).join(",");
-      } catch { return ""; }
-    })(),
+    ...getCategoryPhotos(page),
     heroPhotos: richText(page, "hero_photos"),
     verifiedAt: propDate(page, "verified_at"),
     approvedAt: propDate(page, "approved_at"),
