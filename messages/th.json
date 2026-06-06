@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "โทร",
     "available_now": "ว่างทันที",
-    "from_date": "ตั้งแต่"
+    "from_date": "ตั้งแต่",
+    "sending": "กำลังส่ง…",
+    "inquirySent": "ส่งข้อความแล้ว!",
+    "inquirySentDesc": "เราจะติดต่อกลับโดยเร็วที่สุด",
+    "inquiryError": "ส่งข้อความไม่สำเร็จ",
+    "chatDirectly": "ติดต่อโดยตรง"
   },
   "search": {
     "title": "ค้นหาอสังหาริมทรัพย์",

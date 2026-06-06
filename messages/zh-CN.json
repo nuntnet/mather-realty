@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "电话",
     "available_now": "现在可租",
-    "from_date": "从"
+    "from_date": "从",
+    "sending": "发送中…",
+    "inquirySent": "询问已发送！",
+    "inquirySentDesc": "我们会尽快回复您。",
+    "inquiryError": "发送询问失败",
+    "chatDirectly": "直接联系"
   },
   "search": {
     "title": "浏览房产",

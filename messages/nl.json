@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Bellen",
     "available_now": "Nu beschikbaar",
-    "from_date": "Vanaf"
+    "from_date": "Vanaf",
+    "sending": "Verzenden…",
+    "inquirySent": "Vraag verzonden!",
+    "inquirySentDesc": "We nemen zo snel mogelijk contact op.",
+    "inquiryError": "Verzenden van vraag mislukt",
+    "chatDirectly": "Direct contact"
   },
   "search": {
     "title": "Woningen bekijken",

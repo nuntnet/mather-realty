@@ -89,6 +89,12 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
       type: 'website',
       ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: title }] } : {}),
     },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(image ? { images: [image] } : {}),
+    },
   }
 }
 
@@ -166,9 +172,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
         }
       : {}),
     ...(property.coverImage ? { image: property.coverImage } : {}),
-    ...(property.perfectFor.length > 0
+    ...((property.perfectFor ?? []).length > 0
       ? {
-          audience: property.perfectFor.map(persona => ({
+          audience: (property.perfectFor ?? []).map(persona => ({
             '@type': 'Audience',
             audienceType: persona,
           })),
@@ -190,12 +196,44 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
     ? `66${property.contactPhone.replace(/^0/, '').replace(/\D/g, '')}`
     : null
 
+  // FAQPage JSON-LD for AI assistants and Google rich results
+  const faqJsonLd = faqItems && faqItems.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqItems.map(item => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: { '@type': 'Answer', text: item.a },
+    })),
+  } : null
+
+  // BreadcrumbList JSON-LD
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: 'Properties', item: `${SITE_URL}/${locale}/properties` },
+      { '@type': 'ListItem', position: 3, name: title, item: `${SITE_URL}/${locale}/properties/${slug}` },
+    ],
+  }
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
 
       <div className="min-h-screen bg-[#f1f4f0] pt-16 pb-28 lg:pb-0">
 

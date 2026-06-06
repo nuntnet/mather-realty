@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "कॉल करें",
     "available_now": "अभी उपलब्ध",
-    "from_date": "से"
+    "from_date": "से",
+    "sending": "भेज रहे हैं…",
+    "inquirySent": "पूछताछ भेज दी गई!",
+    "inquirySentDesc": "हम जल्द से जल्द आपसे संपर्क करेंगे।",
+    "inquiryError": "पूछताछ भेजने में विफल",
+    "chatDirectly": "सीधे संपर्क करें"
   },
   "search": {
     "title": "संपत्तियाँ खोजें",

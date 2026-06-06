@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Anrufen",
     "available_now": "Sofort verfügbar",
-    "from_date": "Ab"
+    "from_date": "Ab",
+    "sending": "Senden…",
+    "inquirySent": "Anfrage gesendet!",
+    "inquirySentDesc": "Wir melden uns so schnell wie möglich.",
+    "inquiryError": "Anfrage konnte nicht gesendet werden",
+    "chatDirectly": "Direkt kontaktieren"
   },
   "search": {
     "title": "Immobilien durchsuchen",

@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "전화",
     "available_now": "즉시 입주 가능",
-    "from_date": "부터"
+    "from_date": "부터",
+    "sending": "전송 중…",
+    "inquirySent": "문의가 전송되었습니다!",
+    "inquirySentDesc": "최대한 빨리 연락드리겠습니다.",
+    "inquiryError": "문의 전송 실패",
+    "chatDirectly": "직접 연락"
   },
   "search": {
     "title": "매물 검색",

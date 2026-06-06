@@ -2,6 +2,7 @@ import createMiddleware from 'next-intl/middleware'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkAuthRateLimit } from '@/lib/ratelimit'
 import { routing } from './i18n/routing'
+import { auth } from './lib/auth'
 
 const intlMiddleware = createMiddleware(routing)
 
@@ -12,14 +13,14 @@ function getClientIp(req: NextRequest): string {
 }
 
 async function validateAdminSession(req: NextRequest) {
-  const sessionRes = await fetch(`${req.nextUrl.origin}/api/auth/get-session`, {
-    headers: { cookie: req.headers.get('cookie') ?? '' },
-  }).catch(() => null)
-
-  if (!sessionRes?.ok) return null
-  const session = await sessionRes.json().catch(() => null)
-  if (!session?.user || session.user.role !== 'admin') return null
-  return session
+  // Use auth SDK directly — avoids SSRF via req.nextUrl.origin (attacker-controlled)
+  try {
+    const session = await auth?.api.getSession({ headers: req.headers }) ?? null
+    if (!session?.user || (session.user as { role?: string }).role !== 'admin') return null
+    return session
+  } catch {
+    return null
+  }
 }
 
 export async function middleware(req: NextRequest) {

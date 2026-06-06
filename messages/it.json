@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Chiama",
     "available_now": "Disponibile ora",
-    "from_date": "Dal"
+    "from_date": "Dal",
+    "sending": "Invio…",
+    "inquirySent": "Richiesta inviata!",
+    "inquirySentDesc": "Vi risponderemo prima possibile.",
+    "inquiryError": "Impossibile inviare la richiesta",
+    "chatDirectly": "Contatta direttamente"
   },
   "search": {
     "title": "Sfoglia proprietà",

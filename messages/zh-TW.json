@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "電話",
     "available_now": "現在可租",
-    "from_date": "從"
+    "from_date": "從",
+    "sending": "傳送中…",
+    "inquirySent": "詢問已傳送！",
+    "inquirySentDesc": "我們會盡快回覆您。",
+    "inquiryError": "傳送詢問失敗",
+    "chatDirectly": "直接聯繫"
   },
   "search": {
     "title": "瀏覽房產",

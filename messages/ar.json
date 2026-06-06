@@ -111,7 +111,12 @@
     "whatsapp_label": "واتساب",
     "call_label": "اتصال",
     "available_now": "متاح الآن",
-    "from_date": "من"
+    "from_date": "من",
+    "sending": "جاري الإرسال…",
+    "inquirySent": "تم إرسال الاستفسار!",
+    "inquirySentDesc": "سنعاود الاتصال بك في أقرب وقت ممكن.",
+    "inquiryError": "فشل في إرسال الاستفسار",
+    "chatDirectly": "تواصل مباشرة"
   },
   "search": {
     "title": "استعراض العقارات",

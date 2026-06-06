@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Ring",
     "available_now": "Tillgänglig nu",
-    "from_date": "Från"
+    "from_date": "Från",
+    "sending": "Skickar…",
+    "inquirySent": "Förfrågan skickad!",
+    "inquirySentDesc": "Vi återkommer så snart som möjligt.",
+    "inquiryError": "Misslyckades att skicka förfrågan",
+    "chatDirectly": "Kontakta direkt"
   },
   "search": {
     "title": "Bläddra bland bostäder",

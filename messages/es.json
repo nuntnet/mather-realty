@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Llamar",
     "available_now": "Disponible ahora",
-    "from_date": "Desde"
+    "from_date": "Desde",
+    "sending": "Enviando…",
+    "inquirySent": "¡Consulta enviada!",
+    "inquirySentDesc": "Nos pondremos en contacto lo antes posible.",
+    "inquiryError": "Error al enviar la consulta",
+    "chatDirectly": "Contactar directamente"
   },
   "search": {
     "title": "Explorar propiedades",

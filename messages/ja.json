@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "電話",
     "available_now": "今すぐ入居可",
-    "from_date": "から"
+    "from_date": "から",
+    "sending": "送信中…",
+    "inquirySent": "お問い合わせを送信しました！",
+    "inquirySentDesc": "できるだけ早くご連絡します。",
+    "inquiryError": "お問い合わせの送信に失敗しました",
+    "chatDirectly": "直接連絡"
   },
   "search": {
     "title": "物件を探す",

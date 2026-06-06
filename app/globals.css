@@ -111,6 +111,10 @@
     @apply bg-background text-foreground;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+  /* iOS Safari auto-zoom prevention: inputs must be ≥16px */
+  input, textarea, select {
+    font-size: max(16px, 1em);
+  }
   /* Thai text line-height optimization */
   :lang(th) {
     line-height: 1.7;

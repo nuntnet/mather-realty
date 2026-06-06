@@ -37,7 +37,7 @@ async function callAI(prompt: string): Promise<string> {
     // Try models in order; fall through to next on 429 quota exhaustion
     const MODELS = process.env.GEMINI_MODEL
       ? [process.env.GEMINI_MODEL]
-      : ['gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash']
+      : ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash']
     let lastErr: Error | null = null
     for (const model of MODELS) {
       try {

@@ -186,7 +186,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   className="flex items-center gap-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label="User menu"
                 >
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-10 w-10">
                     <AvatarImage
                       src={(user as { image?: string }).image ?? ""}
                       alt={user?.name ?? "User"}

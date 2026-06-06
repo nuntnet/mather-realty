@@ -28,10 +28,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   const messages = await getMessages()
 
+  const dir = locale === 'ar' ? 'rtl' : 'ltr'
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Navbar locale={locale} />
-      <main>{children}</main>
+      {/* dir for RTL languages (Arabic) — applied to main content wrapper */}
+      <main lang={locale} dir={dir}>{children}</main>
       <Footer />
       <Analytics />
       <SpeedInsights />

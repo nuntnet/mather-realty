@@ -82,18 +82,18 @@ export default async function Footer() {
             {/* Socials */}
             <div className="flex items-center gap-2.5">
               <a href="https://wa.me/66869902999" target="_blank" rel="noopener noreferrer"
-                 className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all" aria-label="WhatsApp">
+                 className="flex h-11 w-11 items-center justify-center rounded-full bg-[#25D366]/15 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all" aria-label="WhatsApp">
                 {WHATSAPP_SVG}
               </a>
               {site.social.line && (
                 <a href={site.social.line} target="_blank" rel="noopener noreferrer"
-                   className="flex h-9 w-9 items-center justify-center rounded-full bg-[#00B900]/15 text-[#00B900] hover:bg-[#00B900] hover:text-white transition-all" aria-label="LINE">
+                   className="flex h-11 w-11 items-center justify-center rounded-full bg-[#00B900]/15 text-[#00B900] hover:bg-[#00B900] hover:text-white transition-all" aria-label="LINE">
                   {LINE_SVG}
                 </a>
               )}
               {site.social.instagram && (
                 <a href={`https://instagram.com/${site.social.instagram}`} target="_blank" rel="noopener noreferrer"
-                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/8 text-white/60 hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 hover:text-white transition-all" aria-label="Instagram">
+                   className="flex h-11 w-11 items-center justify-center rounded-full bg-white/8 text-white/60 hover:bg-gradient-to-br hover:from-purple-500 hover:via-pink-500 hover:to-orange-400 hover:text-white transition-all" aria-label="Instagram">
                   {INSTAGRAM_SVG}
                 </a>
               )}

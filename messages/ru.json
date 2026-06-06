@@ -111,7 +111,12 @@
     "whatsapp_label": "WhatsApp",
     "call_label": "Позвонить",
     "available_now": "Доступно сейчас",
-    "from_date": "С"
+    "from_date": "С",
+    "sending": "Отправка…",
+    "inquirySent": "Запрос отправлен!",
+    "inquirySentDesc": "Мы свяжемся с вами как можно скорее.",
+    "inquiryError": "Не удалось отправить запрос",
+    "chatDirectly": "Связаться напрямую"
   },
   "search": {
     "title": "Поиск недвижимости",
