@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import useEmblaCarousel from 'embla-carousel-react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, X, Grid2X2, Video, ExternalLink } from 'lucide-react'
+import { ChevronLeft, ChevronRight, X, Grid2X2, Video, ExternalLink, LayoutGrid, Home, Sofa, Trees, type LucideIcon } from 'lucide-react'
 import { Dialog, DialogContent } from '@/components/ui/dialog' // still used for virtual tour
 import { cn } from '@/lib/utils'
 
@@ -28,6 +28,13 @@ const CATEGORY_LABELS: Record<CategoryKey, string> = {
   exterior: 'Exterior',
   interior: 'Interior',
   community: 'Community',
+}
+
+const CATEGORY_ICONS: Record<CategoryKey | 'all', LucideIcon> = {
+  all: LayoutGrid,
+  exterior: Home,
+  interior: Sofa,
+  community: Trees,
 }
 
 export default function PropertyGallery({
@@ -157,49 +164,52 @@ export default function PropertyGallery({
   return (
     <>
       {/* ── Category Tabs ────────────────────────────────────────────────────── */}
-      {availableTabs.length > 0 && (
-        <div className="flex gap-1.5 px-1 pt-3 pb-1 overflow-x-auto scrollbar-hide">
-          {/* All tab */}
-          <button
-            onClick={() => setActiveTab('all')}
-            className={cn(
-              'shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200',
-              activeTab === 'all'
-                ? 'bg-[#1d211c] text-white shadow-sm'
-                : 'bg-[#f1f4f0] text-[#5e6360] hover:bg-[#e2e5e0] hover:text-[#1d211c]',
-            )}
-          >
-            All
-            <span className={cn('text-[11px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center',
-              activeTab === 'all' ? 'bg-white/20' : 'bg-[#1d211c]/10'
-            )}>
-              {allImages.length}
-            </span>
-          </button>
-          {availableTabs.map((tab) => {
-            const count = galleryCategories?.[tab]?.length ?? 0
-            return (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={cn(
-                  'shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200',
-                  tab === activeTab
-                    ? 'bg-[#1E6B69] text-white shadow-sm'
-                    : 'bg-[#f1f4f0] text-[#5e6360] hover:bg-[#E0F4F4] hover:text-[#1E6B69]',
-                )}
-              >
-                {CATEGORY_LABELS[tab]}
-                <span className={cn('text-[11px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center',
-                  tab === activeTab ? 'bg-white/25' : 'bg-[#1E6B69]/12 text-[#1E6B69]'
-                )}>
-                  {count}
-                </span>
-              </button>
-            )
-          })}
-        </div>
-      )}
+      {availableTabs.length > 0 && (() => {
+        const AllIcon = CATEGORY_ICONS.all
+        const tabs: Array<{ key: CategoryKey | 'all'; label: string; count: number }> = [
+          { key: 'all', label: 'All', count: allImages.length },
+          ...availableTabs.map(t => ({ key: t, label: CATEGORY_LABELS[t], count: galleryCategories?.[t]?.length ?? 0 })),
+        ]
+        return (
+          <div className="flex gap-2 px-1 pt-4 pb-2 overflow-x-auto scrollbar-hide">
+            {tabs.map(({ key, label, count }) => {
+              const Icon = CATEGORY_ICONS[key as CategoryKey | 'all'] ?? AllIcon
+              const isActive = activeTab === key
+              const isAll = key === 'all'
+              return (
+                <button
+                  key={key}
+                  onClick={() => setActiveTab(key as Tab)}
+                  className={cn(
+                    'shrink-0 flex items-center gap-2 pl-3 pr-4 py-2 rounded-2xl text-[13px] font-semibold transition-all duration-200 border',
+                    isActive && isAll
+                      ? 'bg-[#1d211c] text-white border-[#1d211c] shadow-md'
+                      : isActive
+                      ? 'bg-[#1E6B69] text-white border-[#1E6B69] shadow-md'
+                      : 'bg-white text-[#5e6360] border-[#e2e5e0] hover:border-[#1E6B69]/40 hover:text-[#1E6B69] hover:bg-[#EEF9F9]',
+                  )}
+                >
+                  {/* Icon in a small circle */}
+                  <span className={cn(
+                    'w-6 h-6 rounded-lg flex items-center justify-center shrink-0',
+                    isActive ? 'bg-white/20' : isAll ? 'bg-[#1d211c]/8' : 'bg-[#1E6B69]/10',
+                  )}>
+                    <Icon className="w-3.5 h-3.5" />
+                  </span>
+                  {label}
+                  {/* Count badge */}
+                  <span className={cn(
+                    'text-[11px] font-bold min-w-[20px] h-5 px-1.5 rounded-full flex items-center justify-center',
+                    isActive ? 'bg-white/25 text-white' : 'bg-[#1d211c]/8 text-[#898e87]',
+                  )}>
+                    {count}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       {/* ── Mobile: swipeable carousel ──────────────────────────────────────── */}
       <AnimatePresence mode="wait">
