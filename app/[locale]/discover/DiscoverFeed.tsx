@@ -414,7 +414,6 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
               Double<span className="text-[#4DB5B2]">N</span> Realty
             </h1>
-            {/* counter removed — sidebar shows "1 of N properties" */}
             <div className="hidden lg:block w-10" />
 
             {/* Mobile: vertical dots for property progress */}
@@ -426,31 +425,66 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
                   )} />
               ))}
             </div>
-
-            {/* Desktop: up/down nav */}
-            <div className="hidden lg:flex flex-col gap-1.5">
-              <button onClick={() => scrollTo(Math.max(0, activeIndex - 1))}
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
-                disabled={activeIndex === 0}>
-                <ChevronUp className="w-4 h-4 text-white" />
-              </button>
-              <button onClick={() => scrollTo(Math.min(properties.length - 1, activeIndex + 1))}
-                className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
-                disabled={activeIndex === properties.length - 1}>
-                <ChevronDown className="w-4 h-4 text-white" />
-              </button>
-            </div>
           </header>
 
-          {/* Vertical snap feed */}
+          {/* Desktop: ▲▼ arrows below progress bars (lg:top-28 = progress bars, so top-36) */}
+          <div className="hidden lg:flex absolute top-36 right-4 z-30 flex-col gap-1.5">
+            <button onClick={() => scrollTo(Math.max(0, activeIndex - 1))}
+              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+              disabled={activeIndex === 0}
+              aria-label="Previous property">
+              <ChevronUp className="w-4 h-4 text-white" />
+            </button>
+            <button onClick={() => scrollTo(Math.min(properties.length - 1, activeIndex + 1))}
+              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+              disabled={activeIndex === properties.length - 1}
+              aria-label="Next property">
+              <ChevronDown className="w-4 h-4 text-white" />
+            </button>
+          </div>
+
+          {/* Left/right click zones — desktop only (mobile: swipe vertically)
+              z-[15] so action buttons (z-20) and info card (z-20) stay on top */}
+          <div className="absolute inset-0 z-[15] hidden lg:flex pointer-events-none"
+            style={{ top: 56 }}>
+            {/* Left 45% → previous */}
+            <div
+              className="w-[45%] h-full pointer-events-auto cursor-w-resize select-none"
+              onClick={() => activeIndex > 0 && scrollTo(activeIndex - 1)}
+              aria-label="Previous property"
+            />
+            {/* Middle 10% — no action (avoids accidental navigation) */}
+            <div className="w-[10%] h-full" />
+            {/* Right 45% → next */}
+            <div
+              className="w-[45%] h-full pointer-events-auto cursor-e-resize select-none"
+              onClick={() => activeIndex < properties.length - 1 && scrollTo(activeIndex + 1)}
+              aria-label="Next property"
+            />
+          </div>
+
+          {/* Mobile: left/right tap zones — only the upper photo area, not buttons/info card */}
+          <div className="absolute inset-x-0 z-[15] flex lg:hidden pointer-events-none"
+            style={{ top: 80, bottom: 380 }}>
+            <div
+              className="w-1/2 h-full pointer-events-auto select-none"
+              onClick={() => activeIndex > 0 && scrollTo(activeIndex - 1)}
+            />
+            <div
+              className="w-1/2 h-full pointer-events-auto select-none"
+              onClick={() => activeIndex < properties.length - 1 && scrollTo(activeIndex + 1)}
+            />
+          </div>
+
+          {/* Vertical snap feed — overflow:hidden prevents next card from peeking */}
           <div ref={containerRef}
             className={cn('h-full overflow-y-scroll snap-y snap-mandatory', isDesktop && 'flex flex-col')}
-            style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch' }}>
+            style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'none' }}>
             <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
             {properties.map((property, idx) => (
               <div key={property.id} data-index={idx}
-                className={isDesktop ? 'h-full' : 'h-dvh'}
+                className={cn(isDesktop ? 'h-full' : 'h-dvh', 'overflow-hidden')}
                 style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
                 <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} isDesktop={isDesktop} />
               </div>
