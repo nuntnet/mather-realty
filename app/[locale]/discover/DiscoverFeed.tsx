@@ -209,9 +209,9 @@ function PropertyCard({
         </div>
       )}
 
-      {/* Right side actions — mobile */}
+      {/* Right side actions — mobile, positioned above the info card */}
       <div className={cn(
-        'absolute right-4 bottom-[220px] flex flex-col gap-5 z-20 items-center',
+        'absolute right-4 bottom-[340px] flex flex-col gap-4 z-20 items-center',
         isDesktop && 'hidden'
       )}>
         <button onClick={handleSave} className="flex flex-col items-center gap-1" aria-label={isSaved ? 'Unsave' : 'Save'}>
@@ -253,53 +253,39 @@ function PropertyCard({
         onKeyDown={e => e.key === 'Enter' && handleView()}
         aria-label={`View ${title}`}
         className={cn(
-          'relative z-20 mx-4 mb-24 p-5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
-          'bg-white/15 backdrop-blur-xl border border-white/20 active:scale-[0.98]',
+          'relative z-20 mx-3 mb-24 px-4 py-3.5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
+          'bg-black/55 backdrop-blur-xl border border-white/15 active:scale-[0.98]',
           isActive ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4',
           isDesktop && 'hidden'
         )}
       >
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h2 className="text-white font-bold text-xl leading-tight flex-1">{title}</h2>
-          {property.verifiedAt && <CheckCircle2 className="w-5 h-5 text-[#4DB5B2] shrink-0 mt-0.5" />}
+        {/* Title row */}
+        <div className="flex items-start justify-between gap-2 mb-1.5">
+          <h2 className="text-white font-bold text-lg leading-tight flex-1">{title}</h2>
+          {property.verifiedAt && <CheckCircle2 className="w-4 h-4 text-[#4DB5B2] shrink-0 mt-0.5" />}
         </div>
 
-        <div className="flex items-center gap-1 text-white/80 text-sm mb-3">
-          <MapPin className="w-3.5 h-3.5 shrink-0" />
-          <span>{[property.district, property.city].filter(Boolean).join(', ')}</span>
+        {/* Location + specs in one compact row */}
+        <div className="flex items-center gap-3 text-white/70 text-xs mb-2.5">
+          <span className="flex items-center gap-1">
+            <MapPin className="w-3 h-3 shrink-0" />
+            {[property.district, property.city].filter(Boolean).join(', ')}
+          </span>
+          <span className="text-white/30">·</span>
+          <span className="flex items-center gap-1"><Bed className="w-3 h-3" />{property.bedrooms}</span>
+          <span className="text-white/30">·</span>
+          <span className="flex items-center gap-1"><Bath className="w-3 h-3" />{property.bathrooms}</span>
+          <span className="text-white/30">·</span>
+          <span>{property.sizeSqm}m²</span>
         </div>
 
-        <div className="flex items-center gap-3 text-white/90 text-sm mb-3">
-          <span className="flex items-center gap-1"><Bed className="w-4 h-4" /> {property.bedrooms}</span>
-          <span className="text-white/40">·</span>
-          <span className="flex items-center gap-1"><Bath className="w-4 h-4" /> {property.bathrooms}</span>
-          <span className="text-white/40">·</span>
-          <span className="flex items-center gap-1"><Maximize2 className="w-4 h-4" /> {property.sizeSqm} sqm</span>
-        </div>
-
-        {topAmenities.length > 0 && (
-          <div className="flex gap-1.5 mb-4 flex-wrap">
-            {topAmenities.map(a => (
-              <span key={a} className="text-xs bg-white/20 text-white px-2.5 py-0.5 rounded-full border border-white/20">
-                {AMENITY_ICONS[a] ?? ''} {a}
-              </span>
-            ))}
-            {property.amenities.length > 3 && (
-              <span className="text-xs bg-white/20 text-white px-2.5 py-0.5 rounded-full border border-white/20">
-                +{property.amenities.length - 3}
-              </span>
-            )}
-          </div>
-        )}
-
+        {/* Price + CTA */}
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-white/60 text-xs uppercase tracking-wider">Monthly Rent</p>
-            <p className="text-white font-bold text-2xl">฿{property.priceTHB.toLocaleString()}</p>
-          </div>
-          <div className="flex items-center gap-1.5 text-[#4DB5B2] text-sm font-semibold">
-            View detail
-            <ChevronUp className="w-4 h-4 rotate-90" />
+          <p className="text-white font-bold text-xl">฿{property.priceTHB.toLocaleString()}
+            <span className="text-white/50 text-xs font-normal ml-1">/mo</span>
+          </p>
+          <div className="flex items-center gap-1 text-[#4DB5B2] text-xs font-semibold">
+            View detail <ChevronUp className="w-3.5 h-3.5 rotate-90" />
           </div>
         </div>
       </div>
