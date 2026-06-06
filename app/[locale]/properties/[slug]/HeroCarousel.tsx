@@ -56,15 +56,28 @@ export default function HeroCarousel({
         <div ref={emblaRef} className="absolute inset-0">
           <div className="flex h-full">
             {images.map((img, idx) => (
-              <div key={idx} className="relative flex-shrink-0 w-full h-full"
+              <div key={idx} className="relative flex-shrink-0 w-full h-full overflow-hidden"
                 style={{ willChange: 'transform' }}>
+                {/* Blurred atmospheric backdrop — fills empty space when image
+                    doesn't match container aspect ratio, hides low-res upscaling */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `url(${img})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    filter: 'blur(28px) brightness(0.28) saturate(0.7)',
+                    transform: 'scale(1.12)', // bleed beyond edges to hide blur fringe
+                  }}
+                />
+                {/* Sharp image — object-contain so it's NEVER stretched or pixelated */}
                 <Image
                   src={img}
                   alt={`${title} — photo ${idx + 1}`}
                   fill
                   priority={idx === 0}
                   quality={90}
-                  className="object-cover"
+                  className="object-contain"
                   sizes="100vw"
                   draggable={false}
                 />
