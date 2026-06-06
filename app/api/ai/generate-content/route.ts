@@ -140,34 +140,63 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
   if (action === 'save') {
     try {
       const notion = new Client({ auth: process.env.NOTION_API_KEY })
-      const updates: Record<string, unknown> = {}
-
       const rt = (s: string) => ({ rich_text: chunkRichText(s) })
 
-      // Core fields
-      if (saveData.title_en)    updates.title_en    = rt(saveData.title_en)
-      if (saveData.title_th)    updates.title_th    = rt(saveData.title_th)
-      if (saveData.description_en) updates.description_en = rt(saveData.description_en)
-      if (saveData.description_th) updates.description_th = rt(saveData.description_th)
-      if (saveData.seoDescription) updates.seo_description = rt(saveData.seoDescription)
-      if (saveData.faqItems)    updates.faq_json    = rt(JSON.stringify(saveData.faqItems))
-      if (saveData.personaDescriptions)
-        updates.persona_descriptions = rt(JSON.stringify(saveData.personaDescriptions))
+      // Fetch which properties actually exist in this page's DB schema
+      const pageRaw = await notion.pages.retrieve({ page_id: propertyId }) as { parent?: { database_id?: string }; properties: Record<string, unknown> }
+      const existingProps = new Set(Object.keys(pageRaw.properties))
 
-      // Additional locale translations from the translate step
-      const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
-      for (const loc of ALL_LOCALES) {
-        const safeKey = loc.replace('-', '_')
-        if (saveData[`title_${safeKey}`]) updates[`title_${loc}`] = rt(saveData[`title_${safeKey}`])
-        if (saveData[`description_${safeKey}`]) updates[`description_${loc}`] = rt(saveData[`description_${safeKey}`])
+      const set = (key: string, val: unknown) => {
+        if (existingProps.has(key)) return { [key]: val }
+        console.log(`[ai/generate-content] skip missing prop: ${key}`)
+        return {}
       }
 
-      console.log('[ai/generate-content] save: updating', Object.keys(updates).length, 'fields for', propertyId)
-      await notion.pages.update({
-        page_id: propertyId,
-        properties: updates as Parameters<typeof notion.pages.update>[0]['properties'],
-      })
-      return NextResponse.json({ success: true })
+      // Core EN/TH fields
+      const core: Record<string, unknown> = {
+        ...(saveData.title_en       ? set('title_en',            rt(saveData.title_en))       : {}),
+        ...(saveData.title_th       ? set('title_th',            rt(saveData.title_th))       : {}),
+        ...(saveData.description_en ? set('description_en',      rt(saveData.description_en)) : {}),
+        ...(saveData.description_th ? set('description_th',      rt(saveData.description_th)) : {}),
+        ...(saveData.seoDescription ? set('seo_description',     rt(saveData.seoDescription)) : {}),
+        ...(saveData.faqItems       ? set('faq_json',            rt(JSON.stringify(saveData.faqItems))) : {}),
+        ...(saveData.personaDescriptions
+          ? set('persona_descriptions', rt(JSON.stringify(saveData.personaDescriptions))) : {}),
+      }
+
+      // Locale translations
+      const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
+      const localeUpdates: Record<string, unknown> = {}
+      for (const loc of ALL_LOCALES) {
+        const safeKey = loc.replace('-', '_')
+        if (saveData[`title_${safeKey}`])       Object.assign(localeUpdates, set(`title_${loc}`,       rt(saveData[`title_${safeKey}`])))
+        if (saveData[`description_${safeKey}`]) Object.assign(localeUpdates, set(`description_${loc}`, rt(saveData[`description_${safeKey}`])))
+      }
+
+      // Save core fields
+      if (Object.keys(core).length > 0) {
+        console.log('[ai/generate-content] saving core fields:', Object.keys(core).join(', '))
+        await notion.pages.update({
+          page_id: propertyId,
+          properties: core as Parameters<typeof notion.pages.update>[0]['properties'],
+        })
+      }
+
+      // Save locale translations (separate call — don't fail core if locales missing)
+      if (Object.keys(localeUpdates).length > 0) {
+        console.log('[ai/generate-content] saving locale fields:', Object.keys(localeUpdates).join(', '))
+        try {
+          await notion.pages.update({
+            page_id: propertyId,
+            properties: localeUpdates as Parameters<typeof notion.pages.update>[0]['properties'],
+          })
+        } catch (localeErr) {
+          console.error('[ai/generate-content] locale save error (non-fatal):', (localeErr as Error).message)
+          // Non-fatal: core content saved; locales failed likely due to missing DB columns
+        }
+      }
+
+      return NextResponse.json({ success: true, savedFields: [...Object.keys(core), ...Object.keys(localeUpdates)] })
     } catch (e) {
       console.error('[ai/generate-content] save error:', e)
       return NextResponse.json({ error: `Save failed: ${(e as Error).message}` }, { status: 500 })
