@@ -35,10 +35,15 @@ export async function GET() {
       key_prefix: key.slice(0, 8) + '…',
     })
   } catch (e) {
+    const msg = (e as Error).message ?? ''
+    const is429 = msg.includes('429')
     return NextResponse.json({
       ok: false,
-      error: (e as Error).message,
+      error: is429
+        ? 'Quota exceeded (429). Your GCP project has free-tier quota set to 0. Fix: create a new key at https://aistudio.google.com/app/apikey (use a project WITHOUT billing enabled) and update GOOGLE_AI_API_KEY in Vercel.'
+        : msg,
       key_prefix: key.slice(0, 8) + '…',
-    }, { status: 502 })
+      model,
+    }, { status: is429 ? 429 : 502 })
   }
 }
