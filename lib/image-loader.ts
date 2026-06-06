@@ -18,6 +18,7 @@
 export default function imageLoader({
   src,
   width,
+  quality,
 }: {
   src: string;
   width: number;
@@ -25,23 +26,26 @@ export default function imageLoader({
 }): string {
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
     const [base, rest] = src.split("/upload/");
+    // q_auto:best for large images (hero, gallery full-screen), q_auto:good otherwise
+    const q = quality ? `q_${quality}` : width >= 1024 ? "q_auto:best" : "q_auto:good";
 
     // Replace an existing w_ transform with the requested width (responsive srcset)
     const updated = rest.replace(/w_\d+/, `w_${width}`);
     if (updated !== rest) {
-      return `${base}/upload/${updated}`;
+      // Also update quality if present, or prepend it
+      const withQ = updated.replace(/q_[^,/]+/, q);
+      return `${base}/upload/${withQ !== updated ? withQ : `${q},${updated}`}`;
     }
 
-    // No w_ yet — prepend width into existing transform params (e.g. "f_auto,q_auto:good/v123/...")
+    // No w_ yet — prepend width+quality into existing transform params
     if (/^[a-z]/.test(rest) && rest.includes(",")) {
-      return `${base}/upload/w_${width},${rest}`;
+      return `${base}/upload/f_auto,${q},w_${width},${rest}`;
     }
 
-    // No transforms at all — add a sensible default set
-    return `${base}/upload/f_auto,q_auto:good,w_${width}/${rest}`;
+    // No transforms at all — add full set
+    return `${base}/upload/f_auto,${q},w_${width}/${rest}`;
   }
 
   // Local SVGs, /public assets, and any non-Cloudinary URL: serve as-is.
-  // (Cannot route to /_next/image — it's disabled when loaderFile is set.)
   return src;
 }

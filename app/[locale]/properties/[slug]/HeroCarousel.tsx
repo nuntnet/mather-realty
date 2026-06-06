@@ -6,13 +6,6 @@ import useEmblaCarousel from 'embla-carousel-react'
 import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import PropertyDetailActions from './PropertyDetailActions'
 
-/** Add Cloudinary quality+format optimisation if URL is from Cloudinary */
-function optimiseUrl(url: string): string {
-  if (!url.includes('res.cloudinary.com')) return url
-  // Insert q_auto,f_auto,w_1920 after /upload/
-  return url.replace('/upload/', '/upload/q_auto,f_auto,w_1920/')
-}
-
 interface HeroCarouselProps {
   images: string[]
   title: string
@@ -65,13 +58,12 @@ export default function HeroCarousel({
             {images.map((img, idx) => (
               <div key={idx} className="relative flex-shrink-0 w-full h-full">
                 <Image
-                  src={optimiseUrl(img)}
+                  src={img}
                   alt={`${title} — photo ${idx + 1}`}
                   fill
                   priority={idx === 0}
                   className="object-cover"
                   sizes="100vw"
-                  quality={90}
                   draggable={false}
                 />
               </div>
