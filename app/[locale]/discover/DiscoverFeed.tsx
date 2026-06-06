@@ -40,6 +40,7 @@ function useSaved() {
 function PhotoCarousel({ property, isActive }: { property: Property; isActive: boolean }) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, dragFree: false })
   const [photoIndex, setPhotoIndex] = useState(0)
+  const pointerStart = useRef({ x: 0, y: 0 })
 
   const photos = useMemo(() => {
     const all = new Set<string>()
@@ -63,9 +64,30 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
     if (isActive && emblaApi) emblaApi.scrollTo(0, true)
   }, [isActive, emblaApi])
 
+  // Left/right tap → prev/next photo (distinct from swipe which is handled by embla)
+  const onPhotoPointerDown = (e: React.PointerEvent) => {
+    pointerStart.current = { x: e.clientX, y: e.clientY }
+  }
+  const onPhotoPointerUp = (e: React.PointerEvent) => {
+    const dx = Math.abs(e.clientX - pointerStart.current.x)
+    const dy = Math.abs(e.clientY - pointerStart.current.y)
+    if (dx > 8 || dy > 8) return // was a drag/swipe — let embla handle it
+    const target = e.target as HTMLElement
+    if (target.closest('button, a, [role="button"]')) return
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+    if (ratio < 0.4) emblaApi?.scrollPrev()
+    else if (ratio > 0.6) emblaApi?.scrollNext()
+  }
+
   return (
     <>
-      {/* Photo fill */}
+      {/* Photo fill — pointer handlers for left/right photo tap */}
+      <div
+        className="absolute inset-0"
+        onPointerDown={onPhotoPointerDown}
+        onPointerUp={onPhotoPointerUp}
+      />
       <div ref={emblaRef} className="absolute inset-0 overflow-hidden">
         <div className="flex h-full">
           {photos.length > 0 ? photos.map((img, idx) => (
@@ -212,7 +234,6 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
   const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
-  const pointerStart = useRef({ x: 0, y: 0 })
   const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
@@ -246,23 +267,8 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }, [properties.length])
 
-  // Left/right tap: track pointer start → only fire if minimal movement (= tap, not swipe)
-  const onPointerDown = (e: React.PointerEvent) => {
-    pointerStart.current = { x: e.clientX, y: e.clientY }
-  }
-  const onPointerUp = (e: React.PointerEvent) => {
-    const dx = Math.abs(e.clientX - pointerStart.current.x)
-    const dy = Math.abs(e.clientY - pointerStart.current.y)
-    if (dy > 8 || dx > 8) return // was a swipe, ignore
-
-    const target = e.target as HTMLElement
-    if (target.closest('button, a, [role="button"]')) return // interactive element
-
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const ratio = (e.clientX - rect.left) / rect.width
-    if (ratio < 0.4) scrollTo(Math.max(0, activeIndex - 1))
-    else if (ratio > 0.6) scrollTo(Math.min(properties.length - 1, activeIndex + 1))
-  }
+  // Property navigation: ▲▼ buttons + vertical swipe (native scroll snap)
+  // Photo navigation: left/right tap handled inside PhotoCarousel
 
   if (properties.length === 0) {
     return (
@@ -326,12 +332,8 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
       {/* ── Feed area ────────────────────────────────────────── */}
       <div className="flex-1 flex relative overflow-hidden">
 
-        {/* Main photo zone — pointer events for left/right tap nav */}
-        <div
-          className="relative overflow-hidden bg-black w-full h-full"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-        >
+        {/* Main photo zone */}
+        <div className="relative overflow-hidden bg-black w-full h-full">
 
           {/* ② Arrows — desktop, right side, BELOW progress bars (top-9 ≈ 36px) */}
           <div className="hidden lg:flex absolute top-9 right-3 z-30 flex-col gap-1">
