@@ -523,6 +523,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                             {t('price_per_month')}
                           </span>
                         </p>
+                        {locale !== 'th' && (
+                          <p className="text-xs text-white/50 mt-0.5">
+                            ~${Math.round(property.priceTHB / 34).toLocaleString()} USD/mo
+                          </p>
+                        )}
                       </div>
                       <span
                         className={`text-xs font-semibold px-3 py-1 rounded-full ${

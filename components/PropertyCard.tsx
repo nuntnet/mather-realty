@@ -65,6 +65,11 @@ function formatPrice(price: number, locale: string): string {
   }).format(price)
 }
 
+const THB_TO_USD = 34 // ~midpoint 2025
+function approxUsd(thb: number): string {
+  return `~$${Math.round(thb / THB_TO_USD).toLocaleString()}`
+}
+
 function getSavedIds(): string[] {
   if (typeof window === 'undefined') return []
   try { return JSON.parse(localStorage.getItem('saved_properties') ?? '[]') }
@@ -297,12 +302,17 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
           </p>
         </div>
 
-        {/* Price */}
-        <div className="flex items-baseline gap-1">
-          <span className="font-lexend text-2xl font-bold text-[#124E4C]">
-            {formatPrice(property.priceTHB, locale)}
-          </span>
-          <span className="text-sm text-[#898e87]">{t('perMonth')}</span>
+        {/* Price — THB primary + USD hint for non-Thai locales */}
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-baseline gap-1">
+            <span className="font-lexend text-2xl font-bold text-[#124E4C]">
+              {formatPrice(property.priceTHB, locale)}
+            </span>
+            <span className="text-sm text-[#898e87]">{t('perMonth')}</span>
+          </div>
+          {locale !== 'th' && (
+            <span className="text-xs text-[#898e87]">{approxUsd(property.priceTHB)}/mo USD</span>
+          )}
         </div>
 
         {/* Stats */}
