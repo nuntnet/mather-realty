@@ -3,34 +3,26 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import LineOAFloat from "./LineOAFloat";
-import type { NavCountsByBrand, NavModelsByBrand } from "@/lib/navModels";
 
-const NO_LAYOUT_PREFIXES = ["/admin", "/login"];
+const NO_LAYOUT_PREFIXES = ["/admin", "/login", "/register"];
 
 export default function PublicLayout({
   children,
-  navModelsByBrand = {},
-  navCountsByBrand = {},
+  locale = "en",
 }: {
   children: React.ReactNode;
-  navModelsByBrand?: NavModelsByBrand;
-  navCountsByBrand?: NavCountsByBrand;
+  locale?: string;
 }) {
   const pathname = usePathname();
-  const hideLayout = NO_LAYOUT_PREFIXES.some(p => pathname.startsWith(p));
+  const hideLayout = NO_LAYOUT_PREFIXES.some((p) => pathname.startsWith(p));
 
   if (hideLayout) return <>{children}</>;
 
   return (
     <>
-      <Navbar
-        navModelsByBrand={navModelsByBrand}
-        navCountsByBrand={navCountsByBrand}
-      />
+      <Navbar locale={locale} />
       {children}
       <Footer />
-      <LineOAFloat />
     </>
   );
 }

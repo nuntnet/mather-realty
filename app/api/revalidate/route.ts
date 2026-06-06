@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: NextRequest) {
   const secret = req.nextUrl.searchParams.get("secret");
@@ -16,16 +16,12 @@ export async function POST(req: NextRequest) {
     if (type === "blog") {
       revalidatePath("/blog");
       if (slug) revalidatePath(`/blog/${slug}`);
-      revalidatePath("/"); // home shows recent posts
-    } else if (type === "cars") {
-      revalidatePath("/cars");
-      if (slug) revalidatePath(`/cars/${slug}`);
       revalidatePath("/");
-    } else if (type === "stories") {
-      revalidatePath("/stories");
+    } else if (type === "properties" || !type) {
+      revalidatePath("/properties", "layout");
+      if (slug) revalidatePath(`/properties/${slug}`);
       revalidatePath("/");
     } else {
-      // revalidate everything
       revalidatePath("/", "layout");
     }
 

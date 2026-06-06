@@ -1,7 +1,7 @@
-# CLAUDE.md — ch-erawan-next
+# CLAUDE.md — DoubleN Realty
 
-เว็บไซต์ดีลเลอร์รถยนต์ **ช.เอราวัณ ออโต้ กรุป** จ.นครปฐม  
-6 แบรนด์: Mazda, Ford, Mitsubishi, GWM, Deepal, Kia — 7 สาขา
+**DoubleN Realty** — rental property platform for foreigners in Thailand.
+Multilingual (15 locales), Notion-backed CMS, Algolia search, Turso SQLite, Better Auth.
 
 ## Workflow Rules
 
@@ -9,165 +9,195 @@
 - Only commit when the user **explicitly asks** to commit, push, or deploy.
 - Focus on making code changes quickly without stopping for git operations.
 
+## Git Flow
+
+```
+feature/* ──→ staging ──→ master (production)
+                ↓              ↓
+         staging.vercel.app   doublen-realty.com
+         Staging Notion DBs   Production Notion DBs
+         Staging Turso DB     Production Turso DB
+```
+
+| Branch | Role | Vercel Project | Auto-deploy |
+|---|---|---|---|
+| `master` | **Production** | `doublen-realty` | yes |
+| `staging` | **Staging** — test before prod | `doublen-realty-staging` | yes |
+| `feature/*` | New features | — | — |
+
+**Flow:**
+1. Create feature branch from `staging`
+2. Code + commit
+3. Merge to `staging` → auto-deploy → test
+4. Pass → merge `staging` into `master` → auto-deploy production
+
+Do NOT push directly to `master` without going through staging.
+
 ## Stack
 
 - **Next.js 15** App Router + React 19 + TypeScript
 - **Tailwind CSS 3** + Radix UI + shadcn/ui + Framer Motion
-- **Notion API** — CMS หลัก (cars, blog, stories, appointments, contacts, promotions, feedback, insurance partners, service content)
-- **Better Auth 1.5** + **Turso** (SQLite) — authentication + sessions
-- **Cloudinary** — image hosting + admin upload
-- **Upstash Redis** — rate limit `/api/auth/*` (optional in dev)
-- **Google Maps JS API** — branch map
-- **cmdk** — ⌘K search command palette
-- **Vercel** (sin1) — deployment
+- **Notion API** — CMS (properties, blog posts, static pages)
+- **Better Auth 1.5** + **Turso** (SQLite via Drizzle ORM) — auth + sessions + hot cache
+- **Cloudinary** (`dsteex5wz`) — image hosting + admin upload
+- **Algolia** — property search (react-instantsearch)
+- **Google Maps JS API** — property map + nearby places
+- **Resend** — email notifications (inquiries, submissions)
+- **OpenAI** — AI-generated multilingual property descriptions
+- **Vercel** — deployment
 - **Bun** — package manager
 
 ## Commands
 
 ```bash
-bun dev          # dev server :3002 (avoids conflict with other apps on :3000)
-bun build        # production build
-bun start        # start prod server
-bun lint         # ESLint (config TBD)
-bun run test     # Vitest (unit + integration + component)
+bun dev               # dev server :3002
+bun build             # production build
+bun start             # start prod server
+bun lint              # ESLint
+bun run test          # Vitest (unit + integration + component)
 bun run test:watch
-bun run test:e2e # Playwright e2e
-bun run seed:cars       # seed Notion cars + Cloudinary hero/gallery images
-bun run add-th-cars     # add TH-market models (does not archive existing cars)
-bun run sync:galleries  # push gallery URLs from seed data into Notion
-bun run audit:galleries # report cars missing gallery images in Notion
+bun run test:e2e      # Playwright e2e
+
+# DB
+bun run db:push       # push schema changes to Turso (no migration file)
+bun run db:migrate    # run drizzle migrations
+bun run db:studio     # Drizzle Studio (local DB viewer)
+
+# Algolia
+bun run algolia:index # bulk-index all approved properties to Algolia
+
+# Infrastructure
+bun run infra:setup -- --env staging     # provision new environment
 ```
 
 ## Key Files
 
 | File | Role |
 |------|------|
-| `lib/notion.ts` | Notion queries ทั้งหมด (read + write, retry/backoff) |
-| `lib/admin-auth.ts` | `requireAdmin()` สำหรับ `/api/admin/*` |
+| `lib/notion.ts` | Notion queries — properties, blog, pages |
+| `lib/algolia.ts` | Algolia client + sync helpers (syncPropertyToAlgolia, bulkSyncPropertiesToAlgolia) |
+| `lib/algolia-browser.ts` | Client-side Algolia search client |
+| `lib/admin-auth.ts` | `requireAdmin()` for `/api/admin/*` |
 | `lib/auth.ts` | Better Auth instance (Turso) |
 | `lib/auth-client.ts` | Client-side auth hooks |
-| `lib/ratelimit.ts` | Upstash rate limit auth endpoints |
-| `lib/branchData.ts` | Hardcoded branch data (7 สาขา) |
-| `lib/brandConfig.ts` | Brand config (6 แบรนด์, GWM sub-lines) |
-| `lib/notion-types.ts` | TypeScript interfaces สำหรับ Notion data |
-| `middleware.ts` | Guard `/admin/*`, `/api/admin/*`, rate limit `/api/auth/*` |
-| `drizzle.config.ts` | Drizzle config สำหรับ Turso (inspect/migrate) |
-| `components/SearchPalette.tsx` | ⌘K global search palette |
-| `components/LineOAFloat.tsx` | Floating LINE OA widget (all pages) |
-| `components/BrandSubNav.tsx` | Sticky brand sub-navigation tabs |
-| `components/brands/BrandSubNav.tsx` | Brand sub-nav (scrollPastHero, sticky) |
-| `docs/ADMIN.md` | คู่มือ operator — login, env, แต่ละหน้า admin |
-| `specs/env-vars.md` | Template env vars |
+| `lib/notion-types.ts` | TypeScript interfaces (Property, BlogPost, StaticPage, PropertyFilters) |
+| `lib/email.ts` | Resend email helpers |
+| `lib/db/schema.ts` | Drizzle schema (user, session, properties, inquiries, submissions, searchLogs, etc.) |
+| `middleware.ts` | Guard `/admin/*`, locale routing (15 locales) |
+| `drizzle.config.ts` | Drizzle config for Turso |
+| `scripts/algolia-index.ts` | Bulk-index Notion properties to Algolia |
+| `specs/env-vars.md` | All environment variables documented |
+| `docs/ADMIN.md` | Admin panel user guide |
 
 ## Routes
 
+**Locale pattern:** `/{locale}/...` for all public/landlord routes.
+**Locales (15):** `en` (default), `th`, `zh-CN`, `zh-TW`, `ja`, `ko`, `ru`, `de`, `fr`, `es`, `it`, `nl`, `sv`, `ar`, `hi`
+
 **Public:**
-- `/` `/cars` `/cars/[slug]` `/booking` `/stories` `/blog` `/blog/[slug]`
-- `/branches` `/contact` `/about` `/awards` `/insurance` `/secondhand` `/career`
-- `/feedback` — ศูนย์ร้องเรียนทันใจ (แนะนำ-ติชม)
+- `/{locale}/` — homepage
+- `/{locale}/properties` — property listing with Algolia filters
+- `/{locale}/properties/[slug]` — property detail + Google Maps + inquiry form
+- `/{locale}/blog` — blog listing
+- `/{locale}/blog/[slug]` — blog post
 
-**Brand Web (ทุกแบรนด์ใช้ generic routes `app/(brands)/[brand]/`):**
-- `/gwm` `/ford` `/mazda` `/mitsubishi` `/deepal` `/kia` — brand hub
-- `/gwm/haval` `/gwm/ora` `/gwm/tank` — GWM sub-lines
-- `/[brand]/service` — ศูนย์บริการ
-- `/[brand]/body-repair` — ซ่อมสีตัวถัง (insurance list จาก Notion)
-- `/[brand]/promotions` — โปรโมชั่น (Notion DB)
-- `/[brand]/reviews` — รีวิว (Blog DB + Video Reviews)
-- `/gwm/one-stop` — One Stop Service (GWM only)
-
-**Admin (require role=admin):**
-- `/admin` `/admin/cars` `/admin/blog` `/admin/contacts` `/admin/appointments` `/admin/stories`
-- `/admin/promotions` — จัดการ promotions CRUD
-- `/admin/feedback` — ดู/จัดการ customer feedback (สถานะ: ใหม่/กำลังดำเนินการ/แก้ไขแล้ว)
-- `/admin/service-content` — บริษัทประกัน + Service Page Sections (link → Notion)
+**Admin (role=admin, no locale prefix):**
+- `/admin` — dashboard
+- `/admin/properties` — manage properties (approve, update status)
+- `/admin/blog` — manage blog posts
+- `/admin/inquiries` — view/manage inquiries
+- `/admin/submissions` — review landlord submissions
 
 **Auth:** `/login`
 
 **API:**
-- `POST /api/submit/booking|contact|story|feedback`
-- `POST /api/search-log` — บันทึก failed search queries → Notion analytics
-- `GET|PATCH /api/admin/appointments|stories|feedback`
-- `GET|POST|PATCH|DELETE /api/admin/cars|blog|promotions|insurance-partners`
-- `GET|POST|PATCH /api/admin/service-content`
-- `GET /api/admin/contacts` · `POST /api/admin/revalidate`
-- `POST /api/upload` · `POST /api/revalidate`
+- `POST /api/inquiries` — submit property inquiry (→ email notification)
+- `POST /api/submit/property` — landlord property submission
+- `GET|PATCH /api/admin/properties`
+- `GET|PATCH /api/admin/inquiries`
+- `GET|PATCH /api/admin/submissions`
+- `POST /api/upload` — Cloudinary upload
+- `POST /api/revalidate` — ISR revalidation trigger
 
-## Notion Databases (11)
+## Notion Databases (3)
 
-| Env Var | หน้าที่ |
-|---------|--------|
-| `NOTION_CARS_DB_ID` | รถยนต์ |
-| `NOTION_BLOG_DB_ID` | บทความ (category: review/tips/news/promotion/csr, tags: brand) |
-| `NOTION_STORIES_DB_ID` | รีวิวลูกค้า |
-| `NOTION_APPOINTMENTS_DB_ID` | นัดหมาย |
-| `NOTION_CONTACTS_DB_ID` | ข้อความติดต่อ |
-| `NOTION_PROMOTIONS_DB_ID` | โปรโมชั่น (Brand, IsActive, Start/End Date) |
-| `NOTION_FEEDBACK_DB_ID` | Customer Feedback (Type, Brand, Branch, Status) |
-| `NOTION_SEARCH_ANALYTICS_DB_ID` | Failed search queries (Query, Count, LastSearchedAt) |
-| `NOTION_INSURANCE_PARTNERS_DB_ID` | บริษัทประกัน (Name, Brand, IsActive, SortOrder) |
-| `NOTION_SERVICE_CONTENT_DB_ID` | Service Page Sections (Page, Brand, SectionKey, IsPublished) |
+| Env Var | Purpose |
+|---------|---------|
+| `NOTION_PROPERTIES_DB_ID` | Properties (multilingual title/description, status, approval) |
+| `NOTION_BLOG_DB_ID` | Blog posts (multilingual, category, tags) |
+| `NOTION_PAGES_DB_ID` | Static pages (FAQ, how-it-works, about — multilingual content) |
 
-Content แก้ที่ Notion หรือผ่าน Admin Panel — หลังแก้ trigger revalidation:
+Trigger revalidation after Notion edits:
 ```bash
-curl -X POST "http://localhost:3002/api/revalidate?secret=YOUR_SECRET"
+curl -X POST "https://doublen-realty.com/api/revalidate?secret=YOUR_SECRET"
 ```
 
-## Brand Web Architecture
+## DB Schema (Turso / Drizzle)
 
-Brand sub-pages ใช้ pattern นี้ (GWM เป็น MVP):
-- `app/(brands)/gwm/[section]/page.tsx` — static route ชนะ `gwm/[line]` dynamic
-- `BrandSubNav` — sticky tab bar, `scrollPastHero` prop สำหรับ sub-pages
-- `BrandSubNav` dispatch `brand-subnav-sticky` event → Navbar แสดง brand logo
+| Table | Purpose |
+|-------|---------|
+| `user` | Auth users (role: admin \| landlord) |
+| `session` | Better Auth sessions |
+| `account` | OAuth accounts |
+| `verification` | Email verification tokens |
+| `properties` | Hot cache of Notion properties (slug, price, geo, status) |
+| `rental_periods` | Rental start/end dates per property |
+| `nearby_places` | Google Places cache per property |
+| `inquiries` | Viewing/rental inquiries (name, contact, preferredDate) |
+| `submissions` | Landlord listing submissions (pending review) |
+| `search_logs` | Search query logs (query, locale, resultCount) |
+| `property_views` | Property page view events |
+| `analytics_events` | General analytics events |
+| `audit_log` | Admin action audit trail |
 
-เมื่อ replicate ไปแบรนด์อื่น:
-- สร้าง `app/(brands)/[brand]/service/page.tsx` etc. (generic route)
-- เพิ่ม brand slug ใน `HAS_SUB_PAGES` set ใน `[brand]/page.tsx`
+## Algolia Index
 
-## Search Analytics
+Index name: `properties`
 
-`SearchPalette.tsx` debounce 2s → `POST /api/search-log` เมื่อ query ไม่มีผลลัพธ์  
-ดู failed queries ใน Notion DB `Search Analytics` (Query, Count, LastSearchedAt)
+Each record is a flat `AlgoliaPropertyRecord` with:
+- Filterable: `city`, `district`, `priceTHB`, `bedrooms`, `bathrooms`, `sizeSqm`, `status`, `amenities`, `tags`
+- Geo: `_geoloc { lat, lng }`
+- Multilingual: `title_en`, `title_th`, `title_zh_CN`, ... (15 locales)
+- Same for `description_*`
 
-## LINE OA
-
-- `LineOAFloat.tsx` — floating button ทุกหน้า public (ยกเว้น admin/login)
-- Footer column 4 — LINE OA cards แยกแบรนด์
-- LINE IDs: Mazda `@mazdach.erawan` · Deepal `@deepalch.erawan` · Ford `@fordch.erawan` · Mitsubishi `@mitsuch.erawan` · GWM `@gwmch.erawan` · Kia `@kiach.erawan`
+Sync flow: Notion → `lib/algolia.ts:syncPropertyToAlgolia()` → Algolia  
+Full re-index: `bun run algolia:index`
 
 ## Auth
 
 - Email/password only (minPasswordLength: 8)
-- Admin role เก็บใน `user.role` ใน Turso
-- ถ้า `TURSO_DATABASE_URL` ไม่ถูกตั้ง — auth disabled (warning ใน console)
-- สร้าง admin: sign-up แล้ว `UPDATE user SET role='admin'`
+- Roles: `admin` | `landlord` stored in `user.role` in Turso
+- Create admin: sign up → `UPDATE user SET role='admin' WHERE email='...'`
+- If `TURSO_DATABASE_URL` is unset — auth is disabled (warning in console)
+
+## i18n
+
+- `next-intl` with 15 locales
+- Message files in `messages/[locale].json`
+- Default locale: `en` (no prefix in URL via middleware)
+- All public pages use `/{locale}/` prefix; admin routes have no locale prefix
 
 ## Environment Variables
 
-ดู `specs/env-vars.md` — Notion (10) · Better Auth (2) · Turso (2) · Cloudinary (3) · Google Maps (1) · Revalidate (1) · Upstash (2, prod แนะนำ)
+See `specs/env-vars.md` — full documentation of all vars.
+Template: `.env.local.example`
 
 ## Conventions
 
-- Server Components by default — ใช้ `"use client"` เฉพาะที่จำเป็น
-- Notion data ดึงใน Server Components เท่านั้น (ไม่ expose API key ไป client)
-- Form submissions → `fetch("/api/submit/...")` จาก client
-- Admin data fetching → `fetch("/api/admin/...")` จาก client ใน admin pages
-- Images: admin upload ผ่าน `/api/upload` → Cloudinary URL → เก็บใน Notion
-- `scripts/` excluded จาก tsconfig (build utilities เท่านั้น)
-
-## Car Data (Notion Cars DB)
-
-- **44 active cars** ครบ 6 แบรนด์ — Gallery images 5+ imgs/คัน (official CDN เท่านั้น)
-- **Specs ครบ 100%**: engine, power, torque, battery kWh, charging speed (AC/DC kW), EV range, dimensions, acceleration, features
-- CDN domains: `gwm.co.th`, `kia.com`, `mazda-media-s3.s3.ap-southeast-1.amazonaws.com`, `ford.co.th`, `mitsubishi-motors.co.th`, `changan.co.th`
-- Car detail page (`/cars/[slug]`) แสดง specs แบบ grouped + Thai labels + features highlight
+- Server Components by default — use `"use client"` only when necessary
+- Notion data fetched in Server Components only (API key never exposed to client)
+- Algolia search uses client-side react-instantsearch with search-only key
+- Form submissions: `fetch("/api/...")` from client components
+- Admin data: `fetch("/api/admin/...")` from client, guarded by Better Auth session
+- Images: admin uploads via `/api/upload` → Cloudinary URL → stored in Notion
+- `scripts/` excluded from tsconfig (build utilities only)
 
 ## Known Gaps (TODO)
 
-- ~~Brand sub-pages ยังทำแค่ GWM~~ ✅ ทำ generic routes ครบทุกแบรนด์แล้ว
-- ~~`revalidatePath` หลังแก้รถใช้ Notion id แทน slug~~ ✅ ใช้ `revalidateCarsByNotionId` แล้ว
-- Service Page Sections ยังไม่ render Notion content บนหน้าเว็บ (admin link → Notion แล้ว toggle publish)
-- File upload (damage photos, insurance docs) ใน booking ยังไม่ implement
-- ไม่มี email notifications สำหรับนัดหมายใหม่
-- Video reviews (YouTube/TikTok) — ต้องเพิ่มข้อมูลลง Notion `Video Reviews DB` เพื่อให้หน้า `/[brand]/reviews` แสดงผล
-- Upstash env ต้องตั้งใน prod สำหรับ rate limit
-- SEO gaps: LocalBusiness JSON-LD ใน `/branches`, breadcrumbs ใน blog/about/contact
+- Landlord portal (property submission form, dashboard)
+- AI description generation endpoint using OpenAI
+- Virtual tour integration (Matterport or iframe)
+- Email templates for inquiry confirmations
+- Upstash Redis rate limiting on auth endpoints (optional in dev)
+- SEO: LocalBusiness JSON-LD, breadcrumbs
+- Property comparison feature

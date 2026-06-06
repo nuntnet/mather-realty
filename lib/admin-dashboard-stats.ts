@@ -1,18 +1,4 @@
-import type {
-  Appointment,
-  BlogPost,
-  Car,
-  ContactSubmission,
-  CustomerFeedback,
-  CustomerStory,
-  InsurancePartner,
-  Promotion,
-  ServicePageSection,
-  BrandSocialLink,
-} from "@/lib/notion-types";
-
-export const BRANDS = ["Mazda", "Ford", "Mitsubishi", "GWM", "Deepal", "Kia"] as const;
-export type BrandName = (typeof BRANDS)[number];
+import type { Property, BlogPost } from "@/lib/notion-types";
 
 export function isWithinLastDays(isoDate: string | null | undefined, days: number): boolean {
   if (!isoDate) return false;
@@ -32,101 +18,93 @@ export function countByKey<T>(items: T[], keyFn: (item: T) => string): Record<st
   }, {});
 }
 
-export function brandCounts(items: { brand: string }[]): Record<BrandName, number> {
-  const counts = countByKey(items, (i) => i.brand);
-  return Object.fromEntries(BRANDS.map((b) => [b, counts[b] ?? 0])) as Record<BrandName, number>;
-}
-
-export function carMissingGallery(car: Car): boolean {
-  return car.imageUrls.filter(Boolean).length === 0;
-}
-
-export function carSingleImageOnly(car: Car): boolean {
-  return car.imageUrls.filter(Boolean).length === 1;
-}
-
-export function isPromotionRunning(promo: Promotion, now = new Date()): boolean {
-  if (!promo.isActive) return false;
-  const today = new Date(now);
-  today.setHours(0, 0, 0, 0);
-  if (promo.startDate) {
-    const start = new Date(promo.startDate);
-    if (!Number.isNaN(start.getTime()) && start > today) return false;
-  }
-  if (promo.endDate) {
-    const end = new Date(promo.endDate);
-    if (!Number.isNaN(end.getTime()) && end < today) return false;
-  }
-  return true;
-}
-
-export interface CarDashboardStats {
+// ── Property Stats ─────────────────────────────────────
+export interface PropertyDashboardStats {
   total: number;
-  active: number;
-  inactive: number;
-  newCondition: number;
-  usedCondition: number;
-  bestSeller: number;
-  navFeatured: number;
-  navNew: number;
-  missingGallery: number;
-  singleImageOnly: number;
-  byBrand: Record<BrandName, number>;
-  activeByBrand: Record<BrandName, number>;
-}
-
-export function computeCarStats(cars: Car[]): CarDashboardStats {
-  const activeCars = cars.filter((c) => c.isActive);
-  return {
-    total: cars.length,
-    active: activeCars.length,
-    inactive: cars.length - activeCars.length,
-    newCondition: cars.filter((c) => c.condition === "new").length,
-    usedCondition: cars.filter((c) => c.condition === "used").length,
-    bestSeller: cars.filter((c) => c.isBestSeller).length,
-    navFeatured: cars.filter((c) => c.navFeatured).length,
-    navNew: cars.filter((c) => c.navNew).length,
-    missingGallery: cars.filter(carMissingGallery).length,
-    singleImageOnly: cars.filter(carSingleImageOnly).length,
-    byBrand: brandCounts(cars),
-    activeByBrand: brandCounts(activeCars),
-  };
-}
-
-export interface AppointmentDashboardStats {
-  total: number;
+  available: number;
+  rented: number;
   pending: number;
-  confirmed: number;
-  completed: number;
-  cancelled: number;
+  archived: number;
+  coming_soon: number;
+  verified: number;
   last7Days: number;
-  byType: Record<Appointment["type"], number>;
+  byCity: Record<string, number>;
 }
 
-const APPOINTMENT_TYPES: Appointment["type"][] = [
-  "test_drive",
-  "service",
-  "body_paint",
-  "insurance_quote",
-];
-
-export function computeAppointmentStats(appointments: Appointment[]): AppointmentDashboardStats {
-  const byStatus = countByKey(appointments, (a) => a.status);
-  const byType = Object.fromEntries(
-    APPOINTMENT_TYPES.map((t) => [t, appointments.filter((a) => a.type === t).length]),
-  ) as Record<Appointment["type"], number>;
+export function computePropertyStats(properties: Property[]): PropertyDashboardStats {
+  const byStatus = countByKey(properties, (p) => p.status);
   return {
-    total: appointments.length,
+    total: properties.length,
+    available: byStatus.available ?? 0,
+    rented: byStatus.rented ?? 0,
     pending: byStatus.pending ?? 0,
-    confirmed: byStatus.confirmed ?? 0,
-    completed: byStatus.completed ?? 0,
-    cancelled: byStatus.cancelled ?? 0,
-    last7Days: appointments.filter((a) => isWithinLastDays(a.submittedAt, 7)).length,
-    byType,
+    archived: byStatus.archived ?? 0,
+    coming_soon: byStatus.coming_soon ?? 0,
+    verified: properties.filter((p) => !!p.verifiedAt).length,
+    last7Days: properties.filter((p) => isWithinLastDays(p.createdAt, 7)).length,
+    byCity: countByKey(properties, (p) => p.city || "Unknown"),
   };
 }
 
-export interface StoryDashboardStats {
+// ── Blog Stats ─────────────────────────────────────────
+export interface BlogDashboardStats {
+  total: number;
+  published: number;
+  draft: number;
+  last7Days: number;
+  byCategory: Record<string, number>;
+}
+
+export function computeBlogStats(posts: BlogPost[]): BlogDashboardStats {
+  const published = posts.filter((p) => p.published);
+  return {
+    total: posts.length,
+    published: published.length,
+    draft: posts.length - published.length,
+    last7Days: published.filter((p) => isWithinLastDays(p.publishedAt, 7)).length,
+    byCategory: countByKey(posts, (p) => p.category || "uncategorized"),
+  };
+}
+
+// ── Inquiry Stats ──────────────────────────────────────
+export interface InquiryRecord {
+  id: number;
+  propertyId: string;
+  name: string;
+  contactType: string;
+  status: string;
+  createdAt: string | null;
+}
+
+export interface InquiryDashboardStats {
+  total: number;
+  new: number;
+  contacted: number;
+  booked: number;
+  declined: number;
+  last7Days: number;
+}
+
+export function computeInquiryStats(inquiries: InquiryRecord[]): InquiryDashboardStats {
+  const byStatus = countByKey(inquiries, (i) => i.status);
+  return {
+    total: inquiries.length,
+    new: byStatus.new ?? 0,
+    contacted: byStatus.contacted ?? 0,
+    booked: byStatus.booked ?? 0,
+    declined: byStatus.declined ?? 0,
+    last7Days: inquiries.filter((i) => isWithinLastDays(i.createdAt, 7)).length,
+  };
+}
+
+// ── Submission Stats ───────────────────────────────────
+export interface SubmissionRecord {
+  id: number;
+  status: string;
+  submittedAt: string | null;
+}
+
+export interface SubmissionDashboardStats {
   total: number;
   pending: number;
   approved: number;
@@ -134,151 +112,35 @@ export interface StoryDashboardStats {
   last7Days: number;
 }
 
-export function computeStoryStats(stories: CustomerStory[]): StoryDashboardStats {
-  const byStatus = countByKey(stories, (s) => s.status);
+export function computeSubmissionStats(submissions: SubmissionRecord[]): SubmissionDashboardStats {
+  const byStatus = countByKey(submissions, (s) => s.status);
   return {
-    total: stories.length,
+    total: submissions.length,
     pending: byStatus.pending ?? 0,
     approved: byStatus.approved ?? 0,
     rejected: byStatus.rejected ?? 0,
-    last7Days: stories.filter((s) => isWithinLastDays(s.submittedAt, 7)).length,
+    last7Days: submissions.filter((s) => isWithinLastDays(s.submittedAt, 7)).length,
   };
 }
 
-export interface BlogDashboardStats {
-  total: number;
-  published: number;
-  draft: number;
-  last7Days: number;
-  byCategory: Record<BlogPost["category"], number>;
-}
-
-const BLOG_CATEGORIES: BlogPost["category"][] = [
-  "review",
-  "tips",
-  "news",
-  "promotion",
-  "csr",
-];
-
-export function computeBlogStats(posts: BlogPost[]): BlogDashboardStats {
-  const byCategory = Object.fromEntries(
-    BLOG_CATEGORIES.map((c) => [c, posts.filter((p) => p.category === c).length]),
-  ) as Record<BlogPost["category"], number>;
-  const published = posts.filter((p) => p.isPublished);
-  return {
-    total: posts.length,
-    published: published.length,
-    draft: posts.length - published.length,
-    last7Days: published.filter((p) => isWithinLastDays(p.publishedAt, 7)).length,
-    byCategory,
-  };
-}
-
-export interface ContactDashboardStats {
-  total: number;
-  last7Days: number;
-  byBranch: Record<string, number>;
-}
-
-export function computeContactStats(contacts: ContactSubmission[]): ContactDashboardStats {
-  return {
-    total: contacts.length,
-    last7Days: contacts.filter((c) => isWithinLastDays(c.submittedAt, 7)).length,
-    byBranch: countByKey(contacts, (c) => c.branch || "ไม่ระบุสาขา"),
-  };
-}
-
-export interface FeedbackDashboardStats {
-  total: number;
-  newCount: number;
-  inProgress: number;
-  resolved: number;
-  last7Days: number;
-  byType: Record<CustomerFeedback["type"], number>;
-}
-
-export function computeFeedbackStats(items: CustomerFeedback[]): FeedbackDashboardStats {
-  const byStatus = countByKey(items, (i) => i.status);
-  const byType = countByKey(items, (i) => i.type) as Record<CustomerFeedback["type"], number>;
-  return {
-    total: items.length,
-    newCount: byStatus["ใหม่"] ?? 0,
-    inProgress: byStatus["กำลังดำเนินการ"] ?? 0,
-    resolved: byStatus["แก้ไขแล้ว"] ?? 0,
-    last7Days: items.filter((i) => isWithinLastDays(i.submittedAt, 7)).length,
-    byType,
-  };
-}
-
-export interface PromotionDashboardStats {
-  total: number;
-  active: number;
-  inactive: number;
-  runningNow: number;
-  byBrand: Record<BrandName, number>;
-}
-
-export function computePromotionStats(promos: Promotion[]): PromotionDashboardStats {
-  return {
-    total: promos.length,
-    active: promos.filter((p) => p.isActive).length,
-    inactive: promos.filter((p) => !p.isActive).length,
-    runningNow: promos.filter((p) => isPromotionRunning(p)).length,
-    byBrand: brandCounts(promos),
-  };
-}
-
-export interface BrandContentStats {
-  serviceSections: { total: number; published: number };
-  insurancePartners: { total: number; active: number };
-  socialLinks: { total: number; active: number };
-}
-
-export function computeBrandContentStats(
-  sections: ServicePageSection[],
-  partners: InsurancePartner[],
-  socialLinks: BrandSocialLink[],
-): BrandContentStats {
-  return {
-    serviceSections: {
-      total: sections.length,
-      published: sections.filter((s) => s.isPublished).length,
-    },
-    insurancePartners: {
-      total: partners.length,
-      active: partners.filter((p) => p.isActive).length,
-    },
-    socialLinks: {
-      total: socialLinks.length,
-      active: socialLinks.filter((l) => l.isActive).length,
-    },
-  };
-}
-
+// ── Activity Summary ───────────────────────────────────
 export interface ActivitySummary {
-  appointments: number;
-  contacts: number;
-  stories: number;
-  feedback: number;
+  inquiries: number;
+  submissions: number;
+  views: number;
   total: number;
 }
 
 export function computeActivitySummary(
-  appointments: Appointment[],
-  contacts: ContactSubmission[],
-  stories: CustomerStory[],
-  feedback: CustomerFeedback[],
+  inquiries: InquiryRecord[],
+  submissions: SubmissionRecord[],
 ): ActivitySummary {
-  const appointments7 = appointments.filter((a) => isWithinLastDays(a.submittedAt, 7)).length;
-  const contacts7 = contacts.filter((c) => isWithinLastDays(c.submittedAt, 7)).length;
-  const stories7 = stories.filter((s) => isWithinLastDays(s.submittedAt, 7)).length;
-  const feedback7 = feedback.filter((f) => isWithinLastDays(f.submittedAt, 7)).length;
+  const inquiries7 = inquiries.filter((i) => isWithinLastDays(i.createdAt, 7)).length;
+  const submissions7 = submissions.filter((s) => isWithinLastDays(s.submittedAt, 7)).length;
   return {
-    appointments: appointments7,
-    contacts: contacts7,
-    stories: stories7,
-    feedback: feedback7,
-    total: appointments7 + contacts7 + stories7 + feedback7,
+    inquiries: inquiries7,
+    submissions: submissions7,
+    views: 0,
+    total: inquiries7 + submissions7,
   };
 }

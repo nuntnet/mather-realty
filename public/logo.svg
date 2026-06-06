@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <!-- 2N Badge -->
+  <rect x="0" y="4" width="40" height="40" rx="10" fill="#2563EB"/>
+  <text x="20" y="30" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="900" fill="white" text-anchor="middle">2N</text>
+  <!-- DoubleN Realty text -->
+  <text x="52" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#1E3A5F">Double</text>
+  <text x="148" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#2563EB">N</text>
+  <text x="165" y="34" font-family="system-ui, -apple-system, sans-serif" font-size="28" font-weight="900" fill="#1E3A5F"> Realty</text>
+</svg>

@@ -1,23 +1,25 @@
 /**
- * ช.เอราวัณ ออโต้ กรุป — Company constants
+ * DoubleN Realty — Company constants
  *
- * ปีที่ก่อตั้ง: พ.ศ. 2510 (ค.ศ. 1967)
- * คำนวณปีประสบการณ์อัตโนมัติจากปีปัจจุบัน — ไม่ต้องแก้ไขทุกปี
+ * Founded: 2024
+ * Premium rental properties in Thailand for expats and foreigners
  */
 
-export const FOUNDED_YEAR_BE = 2510; // พ.ศ. ที่ก่อตั้ง
+export const COMPANY_NAME = 'DoubleN Realty';
+export const COMPANY_EMAIL = 'hello@doublen-realty.com';
+export const COMPANY_WEBSITE = 'https://doublen-realty.com';
+
+export const FOUNDED_YEAR = 2024;
 
 /**
- * จำนวนปีที่ดำเนินกิจการ (คำนวณจากปีปัจจุบัน)
- * ใช้ + 543 แปลงปี ค.ศ. → พ.ศ.
+ * Number of years in operation (calculated from current year)
  */
 export function getYearsOfExperience(): number {
-  const currentYearBE = new Date().getFullYear() + 543;
-  return currentYearBE - FOUNDED_YEAR_BE;
+  return new Date().getFullYear() - FOUNDED_YEAR;
 }
 
 /**
- * ใช้ใน JSX: "59+" หรือ "59 ปี" ฯลฯ
+ * Use in JSX: "1+" or "1 year" etc.
  */
 export function getYearsLabel(): string {
   return `${getYearsOfExperience()}+`;

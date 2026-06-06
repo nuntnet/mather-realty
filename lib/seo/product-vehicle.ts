@@ -25,7 +25,7 @@ export function productVehicleJsonLd({ car, slug }: ProductVehicleJsonLdOptions)
       "@type": "Offer",
       priceCurrency: "THB",
       price: car.priceMin,
-      ...(car.priceMax > car.priceMin && { highPrice: car.priceMax }),
+      ...((car.priceMax ?? 0) > car.priceMin && { highPrice: car.priceMax }),
       availability: "https://schema.org/InStock",
       itemCondition:
         car.condition === "new"

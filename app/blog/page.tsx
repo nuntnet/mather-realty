@@ -31,7 +31,7 @@ export default async function BlogPage() {
 
   const itemList = itemListJsonLd(
     "บทความทั้งหมด",
-    posts.map((p) => ({ name: p.title, path: `/blog/${p.slug}` })),
+    posts.map((p) => ({ name: typeof p.title === 'string' ? p.title : (p.title as Record<string,string>).en ?? '', path: `/blog/${p.slug}` })),
     "/blog",
   );
 

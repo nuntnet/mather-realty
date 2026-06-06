@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Thai, Inter } from "next/font/google";
+import { IBM_Plex_Sans_Thai, Inter, Lexend } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import PublicLayoutServer from "@/components/PublicLayoutServer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
-import { JsonLd, organizationGraph, websiteJsonLd } from "@/lib/seo";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -21,37 +17,25 @@ const ibmPlexSansThai = IBM_Plex_Sans_Thai({
   display: "swap",
 });
 
-const BASE_URL = SITE_URL;
+const lexend = Lexend({
+  variable: "--font-lexend",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(SITE_URL),
   title: {
     template: `%s | ${SITE_NAME}`,
-    default: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์ Mazda, Ford, Mitsubishi, GWM, Deepal, Kia`,
+    default: SITE_NAME,
   },
-  description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม บริการซื้อ-ขาย ทดลองขับ และบริการหลังการขายครบวงจร Mazda, Ford, Mitsubishi, GWM, Deepal, Kia",
-  keywords: ["ช.เอราวัณ", "มาสด้า", "ฟอร์ด", "มิตซูบิชิ", "GWM", "Deepal", "Kia", "รถยนต์นครปฐม", "ตัวแทนจำหน่าย"],
-  authors: [{ name: SITE_NAME }],
-  creator: SITE_NAME,
-  alternates: { canonical: BASE_URL },
-  openGraph: {
-    type: "website",
-    locale: "th_TH",
-    url: BASE_URL,
-    siteName: SITE_NAME,
-    title: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์`,
-    description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม บริการซื้อ-ขาย ทดลองขับ และบริการหลังการขายครบวงจร",
-    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: SITE_NAME }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: `${SITE_NAME} | ตัวแทนจำหน่ายรถยนต์`,
-    description: "ตัวแทนจำหน่ายรถยนต์ชั้นนำในจังหวัดนครปฐม",
-    images: ["/opengraph-image"],
-  },
-  robots: {
-    index: true,
-    follow: true,
+  description: "Premium rental properties in Thailand for expats and foreigners.",
+  robots: { index: true, follow: true },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
@@ -61,21 +45,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html suppressHydrationWarning data-scroll-behavior="smooth" lang="en">
       <head>
-        {/* Warm up the Cloudinary CDN connection early — hero image is served from here */}
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
-      <body className={`${inter.variable} ${ibmPlexSansThai.variable} font-sans antialiased`}>
-        <JsonLd data={organizationGraph()} />
-        <JsonLd data={websiteJsonLd()} />
-        <PublicLayoutServer>
-          {children}
-        </PublicLayoutServer>
+      <body className={`${inter.variable} ${ibmPlexSansThai.variable} ${lexend.variable} font-sans antialiased`}>
+        {children}
         <Toaster richColors position="top-right" />
-        <Analytics />
-        <SpeedInsights />
       </body>
     </html>
   );

@@ -5,21 +5,22 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShieldCheck } from "lucide-react";
+import { LogIn } from "lucide-react";
+import Link from "next/link";
 import { signIn } from "@/lib/auth-client";
-import CompanyLogo from "@/components/CompanyLogo";
+import { SITE_NAME } from "@/lib/site";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/en";
   const error = searchParams.get("error");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(
-    error === "unauthorized" ? "คุณไม่มีสิทธิ์เข้าถึง Admin Panel" : ""
+    error === "unauthorized" ? "You are not authorised to access this page." : ""
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,25 +30,27 @@ function LoginForm() {
     try {
       const res = await signIn.email({ email, password });
       if (res.error) {
-        setErrorMsg("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
+        setErrorMsg("Invalid email or password.");
         return;
       }
       router.push(callbackUrl);
     } catch {
-      setErrorMsg("เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง");
+      setErrorMsg("An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        {/* Logo */}
+        {/* Logo / brand */}
         <div className="flex flex-col items-center mb-8">
-          <CompanyLogo height={56} priority className="h-14 w-auto mb-3" />
-          <h1 className="text-xl font-bold text-[#131F3C]">Admin Panel</h1>
-          <p className="text-sm text-gray-500 mt-1">เข้าสู่ระบบเพื่อจัดการเว็บไซต์</p>
+          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mb-3 shadow-lg">
+            <span className="text-white font-bold text-xl">DN</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">{SITE_NAME}</h1>
+          <p className="text-sm text-gray-500 mt-1">Sign in to your account</p>
         </div>
 
         <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
@@ -59,25 +62,25 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <Label htmlFor="email" className="text-gray-600 text-sm">อีเมล</Label>
+              <Label htmlFor="email" className="text-gray-600 text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="admin@ch-erawan.com"
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
                 className="mt-1.5"
                 required
                 autoComplete="email"
               />
             </div>
             <div>
-              <Label htmlFor="password" className="text-gray-600 text-sm">รหัสผ่าน</Label>
+              <Label htmlFor="password" className="text-gray-600 text-sm">Password</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="mt-1.5"
                 required
@@ -87,21 +90,30 @@ function LoginForm() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#131F3C] hover:bg-[#1a2a50] text-white font-semibold h-11"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
                   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  กำลังเข้าสู่ระบบ...
+                  Signing in...
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4" />
-                  เข้าสู่ระบบ
+                  <LogIn className="w-4 h-4" />
+                  Sign In
                 </span>
               )}
             </Button>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-500">
+              Don&apos;t have an account?{" "}
+              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+                Register
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -110,7 +122,11 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#F8F9FB] flex items-center justify-center"><div className="w-8 h-8 border-2 border-[#131F3C] border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    }>
       <LoginForm />
     </Suspense>
   );

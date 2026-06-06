@@ -1,214 +1,196 @@
-export default function CookiePolicy() {
-  return (
-    <div className="min-h-screen bg-white pt-[68px]">
-      {/* Header */}
-      <div className="bg-[#131F3C]">
-        <div className="container py-12">
-          <p className="text-white/40 text-sm font-medium tracking-wider uppercase mb-2">Legal</p>
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">นโยบายการใช้คุกกี้</h1>
-          <p className="text-white/50 text-sm">มีผลบังคับใช้ตั้งแต่วันที่ 1 มิถุนายน 2565 | ปรับปรุงล่าสุด 1 มกราคม 2567</p>
-        </div>
-      </div>
+import type { Metadata } from 'next'
+import Link from 'next/link'
 
-      {/* Content */}
-      <div className="container py-12 max-w-4xl">
-        <div className="space-y-8 text-[#374151]">
-
-          <section>
-            <p className="text-sm text-gray-500 mb-6">
-              เว็บไซต์ www.cherawan.co.th ("เว็บไซต์") ดำเนินการโดย กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุป ("บริษัท")
-              ใช้คุกกี้และเทคโนโลยีที่คล้ายคลึงกันเพื่อให้บริการที่ดีขึ้นแก่ท่าน
-              นโยบายนี้อธิบายถึงประเภทของคุกกี้ที่ใช้ วัตถุประสงค์ และวิธีที่ท่านสามารถจัดการคุกกี้เหล่านั้น
-            </p>
-          </section>
-
-          <CookieSection title="1. คุกกี้คืออะไร?">
-            <p>
-              คุกกี้คือไฟล์ข้อความขนาดเล็กที่ถูกบันทึกลงในอุปกรณ์ของท่าน (คอมพิวเตอร์ สมาร์ทโฟน หรือแท็บเล็ต)
-              เมื่อท่านเข้าชมเว็บไซต์ คุกกี้ช่วยให้เว็บไซต์จำข่าวสารเกี่ยวกับการเยี่ยมชมของท่าน
-              เพื่อให้การเยี่ยมชมครั้งต่อไปง่ายขึ้นและเว็บไซต์มีประโยชน์มากขึ้น
-            </p>
-          </CookieSection>
-
-          <CookieSection title="2. ประเภทคุกกี้ที่เราใช้">
-            <div className="space-y-5">
-
-              <CookieType
-                name="คุกกี้ที่จำเป็น (Strictly Necessary Cookies)"
-                badge="จำเป็น"
-                badgeColor="bg-[#131F3C] text-white"
-                canDisable={false}
-                examples={["Session ID", "ข้อมูลความปลอดภัย CSRF Token", "สถานะการล็อกอิน"]}
-              >
-                คุกกี้เหล่านี้จำเป็นสำหรับการทำงานพื้นฐานของเว็บไซต์ และไม่สามารถปิดใช้งานได้
-                เนื่องจากหากปิดแล้ว เว็บไซต์จะไม่สามารถทำงานได้อย่างถูกต้อง
-              </CookieType>
-
-              <CookieType
-                name="คุกกี้เพื่อการใช้งาน (Functional Cookies)"
-                badge="ปรับแต่ง"
-                badgeColor="bg-blue-100 text-blue-700"
-                canDisable={true}
-                examples={["ภาษาที่เลือก", "ประวัติการค้นหา", "การตั้งค่าที่บันทึกไว้"]}
-              >
-                คุกกี้เหล่านี้ช่วยให้เว็บไซต์จดจำการตั้งค่าและตัวเลือกของท่าน
-                เพื่อให้ประสบการณ์การใช้งานที่ดีขึ้นและเป็นส่วนตัวมากขึ้น
-              </CookieType>
-
-              <CookieType
-                name="คุกกี้เพื่อการวิเคราะห์ (Analytics Cookies)"
-                badge="วิเคราะห์"
-                badgeColor="bg-purple-100 text-purple-700"
-                canDisable={true}
-                examples={["Google Analytics (_ga, _gid)", "จำนวนผู้เข้าชม", "หน้าที่เข้าชมบ่อย"]}
-              >
-                คุกกี้เหล่านี้ช่วยให้บริษัทเข้าใจว่าผู้เข้าชมใช้งานเว็บไซต์อย่างไร
-                ข้อมูลทั้งหมดเป็นแบบไม่ระบุตัวตนและใช้เพื่อปรับปรุงเว็บไซต์เท่านั้น
-              </CookieType>
-
-              <CookieType
-                name="คุกกี้เพื่อการตลาด (Marketing Cookies)"
-                badge="การตลาด"
-                badgeColor="bg-orange-100 text-orange-700"
-                canDisable={true}
-                examples={["Facebook Pixel", "Google Ads", "Retargeting Cookies"]}
-              >
-                คุกกี้เหล่านี้ใช้เพื่อแสดงโฆษณาที่เกี่ยวข้องและตรงกับความสนใจของท่าน
-                บนเว็บไซต์ของบริษัทและช่องทางออนไลน์อื่น ๆ
-              </CookieType>
-
-            </div>
-          </CookieSection>
-
-          <CookieSection title="3. คุกกี้ของบุคคลที่สาม">
-            <p>
-              เว็บไซต์ของเราอาจมีคุกกี้จากบุคคลที่สาม ซึ่งรวมถึงแต่ไม่จำกัดเพียง
-            </p>
-            <div className="mt-3 overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="text-left p-3 font-semibold text-[#131F3C] border border-gray-200">บริการ</th>
-                    <th className="text-left p-3 font-semibold text-[#131F3C] border border-gray-200">วัตถุประสงค์</th>
-                    <th className="text-left p-3 font-semibold text-[#131F3C] border border-gray-200">นโยบายความเป็นส่วนตัว</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { service: "Google Analytics", purpose: "วิเคราะห์การใช้งานเว็บไซต์", url: "policies.google.com/privacy" },
-                    { service: "Google Maps", purpose: "แสดงแผนที่สาขา", url: "policies.google.com/privacy" },
-                    { service: "Facebook Pixel", purpose: "โฆษณาและวิเคราะห์", url: "facebook.com/privacy/policy" },
-                    { service: "LINE Liff", purpose: "ระบบแชทและติดต่อ", url: "line.me/en/terms/policy" },
-                  ].map((row) => (
-                    <tr key={row.service} className="border-b border-gray-100">
-                      <td className="p-3 border border-gray-200 font-medium">{row.service}</td>
-                      <td className="p-3 border border-gray-200 text-gray-600">{row.purpose}</td>
-                      <td className="p-3 border border-gray-200 text-[#DD5259]">{row.url}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CookieSection>
-
-          <CookieSection title="4. การจัดการและปฏิเสธคุกกี้">
-            <p>ท่านสามารถจัดการคุกกี้ได้หลายวิธี</p>
-
-            <div className="mt-4 space-y-4">
-              <div className="bg-gray-50 rounded-xl p-5">
-                <h4 className="font-semibold text-[#131F3C] mb-2">ผ่านเบราว์เซอร์</h4>
-                <p className="text-sm text-gray-600 mb-3">ท่านสามารถตั้งค่าเบราว์เซอร์เพื่อปฏิเสธหรือลบคุกกี้ได้</p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  {[
-                    { name: "Google Chrome", path: "Settings → Privacy and security → Cookies" },
-                    { name: "Firefox", path: "Options → Privacy & Security → Cookies" },
-                    { name: "Safari", path: "Preferences → Privacy → Cookies" },
-                    { name: "Microsoft Edge", path: "Settings → Privacy → Cookies" },
-                  ].map((b) => (
-                    <div key={b.name} className="bg-white rounded-lg p-3 border border-gray-100">
-                      <p className="font-medium text-[#131F3C]">{b.name}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{b.path}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 text-sm">
-                <p className="font-semibold text-amber-800 mb-1">⚠️ หมายเหตุสำคัญ</p>
-                <p className="text-amber-700">
-                  การปิดใช้งานคุกกี้บางประเภทอาจส่งผลให้ฟีเจอร์บางอย่างของเว็บไซต์ทำงานได้ไม่สมบูรณ์
-                  โดยเฉพาะคุกกี้ที่จำเป็น (Strictly Necessary Cookies) ไม่สามารถปิดได้
-                </p>
-              </div>
-            </div>
-          </CookieSection>
-
-          <CookieSection title="5. ระยะเวลาการเก็บคุกกี้">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="font-semibold text-[#131F3C] mb-1">Session Cookies</p>
-                <p className="text-gray-600">ถูกลบโดยอัตโนมัติเมื่อท่านปิดเบราว์เซอร์</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="font-semibold text-[#131F3C] mb-1">Persistent Cookies</p>
-                <p className="text-gray-600">เก็บไว้ตามระยะเวลาที่กำหนด (ตั้งแต่ 30 วัน ถึง 2 ปี)</p>
-              </div>
-            </div>
-          </CookieSection>
-
-          <CookieSection title="6. การอัปเดตนโยบาย">
-            <p>
-              บริษัทอาจปรับปรุงนโยบายการใช้คุกกี้นี้เป็นครั้งคราว เพื่อให้สอดคล้องกับการเปลี่ยนแปลงทางเทคโนโลยี
-              กฎหมาย หรือการดำเนินธุรกิจ บริษัทจะแจ้งให้ท่านทราบถึงการเปลี่ยนแปลงที่สำคัญ
-              ผ่านทางเว็บไซต์หรือช่องทางการสื่อสารอื่น ๆ
-            </p>
-          </CookieSection>
-
-          <CookieSection title="7. ติดต่อสอบถาม">
-            <div className="bg-gray-50 rounded-xl p-5 text-sm space-y-1">
-              <p><strong>กลุ่มบริษัท ช.เอราวัณ ออโต้ กรุป</strong></p>
-              <p>75/2 หมู่ 1 ต.ธรรมศาลา อ.เมือง จ.นครปฐม 73000</p>
-              <p>โทรศัพท์: 034-305-500</p>
-              <p>อีเมล: info@ch-erawan.com</p>
-            </div>
-          </CookieSection>
-
-        </div>
-      </div>
-    </div>
-  );
+export const metadata: Metadata = {
+  title: 'Cookie Policy | DoubleN Realty',
+  description: 'Learn how DoubleN Realty uses cookies and similar technologies on our platform.',
 }
 
-function CookieSection({ title, children }: { title: string; children: React.ReactNode }) {
+export default function CookiePolicyPage() {
   return (
-    <section>
-      <h2 className="text-lg font-bold text-[#131F3C] mb-3 pb-2 border-b border-gray-100">{title}</h2>
-      <div className="text-sm text-[#4B5563] space-y-2 leading-relaxed">{children}</div>
-    </section>
-  );
-}
+    <div className="pt-28 pb-16 max-w-3xl mx-auto px-4">
+      <h1 className="text-3xl font-bold text-gray-900 mb-2">Cookie Policy</h1>
+      <p className="text-gray-500 text-sm mb-10">Last updated: June 2025</p>
 
-function CookieType({
-  name, badge, badgeColor, canDisable, examples, children,
-}: {
-  name: string; badge: string; badgeColor: string; canDisable: boolean;
-  examples: string[]; children: React.ReactNode;
-}) {
-  return (
-    <div className="border border-gray-100 rounded-xl p-5">
-      <div className="flex items-center gap-2 mb-2 flex-wrap">
-        <h3 className="font-semibold text-[#131F3C] text-sm">{name}</h3>
-        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${badgeColor}`}>{badge}</span>
-        <span className={`text-xs px-2 py-0.5 rounded-full ${canDisable ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-          {canDisable ? "ปิดได้" : "ปิดไม่ได้"}
-        </span>
+      <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed">
+
+        <p>
+          DoubleN Realty (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates the website at{' '}
+          <strong>doublen-realty.com</strong>. This Cookie Policy explains what cookies are, how
+          we use them, and how you can control them. By continuing to use our site, you consent to
+          our use of cookies as described in this policy.
+        </p>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">1. What Are Cookies?</h2>
+        <p>
+          Cookies are small text files placed on your device (computer, smartphone, or tablet) when
+          you visit a website. They allow the site to remember your actions and preferences over
+          time, so you don&apos;t have to re-enter them each visit. Cookies can be &quot;session
+          cookies&quot; (deleted when you close your browser) or &quot;persistent cookies&quot;
+          (stored for a set period).
+        </p>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">2. Cookies We Use</h2>
+        <p>We use the following categories of cookies:</p>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">a) Strictly Necessary Cookies</h3>
+        <p>
+          These cookies are essential for our platform to function. They enable core features such
+          as secure login sessions, CSRF protection, and locale routing. You cannot opt out of
+          these cookies as the site cannot operate without them.
+        </p>
+        <ul className="list-disc pl-6 space-y-1 mt-2">
+          <li><strong>Session token</strong> — maintains your authenticated session</li>
+          <li><strong>CSRF token</strong> — protects form submissions from cross-site attacks</li>
+          <li><strong>Locale preference</strong> — remembers your selected language</li>
+        </ul>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">b) Analytics Cookies</h3>
+        <p>
+          We use Google Analytics to understand how visitors interact with our site. This helps us
+          improve the platform experience. All data collected is aggregated and anonymised.
+        </p>
+        <div className="overflow-x-auto mt-3">
+          <table className="w-full text-sm border border-gray-200 border-collapse">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left px-4 py-2 border border-gray-200 font-semibold text-gray-700">Cookie</th>
+                <th className="text-left px-4 py-2 border border-gray-200 font-semibold text-gray-700">Provider</th>
+                <th className="text-left px-4 py-2 border border-gray-200 font-semibold text-gray-700">Purpose</th>
+                <th className="text-left px-4 py-2 border border-gray-200 font-semibold text-gray-700">Duration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-2 border border-gray-200 font-mono text-xs">_ga</td>
+                <td className="px-4 py-2 border border-gray-200">Google Analytics</td>
+                <td className="px-4 py-2 border border-gray-200">Distinguishes unique users</td>
+                <td className="px-4 py-2 border border-gray-200">2 years</td>
+              </tr>
+              <tr className="bg-gray-50">
+                <td className="px-4 py-2 border border-gray-200 font-mono text-xs">_gid</td>
+                <td className="px-4 py-2 border border-gray-200">Google Analytics</td>
+                <td className="px-4 py-2 border border-gray-200">Distinguishes users (short-term)</td>
+                <td className="px-4 py-2 border border-gray-200">24 hours</td>
+              </tr>
+              <tr>
+                <td className="px-4 py-2 border border-gray-200 font-mono text-xs">_ga_*</td>
+                <td className="px-4 py-2 border border-gray-200">Google Analytics (GA4)</td>
+                <td className="px-4 py-2 border border-gray-200">Maintains session state</td>
+                <td className="px-4 py-2 border border-gray-200">2 years</td>
+              </tr>
+              <tr className="bg-gray-50">
+                <td className="px-4 py-2 border border-gray-200 font-mono text-xs">_gat</td>
+                <td className="px-4 py-2 border border-gray-200">Google Analytics</td>
+                <td className="px-4 py-2 border border-gray-200">Throttles request rate</td>
+                <td className="px-4 py-2 border border-gray-200">1 minute</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-sm text-gray-500">
+          For more information on how Google uses cookie data, visit{' '}
+          <a
+            href="https://policies.google.com/technologies/cookies"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#1E6B69] hover:underline"
+          >
+            policies.google.com/technologies/cookies
+          </a>.
+        </p>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">c) Functional Cookies</h3>
+        <p>
+          Functional cookies remember choices you make to improve your experience, such as your
+          preferred language or region. Disabling these may affect how the site behaves but will
+          not prevent you from using core features.
+        </p>
+        <ul className="list-disc pl-6 space-y-1 mt-2">
+          <li><strong>Locale/language</strong> — stores your preferred display language across visits</li>
+          <li><strong>Search filters</strong> — remembers your last property search preferences</li>
+        </ul>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">3. How to Manage Cookies</h2>
+        <p>
+          You can control and manage cookies in several ways. Please bear in mind that removing or
+          blocking cookies can affect your user experience and some functionality may no longer be
+          available.
+        </p>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">Browser Settings</h3>
+        <p>
+          Most browsers allow you to view, delete, and block cookies. Find instructions for your
+          browser below:
+        </p>
+        <ul className="list-disc pl-6 space-y-1 mt-2">
+          <li>
+            <strong>Google Chrome:</strong>{' '}
+            Settings &rarr; Privacy and security &rarr; Cookies and other site data
+          </li>
+          <li>
+            <strong>Mozilla Firefox:</strong>{' '}
+            Options &rarr; Privacy &amp; Security &rarr; Cookies and Site Data
+          </li>
+          <li>
+            <strong>Safari:</strong>{' '}
+            Preferences &rarr; Privacy &rarr; Manage Website Data
+          </li>
+          <li>
+            <strong>Microsoft Edge:</strong>{' '}
+            Settings &rarr; Privacy, search, and services &rarr; Cookies
+          </li>
+        </ul>
+
+        <h3 className="text-base font-semibold text-gray-900 mt-5 mb-2">Opt Out of Google Analytics</h3>
+        <p>
+          To opt out of Google Analytics tracking across all websites, you can install the{' '}
+          <a
+            href="https://tools.google.com/dlpage/gaoptout"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#1E6B69] hover:underline"
+          >
+            Google Analytics Opt-out Browser Add-on
+          </a>.
+        </p>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">4. Third-Party Cookies</h2>
+        <p>
+          Some pages on our site may embed content from third-party services (such as Google Maps
+          for property location previews). These services may set their own cookies subject to their
+          respective privacy policies. We do not control these cookies.
+        </p>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">5. Updates to This Policy</h2>
+        <p>
+          We may update this Cookie Policy from time to time to reflect changes in technology,
+          legislation, or our practices. When we do, we will revise the &quot;last updated&quot;
+          date at the top of this page. We encourage you to review this policy periodically.
+        </p>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">6. Contact Us</h2>
+        <p>
+          If you have any questions about our use of cookies, please contact us at:{' '}
+          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
+            janjiranui@gmail.com
+          </a>
+        </p>
+
+        <p className="mt-6">
+          For more information on how we handle your personal data, please see our{' '}
+          <Link href="/en/privacy" className="text-[#1E6B69] hover:underline">
+            Privacy Policy
+          </Link>.
+        </p>
+
       </div>
-      <p className="text-gray-600 text-sm mb-3">{children}</p>
-      <div className="flex flex-wrap gap-1.5">
-        {examples.map((ex) => (
-          <span key={ex} className="text-xs bg-gray-50 border border-gray-200 px-2 py-1 rounded text-gray-500">{ex}</span>
-        ))}
+
+      <div className="mt-12 pt-8 border-t border-gray-100">
+        <Link href="/" className="text-[#1E6B69] hover:underline text-sm font-medium">
+          &larr; Back to home
+        </Link>
       </div>
     </div>
-  );
+  )
 }
