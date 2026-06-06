@@ -111,6 +111,7 @@ export async function POST(req: NextRequest) {
     data: saveData, locales, titleEn, descriptionEn,
     // translate-all payload
     highlightsEn, seoEn, faqEn,
+    targetLocale,  // single locale for translate-all (replaces ALL_LOCALES)
   } = await req.json()
   if (!propertyId && !['translate','translate-all'].includes(action))
     return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
@@ -146,13 +147,20 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
   if (action === 'translate-all') {
     if (!titleEn) return NextResponse.json({ error: 'titleEn is required' }, { status: 400 })
 
-    const ALL_LOCALES = ['th','zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
-    const langList = ALL_LOCALES.map(l => `${l}=${LOCALE_NAMES[l] ?? l}`).join(', ')
+    // Single locale mode (new) or all-14 mode (legacy)
+    const TARGET_LOCALES = targetLocale
+      ? [targetLocale as string]
+      : ['th','zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
 
-    // Helper: translate titles + descriptions for all locales in one call
+    const langList = TARGET_LOCALES.map(l => `${l}=${LOCALE_NAMES[l] ?? l}`).join(', ')
+    const langName = TARGET_LOCALES.length === 1
+      ? (LOCALE_NAMES[TARGET_LOCALES[0]] ?? TARGET_LOCALES[0])
+      : `${TARGET_LOCALES.length} languages`
+
+    // Helper: translate titles + descriptions
     async function translateTitleDesc() {
-      const targetList = ALL_LOCALES.map(l => `"${l}":{"title":"...","description":"..."}`).join(',\n  ')
-      const prompt = `Translate this property listing to: ${langList}
+      const targetList = TARGET_LOCALES.map(l => `"${l}":{"title":"...","description":"..."}`).join(',\n  ')
+      const prompt = `Translate this property listing to ${langName} (${langList}).
 
 Title (EN): ${titleEn}
 Description (EN): ${descriptionEn ?? '(none)'}
@@ -164,7 +172,7 @@ Return ONLY JSON: {\n  ${targetList}\n}`
 
     // Helper: translate short text (highlights, SEO) for all locales
     async function translateShort(label: string, textEn: string) {
-      const targetList = ALL_LOCALES.map(l => `"${l}":"..."`).join(', ')
+      const targetList = TARGET_LOCALES.map(l => `"${l}":"..."`).join(', ')
       const prompt = `Translate this ${label} text to these languages (${langList}). Keep translations natural and culturally appropriate.
 
 English: ${textEn}
@@ -174,10 +182,10 @@ Return ONLY JSON: {${targetList}}`
       return parseJSON(raw) as Record<string, string>
     }
 
-    // Helper: translate FAQ array for all locales
+    // Helper: translate FAQ array
     async function translateFaq(faqItems: Array<{q: string; a: string}>) {
-      const targetList = ALL_LOCALES.map(l => `"${l}":[{"q":"...","a":"..."}]`).join(',\n  ')
-      const prompt = `Translate these FAQ items to: ${langList}
+      const targetList = TARGET_LOCALES.map(l => `"${l}":[{"q":"...","a":"..."}]`).join(',\n  ')
+      const prompt = `Translate these FAQ items to ${langName} (${langList}).
 
 FAQ (EN): ${JSON.stringify(faqItems)}
 
@@ -188,7 +196,7 @@ Each locale should have an array of the same number of FAQ items.`
     }
 
     try {
-      // Run translations in parallel (3 calls max at a time)
+      // Run all translations in parallel
       const results: {
         titleDesc?: Record<string, { title: string; description: string }>
         highlights?: Record<string, string>
@@ -205,13 +213,13 @@ Each locale should have an array of the same number of FAQ items.`
 
       await Promise.all(tasks)
 
-      // Save all translations to Notion
+      // Save translations to Notion
       if (propertyId) {
         const notion = new Client({ auth: process.env.NOTION_API_KEY })
         const rt = (s: string) => ({ rich_text: chunkRichText(s) })
         const updates: Record<string, unknown> = {}
 
-        for (const loc of ALL_LOCALES) {
+        for (const loc of TARGET_LOCALES) {
           const safeKey = loc.replace('-', '_')
           void safeKey // used for response key, not Notion key
           if (results.titleDesc?.[loc]?.title)       updates[`title_${loc}`]              = rt(results.titleDesc[loc].title)
@@ -229,7 +237,7 @@ Each locale should have an array of the same number of FAQ items.`
         }
       }
 
-      return NextResponse.json({ success: true, results, locales: ALL_LOCALES })
+      return NextResponse.json({ success: true, results, locales: TARGET_LOCALES })
     } catch (e) {
       return NextResponse.json({ error: (e as Error).message }, { status: 502 })
     }
