@@ -333,12 +333,13 @@ export async function PATCH(
         : { date: null };
     }
 
-    // Contact fields (text)
+    // Contact fields
     if (data.contactLine !== undefined) {
       updates["contact_line"] = { rich_text: [{ text: { content: data.contactLine ?? "" } }] };
     }
+    // contact_phone is phone_number type in Notion (not rich_text)
     if (data.contactPhone !== undefined) {
-      updates["contact_phone"] = { rich_text: [{ text: { content: data.contactPhone ?? "" } }] };
+      updates["contact_phone"] = { phone_number: data.contactPhone || null };
     }
 
     // Highlights: array → bullet string
