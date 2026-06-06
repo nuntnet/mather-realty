@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Background: dark teal rounded square -->
+  <rect width="32" height="32" rx="7" fill="#0C3837"/>
+  <!-- "D" letter in white -->
+  <text x="4" y="23" font-family="system-ui,-apple-system,sans-serif" font-size="19" font-weight="900" fill="white">D</text>
+  <!-- "N" letter in orange -->
+  <text x="16" y="23" font-family="system-ui,-apple-system,sans-serif" font-size="19" font-weight="900" fill="#F4581A">N</text>
+</svg>

@@ -32,6 +32,11 @@ export const metadata: Metadata = {
   },
   description: "Premium rental properties in Thailand for expats and foreigners.",
   robots: { index: true, follow: true },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
+  },
 };
 
 export default function RootLayout({
