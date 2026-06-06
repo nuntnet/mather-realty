@@ -121,9 +121,9 @@ type PropertyForm = {
   tags: string;             // comma-separated in UI
   faq: FaqItem[];
   seoDescription: string;
-  exteriorPhotos: string;   // comma-separated Cloudinary URLs
-  interiorPhotos: string;
-  communityPhotos: string;
+  exteriorPhotos: string[];
+  interiorPhotos: string[];
+  communityPhotos: string[];
 };
 
 function emptyForm(): PropertyForm {
@@ -158,9 +158,9 @@ function emptyForm(): PropertyForm {
     tags: "",
     faq: [],
     seoDescription: "",
-    exteriorPhotos: "",
-    interiorPhotos: "",
-    communityPhotos: "",
+    exteriorPhotos: [],
+    interiorPhotos: [],
+    communityPhotos: [],
   };
 }
 
@@ -282,14 +282,20 @@ export default function PropertyEditPage() {
           faq: faqArr,
           seoDescription: data.seoDescription ?? "",
           exteriorPhotos: Array.isArray(data.exteriorPhotos)
-            ? data.exteriorPhotos.join(", ")
-            : (data.exteriorPhotos ?? ""),
+            ? data.exteriorPhotos
+            : (typeof data.exteriorPhotos === "string"
+                ? data.exteriorPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
+                : []),
           interiorPhotos: Array.isArray(data.interiorPhotos)
-            ? data.interiorPhotos.join(", ")
-            : (data.interiorPhotos ?? ""),
+            ? data.interiorPhotos
+            : (typeof data.interiorPhotos === "string"
+                ? data.interiorPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
+                : []),
           communityPhotos: Array.isArray(data.communityPhotos)
-            ? data.communityPhotos.join(", ")
-            : (data.communityPhotos ?? ""),
+            ? data.communityPhotos
+            : (typeof data.communityPhotos === "string"
+                ? data.communityPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
+                : []),
         });
       })
       .finally(() => setLoading(false));
@@ -414,10 +420,10 @@ export default function PropertyEditPage() {
         tags: tagsArray,
         faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : "",
         seoDescription: form.seoDescription || "",
-        // Keep as comma-separated strings — the API stores them as Notion rich_text
-        exteriorPhotos: form.exteriorPhotos,
-        interiorPhotos: form.interiorPhotos,
-        communityPhotos: form.communityPhotos,
+        // Join arrays → comma-separated strings for Notion rich_text
+        exteriorPhotos: form.exteriorPhotos.join(","),
+        interiorPhotos: form.interiorPhotos.join(","),
+        communityPhotos: form.communityPhotos.join(","),
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
@@ -1010,39 +1016,39 @@ export default function PropertyEditPage() {
         </div>
 
         {/* ── Gallery Categories ────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
-          <SectionTitle>Gallery Categories</SectionTitle>
-          <p className="text-xs text-gray-400">
-            Comma-separated Cloudinary URLs for each photo category.
-          </p>
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-6">
+          <div>
+            <SectionTitle>Gallery Categories</SectionTitle>
+            <p className="text-xs text-gray-400 mt-1.5">
+              Categorise photos so users can browse by Exterior / Interior / Community tabs on the property page.
+              Photos added here also appear in the main swipeable hero carousel.
+            </p>
+          </div>
 
-          <Field label="Exterior Photos">
-            <textarea
-              rows={3}
+          <Field label="🏠 Exterior — façade, garden, entrance, parking">
+            <ImageUploader
               value={form.exteriorPhotos}
-              onChange={(e) => setForm((f) => ({ ...f, exteriorPhotos: e.target.value }))}
-              className={TEXTAREA_CLS}
-              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+              onChange={(urls) => setForm((f) => ({ ...f, exteriorPhotos: urls }))}
+              multiple
+              label="Upload exterior photos"
             />
           </Field>
 
-          <Field label="Interior Photos">
-            <textarea
-              rows={3}
+          <Field label="🛋️ Interior — living room, bedroom, kitchen, bathroom">
+            <ImageUploader
               value={form.interiorPhotos}
-              onChange={(e) => setForm((f) => ({ ...f, interiorPhotos: e.target.value }))}
-              className={TEXTAREA_CLS}
-              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+              onChange={(urls) => setForm((f) => ({ ...f, interiorPhotos: urls }))}
+              multiple
+              label="Upload interior photos"
             />
           </Field>
 
-          <Field label="Community Photos">
-            <textarea
-              rows={3}
+          <Field label="🏘️ Community — pool, gym, lobby, rooftop, neighbourhood">
+            <ImageUploader
               value={form.communityPhotos}
-              onChange={(e) => setForm((f) => ({ ...f, communityPhotos: e.target.value }))}
-              className={TEXTAREA_CLS}
-              placeholder="https://res.cloudinary.com/..., https://res.cloudinary.com/..."
+              onChange={(urls) => setForm((f) => ({ ...f, communityPhotos: urls }))}
+              multiple
+              label="Upload community photos"
             />
           </Field>
         </div>
