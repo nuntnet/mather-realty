@@ -134,6 +134,30 @@ function mapToForm(page: PageObjectResponse) {
   };
 }
 
+// ── Notion rich_text helper — splits strings > 1900 chars across multiple items ─
+// Notion enforces a 2000-char limit per text block. Long comma-separated URL
+// lists (gallery, categories, hero) easily exceed this.
+function toRichText(str: string) {
+  const LIMIT = 1900;
+  if (!str) return [{ text: { content: "" } }];
+  if (str.length <= LIMIT) return [{ text: { content: str } }];
+
+  const items = [];
+  let remaining = str;
+  while (remaining.length > 0) {
+    if (remaining.length <= LIMIT) {
+      items.push({ text: { content: remaining } });
+      break;
+    }
+    // Prefer cutting at a comma boundary so URLs stay intact
+    const cut = remaining.lastIndexOf(",", LIMIT);
+    const end = cut > 0 ? cut + 1 : LIMIT; // include the comma in the chunk
+    items.push({ text: { content: remaining.slice(0, end) } });
+    remaining = remaining.slice(end);
+  }
+  return items;
+}
+
 // ── PATCH schema ───────────────────────────────────────────────────────────────
 
 const patchSchema = z.object({
@@ -295,7 +319,7 @@ export async function PATCH(
     // Highlights: array → bullet string
     if (data.highlights !== undefined) {
       const bullet = data.highlights.filter(Boolean).join(" • ");
-      updates["highlights"] = { rich_text: [{ text: { content: bullet } }] };
+      updates["highlights"] = { rich_text: toRichText(bullet) };
     }
 
     // Perfect For / Tags (multi_select)
@@ -306,14 +330,14 @@ export async function PATCH(
       updates["tags"] = { multi_select: data.tags.map(name => ({ name })) };
     }
 
-    // FAQ (JSON string)
+    // FAQ (JSON string) — can be long
     if (data.faqJson !== undefined) {
-      updates["faq_json"] = { rich_text: [{ text: { content: data.faqJson } }] };
+      updates["faq_json"] = { rich_text: toRichText(data.faqJson) };
     }
 
     // SEO description
     if (data.seoDescription !== undefined) {
-      updates["seo_description"] = { rich_text: [{ text: { content: data.seoDescription } }] };
+      updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
     }
 
     // Has virtual tour (checkbox)
@@ -321,18 +345,18 @@ export async function PATCH(
       updates["has_virtual_tour"] = { checkbox: data.hasVirtualTour };
     }
 
-    // Gallery category photo URL strings
+    // Gallery category photo URL strings — chunked to respect Notion 2000-char limit
     if (data.exteriorPhotos !== undefined) {
-      updates["exterior_photos"] = { rich_text: [{ text: { content: data.exteriorPhotos } }] };
+      updates["exterior_photos"] = { rich_text: toRichText(data.exteriorPhotos) };
     }
     if (data.interiorPhotos !== undefined) {
-      updates["interior_photos"] = { rich_text: [{ text: { content: data.interiorPhotos } }] };
+      updates["interior_photos"] = { rich_text: toRichText(data.interiorPhotos) };
     }
     if (data.communityPhotos !== undefined) {
-      updates["community_photos"] = { rich_text: [{ text: { content: data.communityPhotos } }] };
+      updates["community_photos"] = { rich_text: toRichText(data.communityPhotos) };
     }
     if (data.heroPhotos !== undefined) {
-      updates["hero_photos"] = { rich_text: [{ text: { content: data.heroPhotos } }] };
+      updates["hero_photos"] = { rich_text: toRichText(data.heroPhotos) };
     }
 
     // Status (select or status type)
@@ -352,11 +376,9 @@ export async function PATCH(
       };
     }
 
-    // Gallery URLs — store as comma-separated text
+    // Gallery URLs — comma-separated, chunked to respect Notion 2000-char limit
     if (data.gallery !== undefined) {
-      updates["gallery_urls"] = {
-        rich_text: [{ text: { content: data.gallery.join(",") } }],
-      };
+      updates["gallery_urls"] = { rich_text: toRichText(data.gallery.join(",")) };
     }
 
     // Virtual tour URL
