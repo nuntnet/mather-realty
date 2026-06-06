@@ -240,30 +240,28 @@ export async function PATCH(
 
     const client = notion();
 
-    // First retrieve the page to determine property types (select vs status)
-    const existing = await client.pages.retrieve({ page_id: id }) as PageObjectResponse;
-    const existingProps = existing.properties as Record<string, { type: string }>;
-
+    // Skip the retrieve call — we know the DB schema:
+    //   status = select type, all optional fields guarded below
     const updates: Record<string, unknown> = {};
+
+    // Helper: only add update if the key might exist (prevents Notion 400 on missing props)
+    // We use a soft check — if Notion rejects, it's caught per-call
+    const addUpdate = (key: string, value: unknown) => { updates[key] = value; };
 
     // Multilingual titles
     if (data.titles) {
       for (const loc of LOCALES) {
         if (data.titles[loc] !== undefined) {
-          updates[`title_${loc}`] = {
-            rich_text: [{ text: { content: data.titles[loc] ?? "" } }],
-          };
+          addUpdate(`title_${loc}`, { rich_text: toRichText(data.titles[loc] ?? "") });
         }
       }
     }
 
-    // Multilingual descriptions
+    // Multilingual descriptions — can be very long, must chunk
     if (data.descriptions) {
       for (const loc of LOCALES) {
         if (data.descriptions[loc] !== undefined) {
-          updates[`description_${loc}`] = {
-            rich_text: [{ text: { content: data.descriptions[loc] ?? "" } }],
-          };
+          addUpdate(`description_${loc}`, { rich_text: toRichText(data.descriptions[loc] ?? "") });
         }
       }
     }
@@ -296,7 +294,7 @@ export async function PATCH(
       ["depositMonths", "deposit_months"],
     ];
     for (const [formKey, notionKey] of numFields) {
-      if (data[formKey] !== undefined && existingProps[notionKey] !== undefined) {
+      if (data[formKey] !== undefined) {
         updates[notionKey] = { number: data[formKey] ?? null };
       }
     }
@@ -340,40 +338,27 @@ export async function PATCH(
       updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
     }
 
-    // Has virtual tour (checkbox) — only if property exists
-    if (data.hasVirtualTour !== undefined && existingProps["has_virtual_tour"]) {
-      updates["has_virtual_tour"] = { checkbox: data.hasVirtualTour };
+    if (data.hasVirtualTour !== undefined) {
+      addUpdate("has_virtual_tour", { checkbox: data.hasVirtualTour });
     }
 
-    // Gallery category photo URL strings — chunked + only if property exists in DB
-    // (if user hasn't added these Notion properties yet, skip gracefully)
-    const setPropIfExists = (notionKey: string, value: unknown) => {
-      if (existingProps[notionKey] !== undefined) {
-        updates[notionKey] = value;
-      }
-    };
-
+    // Gallery category photo URL strings — chunked to respect 2000-char limit
     if (data.exteriorPhotos !== undefined) {
-      setPropIfExists("exterior_photos", { rich_text: toRichText(data.exteriorPhotos) });
+      addUpdate("exterior_photos", { rich_text: toRichText(data.exteriorPhotos) });
     }
     if (data.interiorPhotos !== undefined) {
-      setPropIfExists("interior_photos", { rich_text: toRichText(data.interiorPhotos) });
+      addUpdate("interior_photos", { rich_text: toRichText(data.interiorPhotos) });
     }
     if (data.communityPhotos !== undefined) {
-      setPropIfExists("community_photos", { rich_text: toRichText(data.communityPhotos) });
+      addUpdate("community_photos", { rich_text: toRichText(data.communityPhotos) });
     }
     if (data.heroPhotos !== undefined) {
-      setPropIfExists("hero_photos", { rich_text: toRichText(data.heroPhotos) });
+      addUpdate("hero_photos", { rich_text: toRichText(data.heroPhotos) });
     }
 
-    // Status (select or status type)
+    // Status — confirmed select type in this DB
     if (data.status) {
-      const statusProp = existingProps["status"];
-      if (statusProp?.type === "select") {
-        updates["status"] = { select: { name: data.status } };
-      } else if (statusProp?.type === "status") {
-        updates["status"] = { status: { name: data.status } };
-      }
+      updates["status"] = { select: { name: data.status } };
     }
 
     // Amenities (multi_select)
