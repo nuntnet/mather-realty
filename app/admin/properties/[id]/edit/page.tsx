@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { ChevronLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
+import LocationPicker from "@/components/admin/LocationPicker";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
@@ -523,27 +524,17 @@ export default function PropertyEditPage() {
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Latitude">
-              <input
-                type="number"
-                step="any"
-                value={form.lat}
-                onChange={(e) => setForm((f) => ({ ...f, lat: e.target.value }))}
-                className={INPUT_CLS}
-                placeholder="13.756331"
-              />
-            </Field>
-            <Field label="Longitude">
-              <input
-                type="number"
-                step="any"
-                value={form.lng}
-                onChange={(e) => setForm((f) => ({ ...f, lng: e.target.value }))}
-                className={INPUT_CLS}
-                placeholder="100.501765"
-              />
-            </Field>
+          {/* Map location picker */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Map Location <span className="text-gray-400 text-xs font-normal">(click map to pin)</span>
+            </label>
+            <LocationPicker
+              lat={form.lat}
+              lng={form.lng}
+              onLatChange={(v) => setForm((f) => ({ ...f, lat: v }))}
+              onLngChange={(v) => setForm((f) => ({ ...f, lng: v }))}
+            />
           </div>
         </div>
 
