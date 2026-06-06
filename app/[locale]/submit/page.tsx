@@ -124,10 +124,16 @@ export default function SubmitPage() {
   async function handleSubmit() {
     setSubmitting(true)
     try {
+      const { ownerEmail, ownerPhone, ownerName, ownerLine, ownerWhatsapp, images, ...propertyData } = form
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, locale }),
+        body: JSON.stringify({
+          ownerEmail,
+          ownerPhone,
+          dataJson: JSON.stringify({ ...propertyData, ownerName, ownerLine, ownerWhatsapp, locale }),
+          imagesJson: JSON.stringify(images),
+        }),
       })
       if (res.ok) {
         setSuccess(true)
