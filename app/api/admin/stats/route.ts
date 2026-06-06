@@ -1,88 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import { drizzle } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
-import { properties, inquiries, submissions, propertyViews } from "@/lib/db/schema";
+import { inquiries, submissions, propertyViews } from "@/lib/db/schema";
 import { eq, sql, gte, and } from "drizzle-orm";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getProperties } from "@/lib/notion";
 
 function getDb() {
   const url = process.env.TURSO_DATABASE_URL;
-  if (!url) throw new Error("TURSO_DATABASE_URL is not set");
+  if (!url) return null;
   const client = createClient({ url, authToken: process.env.TURSO_AUTH_TOKEN });
-  return drizzle(client, {
-    schema: { properties, inquiries, submissions, propertyViews },
-  });
+  return drizzle(client, { schema: { inquiries, submissions, propertyViews } });
 }
 
-export async function GET(_req: NextRequest) {
+export async function GET(req: NextRequest) {
   const denied = await requireAdmin();
   if (denied) return denied;
+
+  const quick = req.nextUrl.searchParams.get("quick") === "1";
 
   try {
     const db = getDb();
 
-    // Start of today (UTC)
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
     const todayStr = todayStart.toISOString();
 
-    // Start of this month (UTC)
     const monthStart = new Date();
     monthStart.setUTCDate(1);
     monthStart.setUTCHours(0, 0, 0, 0);
     const monthStr = monthStart.toISOString();
 
-    const [
-      statusCounts,
-      newInquiriesToday,
-      pendingSubmissions,
-      viewsThisMonth,
-    ] = await Promise.all([
-      // Properties grouped by status
-      db
-        .select({
-          status: properties.status,
-          count: sql<number>`count(*)`,
-        })
-        .from(properties)
-        .groupBy(properties.status),
+    // Fast Turso counts
+    const [newInquiriesToday, pendingSubmissions, viewsThisMonth] = db
+      ? await Promise.all([
+          db.select({ count: sql<number>`count(*)` })
+            .from(inquiries)
+            .where(and(eq(inquiries.status, "new"), gte(inquiries.createdAt, todayStr)))
+            .get(),
+          db.select({ count: sql<number>`count(*)` })
+            .from(submissions)
+            .where(eq(submissions.status, "pending"))
+            .get(),
+          db.select({ count: sql<number>`count(*)` })
+            .from(propertyViews)
+            .where(gte(propertyViews.createdAt, monthStr))
+            .get(),
+        ])
+      : [null, null, null];
 
-      // New inquiries today (status = 'new', createdAt >= today)
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(inquiries)
-        .where(
-          and(
-            eq(inquiries.status, "new"),
-            gte(inquiries.createdAt, todayStr)
-          )
-        )
-        .get(),
+    const pendingSubCount = Number(pendingSubmissions?.count ?? 0);
 
-      // Pending submissions
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(submissions)
-        .where(eq(submissions.status, "pending"))
-        .get(),
+    // quick=1 used by sidebar badge — only needs a fast number
+    if (quick) {
+      return NextResponse.json({ pendingProperties: pendingSubCount });
+    }
 
-      // Property views this month
-      db
-        .select({ count: sql<number>`count(*)` })
-        .from(propertyViews)
-        .where(gte(propertyViews.createdAt, monthStr))
-        .get(),
-    ]);
-
-    const propertyCount = Object.fromEntries(
-      statusCounts.map((r) => [r.status ?? "unknown", Number(r.count)])
-    );
+    // Property counts from Notion (source of truth — Turso hot-cache is not reliable)
+    const props = await getProperties(undefined, "en").catch(() => []);
+    const propertyCount = props.reduce<Record<string, number>>((acc, p) => {
+      acc[p.status] = (acc[p.status] ?? 0) + 1;
+      return acc;
+    }, {});
 
     return NextResponse.json({
       propertyCount,
+      totalProperties: props.length,
+      availableProperties: propertyCount["available"] ?? 0,
+      rentedProperties: propertyCount["rented"] ?? 0,
+      pendingProperties: propertyCount["pending"] ?? 0,
       newInquiriesToday: Number(newInquiriesToday?.count ?? 0),
-      pendingSubmissions: Number(pendingSubmissions?.count ?? 0),
-      viewsThisMonth: Number(viewsThisMonth?.count ?? 0),
+      pendingSubmissions: pendingSubCount,
+      totalViewsThisMonth: Number(viewsThisMonth?.count ?? 0),
     });
   } catch (err) {
     console.error("GET /api/admin/stats error:", err);
