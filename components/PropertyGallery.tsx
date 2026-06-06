@@ -37,9 +37,19 @@ export default function PropertyGallery({
   galleryCategories,
 }: PropertyGalleryProps) {
   const allImages = useMemo(() => {
-    const deduped = [coverImage, ...images.filter((img) => img !== coverImage)].filter(Boolean)
-    return deduped
-  }, [images, coverImage])
+    // All tab = cover + gallery_urls + ALL category photos (deduped)
+    const seen = new Set<string>()
+    const result: string[] = []
+    const add = (url: string) => { if (url && !seen.has(url)) { seen.add(url); result.push(url) } }
+    if (coverImage) add(coverImage)
+    images.forEach(add)
+    if (galleryCategories) {
+      galleryCategories.exterior.forEach(add)
+      galleryCategories.interior.forEach(add)
+      galleryCategories.community.forEach(add)
+    }
+    return result
+  }, [images, coverImage, galleryCategories])
 
   // Determine available tabs (those with at least 1 image)
   const availableTabs = useMemo<CategoryKey[]>(() => {

@@ -257,8 +257,12 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         isList ? 'flex flex-row' : 'flex flex-col',
       )}
     >
-      {/* Status bar */}
-      <div className={cn('h-1 w-full shrink-0', statusCfg.barClass)} />
+      {/* Status bar — top strip in grid, left strip in list */}
+      <div className={cn(
+        'shrink-0',
+        isList ? 'w-1.5 self-stretch' : 'h-1 w-full',
+        statusCfg.barClass,
+      )} />
 
       {/* Swipeable photo carousel */}
       <CardCarousel
