@@ -424,7 +424,11 @@ export async function PATCH(
       }
     }
 
-    if (data.coverImage) {
+    // Only set cover if it's a valid absolute URL (Notion rejects relative/invalid URLs)
+    const isValidUrl = (u: string) => {
+      try { return /^https?:\/\/.+/.test(u); } catch { return false; }
+    };
+    if (data.coverImage && isValidUrl(data.coverImage)) {
       try {
         await client.pages.update({
           page_id: id,

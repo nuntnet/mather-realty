@@ -319,20 +319,22 @@ export default function PhotoManagerPage() {
   async function handleSave() {
     setSaving(true)
     try {
+      const isUrl = (u: string) => /^https?:\/\/.+/.test(u)
+
       const allCategorised = [
         ...columns.exterior,
         ...columns.interior,
         ...columns.community,
         ...columns.unassigned,
-      ]
+      ].filter(p => isUrl(p.url))   // strip any non-URL test values
 
       const body = {
-        coverImage: allCategorised[0]?.url || mainOrder[0]?.url || '',
+        coverImage: allCategorised[0]?.url || '',
         gallery: allCategorised.slice(1).map(p => p.url),
-        exteriorPhotos:  columns.exterior.map(p => p.url).join(','),
-        interiorPhotos:  columns.interior.map(p => p.url).join(','),
-        communityPhotos: columns.community.map(p => p.url).join(','),
-        heroPhotos:      heroPhotos.join(','),
+        exteriorPhotos:  columns.exterior.filter(p => isUrl(p.url)).map(p => p.url).join(','),
+        interiorPhotos:  columns.interior.filter(p => isUrl(p.url)).map(p => p.url).join(','),
+        communityPhotos: columns.community.filter(p => isUrl(p.url)).map(p => p.url).join(','),
+        heroPhotos:      heroPhotos.filter(isUrl).join(','),
       }
 
       const res = await fetch(`/api/admin/properties/${propertyId}`, {
