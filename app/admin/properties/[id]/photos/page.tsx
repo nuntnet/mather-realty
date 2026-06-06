@@ -6,6 +6,8 @@ import Image from 'next/image'
 import {
   DndContext,
   closestCenter,
+  pointerWithin,
+  rectIntersection,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -16,6 +18,7 @@ import {
   DragOverlay,
   UniqueIdentifier,
   useDroppable,
+  type CollisionDetection,
 } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -28,6 +31,31 @@ import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Star, Trash2, ArrowLeft, Save, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+
+// ── Collision detection ────────────────────────────────────────────────────────
+// pointerWithin checks if the cursor is physically inside a droppable —
+// much better than closestCenter for multi-column kanban because an empty
+// column's "center" can be further than items in adjacent columns.
+const COLUMN_IDS = new Set(['unassigned', 'exterior', 'interior', 'community'])
+
+const columnFirstCollision: CollisionDetection = (args) => {
+  // 1. If the pointer is directly over a column zone, use that immediately
+  const pointerHits = pointerWithin(args)
+  const columnHit = pointerHits.find(c => COLUMN_IDS.has(c.id as string))
+  if (columnHit) return [columnHit]
+
+  // 2. If hovering over a photo card inside a column, use it (for reorder)
+  if (pointerHits.length > 0) return [pointerHits[0]]
+
+  // 3. Fall back to rect intersection for edge cases
+  const rectHits = rectIntersection(args)
+  const rectColumn = rectHits.find(c => COLUMN_IDS.has(c.id as string))
+  if (rectColumn) return [rectColumn]
+  if (rectHits.length > 0) return [rectHits[0]]
+
+  // 4. Last resort: closest center
+  return closestCenter(args)
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -95,8 +123,8 @@ function Column({ col, photos, onRemove, activeId }: {
   const { setNodeRef, isOver } = useDroppable({ id: col.key })
 
   return (
-    <div className={`flex flex-col rounded-2xl border-2 transition-colors min-h-[200px]
-      ${isOver ? 'border-[#1E6B69] bg-[#1E6B69]/5' : col.border + ' ' + col.bg}`}>
+    <div className={`flex flex-col rounded-2xl border-2 transition-colors min-h-[280px]
+      ${isOver ? 'border-[#1E6B69] bg-[#1E6B69]/5 shadow-md' : col.border + ' ' + col.bg}`}>
       {/* Header */}
       <div className={`px-3 py-2.5 border-b ${col.border} flex items-center justify-between`}>
         <span className={`text-sm font-semibold ${col.color}`}>{col.label}</span>
@@ -119,10 +147,10 @@ function Column({ col, photos, onRemove, activeId }: {
         </SortableContext>
 
         {photos.length === 0 && (
-          <div className={`flex items-center justify-center h-20 rounded-xl border-2 border-dashed
-            ${isOver ? 'border-[#1E6B69] text-[#1E6B69]' : 'border-gray-200 text-gray-300'} transition-colors`}>
+          <div className={`flex items-center justify-center rounded-xl border-2 border-dashed min-h-[120px]
+            ${isOver ? 'border-[#1E6B69] text-[#1E6B69] bg-[#1E6B69]/5' : 'border-gray-200 text-gray-300'} transition-colors`}>
             <span className="text-xs font-medium">
-              {isOver ? 'Drop here' : 'Drag photos here'}
+              {isOver ? '↓ Drop here' : 'Drag photos here'}
             </span>
           </div>
         )}
@@ -397,7 +425,7 @@ export default function PhotoManagerPage() {
 
           <DndContext
             sensors={sensors}
-            collisionDetection={closestCenter}
+            collisionDetection={columnFirstCollision}
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
