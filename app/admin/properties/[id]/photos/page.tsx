@@ -51,16 +51,22 @@ function makeId(url: string, col: ColumnKey, idx: number) {
 }
 
 // ── Collision detection ────────────────────────────────────────────────────────
+// Photo IDs encode their column: "exterior::0::abc" → column = "exterior"
+function colFromId(id: UniqueIdentifier): string {
+  return String(id).split('::')[0]
+}
 
 const columnFirstCollision: CollisionDetection = (args) => {
+  const activeCol = colFromId(args.active.id)
+
+  // Look for a DIFFERENT column zone under the pointer
+  // (only relevant for cross-column moves)
   const ptr = pointerWithin(args)
-  const colHit = ptr.find(c => COLUMN_IDS.has(c.id as string))
-  if (colHit) return [colHit]
-  if (ptr.length > 0) return [ptr[0]]
-  const rect = rectIntersection(args)
-  const rectCol = rect.find(c => COLUMN_IDS.has(c.id as string))
-  if (rectCol) return [rectCol]
-  if (rect.length > 0) return [rect[0]]
+  const crossCol = ptr.find(c => COLUMN_IDS.has(c.id as string) && c.id !== activeCol)
+  if (crossCol) return [crossCol]
+
+  // Within same column (or no column zone hit) → use closestCenter so
+  // the nearest PHOTO is returned, enabling within-column reorder
   return closestCenter(args)
 }
 
@@ -274,10 +280,10 @@ export default function PhotoManagerPage() {
     const { active, over } = e
     if (!over) return
     const fromCol = findColumn(active.id)
-    // Determine target column: if over.id is a column key → use it, else find photo's column
+    // Target column: column key directly, OR derived from the hovered photo's id
     const toCol = COLUMN_IDS.has(over.id as string)
       ? (over.id as ColumnKey)
-      : findColumn(over.id)
+      : (findColumn(over.id) ?? (COLUMN_IDS.has(colFromId(over.id)) ? colFromId(over.id) as ColumnKey : null))
 
     if (!fromCol || !toCol || fromCol === toCol) return
 
