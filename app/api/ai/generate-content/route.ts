@@ -62,12 +62,46 @@ function chunkRichText(text: string) {
   return chunks
 }
 
+const LOCALE_NAMES: Record<string, string> = {
+  'zh-CN': 'Simplified Chinese', 'zh-TW': 'Traditional Chinese',
+  'ja': 'Japanese', 'ko': 'Korean', 'ru': 'Russian', 'de': 'German',
+  'fr': 'French', 'es': 'Spanish', 'it': 'Italian', 'nl': 'Dutch',
+  'sv': 'Swedish', 'ar': 'Arabic', 'hi': 'Hindi',
+}
+
 export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
 
-  const { propertyId, action, data: saveData } = await req.json()
-  if (!propertyId) return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
+  const { propertyId, action, data: saveData, locales, titleEn, descriptionEn } = await req.json()
+  if (!propertyId && action !== 'translate') return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
+
+  // ── TRANSLATE action ─────────────────────────────────────────────────────────
+  if (action === 'translate') {
+    if (!titleEn || !descriptionEn || !locales?.length)
+      return NextResponse.json({ error: 'titleEn, descriptionEn, locales required' }, { status: 400 })
+
+    const targetList = (locales as string[]).map(l => `"${l}": { "title": "...", "description": "..." }`).join(',\n  ')
+    const langList = (locales as string[]).map(l => `${l} = ${LOCALE_NAMES[l] ?? l}`).join(', ')
+
+    const prompt = `Translate the following English property listing to these languages: ${langList}
+
+English title: ${titleEn}
+English description: ${descriptionEn}
+
+Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words. Keep descriptions natural and culturally appropriate (not literal word-for-word). Format:
+{
+  ${targetList}
+}`
+
+    try {
+      const raw = await callAI(prompt)
+      const translations = parseJSON(raw)
+      return NextResponse.json({ success: true, translations })
+    } catch (e) {
+      return NextResponse.json({ error: (e as Error).message }, { status: 502 })
+    }
+  }
 
   // ── SAVE action — write pre-approved content to Notion ─────────────────────
   if (action === 'save') {
@@ -76,6 +110,7 @@ export async function POST(req: NextRequest) {
 
     const rt = (s: string) => ({ rich_text: chunkRichText(s) })
 
+    // Core fields
     if (saveData.title_en)    updates.title_en    = rt(saveData.title_en)
     if (saveData.title_th)    updates.title_th    = rt(saveData.title_th)
     if (saveData.description_en) updates.description_en = rt(saveData.description_en)
@@ -84,6 +119,14 @@ export async function POST(req: NextRequest) {
     if (saveData.faqItems)    updates.faq_json    = rt(JSON.stringify(saveData.faqItems))
     if (saveData.personaDescriptions)
       updates.persona_descriptions = rt(JSON.stringify(saveData.personaDescriptions))
+
+    // Additional locale translations from the translate step
+    const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
+    for (const loc of ALL_LOCALES) {
+      const safeKey = loc.replace('-', '_')
+      if (saveData[`title_${safeKey}`]) updates[`title_${loc}`] = rt(saveData[`title_${safeKey}`])
+      if (saveData[`description_${safeKey}`]) updates[`description_${loc}`] = rt(saveData[`description_${safeKey}`])
+    }
 
     await notion.pages.update({
       page_id: propertyId,

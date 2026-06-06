@@ -2,22 +2,35 @@
 
 import { use, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Bot, Loader2, Save, CheckCircle2, RefreshCw } from "lucide-react";
+import { ArrowLeft, Bot, Loader2, Save, CheckCircle2, RefreshCw, Languages } from "lucide-react";
 import { toast } from "sonner";
 
 type Props = { params: Promise<{ id: string }> };
-
 type FaqItem = { q: string; a: string };
-
 type Generated = {
-  title_en?: string;
-  title_th?: string;
-  description_en?: string;
-  description_th?: string;
+  title_en?: string; title_th?: string;
+  description_en?: string; description_th?: string;
   seoDescription?: string;
   faqItems?: FaqItem[];
   personaDescriptions?: Record<string, string>;
+  [key: string]: unknown; // locale translations like title_zh_CN
 };
+
+const EXTRA_LOCALES = [
+  { code: 'zh-CN', label: '🇨🇳 Chinese (Simplified)' },
+  { code: 'zh-TW', label: '🇹🇼 Chinese (Traditional)' },
+  { code: 'ja',    label: '🇯🇵 Japanese' },
+  { code: 'ko',    label: '🇰🇷 Korean' },
+  { code: 'ru',    label: '🇷🇺 Russian' },
+  { code: 'de',    label: '🇩🇪 German' },
+  { code: 'fr',    label: '🇫🇷 French' },
+  { code: 'es',    label: '🇪🇸 Spanish' },
+  { code: 'it',    label: '🇮🇹 Italian' },
+  { code: 'nl',    label: '🇳🇱 Dutch' },
+  { code: 'sv',    label: '🇸🇪 Swedish' },
+  { code: 'ar',    label: '🇸🇦 Arabic' },
+  { code: 'hi',    label: '🇮🇳 Hindi' },
+];
 
 function Section({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -50,11 +63,14 @@ function EditArea({
 export default function AIAssistantPage({ params }: Props) {
   const { id } = use(params);
   const [generating, setGenerating] = useState(false);
+  const [translating, setTranslating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draft, setDraft] = useState<Generated>({});
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [selectedLocales, setSelectedLocales] = useState<string[]>([]);
+  const [translations, setTranslations] = useState<Record<string, { title: string; description: string }>>({});
 
   const updateDraft = (key: keyof Generated, value: unknown) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -83,6 +99,32 @@ export default function AIAssistantPage({ params }: Props) {
     }
   };
 
+  const handleTranslate = async () => {
+    if (!selectedLocales.length) return;
+    setTranslating(true);
+    try {
+      const res = await fetch("/api/ai/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "translate",
+          titleEn: draft.title_en,
+          descriptionEn: draft.description_en,
+          locales: selectedLocales,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.error ?? `Error ${res.status}`);
+      setTranslations((prev) => ({ ...prev, ...data.translations }));
+      setSaved(false);
+      toast.success(`Translated to ${selectedLocales.length} language${selectedLocales.length > 1 ? "s" : ""}!`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Translation failed");
+    } finally {
+      setTranslating(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!hasGenerated) return;
     setSaving(true);
@@ -90,7 +132,19 @@ export default function AIAssistantPage({ params }: Props) {
       const res = await fetch("/api/ai/generate-content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ propertyId: id, action: "save", data: draft }),
+        body: JSON.stringify({
+          propertyId: id, action: "save",
+          data: {
+            ...draft,
+            // Merge translations: title_zh_CN, description_zh_CN, etc.
+            ...Object.fromEntries(
+              Object.entries(translations).flatMap(([loc, t]) => {
+                const key = loc.replace('-', '_');
+                return [[`title_${key}`, t.title], [`description_${key}`, t.description]];
+              })
+            ),
+          },
+        }),
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
@@ -240,6 +294,70 @@ export default function AIAssistantPage({ params }: Props) {
               </div>
             </Section>
           )}
+
+          {/* ── Translation section ── */}
+          <div className="border-t border-gray-100 pt-5 space-y-4">
+            <div className="flex items-center gap-2">
+              <Languages className="w-4 h-4 text-[#1E6B69]" />
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Translate to other languages</p>
+            </div>
+            <p className="text-xs text-gray-400">Select languages, then click Translate. Reviews EN title + description and renders natural translations.</p>
+
+            {/* Language checkboxes */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {EXTRA_LOCALES.map(({ code, label }) => (
+                <label key={code} className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer text-xs transition-all ${
+                  selectedLocales.includes(code)
+                    ? "border-[#1E6B69] bg-[#EEF9F9] text-[#1E6B69] font-medium"
+                    : "border-gray-200 text-gray-500 hover:border-gray-300"
+                }`}>
+                  <input type="checkbox" className="sr-only"
+                    checked={selectedLocales.includes(code)}
+                    onChange={() => setSelectedLocales(prev =>
+                      prev.includes(code) ? prev.filter(l => l !== code) : [...prev, code]
+                    )} />
+                  <span>{label}</span>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex gap-2">
+              <button onClick={() => setSelectedLocales(EXTRA_LOCALES.map(l => l.code))}
+                className="text-xs px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg hover:bg-gray-50">
+                Select all
+              </button>
+              <button onClick={() => setSelectedLocales([])}
+                className="text-xs px-3 py-1.5 border border-gray-200 text-gray-500 rounded-lg hover:bg-gray-50">
+                Clear
+              </button>
+              <button onClick={handleTranslate} disabled={!selectedLocales.length || translating || !draft.title_en}
+                className="flex items-center gap-1.5 text-xs px-4 py-1.5 bg-[#1E6B69] text-white rounded-lg hover:bg-[#18605E] disabled:opacity-50 transition-colors ml-auto">
+                {translating ? <><Loader2 className="w-3.5 h-3.5 animate-spin" />Translating…</> : <><Languages className="w-3.5 h-3.5" />Translate {selectedLocales.length > 0 ? `(${selectedLocales.length})` : ""}</>}
+              </button>
+            </div>
+
+            {/* Translation results */}
+            {Object.entries(translations).length > 0 && (
+              <div className="space-y-4">
+                {Object.entries(translations).map(([loc, t]) => {
+                  const locInfo = EXTRA_LOCALES.find(l => l.code === loc);
+                  return (
+                    <div key={loc} className="bg-gray-50 rounded-xl p-4 space-y-2">
+                      <p className="text-xs font-semibold text-gray-600">{locInfo?.label ?? loc}</p>
+                      <input value={t.title}
+                        onChange={e => setTranslations(prev => ({ ...prev, [loc]: { ...prev[loc], title: e.target.value } }))}
+                        className="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-[#1E6B69]/20"
+                        placeholder="Title" />
+                      <textarea value={t.description} rows={4}
+                        onChange={e => setTranslations(prev => ({ ...prev, [loc]: { ...prev[loc], description: e.target.value } }))}
+                        className="w-full text-sm border border-gray-200 rounded-lg px-2.5 py-1.5 bg-white resize-y focus:outline-none focus:ring-1 focus:ring-[#1E6B69]/20"
+                        placeholder="Description" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Save */}
           <div className="flex items-center justify-between pt-2 border-t border-gray-100">

@@ -121,7 +121,7 @@ function CardCarousel({
       locale={locale as Parameters<typeof Link>[0]['locale']}
       className={cn(
         'relative block shrink-0 overflow-hidden',
-        isList ? 'w-56 self-stretch' : 'w-full',
+        isList ? 'w-72 self-stretch' : 'w-full',
       )}
       tabIndex={-1}
       onMouseEnter={() => setHovering(true)}
