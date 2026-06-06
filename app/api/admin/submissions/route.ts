@@ -16,7 +16,11 @@ function getDb() {
 const PAGE_SIZE = 20;
 const patchSchema = z.object({
   id: z.number().int(),
-  status: z.enum(["pending", "approved", "rejected"]),
+  // accept either `status` directly or `action` shorthand
+  status: z.enum(["pending", "approved", "rejected"]).optional(),
+  action: z.enum(["approve", "reject"]).optional(),
+}).refine((d) => d.status !== undefined || d.action !== undefined, {
+  message: "Either status or action is required",
 });
 
 export async function GET(req: NextRequest) {
@@ -63,7 +67,9 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { id, status } = patchSchema.parse(body);
+    const parsed = patchSchema.parse(body);
+    const { id } = parsed;
+    const status = parsed.status ?? (parsed.action === "approve" ? "approved" : "rejected");
     const db = getDb();
 
     const updated = await db
