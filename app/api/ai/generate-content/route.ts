@@ -35,7 +35,7 @@ async function callAI(prompt: string): Promise<string> {
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     })
     const c = await gemini.chat.completions.create({
-      model: process.env.GEMINI_MODEL ?? 'gemini-2.0-flash',
+      model: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash',
       max_tokens: 3000,
       temperature: 0.7,
       messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
