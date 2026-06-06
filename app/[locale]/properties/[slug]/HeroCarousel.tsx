@@ -65,7 +65,7 @@ export default function HeroCarousel({
                     backgroundImage: `url(${img})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    filter: 'blur(18px) brightness(0.5) saturate(0.85)',
+                    filter: 'blur(8px) brightness(0.65) saturate(1.1)',
                     transform: 'scale(1.08)',
                   }}
                 />
