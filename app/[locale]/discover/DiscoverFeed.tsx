@@ -302,8 +302,11 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             const ptitle = p.title[locale] ?? p.title.en ?? p.slug
             return (
               <button key={p.id} onClick={() => scrollTo(idx)}
-                className={cn('w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-all',
-                  idx === activeIndex ? 'bg-[#1E6B69]/20 border border-[#1E6B69]/40' : 'hover:bg-white/5')}>
+                className={cn('w-full flex items-center gap-3 p-2.5 rounded-xl text-left transition-colors border',
+                  idx === activeIndex
+                    ? 'bg-[#1E6B69]/20 border-[#1E6B69]/40'
+                    : 'border-transparent hover:bg-white/5'
+                )}>
                 {p.coverImage && (
                   <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
                     <img src={p.coverImage} alt="" className="w-full h-full object-cover" />
