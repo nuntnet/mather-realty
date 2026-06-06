@@ -102,12 +102,13 @@ export async function POST(req: NextRequest) {
     const slug = slugProp?.rich_text?.map(r => r.plain_text).join('') ?? ''
     if (!slug) return NextResponse.json({ error: 'Property has no slug' }, { status: 400 })
     property = await getProperty(slug, 'en')
+    if (!property) throw new Error('Property not found')
   } catch (e) {
     return NextResponse.json({ error: `Could not load property: ${(e as Error).message}` }, { status: 500 })
   }
 
   const ctx = {
-    title: property.title.en,
+    title: property!.title.en,
     address: property.address,
     city: property.city,
     district: property.district,
