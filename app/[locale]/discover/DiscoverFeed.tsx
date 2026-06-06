@@ -28,15 +28,9 @@ interface DiscoverFeedProps {
 }
 
 const AMENITY_ICONS: Record<string, string> = {
-  Pool: '🏊',
-  WiFi: '📶',
-  Parking: '🚗',
-  Gym: '💪',
-  Furnished: '🛋️',
-  AirCon: '❄️',
-  Security: '🔒',
-  EVCharger: '⚡',
-  PetFriendly: '🐾',
+  Pool: '🏊', WiFi: '📶', Parking: '🚗', Gym: '💪',
+  Furnished: '🛋️', AirCon: '❄️', Security: '🔒',
+  EVCharger: '⚡', PetFriendly: '🐾',
 }
 
 function useSaved() {
@@ -83,7 +77,6 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
     return () => { emblaApi.off('select', onSelect) }
   }, [emblaApi])
 
-  // Reset to first photo when card becomes active
   useEffect(() => {
     if (isActive && emblaApi) emblaApi.scrollTo(0, true)
   }, [isActive, emblaApi])
@@ -114,11 +107,9 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
         </div>
       </div>
 
-      {/* Story-style progress bars — below header
-          mobile: top-16 (64px, below 56px header)
-          desktop: top-28 (112px, below stacked chevron header ~100px) */}
+      {/* Story-style progress bars — top of card, right below header */}
       {photos.length > 1 && (
-        <div className="absolute top-16 lg:top-28 left-4 right-4 z-20 flex gap-1">
+        <div className="absolute top-14 left-4 right-4 z-20 flex gap-1">
           {photos.slice(0, 12).map((_, idx) => (
             <div
               key={idx}
@@ -129,13 +120,6 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
               )}
             />
           ))}
-        </div>
-      )}
-
-      {/* Photo count badge */}
-      {photos.length > 1 && (
-        <div className="absolute top-[4.5rem] right-4 z-20 hidden">
-          {/* hidden — progress bars replace this */}
         </div>
       )}
     </>
@@ -162,8 +146,10 @@ function PropertyCard({
 
   const title = property.title[locale] ?? property.title.en ?? property.slug
   const topAmenities = property.amenities.slice(0, 3)
+  void topAmenities
 
-  const handleSave = () => {
+  const handleSave = (e: React.MouseEvent) => {
+    e.stopPropagation()
     toggle(property.id)
     if (!isSaved) {
       setHearted(true)
@@ -171,7 +157,8 @@ function PropertyCard({
     }
   }
 
-  const handleShare = async () => {
+  const handleShare = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     const url = `${window.location.origin}/${locale}/properties/${property.slug}`
     try {
       if (navigator.share) {
@@ -184,14 +171,15 @@ function PropertyCard({
     } catch {}
   }
 
-  const handleView = () => {
+  const handleView = (e: React.MouseEvent) => {
+    e.stopPropagation()
     router.push(`/properties/${property.slug}` as '/properties')
   }
 
   return (
     <section className={cn(
-      'relative w-full snap-start overflow-hidden flex flex-col justify-end flex-shrink-0',
-      isDesktop ? 'h-full' : 'h-dvh'
+      'relative w-full overflow-hidden flex flex-col justify-end flex-shrink-0',
+      isDesktop ? 'h-full' : 'h-full'
     )}>
 
       {/* ── Swipeable photo carousel ── */}
@@ -200,16 +188,16 @@ function PropertyCard({
       {/* Dark gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/35 pointer-events-none z-10" />
 
-      {/* Status badge — below progress bars */}
+      {/* Status badge */}
       {property.status === 'available' && (
-        <div className="absolute top-[5.5rem] lg:top-36 left-4 z-20">
+        <div className="absolute top-20 left-4 z-20">
           <span className="bg-[#1E6B69]/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
             ● Available
           </span>
         </div>
       )}
 
-      {/* Right side actions — mobile, positioned above the info card */}
+      {/* Right side actions — mobile */}
       <div className={cn(
         'absolute right-4 bottom-[340px] flex flex-col gap-4 z-20 items-center',
         isDesktop && 'hidden'
@@ -250,7 +238,7 @@ function PropertyCard({
         onClick={handleView}
         role="button"
         tabIndex={0}
-        onKeyDown={e => e.key === 'Enter' && handleView()}
+        onKeyDown={e => e.key === 'Enter' && handleView(e as unknown as React.MouseEvent)}
         aria-label={`View ${title}`}
         className={cn(
           'relative z-20 mx-3 mb-24 px-4 py-3.5 rounded-2xl shadow-2xl transition-all duration-500 cursor-pointer',
@@ -259,13 +247,10 @@ function PropertyCard({
           isDesktop && 'hidden'
         )}
       >
-        {/* Title row */}
         <div className="flex items-start justify-between gap-2 mb-1.5">
           <h2 className="text-white font-bold text-lg leading-tight flex-1">{title}</h2>
           {property.verifiedAt && <CheckCircle2 className="w-4 h-4 text-[#4DB5B2] shrink-0 mt-0.5" />}
         </div>
-
-        {/* Location + specs in one compact row */}
         <div className="flex items-center gap-3 text-white/70 text-xs mb-2.5">
           <span className="flex items-center gap-1">
             <MapPin className="w-3 h-3 shrink-0" />
@@ -278,8 +263,6 @@ function PropertyCard({
           <span className="text-white/30">·</span>
           <span>{property.sizeSqm}m²</span>
         </div>
-
-        {/* Price + CTA */}
         <div className="flex items-center justify-between">
           <p className="text-white font-bold text-xl">฿{property.priceTHB.toLocaleString()}
             <span className="text-white/50 text-xs font-normal ml-1">/mo</span>
@@ -298,7 +281,6 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
   const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
-  const observerRef = useRef<IntersectionObserver | null>(null)
   const [isDesktop, setIsDesktop] = useState(false)
 
   useEffect(() => {
@@ -312,9 +294,12 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
     if (containerRef.current) containerRef.current.scrollTop = 0
   }, [])
 
+  // IntersectionObserver to track active card
   useEffect(() => {
-    if (!containerRef.current) return
-    observerRef.current = new IntersectionObserver(
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
       entries => {
         entries.forEach(entry => {
           if (entry.isIntersecting) {
@@ -323,17 +308,34 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
           }
         })
       },
-      { threshold: 0.6, root: containerRef.current }
+      { threshold: 0.6, root: container }
     )
-    const sections = containerRef.current.querySelectorAll('[data-index]')
-    sections.forEach(s => observerRef.current!.observe(s))
-    return () => observerRef.current?.disconnect()
+
+    const sections = container.querySelectorAll('[data-index]')
+    sections.forEach(s => observer.observe(s))
+    return () => observer.disconnect()
   }, [properties])
 
-  const scrollTo = (idx: number) => {
+  const scrollTo = useCallback((idx: number) => {
+    if (idx < 0 || idx >= properties.length) return
     setActiveIndex(idx)
-    containerRef.current?.querySelectorAll('[data-index]')[idx]?.scrollIntoView({ behavior: 'smooth' })
-  }
+    const target = containerRef.current?.querySelectorAll('[data-index]')[idx]
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [properties.length])
+
+  // Click handler: left half = prev, right half = next
+  // Ignores clicks on interactive elements — swipe still works (not intercepted)
+  const handleFeedClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement
+    // Skip if clicking a button, link, or labeled interactive element
+    if (target.closest('button, a, [role="button"], input, textarea')) return
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const ratio = (e.clientX - rect.left) / rect.width
+
+    if (ratio < 0.4) scrollTo(Math.max(0, activeIndex - 1))
+    else if (ratio > 0.6) scrollTo(Math.min(properties.length - 1, activeIndex + 1))
+  }, [activeIndex, properties.length, scrollTo])
 
   if (properties.length === 0) {
     return (
@@ -400,104 +402,105 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
 
       {/* ── Feed ─────────────────────────────────────── */}
       <div className="flex-1 flex relative overflow-hidden">
-        <div className="relative overflow-hidden bg-black w-full h-full">
+        {/* Main photo area — click handler for left/right navigation */}
+        <div
+          className="relative overflow-hidden bg-black w-full h-full cursor-pointer"
+          onClick={handleFeedClick}
+        >
 
-          {/* Header */}
-          <header className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3">
-            <button onClick={() => router.back()}
-              className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center lg:hidden"
-              aria-label="Back">
-              <ArrowLeft className="w-5 h-5 text-white" />
-            </button>
-            <div className="hidden lg:block w-10" />
+          {/* ── Top bar: header + progress + arrows all in one strip ── */}
+          <div className="absolute top-0 left-0 right-0 z-30">
+            {/* Row 1: back button / title / mobile dots */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <button onClick={(e) => { e.stopPropagation(); router.back() }}
+                className="w-10 h-10 rounded-full bg-black/30 backdrop-blur-md flex items-center justify-center lg:hidden"
+                aria-label="Back">
+                <ArrowLeft className="w-5 h-5 text-white" />
+              </button>
+              <div className="hidden lg:block w-10" />
 
-            <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
-              Double<span className="text-[#4DB5B2]">N</span> Realty
-            </h1>
-            <div className="hidden lg:block w-10" />
+              <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
+                Double<span className="text-[#4DB5B2]">N</span> Realty
+              </h1>
+              <div className="hidden lg:block flex-1" />
 
-            {/* Mobile: vertical dots for property progress */}
-            <div className="flex flex-col gap-1 lg:hidden">
-              {properties.slice(0, 8).map((_, idx) => (
-                <div key={idx} onClick={() => scrollTo(idx)}
-                  className={cn('w-1 rounded-full transition-all duration-300 cursor-pointer',
-                    idx === activeIndex ? 'h-4 bg-[#1E6B69]' : 'h-1.5 bg-white/40'
-                  )} />
-              ))}
+              {/* Mobile: vertical dots */}
+              <div className="flex flex-col gap-1 lg:hidden">
+                {properties.slice(0, 8).map((_, idx) => (
+                  <div key={idx}
+                    onClick={(e) => { e.stopPropagation(); scrollTo(idx) }}
+                    className={cn('w-1 rounded-full transition-all duration-300 cursor-pointer',
+                      idx === activeIndex ? 'h-4 bg-[#1E6B69]' : 'h-1.5 bg-white/40'
+                    )} />
+                ))}
+              </div>
+
+              {/* Desktop: ▲▼ arrows — top right */}
+              <div className="hidden lg:flex items-center gap-1.5">
+                <button
+                  onClick={(e) => { e.stopPropagation(); scrollTo(Math.max(0, activeIndex - 1)) }}
+                  className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                  disabled={activeIndex === 0}
+                  aria-label="Previous property">
+                  <ChevronUp className="w-4 h-4 text-white" />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); scrollTo(Math.min(properties.length - 1, activeIndex + 1)) }}
+                  className="w-8 h-8 rounded-full bg-black/50 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
+                  disabled={activeIndex === properties.length - 1}
+                  aria-label="Next property">
+                  <ChevronDown className="w-4 h-4 text-white" />
+                </button>
+              </div>
             </div>
-          </header>
 
-          {/* Desktop: ▲▼ arrows below progress bars (lg:top-28 = progress bars, so top-36) */}
-          <div className="hidden lg:flex absolute top-36 right-4 z-30 flex-col gap-1.5">
-            <button onClick={() => scrollTo(Math.max(0, activeIndex - 1))}
-              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
-              disabled={activeIndex === 0}
-              aria-label="Previous property">
-              <ChevronUp className="w-4 h-4 text-white" />
-            </button>
-            <button onClick={() => scrollTo(Math.min(properties.length - 1, activeIndex + 1))}
-              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm border border-white/20 flex items-center justify-center hover:bg-white/20 transition-colors disabled:opacity-30"
-              disabled={activeIndex === properties.length - 1}
-              aria-label="Next property">
-              <ChevronDown className="w-4 h-4 text-white" />
-            </button>
+            {/* Row 2: photo progress bars — directly below header row */}
+            {/* PhotoCarousel renders its own progress bars, but we show property-count here */}
           </div>
 
-          {/* Left/right click zones — desktop only (mobile: swipe vertically)
-              z-[15] so action buttons (z-20) and info card (z-20) stay on top */}
-          <div className="absolute inset-0 z-[15] hidden lg:flex pointer-events-none"
-            style={{ top: 56 }}>
-            {/* Left 45% → previous */}
-            <div
-              className="w-[45%] h-full pointer-events-auto cursor-w-resize select-none"
-              onClick={() => activeIndex > 0 && scrollTo(activeIndex - 1)}
-              aria-label="Previous property"
-            />
-            {/* Middle 10% — no action (avoids accidental navigation) */}
-            <div className="w-[10%] h-full" />
-            {/* Right 45% → next */}
-            <div
-              className="w-[45%] h-full pointer-events-auto cursor-e-resize select-none"
-              onClick={() => activeIndex < properties.length - 1 && scrollTo(activeIndex + 1)}
-              aria-label="Next property"
-            />
-          </div>
-
-          {/* Mobile: left/right tap zones — only the upper photo area, not buttons/info card */}
-          <div className="absolute inset-x-0 z-[15] flex lg:hidden pointer-events-none"
-            style={{ top: 80, bottom: 380 }}>
-            <div
-              className="w-1/2 h-full pointer-events-auto select-none"
-              onClick={() => activeIndex > 0 && scrollTo(activeIndex - 1)}
-            />
-            <div
-              className="w-1/2 h-full pointer-events-auto select-none"
-              onClick={() => activeIndex < properties.length - 1 && scrollTo(activeIndex + 1)}
-            />
-          </div>
-
-          {/* Vertical snap feed — overflow:hidden prevents next card from peeking */}
-          <div ref={containerRef}
-            className={cn('h-full overflow-y-scroll snap-y snap-mandatory', isDesktop && 'flex flex-col')}
-            style={{ scrollSnapType: 'y mandatory', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'none' }}>
-            <style>{`div::-webkit-scrollbar { display: none; }`}</style>
-
+          {/* Vertical snap feed — each card exactly fills container, no peeking */}
+          <div
+            ref={containerRef}
+            className="absolute inset-0 overflow-y-scroll"
+            style={{
+              scrollSnapType: 'y mandatory',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehavior: 'none',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+            }}
+            onClick={(e) => e.stopPropagation()} // let parent handle
+          >
             {properties.map((property, idx) => (
-              <div key={property.id} data-index={idx}
-                className={cn(isDesktop ? 'h-full' : 'h-dvh', 'overflow-hidden')}
-                style={{ scrollSnapAlign: 'start', flexShrink: 0 }}>
-                <PropertyCard property={property} locale={locale} isActive={idx === activeIndex} isDesktop={isDesktop} />
+              <div
+                key={property.id}
+                data-index={idx}
+                style={{
+                  scrollSnapAlign: 'start',
+                  scrollSnapStop: 'always',
+                  height: '100%',
+                  flexShrink: 0,
+                  overflow: 'hidden',
+                }}
+              >
+                <PropertyCard
+                  property={property}
+                  locale={locale}
+                  isActive={idx === activeIndex}
+                  isDesktop={isDesktop}
+                />
               </div>
             ))}
 
             {/* End card */}
-            <div className={cn(isDesktop ? 'h-full' : 'h-dvh', 'flex flex-col items-center justify-center bg-[#1d211c]')}
-              style={{ scrollSnapAlign: 'start' }}>
+            <div style={{ scrollSnapAlign: 'start', height: '100%', flexShrink: 0 }}
+              className="flex flex-col items-center justify-center bg-[#1d211c]">
               <div className="text-center space-y-4 px-8">
                 <Home className="w-12 h-12 text-[#1E6B69] mx-auto" />
                 <p className="text-white text-xl font-bold">That&apos;s all for now</p>
                 <p className="text-[#cdd1cb] text-sm">More properties coming soon</p>
-                <button onClick={() => router.push('/properties')}
+                <button
+                  onClick={(e) => { e.stopPropagation(); router.push('/properties') }}
                   className="bg-[#1E6B69] text-white font-semibold px-6 py-3 rounded-full mt-4">
                   Browse all properties
                 </button>
@@ -506,7 +509,8 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
           </div>
 
           {/* Bottom nav — mobile */}
-          <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/60 backdrop-blur-xl lg:hidden">
+          <nav className="absolute bottom-0 left-0 right-0 z-30 flex justify-around items-center px-4 pb-8 pt-3 bg-black/60 backdrop-blur-xl lg:hidden"
+            onClick={(e) => e.stopPropagation()}>
             <button onClick={() => router.push('/discover' as '/')}
               className="flex flex-col items-center gap-0.5 bg-[#1E6B69]/20 text-[#4DB5B2] px-5 py-2 rounded-full">
               <Compass className="w-5 h-5" />
