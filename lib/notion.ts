@@ -5,6 +5,7 @@
  */
 
 import { Client } from '@notionhq/client'
+import { unstable_cache } from 'next/cache'
 import type {
   PageObjectResponse,
   QueryDatabaseParameters,
@@ -39,6 +40,12 @@ function getNotionClient(): Client {
 const PROPERTIES_DB_ID = process.env.NOTION_PROPERTIES_DB_ID ?? ''
 const BLOG_DB_ID = process.env.NOTION_BLOG_DB_ID ?? ''
 const PAGES_DB_ID = process.env.NOTION_PAGES_DB_ID ?? ''
+
+// Fail fast at startup if critical env vars are missing
+if (typeof window === 'undefined' && process.env.NODE_ENV === 'production') {
+  if (!PROPERTIES_DB_ID) console.error('[notion] NOTION_PROPERTIES_DB_ID is not set — property queries will fail')
+  if (!process.env.NOTION_API_KEY) console.error('[notion] NOTION_API_KEY is not set')
+}
 
 // ---------------------------------------------------------------------------
 // Supported locales
@@ -466,52 +473,52 @@ async function queryAllPages(
 // Properties
 // ---------------------------------------------------------------------------
 
-export async function getProperties(
-  filters?: PropertyFilters,
-  locale = 'en',
-): Promise<Property[]> {
-  try {
-    const pages = await queryAllPages(PROPERTIES_DB_ID, {
-      filter: buildPropertyFilters(filters, true),
-      sorts: [{ property: 'approved_at', direction: 'descending' }],
-    })
-    return pages.map((p) => mapProperty(p, locale))
-  } catch (err) {
-    console.error('[notion] getProperties error:', err)
-    return []
-  }
-}
+export const getProperties = unstable_cache(
+  async (filters?: PropertyFilters, locale = 'en'): Promise<Property[]> => {
+    try {
+      const pages = await queryAllPages(PROPERTIES_DB_ID, {
+        filter: buildPropertyFilters(filters, true),
+        sorts: [{ property: 'approved_at', direction: 'descending' }],
+      })
+      return pages.map((p) => mapProperty(p, locale))
+    } catch (err) {
+      console.error('[notion] getProperties error:', err)
+      return []
+    }
+  },
+  ['getProperties'],
+  { tags: ['properties'], revalidate: 3600 }
+)
 
-export async function getProperty(
-  slug: string,
-  locale = 'en',
-): Promise<Property | null> {
-  try {
-    const notion = getNotionClient()
-    const response = await notion.databases.query({
-      database_id: PROPERTIES_DB_ID,
-      filter: {
-        and: [
-          { property: 'slug', rich_text: { equals: slug } },
-          { property: 'approved_at', date: { is_not_empty: true } },
-        ],
-      },
-      page_size: 1,
-    })
+export const getProperty = unstable_cache(
+  async (slug: string, locale = 'en'): Promise<Property | null> => {
+    try {
+      const notion = getNotionClient()
+      const response = await notion.databases.query({
+        database_id: PROPERTIES_DB_ID,
+        filter: {
+          and: [
+            { property: 'slug', rich_text: { equals: slug } },
+            { property: 'approved_at', date: { is_not_empty: true } },
+          ],
+        },
+        page_size: 1,
+      })
 
-    const page = response.results[0]
-    if (!page || page.object !== 'page') return null
-    return mapProperty(page as PageObjectResponse, locale)
-  } catch (err) {
-    console.error('[notion] getProperty error:', err)
-    return null
-  }
-}
+      const page = response.results[0]
+      if (!page || page.object !== 'page') return null
+      return mapProperty(page as PageObjectResponse, locale)
+    } catch (err) {
+      console.error('[notion] getProperty error:', err)
+      return null
+    }
+  },
+  ['getProperty'],
+  { tags: ['properties'], revalidate: 3600 }
+)
 
-export async function getFeaturedProperties(
-  locale = 'en',
-  limit = 6,
-): Promise<Property[]> {
+export const getFeaturedProperties = unstable_cache(
+  async (locale = 'en', limit = 6): Promise<Property[]> => {
   try {
     const notion = getNotionClient()
     const response = await notion.databases.query({
@@ -534,7 +541,10 @@ export async function getFeaturedProperties(
     console.error('[notion] getFeaturedProperties error:', err)
     return []
   }
-}
+  },
+  ['getFeaturedProperties'],
+  { tags: ['properties'], revalidate: 3600 }
+)
 
 export async function getPropertiesByPersona(
   persona: string,

@@ -101,7 +101,19 @@ export default async function PropertiesPage({ params, searchParams }: Propertie
 
   const cityLabel = filters.city
 
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: 'Properties', item: `${SITE_URL}/${locale}/properties` },
+      ...(cityLabel ? [{ '@type': 'ListItem', position: 3, name: cityLabel, item: `${SITE_URL}/${locale}/properties?city=${encodeURIComponent(cityLabel)}` }] : []),
+    ],
+  }
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 py-6 px-4">
@@ -130,5 +142,6 @@ export default async function PropertiesPage({ params, searchParams }: Propertie
         />
       </div>
     </div>
+    </>
   )
 }

@@ -4,6 +4,23 @@ import { requireAdmin } from '@/lib/admin-auth'
 import { Client } from '@notionhq/client'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
+import { z } from 'zod'
+
+const bodySchema = z.object({
+  action: z.enum(['generate', 'generate-field', 'translate', 'translate-all', 'save']),
+  propertyId: z.string().optional(),
+  field: z.string().optional(),
+  locale: z.string().optional(),
+  titleEn: z.string().optional(),
+  descriptionEn: z.string().optional(),
+  highlightsEn: z.string().optional(),
+  seoEn: z.string().optional(),
+  faqEn: z.array(z.object({ q: z.string(), a: z.string() })).optional(),
+  personasEn: z.string().optional(),
+  targetLocale: z.string().optional(),
+  locales: z.array(z.string()).optional(),
+  data: z.record(z.unknown()).optional(),
+})
 
 async function callAI(prompt: string): Promise<string> {
   const hermesUrl    = process.env.HERMES_URL
@@ -124,13 +141,26 @@ export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
 
+  let rawBody: unknown
+  try { rawBody = await req.json() } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+  const parsed = bodySchema.safeParse(rawBody)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Validation failed', issues: parsed.error.flatten().fieldErrors }, { status: 400 })
+  }
+
   const {
-    propertyId, action, field, locale: reqLocale,
-    data: saveData, locales, titleEn, descriptionEn,
-    // translate-all payload
+    action, field, locale: reqLocale,
+    locales, titleEn, descriptionEn,
     highlightsEn, seoEn, faqEn, personasEn,
-    targetLocale,  // single locale for translate-all (replaces ALL_LOCALES)
-  } = await req.json()
+    targetLocale,
+  } = parsed.data
+  // For backwards compat, also accept unknown fields from raw body
+  const rawData    = rawBody as Record<string, unknown>
+  const propertyId = (rawData.propertyId as string | undefined) ?? ''
+  const saveData   = (rawData.data as Record<string, unknown> | undefined) ?? {}
+
   if (!propertyId && !['translate','translate-all'].includes(action))
     return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
 
@@ -224,11 +254,11 @@ Each locale should have an array of the same number of FAQ items.`
       } = {}
 
       const tasks: Promise<void>[] = [
-        translateTitleDesc().then(r => { results.titleDesc = r }).catch(() => {}),
+        translateTitleDesc().then(r => { results.titleDesc = r }).catch(e => { console.error('[translate-all] titleDesc failed:', e.message) }),
       ]
-      if (highlightsEn) tasks.push(translateShort('property highlights (keep as bullet points separated by newlines)', highlightsEn).then(r => { results.highlights = r }).catch(() => {}))
-      if (seoEn) tasks.push(translateShort('SEO meta description (max 160 chars)', seoEn).then(r => { results.seo = r }).catch(() => {}))
-      if (faqEn?.length) tasks.push(translateFaq(faqEn).then(r => { results.faq = r }).catch(() => {}))
+      if (highlightsEn) tasks.push(translateShort('property highlights (keep as bullet points separated by newlines)', highlightsEn).then(r => { results.highlights = r }).catch(e => { console.warn('[translate-all] highlights failed:', e.message) }))
+      if (seoEn) tasks.push(translateShort('SEO meta description (max 160 chars)', seoEn).then(r => { results.seo = r }).catch(e => { console.warn('[translate-all] seo failed:', e.message) }))
+      if (faqEn?.length) tasks.push(translateFaq(faqEn).then(r => { results.faq = r }).catch(e => { console.warn('[translate-all] faq failed:', e.message) }))
       if (personasEn) {
         // Use a dedicated prompt that returns locale → JSON-string (not nested object)
         tasks.push((async () => {
@@ -281,7 +311,8 @@ Each value must be a valid JSON string (escaped), e.g. "{\\"family\\":\\"...\\"}
         }
       }
 
-      return NextResponse.json({ success: true, results, locales: TARGET_LOCALES })
+      const partialFailure = !results.titleDesc && Object.keys(results).length === 0
+      return NextResponse.json({ success: true, results, locales: TARGET_LOCALES, partialFailure })
     } catch (e) {
       return NextResponse.json({ error: (e as Error).message }, { status: 502 })
     }
@@ -397,16 +428,18 @@ Each value must be a valid JSON string (escaped), e.g. "{\\"family\\":\\"...\\"}
         return {}
       }
 
+      const sd = saveData as Record<string, string>  // type assertion for save data fields
+
       // Core EN/TH fields
       const core: Record<string, unknown> = {
-        ...(saveData.title_en       ? set('title_en',            rt(saveData.title_en))       : {}),
-        ...(saveData.title_th       ? set('title_th',            rt(saveData.title_th))       : {}),
-        ...(saveData.description_en ? set('description_en',      rt(saveData.description_en)) : {}),
-        ...(saveData.description_th ? set('description_th',      rt(saveData.description_th)) : {}),
-        ...(saveData.seoDescription ? set('seo_description',     rt(saveData.seoDescription)) : {}),
-        ...(saveData.faqItems       ? set('faq_json',            rt(JSON.stringify(saveData.faqItems))) : {}),
-        ...(saveData.personaDescriptions
-          ? set('persona_descriptions', rt(JSON.stringify(saveData.personaDescriptions))) : {}),
+        ...(sd.title_en       ? set('title_en',            rt(sd.title_en))       : {}),
+        ...(sd.title_th       ? set('title_th',            rt(sd.title_th))       : {}),
+        ...(sd.description_en ? set('description_en',      rt(sd.description_en)) : {}),
+        ...(sd.description_th ? set('description_th',      rt(sd.description_th)) : {}),
+        ...(sd.seoDescription ? set('seo_description',     rt(sd.seoDescription)) : {}),
+        ...(sd.faqItems       ? set('faq_json',            rt(JSON.stringify(sd.faqItems))) : {}),
+        ...(sd.personaDescriptions
+          ? set('persona_descriptions', rt(JSON.stringify(sd.personaDescriptions))) : {}),
       }
 
       // Locale translations (title + description + highlights + seo + faq per locale)
@@ -414,11 +447,11 @@ Each value must be a valid JSON string (escaped), e.g. "{\\"family\\":\\"...\\"}
       const localeUpdates: Record<string, unknown> = {}
       for (const loc of ALL_LOCALES) {
         const safeKey = loc.replace('-', '_')
-        if (saveData[`title_${safeKey}`])               Object.assign(localeUpdates, set(`title_${loc}`,              rt(saveData[`title_${safeKey}`])))
-        if (saveData[`description_${safeKey}`])         Object.assign(localeUpdates, set(`description_${loc}`,        rt(saveData[`description_${safeKey}`])))
-        if (saveData[`highlights_${safeKey}`])          Object.assign(localeUpdates, set(`highlights_${loc}`,         rt(saveData[`highlights_${safeKey}`])))
-        if (saveData[`seoDescription_${safeKey}`])      Object.assign(localeUpdates, set(`seo_description_${loc}`,    rt(saveData[`seoDescription_${safeKey}`])))
-        if (saveData[`faqItems_${safeKey}`])            Object.assign(localeUpdates, set(`faq_json_${loc}`,           rt(JSON.stringify(saveData[`faqItems_${safeKey}`]))))
+        if (sd[`title_${safeKey}`])               Object.assign(localeUpdates, set(`title_${loc}`,              rt(sd[`title_${safeKey}`])))
+        if (sd[`description_${safeKey}`])         Object.assign(localeUpdates, set(`description_${loc}`,        rt(sd[`description_${safeKey}`])))
+        if (sd[`highlights_${safeKey}`])          Object.assign(localeUpdates, set(`highlights_${loc}`,         rt(sd[`highlights_${safeKey}`])))
+        if (sd[`seoDescription_${safeKey}`])      Object.assign(localeUpdates, set(`seo_description_${loc}`,    rt(sd[`seoDescription_${safeKey}`])))
+        if (sd[`faqItems_${safeKey}`])            Object.assign(localeUpdates, set(`faq_json_${loc}`,           rt(JSON.stringify(sd[`faqItems_${safeKey}`]))))
       }
 
       // Save core fields
