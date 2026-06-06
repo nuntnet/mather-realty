@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+export const maxDuration = 60  // Allow up to 60s for AI generation (requires Vercel Pro)
 import { requireAdmin } from '@/lib/admin-auth'
 import { getProperty } from '@/lib/notion'
 import { Client } from '@notionhq/client'
@@ -44,7 +45,16 @@ async function callAI(prompt: string): Promise<string> {
     return c.choices[0]?.message?.content ?? ''
   }
 
-  throw new Error('No AI provider configured. Set HERMES_URL, ANTHROPIC_API_KEY, or OPENAI_API_KEY.')
+  const configured = [
+    process.env.HERMES_URL ? 'HERMES_URL' : null,
+    process.env.ANTHROPIC_API_KEY ? 'ANTHROPIC_API_KEY' : null,
+    process.env.OPENAI_API_KEY ? 'OPENAI_API_KEY' : null,
+  ].filter(Boolean)
+  throw new Error(
+    configured.length
+      ? `AI call failed — provider(s) present: ${configured.join(', ')}`
+      : 'No AI provider configured in this environment. Add OPENAI_API_KEY to Vercel project environment variables.'
+  )
 }
 
 function parseJSON(raw: string) {

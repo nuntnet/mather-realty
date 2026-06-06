@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+export const maxDuration = 60
 import { requireAdmin } from '@/lib/admin-auth'
 import { getProperty } from '@/lib/notion'
 import { Client } from '@notionhq/client'
