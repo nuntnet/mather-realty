@@ -95,7 +95,10 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
               <Image
                 src={img} alt={`Photo ${idx + 1}`} fill
                 className={cn('object-cover transition-transform duration-700',
-                  isActive && idx === photoIndex ? 'scale-100' : 'scale-105')}
+                  // scale-105 only for standby photos WITHIN the active card
+                  // inactive cards stay at scale-100 → no 5% bleed into adjacent snap slots
+                  isActive ? (idx === photoIndex ? 'scale-100' : 'scale-105') : 'scale-100'
+                )}
                 priority={isActive && idx === 0}
                 sizes="100vw" draggable={false}
               />
