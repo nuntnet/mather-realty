@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { useParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,17 +12,41 @@ import { CheckCircle2, Upload, Sparkles, ChevronRight, ChevronLeft } from 'lucid
 const PROPERTY_TYPES = ['Condo', 'House', 'Townhouse', 'Apartment', 'Villa', 'Studio']
 const THAI_CITIES = ['Bangkok', 'Chiang Mai', 'Phuket', 'Pattaya', 'Hua Hin', 'Koh Samui', 'Krabi', 'Ayutthaya']
 const AMENITY_OPTIONS = ['Pool', 'Parking', 'WiFi', 'EVCharger', 'Furnished', 'PetFriendly', 'Gym', 'Security', 'Elevator', 'Balcony', 'Garden', 'AirCon']
+const PERFECT_FOR_OPTIONS = [
+  { value: 'family',        label: 'Family' },
+  { value: 'expat-couple',  label: 'Expat Couple' },
+  { value: 'remote-worker', label: 'Remote Worker' },
+  { value: 'teacher',       label: 'Teacher' },
+  { value: 'student',       label: 'Student' },
+  { value: 'retiree',       label: 'Retiree' },
+]
+const MIN_LEASE_OPTIONS = [
+  { value: '1',  label: '1 month' },
+  { value: '3',  label: '3 months' },
+  { value: '6',  label: '6 months' },
+  { value: '12', label: '1 year' },
+]
 
 interface FormData {
-  // Step 1
+  // Step 1 — basics
   propertyType: string
-  address: string
   city: string
+  district: string
+  address: string
   price: string
+  size: string
   bedrooms: string
   bathrooms: string
-  size: string
+  floors: string
+  parkingSpots: string
+  // Step 1 — terms
+  availableFrom: string
+  minLeaseTerm: string
+  depositMonths: string
+  // Step 1 — details
   amenities: string[]
+  perfectFor: string[]
+  highlights: string
   description_en: string
   // Step 2
   images: string[]
@@ -36,8 +60,10 @@ interface FormData {
 }
 
 const INITIAL: FormData = {
-  propertyType: '', address: '', city: '', price: '', bedrooms: '', bathrooms: '', size: '',
-  amenities: [], description_en: '',
+  propertyType: '', city: '', district: '', address: '',
+  price: '', size: '', bedrooms: '', bathrooms: '', floors: '', parkingSpots: '',
+  availableFrom: '', minLeaseTerm: '', depositMonths: '',
+  amenities: [], perfectFor: [], highlights: '', description_en: '',
   images: [], virtualTourUrl: '',
   ownerName: '', ownerEmail: '', ownerPhone: '', ownerLine: '', ownerWhatsapp: '',
 }
@@ -62,12 +88,12 @@ export default function SubmitPage() {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  function toggleAmenity(amenity: string) {
+  function toggleChip(field: 'amenities' | 'perfectFor', value: string) {
     setForm((prev) => ({
       ...prev,
-      amenities: prev.amenities.includes(amenity)
-        ? prev.amenities.filter((a) => a !== amenity)
-        : [...prev.amenities, amenity],
+      [field]: prev[field].includes(value)
+        ? (prev[field] as string[]).filter((v) => v !== value)
+        : [...(prev[field] as string[]), value],
     }))
   }
 
@@ -80,6 +106,7 @@ export default function SubmitPage() {
         body: JSON.stringify({
           propertyType: form.propertyType,
           city: form.city,
+          district: form.district,
           bedrooms: form.bedrooms,
           bathrooms: form.bathrooms,
           size: form.size,
@@ -105,12 +132,12 @@ export default function SubmitPage() {
     try {
       const uploaded: string[] = []
       for (const file of Array.from(files)) {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('upload_preset', 'doublen_realty')
+        const fd = new FormData()
+        fd.append('file', file)
+        fd.append('upload_preset', 'doublen_realty')
         const res = await fetch(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-          { method: 'POST', body: formData }
+          { method: 'POST', body: fd }
         )
         if (res.ok) {
           const data = await res.json()
@@ -127,8 +154,8 @@ export default function SubmitPage() {
     const errs: Partial<Record<keyof FormData, string>> = {}
     if (s === 1) {
       if (!form.propertyType) errs.propertyType = 'Property type is required'
-      if (!form.address.trim()) errs.address = 'Address is required'
       if (!form.city) errs.city = 'City is required'
+      if (!form.address.trim()) errs.address = 'Address is required'
       if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) errs.price = 'Valid price is required'
     }
     if (s === 3) {
@@ -210,113 +237,173 @@ export default function SubmitPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          {/* Step 1: Property Details */}
+
+          {/* ── Step 1: Property Details ─────────────────────────────── */}
           {step === 1 && (
             <div className="space-y-5">
+
+              {/* Property Type */}
               <div>
-                <Label>Property Type</Label>
+                <Label>Property Type <span className="text-red-500">*</span></Label>
                 <div className="grid grid-cols-3 gap-2 mt-2">
                   {PROPERTY_TYPES.map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => update('propertyType', type)}
+                    <button key={type} type="button" onClick={() => { update('propertyType', type); setErrors(p => ({ ...p, propertyType: undefined })) }}
                       className={`px-3 py-2 rounded-xl text-sm font-medium border transition-colors
-                        ${form.propertyType === type ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}`}
-                    >
+                        ${form.propertyType === type ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}
+                        ${errors.propertyType ? 'border-red-300' : ''}`}>
                       {type}
                     </button>
                   ))}
                 </div>
+                {errors.propertyType && <p className="text-xs text-red-500 mt-1">{errors.propertyType}</p>}
               </div>
 
-              <div>
-                <Label>City</Label>
-                <select
-                  className="w-full mt-1.5 border border-gray-200 rounded-xl px-3 py-2 text-sm"
-                  value={form.city}
-                  onChange={(e) => update('city', e.target.value)}
-                >
-                  <option value="">Select a city</option>
-                  {THAI_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <Label>Full Address</Label>
-                <Input
-                  className="mt-1.5"
-                  placeholder="Street address, building, floor..."
-                  value={form.address}
-                  onChange={(e) => update('address', e.target.value)}
-                />
-              </div>
-
+              {/* City + District */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Monthly Rent (THB)</Label>
-                  <Input className="mt-1.5" type="number" placeholder="e.g. 25000" value={form.price} onChange={(e) => update('price', e.target.value)} />
+                  <Label>City <span className="text-red-500">*</span></Label>
+                  <select
+                    className={`w-full mt-1.5 border rounded-xl px-3 py-2 text-sm ${errors.city ? 'border-red-400' : 'border-gray-200'}`}
+                    value={form.city}
+                    onChange={(e) => { update('city', e.target.value); setErrors(p => ({ ...p, city: undefined })) }}
+                  >
+                    <option value="">Select city</option>
+                    {THAI_CITIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  {errors.city && <p className="text-xs text-red-500 mt-1">{errors.city}</p>}
+                </div>
+                <div>
+                  <Label>District / Area <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+                  <Input className="mt-1.5" placeholder="e.g. Sukhumvit, Nimman" value={form.district}
+                    onChange={(e) => update('district', e.target.value)} />
+                </div>
+              </div>
+
+              {/* Address */}
+              <div>
+                <Label>Full Address <span className="text-red-500">*</span></Label>
+                <Input className={`mt-1.5 ${errors.address ? 'border-red-400' : ''}`}
+                  placeholder="Street, building, unit number..."
+                  value={form.address}
+                  onChange={(e) => { update('address', e.target.value); setErrors(p => ({ ...p, address: undefined })) }} />
+                {errors.address && <p className="text-xs text-red-500 mt-1">{errors.address}</p>}
+              </div>
+
+              {/* Price + Size */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Monthly Rent (THB) <span className="text-red-500">*</span></Label>
+                  <Input className={`mt-1.5 ${errors.price ? 'border-red-400' : ''}`} type="number" placeholder="e.g. 25000"
+                    value={form.price} onChange={(e) => { update('price', e.target.value); setErrors(p => ({ ...p, price: undefined })) }} />
+                  {errors.price && <p className="text-xs text-red-500 mt-1">{errors.price}</p>}
                 </div>
                 <div>
                   <Label>Size (sqm)</Label>
-                  <Input className="mt-1.5" type="number" placeholder="e.g. 65" value={form.size} onChange={(e) => update('size', e.target.value)} />
+                  <Input className="mt-1.5" type="number" placeholder="e.g. 65" value={form.size}
+                    onChange={(e) => update('size', e.target.value)} />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* Beds + Baths + Floors + Parking */}
+              <div className="grid grid-cols-4 gap-3">
                 <div>
-                  <Label>Bedrooms</Label>
-                  <Input className="mt-1.5" type="number" placeholder="0" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} />
+                  <Label className="text-xs">Bedrooms</Label>
+                  <Input className="mt-1.5" type="number" min="0" placeholder="0" value={form.bedrooms}
+                    onChange={(e) => update('bedrooms', e.target.value)} />
                 </div>
                 <div>
-                  <Label>Bathrooms</Label>
-                  <Input className="mt-1.5" type="number" placeholder="0" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} />
+                  <Label className="text-xs">Bathrooms</Label>
+                  <Input className="mt-1.5" type="number" min="0" placeholder="0" value={form.bathrooms}
+                    onChange={(e) => update('bathrooms', e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-xs">Floor(s)</Label>
+                  <Input className="mt-1.5" type="number" min="0" placeholder="e.g. 8" value={form.floors}
+                    onChange={(e) => update('floors', e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-xs">Parking</Label>
+                  <Input className="mt-1.5" type="number" min="0" placeholder="0" value={form.parkingSpots}
+                    onChange={(e) => update('parkingSpots', e.target.value)} />
                 </div>
               </div>
 
+              {/* Available From + Min Lease + Deposit */}
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <Label className="text-xs">Available From</Label>
+                  <Input className="mt-1.5" type="date" value={form.availableFrom}
+                    onChange={(e) => update('availableFrom', e.target.value)} />
+                </div>
+                <div>
+                  <Label className="text-xs">Min. Lease Term</Label>
+                  <select className="w-full mt-1.5 border border-gray-200 rounded-xl px-3 py-2 text-sm"
+                    value={form.minLeaseTerm} onChange={(e) => update('minLeaseTerm', e.target.value)}>
+                    <option value="">Any</option>
+                    {MIN_LEASE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <Label className="text-xs">Deposit (months)</Label>
+                  <Input className="mt-1.5" type="number" min="0" max="6" placeholder="e.g. 2" value={form.depositMonths}
+                    onChange={(e) => update('depositMonths', e.target.value)} />
+                </div>
+              </div>
+
+              {/* Amenities */}
               <div>
                 <Label>Amenities</Label>
-                <div className="grid grid-cols-3 gap-2 mt-2">
+                <div className="grid grid-cols-4 gap-2 mt-2">
                   {AMENITY_OPTIONS.map((a) => (
-                    <button
-                      key={a}
-                      type="button"
-                      onClick={() => toggleAmenity(a)}
-                      className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors
-                        ${form.amenities.includes(a) ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}`}
-                    >
+                    <button key={a} type="button" onClick={() => toggleChip('amenities', a)}
+                      className={`px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors
+                        ${form.amenities.includes(a) ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}`}>
                       {a}
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Perfect For */}
+              <div>
+                <Label>Perfect For <span className="text-gray-400 font-normal text-xs">(select all that apply)</span></Label>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {PERFECT_FOR_OPTIONS.map((o) => (
+                    <button key={o.value} type="button" onClick={() => toggleChip('perfectFor', o.value)}
+                      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors
+                        ${form.perfectFor.includes(o.value) ? 'border-emerald-600 bg-emerald-50 text-emerald-700' : 'border-gray-200 hover:border-gray-300'}`}>
+                      {o.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <Label>Key Highlights <span className="text-gray-400 font-normal text-xs">(optional — one per line)</span></Label>
+                <Textarea className="mt-1.5" rows={3}
+                  placeholder={"Newly renovated kitchen\nCity view from balcony\n5 min walk to BTS"}
+                  value={form.highlights}
+                  onChange={(e) => update('highlights', e.target.value)} />
+              </div>
+
+              {/* Description */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <Label>Description</Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={generateDescription}
-                    disabled={aiLoading}
-                    className="text-xs h-7 gap-1"
-                  >
+                  <Button type="button" variant="outline" size="sm" onClick={generateDescription}
+                    disabled={aiLoading} className="text-xs h-7 gap-1">
                     <Sparkles className="w-3.5 h-3.5" />
                     {aiLoading ? t('ai_generating') : t('ai_generate')}
                   </Button>
                 </div>
-                <Textarea
-                  rows={4}
-                  placeholder="Describe your property..."
-                  value={form.description_en}
-                  onChange={(e) => update('description_en', e.target.value)}
-                />
+                <Textarea rows={4} placeholder="Describe your property..."
+                  value={form.description_en} onChange={(e) => update('description_en', e.target.value)} />
               </div>
             </div>
           )}
 
-          {/* Step 2: Photos */}
+          {/* ── Step 2: Photos ───────────────────────────────────────── */}
           {step === 2 && (
             <div className="space-y-6">
               <div>
@@ -328,60 +415,69 @@ export default function SubmitPage() {
                     <span className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">
                       {uploadingImages ? 'Uploading...' : 'Choose Files'}
                     </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      className="hidden"
-                      onChange={handleImageUpload}
-                      disabled={uploadingImages}
-                    />
+                    <input type="file" accept="image/*" multiple className="hidden"
+                      onChange={handleImageUpload} disabled={uploadingImages} />
                   </label>
                   {form.images.length > 0 && (
-                    <p className="text-xs text-green-600 mt-3">{form.images.length} photo(s) uploaded</p>
+                    <div className="mt-4">
+                      <p className="text-xs text-green-600 mb-3">{form.images.length} photo(s) uploaded</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        {form.images.map((url, i) => (
+                          <div key={i} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={url} alt="" className="w-full h-full object-cover" />
+                            <button type="button"
+                              onClick={() => update('images', form.images.filter((_, j) => j !== i))}
+                              className="absolute top-1 right-1 w-5 h-5 bg-black/60 text-white rounded-full text-xs hidden group-hover:flex items-center justify-center">
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
 
               <div>
-                <Label>Virtual Tour URL (optional)</Label>
-                <Input
-                  className="mt-1.5"
-                  type="url"
-                  placeholder="https://..."
-                  value={form.virtualTourUrl}
-                  onChange={(e) => update('virtualTourUrl', e.target.value)}
-                />
+                <Label>Virtual Tour URL <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+                <Input className="mt-1.5" type="url" placeholder="https://..." value={form.virtualTourUrl}
+                  onChange={(e) => update('virtualTourUrl', e.target.value)} />
               </div>
             </div>
           )}
 
-          {/* Step 3: Contact */}
+          {/* ── Step 3: Contact ──────────────────────────────────────── */}
           {step === 3 && (
             <div className="space-y-5">
               <div>
                 <Label>Your Name <span className="text-red-500">*</span></Label>
-                <Input className={`mt-1.5 ${errors.ownerName ? 'border-red-400' : ''}`} placeholder="Full name" value={form.ownerName} onChange={(e) => { update('ownerName', e.target.value); setErrors(p => ({ ...p, ownerName: undefined })) }} />
+                <Input className={`mt-1.5 ${errors.ownerName ? 'border-red-400' : ''}`} placeholder="Full name"
+                  value={form.ownerName} onChange={(e) => { update('ownerName', e.target.value); setErrors(p => ({ ...p, ownerName: undefined })) }} />
                 {errors.ownerName && <p className="text-xs text-red-500 mt-1">{errors.ownerName}</p>}
               </div>
               <div>
                 <Label>Email <span className="text-red-500">*</span></Label>
-                <Input className={`mt-1.5 ${errors.ownerEmail ? 'border-red-400' : ''}`} type="email" placeholder="you@example.com" value={form.ownerEmail} onChange={(e) => { update('ownerEmail', e.target.value); setErrors(p => ({ ...p, ownerEmail: undefined })) }} />
+                <Input className={`mt-1.5 ${errors.ownerEmail ? 'border-red-400' : ''}`} type="email" placeholder="you@example.com"
+                  value={form.ownerEmail} onChange={(e) => { update('ownerEmail', e.target.value); setErrors(p => ({ ...p, ownerEmail: undefined })) }} />
                 {errors.ownerEmail && <p className="text-xs text-red-500 mt-1">{errors.ownerEmail}</p>}
               </div>
               <div>
                 <Label>Phone <span className="text-red-500">*</span></Label>
-                <Input className={`mt-1.5 ${errors.ownerPhone ? 'border-red-400' : ''}`} type="tel" placeholder="+66..." value={form.ownerPhone} onChange={(e) => { update('ownerPhone', e.target.value); setErrors(p => ({ ...p, ownerPhone: undefined })) }} />
+                <Input className={`mt-1.5 ${errors.ownerPhone ? 'border-red-400' : ''}`} type="tel" placeholder="+66..."
+                  value={form.ownerPhone} onChange={(e) => { update('ownerPhone', e.target.value); setErrors(p => ({ ...p, ownerPhone: undefined })) }} />
                 {errors.ownerPhone && <p className="text-xs text-red-500 mt-1">{errors.ownerPhone}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>LINE ID (optional)</Label>
-                  <Input className="mt-1.5" placeholder="@lineid" value={form.ownerLine} onChange={(e) => update('ownerLine', e.target.value)} />
+                  <Label>LINE ID <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+                  <Input className="mt-1.5" placeholder="@lineid" value={form.ownerLine}
+                    onChange={(e) => update('ownerLine', e.target.value)} />
                 </div>
                 <div>
-                  <Label>WhatsApp (optional)</Label>
-                  <Input className="mt-1.5" placeholder="+66..." value={form.ownerWhatsapp} onChange={(e) => update('ownerWhatsapp', e.target.value)} />
+                  <Label>WhatsApp <span className="text-gray-400 font-normal text-xs">(optional)</span></Label>
+                  <Input className="mt-1.5" placeholder="+66..." value={form.ownerWhatsapp}
+                    onChange={(e) => update('ownerWhatsapp', e.target.value)} />
                 </div>
               </div>
               {submitError && (
@@ -401,16 +497,13 @@ export default function SubmitPage() {
             ) : <div />}
 
             {step < totalSteps ? (
-              <Button type="button" onClick={() => { if (validateStep(step)) setStep((s) => s + 1) }} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button type="button" onClick={() => { if (validateStep(step)) setStep((s) => s + 1) }}
+                className="bg-blue-600 hover:bg-blue-700 text-white">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
+              <Button type="button" onClick={handleSubmit} disabled={submitting}
+                className="bg-blue-600 hover:bg-blue-700 text-white">
                 {submitting ? 'Submitting...' : t('submit')}
               </Button>
             )}
