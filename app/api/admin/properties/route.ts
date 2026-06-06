@@ -98,6 +98,22 @@ export async function PATCH(req: NextRequest) {
       });
     }
 
+    // Fire n8n webhook when property becomes available (approved)
+    if (data.status === "available" && process.env.N8N_WEBHOOK_URL) {
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doublen-realty.com"
+      fetch(process.env.N8N_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "property.approved",
+          propertyId: data.id,
+          approvedAt: data.approvedAt ?? new Date().toISOString(),
+          propertyUrl: `${siteUrl}/en/properties/${data.id}`,
+        }),
+      }).catch(e => console.warn("[n8n webhook] failed:", e.message))
+      // Non-blocking — don't await, don't fail the PATCH on n8n error
+    }
+
     return NextResponse.json({ success: true, id: data.id });
   } catch (err) {
     if (err instanceof z.ZodError) {
