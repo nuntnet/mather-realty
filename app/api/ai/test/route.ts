@@ -14,9 +14,9 @@ export async function GET() {
     }, { status: 400 })
   }
 
+  const model = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
   try {
     const start = Date.now()
-    const model = process.env.GEMINI_MODEL ?? 'gemini-2.5-flash'
     const gemini = new OpenAI({
       apiKey: key,
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
