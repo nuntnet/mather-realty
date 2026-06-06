@@ -14,9 +14,11 @@ function getClientIp(req: NextRequest): string {
 
 async function validateAdminSession(req: NextRequest) {
   // Use auth SDK directly — avoids SSRF via req.nextUrl.origin (attacker-controlled)
+  if (!auth) return null  // auth is null when TURSO_DATABASE_URL is not set
   try {
-    const session = await auth?.api.getSession({ headers: req.headers }) ?? null
-    if (!session?.user || (session.user as { role?: string }).role !== 'admin') return null
+    const session = await auth.api.getSession({ headers: req.headers })
+    if (!session?.user) return null
+    if ((session.user as { role?: string }).role !== 'admin') return null
     return session
   } catch {
     return null

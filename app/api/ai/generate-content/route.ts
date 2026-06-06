@@ -8,7 +8,7 @@ import { z } from 'zod'
 
 const bodySchema = z.object({
   action: z.enum(['generate', 'generate-field', 'translate', 'translate-all', 'save']),
-  propertyId: z.string().optional(),
+  propertyId: z.string().default(''),
   field: z.string().optional(),
   locale: z.string().optional(),
   titleEn: z.string().optional(),
@@ -156,10 +156,10 @@ export async function POST(req: NextRequest) {
     highlightsEn, seoEn, faqEn, personasEn,
     targetLocale,
   } = parsed.data
-  // For backwards compat, also accept unknown fields from raw body
-  const rawData    = rawBody as Record<string, unknown>
-  const propertyId = (rawData.propertyId as string | undefined) ?? ''
-  const saveData   = (rawData.data as Record<string, unknown> | undefined) ?? {}
+  const propertyId = parsed.data.propertyId ?? ''
+  // saveData comes from body.data (untyped freeform payload for save action)
+  const rawData  = rawBody as Record<string, unknown>
+  const saveData = (rawData.data as Record<string, unknown> | undefined) ?? {}
 
   if (!propertyId && !['translate','translate-all'].includes(action))
     return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
