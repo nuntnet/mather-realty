@@ -91,12 +91,12 @@ type PropertyForm = {
   hasVirtualTour: boolean;
   contactLine: string;
   contactPhone: string;
-  highlights: string;       // newline-separated in UI, joined with " • " for Notion
+  highlights: Record<string, string>;      // locale → newline-separated lines
   perfectFor: string[];
-  tags: string;             // comma-separated in UI
-  faq: FaqItem[];
-  seoDescription: string;
-  personaDescriptions: string; // JSON string: { family: "...", "expat-couple": "...", ... }
+  tags: string;                             // comma-separated in UI
+  faq: Record<string, FaqItem[]>;          // locale → FAQ items
+  seoDescription: Record<string, string>;  // locale → SEO text
+  personaDescriptions: string;             // JSON (EN only, not locale-split yet)
 };
 
 function emptyForm(): PropertyForm {
@@ -124,11 +124,11 @@ function emptyForm(): PropertyForm {
     hasVirtualTour: false,
     contactLine: "",
     contactPhone: "",
-    highlights: "",
+    highlights: {},
     perfectFor: [],
     tags: "",
-    faq: [],
-    seoDescription: "",
+    faq: {},
+    seoDescription: {},
     personaDescriptions: "",
   };
 }
@@ -202,19 +202,21 @@ export default function PropertyEditPage() {
       .then((data) => {
         if (!data) { toast.error("Property not found"); router.push("/admin/properties"); return; }
 
-        // Parse highlights — now per-locale Record<string, string[]>, show EN in form
-        let highlightsStr = "";
-        if (typeof data.highlights === "object" && data.highlights !== null && !Array.isArray(data.highlights)) {
-          const enHL = (data.highlights as Record<string, string[]>)["en"] ?? [];
-          highlightsStr = enHL.join("\n");
-        } else if (Array.isArray(data.highlights)) {
-          highlightsStr = (data.highlights as string[]).join("\n");
-        } else if (typeof data.highlights === "string" && data.highlights) {
-          highlightsStr = data.highlights.split(" • ").join("\n");
+        // Parse highlights per-locale: Record<string, string[]> → Record<string, string>
+        const parseHL = (arr: unknown): string => {
+          if (Array.isArray(arr)) return (arr as string[]).join("\n");
+          if (typeof arr === "string") return (arr as string).split(" • ").join("\n");
+          return "";
+        };
+        const highlightsByLocale: Record<string, string> = {};
+        if (typeof data.highlights === "object" && data.highlights !== null) {
+          for (const [loc, arr] of Object.entries(data.highlights as Record<string, unknown>)) {
+            const s = parseHL(arr);
+            if (s) highlightsByLocale[loc] = s;
+          }
         }
 
-        // Parse faq — now per-locale Record<string, FaqItem[]>, show EN in form
-        let faqArr: FaqItem[] = [];
+        // Parse FAQ per-locale: Record<string, FaqItem[]>
         const tryParseFaq = (v: unknown): FaqItem[] => {
           if (Array.isArray(v)) return v as FaqItem[];
           if (typeof v === "string" && v) {
@@ -222,16 +224,26 @@ export default function PropertyEditPage() {
           }
           return [];
         };
+        const faqByLocale: Record<string, FaqItem[]> = {};
         if (typeof data.faqJson === "object" && data.faqJson !== null && !Array.isArray(data.faqJson)) {
-          faqArr = tryParseFaq((data.faqJson as Record<string, unknown>)["en"]);
+          for (const [loc, v] of Object.entries(data.faqJson as Record<string, unknown>)) {
+            const arr = tryParseFaq(v);
+            if (arr.length) faqByLocale[loc] = arr;
+          }
         } else {
-          faqArr = tryParseFaq(data.faqJson) || tryParseFaq(data.faq);
+          const enFaq = tryParseFaq(data.faqJson) || tryParseFaq(data.faq);
+          if (enFaq.length) faqByLocale["en"] = enFaq;
         }
 
-        // SEO — now per-locale Record<string, string>, show EN in form
-        const seoEn = typeof data.seoDescription === "object" && data.seoDescription !== null
-          ? (data.seoDescription as Record<string, string>)["en"] ?? ""
-          : (data.seoDescription ?? "");
+        // Parse SEO per-locale: Record<string, string>
+        const seoByLocale: Record<string, string> = {};
+        if (typeof data.seoDescription === "object" && data.seoDescription !== null) {
+          for (const [loc, v] of Object.entries(data.seoDescription as Record<string, string>)) {
+            if (v) seoByLocale[loc] = v;
+          }
+        } else if (typeof data.seoDescription === "string" && data.seoDescription) {
+          seoByLocale["en"] = data.seoDescription;
+        }
 
         setForm({
           titles: data.titles ?? {},
@@ -249,7 +261,6 @@ export default function PropertyEditPage() {
           status: data.status ?? "pending",
           virtualTourUrl: data.virtualTourUrl ?? "",
           verified: !!data.verifiedAt,
-          // New fields
           availableFrom: data.availableFrom ?? "",
           minLeaseTerm: data.minLeaseTerm != null ? String(data.minLeaseTerm) : "",
           depositMonths: data.depositMonths != null ? String(data.depositMonths) : "",
@@ -258,11 +269,11 @@ export default function PropertyEditPage() {
           hasVirtualTour: !!data.hasVirtualTour,
           contactLine: data.contactLine ?? "",
           contactPhone: data.contactPhone ?? "",
-          highlights: highlightsStr,
+          highlights: highlightsByLocale,
           perfectFor: data.perfectFor ?? [],
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
-          faq: faqArr,
-          seoDescription: seoEn,
+          faq: faqByLocale,
+          seoDescription: seoByLocale,
           personaDescriptions: data.personaDescriptions
             ? (typeof data.personaDescriptions === "string"
                 ? data.personaDescriptions
@@ -316,18 +327,24 @@ export default function PropertyEditPage() {
     }));
   };
 
+  // FAQ helpers — locale-aware (operate on activeLocale)
+  const activeFaq = (): FaqItem[] => form.faq[activeLocale] ?? [];
+
   const addFaqItem = () => {
-    dirtySetForm((f) => ({ ...f, faq: [...f.faq, { q: "", a: "" }] }));
+    dirtySetForm((f) => ({
+      ...f, faq: { ...f.faq, [activeLocale]: [...(f.faq[activeLocale] ?? []), { q: "", a: "" }] },
+    }));
   };
 
   const removeFaqItem = (idx: number) => {
-    dirtySetForm((f) => ({ ...f, faq: f.faq.filter((_, i) => i !== idx) }));
+    dirtySetForm((f) => ({
+      ...f, faq: { ...f.faq, [activeLocale]: (f.faq[activeLocale] ?? []).filter((_, i) => i !== idx) },
+    }));
   };
 
   const updateFaqItem = (idx: number, field: "q" | "a", value: string) => {
     dirtySetForm((f) => ({
-      ...f,
-      faq: f.faq.map((item, i) => (i === idx ? { ...item, [field]: value } : item)),
+      ...f, faq: { ...f.faq, [activeLocale]: (f.faq[activeLocale] ?? []).map((item, i) => i === idx ? { ...item, [field]: value } : item) },
     }));
   };
 
@@ -366,11 +383,12 @@ export default function PropertyEditPage() {
     }
     setSaving(true);
     try {
-      // Parse highlights: each non-empty line becomes a bullet
-      const highlightsArray = form.highlights
-        .split("\n")
-        .map((l) => l.trim())
-        .filter(Boolean);
+      // Convert highlights per-locale: { en: "line1\nline2", ko: "..." } → { en: ["line1","line2"], ko: [...] }
+      const highlightsObj = Object.fromEntries(
+        Object.entries(form.highlights)
+          .map(([loc, txt]) => [loc, txt.split("\n").map(l => l.trim()).filter(Boolean)])
+          .filter(([, arr]) => (arr as string[]).length > 0)
+      );
 
       // Parse tags
       const tagsArray = form.tags
@@ -406,11 +424,13 @@ export default function PropertyEditPage() {
         hasVirtualTour: form.hasVirtualTour,
         contactLine: form.contactLine || null,
         contactPhone: form.contactPhone || null,
-        highlights: highlightsArray,
+        highlights: highlightsObj,
         perfectFor: form.perfectFor,
         tags: tagsArray,
-        faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : "",
-        seoDescription: form.seoDescription || "",
+        // faqJson: per-locale Record<string, FaqItem[]>
+        faqJson: Object.keys(form.faq).length > 0 ? form.faq : {},
+        // seoDescription: per-locale Record<string, string>
+        seoDescription: form.seoDescription,
         personaDescriptions: form.personaDescriptions || "",
       };
 
@@ -460,24 +480,18 @@ export default function PropertyEditPage() {
       if (field === "title_en")       { setIsDirty(true); setForm((f) => ({ ...f, titles: { ...f.titles, en: val } })); }
       if (field === "description_en") { setIsDirty(true); setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } })); }
 
-      // For locale-specific fields (highlights, seo, faq, personas):
-      // - When locale === 'en': update form state (form represents English content)
-      // - When locale !== 'en': content already auto-saved to Notion (highlights_ko etc.)
-      //   do NOT update form state or it will overwrite the English Notion field on Save
+      // For locale-specific fields: always update form state for the target locale
+      // (form is now per-locale, so this is safe regardless of which locale)
       const isLocaleField = ["seo", "highlights", "faq", "personas"].includes(field);
-      if (isLocaleField && locale === "en") {
+      if (isLocaleField) {
         setIsDirty(true);
-        if (field === "seo")      setForm((f) => ({ ...f, seoDescription: val }));
-        if (field === "highlights") setForm((f) => ({ ...f, highlights: val }));
-        if (field === "faq")      setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
-        if (field === "personas") setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
+        if (field === "seo")       setForm((f) => ({ ...f, seoDescription: { ...f.seoDescription, [locale]: typeof val === "string" ? val : "" } }));
+        if (field === "highlights") setForm((f) => ({ ...f, highlights: { ...f.highlights, [locale]: typeof val === "string" ? val : (Array.isArray(val) ? (val as string[]).join("\n") : "") } }));
+        if (field === "faq")       setForm((f) => ({ ...f, faq: { ...f.faq, [locale]: Array.isArray(val) ? val : [] } }));
+        if (field === "personas")  setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
       }
 
-      // Auto-saved to Notion already (for locale-specific fields) — confirm to user
-      const savedNote = isLocaleField && locale !== "en" && data.autoSaved
-        ? ` (saved to Notion as ${field}_${locale})`
-        : "";
-      toast.success(`Generated!${savedNote}`);
+      toast.success(`Generated!`);
     } catch (e) {
       if ((e as Error).message !== "Unauthorized")
         toast.error(e instanceof Error ? e.message : "AI generation failed");
@@ -515,16 +529,16 @@ export default function PropertyEditPage() {
     const key = `translate-all-fields-${targetLocale}`;
     setAiLoading((p) => ({ ...p, [key]: true }));
     try {
-      const highlightsEn = form.highlights.split("\n").filter(Boolean).join("\n");
-      const faqEn = form.faq.length > 0 ? form.faq : undefined;
+      const highlightsEn = (form.highlights["en"] ?? "").split("\n").filter(Boolean).join("\n");
+      const faqEn = (form.faq["en"] ?? []).length > 0 ? form.faq["en"] : undefined;
       const data = await aiPost({
         propertyId,
         action: "translate-all",
-        targetLocale,                              // single locale now
+        targetLocale,
         titleEn: form.titles["en"],
         descriptionEn: form.descriptions["en"] || "",
         highlightsEn: highlightsEn || undefined,
-        seoEn: form.seoDescription || undefined,
+        seoEn: form.seoDescription["en"] || undefined,
         faqEn,
       });
       if (!data.success) throw new Error(data.error ?? "Translation failed");
@@ -536,14 +550,20 @@ export default function PropertyEditPage() {
         faq?: Record<string, Array<{ q: string; a: string }>>;
       };
 
-      // Update form state for the target locale
+      // Update form state for the target locale (all per-locale fields)
       setForm((f) => {
         const newTitles = { ...f.titles };
         const newDescs  = { ...f.descriptions };
+        const newHL     = { ...f.highlights };
+        const newFaq    = { ...f.faq };
+        const newSeo    = { ...f.seoDescription };
         const td = r.titleDesc?.[targetLocale];
         if (td?.title)       newTitles[targetLocale] = td.title;
         if (td?.description) newDescs[targetLocale]  = td.description;
-        return { ...f, titles: newTitles, descriptions: newDescs };
+        if (r.highlights?.[targetLocale]) newHL[targetLocale] = String(r.highlights[targetLocale]).split(" • ").join("\n");
+        if (r.faq?.[targetLocale]?.length) newFaq[targetLocale] = r.faq[targetLocale];
+        if (r.seo?.[targetLocale]) newSeo[targetLocale] = r.seo[targetLocale];
+        return { ...f, titles: newTitles, descriptions: newDescs, highlights: newHL, faq: newFaq, seoDescription: newSeo };
       });
 
       const fields = ["title & description",
@@ -980,17 +1000,19 @@ export default function PropertyEditPage() {
         {/* ── Highlights ───────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <SectionTitle>Highlights</SectionTitle>
+            <div>
+              <SectionTitle>Highlights <span className="text-[#1E6B69] font-bold text-xs ml-1">[{activeLocale.toUpperCase()}]</span></SectionTitle>
+            </div>
             <AiBtn fieldKey="highlights" label="Generate" />
           </div>
           <p className="text-xs text-gray-400">
-            One highlight per line. These are displayed as bullet points on the property page.
+            One highlight per line. Content is per-language — switch locale tab to edit each language.
           </p>
-          <Field label="Highlights">
+          <Field label={`Highlights (${activeLocale.toUpperCase()})`}>
             <textarea
               rows={5}
-              value={form.highlights}
-              onChange={(e) => setForm((f) => ({ ...f, highlights: e.target.value }))}
+              value={form.highlights[activeLocale] ?? ""}
+              onChange={(e) => dirtySetForm((f) => ({ ...f, highlights: { ...f.highlights, [activeLocale]: e.target.value } }))}
               className={TEXTAREA_CLS}
               placeholder={"Great location\nFurnished\nPet friendly"}
             />
@@ -1072,7 +1094,7 @@ export default function PropertyEditPage() {
         {/* ── FAQ ──────────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
           <div className="flex items-center justify-between">
-            <SectionTitle>FAQ</SectionTitle>
+            <SectionTitle>FAQ <span className="text-[#1E6B69] font-bold text-xs ml-1">[{activeLocale.toUpperCase()}]</span></SectionTitle>
             <div className="flex gap-2">
               <AiBtn fieldKey="faq" label="Generate FAQs" />
               <button
@@ -1085,15 +1107,16 @@ export default function PropertyEditPage() {
               </button>
             </div>
           </div>
+          <p className="text-xs text-gray-400">Editing FAQ for <strong>{activeLocale.toUpperCase()}</strong> — switch locale tab to edit other languages.</p>
 
-          {form.faq.length === 0 && (
+          {activeFaq().length === 0 && (
             <p className="text-sm text-gray-400 text-center py-4">
-              No FAQ items yet. Click &ldquo;Add Q&amp;A&rdquo; to add one.
+              No FAQ items for {activeLocale.toUpperCase()} yet. Click &ldquo;Generate FAQs&rdquo; or &ldquo;Add Q&amp;A&rdquo;.
             </p>
           )}
 
           <div className="space-y-4">
-            {form.faq.map((item, idx) => (
+            {activeFaq().map((item, idx) => (
               <div key={idx} className="rounded-xl border border-gray-100 p-4 space-y-3 bg-gray-50/40">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -1128,38 +1151,27 @@ export default function PropertyEditPage() {
               </div>
             ))}
           </div>
-
-          {form.faq.length > 0 && (
-            <div className="space-y-1.5">
-              <p className="text-xs font-medium text-gray-500">JSON Preview (read-only)</p>
-              <textarea
-                rows={4}
-                readOnly
-                value={JSON.stringify(form.faq, null, 2)}
-                className={`${TEXTAREA_CLS} font-mono text-xs text-gray-500 bg-gray-50`}
-              />
-            </div>
-          )}
         </div>
 
         {/* ── SEO ──────────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <SectionTitle>SEO</SectionTitle>
+            <SectionTitle>SEO <span className="text-[#1E6B69] font-bold text-xs ml-1">[{activeLocale.toUpperCase()}]</span></SectionTitle>
             <AiBtn fieldKey="seo" label="Generate" />
           </div>
+          <p className="text-xs text-gray-400">SEO description is per-language — switch locale tab to edit each language.</p>
 
-          <Field label="SEO Description">
+          <Field label={`SEO Description (${activeLocale.toUpperCase()})`}>
             <textarea
               rows={4}
               maxLength={500}
-              value={form.seoDescription}
-              onChange={(e) => setForm((f) => ({ ...f, seoDescription: e.target.value }))}
+              value={form.seoDescription[activeLocale] ?? ""}
+              onChange={(e) => dirtySetForm((f) => ({ ...f, seoDescription: { ...f.seoDescription, [activeLocale]: e.target.value } }))}
               className={TEXTAREA_CLS}
               placeholder="Short description for search engines (max 500 characters)"
             />
             <p className="text-xs text-gray-400 text-right mt-1">
-              {form.seoDescription.length} / 500
+              {(form.seoDescription[activeLocale] ?? "").length} / 500
             </p>
           </Field>
         </div>
