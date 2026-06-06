@@ -28,19 +28,37 @@ async function callAI(prompt: string): Promise<string> {
     return (await res.json()).choices[0]?.message?.content ?? ''
   }
 
-  // 2. Google Gemini via OpenAI-compatible endpoint
+  // 2. Google Gemini via OpenAI-compatible endpoint — with model fallback on quota errors
   if (geminiKey) {
     const gemini = new OpenAI({
       apiKey: geminiKey,
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     })
-    const c = await gemini.chat.completions.create({
-      model: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash-lite',
-      max_tokens: 8192,
-      temperature: 0.7,
-      messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
-    })
-    return c.choices[0]?.message?.content ?? ''
+    // Try models in order; fall through to next on 429 quota exhaustion
+    const MODELS = process.env.GEMINI_MODEL
+      ? [process.env.GEMINI_MODEL]
+      : ['gemini-2.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash']
+    let lastErr: Error | null = null
+    for (const model of MODELS) {
+      try {
+        const c = await gemini.chat.completions.create({
+          model,
+          max_tokens: 8192,
+          temperature: 0.7,
+          messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
+        })
+        return c.choices[0]?.message?.content ?? ''
+      } catch (e) {
+        const msg = (e as Error).message ?? ''
+        if (msg.includes('429') || msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED')) {
+          console.warn(`[callAI] ${model} quota exhausted, trying next model`)
+          lastErr = e as Error
+          continue
+        }
+        throw e // non-quota error, don't retry
+      }
+    }
+    throw lastErr ?? new Error('All Gemini models quota exhausted')
   }
 
   // 3. Anthropic Claude

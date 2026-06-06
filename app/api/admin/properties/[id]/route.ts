@@ -238,11 +238,14 @@ const patchSchema = z.object({
   depositMonths: z.number().int().nullable().optional(),
   contactLine: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
-  highlights: z.array(z.string()).optional(),
+  // highlights: legacy = string[], new = Record<locale, string[]>
+  highlights: z.union([z.array(z.string()), z.record(z.array(z.string()))]).optional(),
   perfectFor: z.array(z.string()).optional(),
   tags: z.array(z.string()).optional(),
-  faqJson: z.string().optional(),            // JSON string or ""
-  seoDescription: z.string().optional(),
+  // faqJson: legacy = JSON string, new = Record<locale, FaqItem[]>
+  faqJson: z.union([z.string(), z.record(z.unknown())]).optional(),
+  // seoDescription: legacy = string, new = Record<locale, string>
+  seoDescription: z.union([z.string(), z.record(z.string())]).optional(),
   personaDescriptions: z.string().optional(), // JSON string or ""
   hasVirtualTour: z.boolean().optional(),
   gallery: z.array(z.string()).optional(),
