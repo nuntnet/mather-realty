@@ -56,12 +56,14 @@ export default function HeroCarousel({
         <div ref={emblaRef} className="absolute inset-0">
           <div className="flex h-full">
             {images.map((img, idx) => (
-              <div key={idx} className="relative flex-shrink-0 w-full h-full">
+              <div key={idx} className="relative flex-shrink-0 w-full h-full"
+                style={{ willChange: 'transform' }}>
                 <Image
                   src={img}
                   alt={`${title} — photo ${idx + 1}`}
                   fill
                   priority={idx === 0}
+                  quality={90}
                   className="object-cover"
                   sizes="100vw"
                   draggable={false}

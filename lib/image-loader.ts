@@ -1,19 +1,18 @@
 /**
- * Custom Next.js image loader.
+ * Custom Next.js image loader for Cloudinary.
  *
- * IMPORTANT: Setting `images.loaderFile` globally DISABLES Next.js's built-in
- * `/_next/image` optimization endpoint. So this loader must NEVER return a
- * `/_next/image?...` URL — that endpoint no longer exists and would 400.
+ * Format strategy (sharpness vs file size):
+ * - width >= 1200 (hero / fullscreen) → f_jpg  (JPEG, no AVIF)
+ *   AVIF can look over-smoothed on detailed photos; JPEG preserves fine
+ *   texture better at these sizes.
+ * - width 640–1199 (gallery cards, list thumbnails) → f_webp
+ * - width < 640 (small thumbnails, avatars) → f_auto (smallest file)
  *
- * Strategy:
- * - Cloudinary URLs  → return a Cloudinary URL with a `w_<width>` transform so
- *   responsive srcset works, served straight from Cloudinary's CDN. This is the
- *   bulk of the site's images (cars, hero, brands, awards, team) and costs zero
- *   Vercel image-optimization quota.
- * - Everything else (local /public SVGs like brand logos, the few remaining
- *   external raster URLs) → passthrough the original src unchanged. SVGs are
- *   vectors and need no optimization; remaining rasters are rare since almost
- *   all images were migrated to Cloudinary.
+ * Quality:
+ * - Explicit `quality` prop → q_{value}
+ * - width >= 1200 → q_90  (hero: near-lossless)
+ * - width >= 640  → q_auto:good
+ * - width < 640   → q_auto:eco
  */
 export default function imageLoader({
   src,
@@ -26,26 +25,41 @@ export default function imageLoader({
 }): string {
   if (src.includes("res.cloudinary.com") && src.includes("/upload/")) {
     const [base, rest] = src.split("/upload/");
-    // q_auto:best for large images (hero, gallery full-screen), q_auto:good otherwise
-    const q = quality ? `q_${quality}` : width >= 1024 ? "q_auto:best" : "q_auto:good";
 
-    // Replace an existing w_ transform with the requested width (responsive srcset)
+    // Format selection
+    const f = width >= 1200 ? "f_jpg" : width >= 640 ? "f_webp" : "f_auto";
+
+    // Quality selection
+    const q = quality
+      ? `q_${quality}`
+      : width >= 1200
+      ? "q_90"
+      : width >= 640
+      ? "q_auto:good"
+      : "q_auto:eco";
+
+    // Replace an existing w_ transform
     const updated = rest.replace(/w_\d+/, `w_${width}`);
     if (updated !== rest) {
-      // Also update quality if present, or prepend it
+      // Replace or prepend quality
       const withQ = updated.replace(/q_[^,/]+/, q);
-      return `${base}/upload/${withQ !== updated ? withQ : `${q},${updated}`}`;
+      // Replace or prepend format
+      const withF = withQ.replace(/f_[^,/]+/, f);
+      // If both were already there, return as-is
+      if (withF !== withQ) return `${base}/upload/${withF}`;
+      if (withQ !== updated) return `${base}/upload/${f},${withQ}`;
+      return `${base}/upload/${f},${q},${updated}`;
     }
 
-    // No w_ yet — prepend width+quality into existing transform params
+    // No w_ yet — prepend into existing transforms
     if (/^[a-z]/.test(rest) && rest.includes(",")) {
-      return `${base}/upload/f_auto,${q},w_${width},${rest}`;
+      return `${base}/upload/${f},${q},w_${width},${rest}`;
     }
 
-    // No transforms at all — add full set
-    return `${base}/upload/f_auto,${q},w_${width}/${rest}`;
+    // Plain URL — add all transforms
+    return `${base}/upload/${f},${q},w_${width}/${rest}`;
   }
 
-  // Local SVGs, /public assets, and any non-Cloudinary URL: serve as-is.
+  // Non-Cloudinary: serve as-is
   return src;
 }
