@@ -124,9 +124,31 @@ function mapToForm(page: PageObjectResponse) {
     hasVirtualTour: propBool("has_virtual_tour"),
     gallery: galleryUrls,
     virtualTourUrl: richText(page, "virtual_tour_url") || null,
-    exteriorPhotos: richText(page, "exterior_photos"),
-    interiorPhotos: richText(page, "interior_photos"),
-    communityPhotos: richText(page, "community_photos"),
+    // New separate fields — fallback to legacy gallery_categories JSON if empty
+    exteriorPhotos: (() => {
+      const v = richText(page, "exterior_photos");
+      if (v) return v;
+      try {
+        const legacy = JSON.parse(richText(page, "gallery_categories"));
+        return (legacy?.exterior ?? []).join(",");
+      } catch { return ""; }
+    })(),
+    interiorPhotos: (() => {
+      const v = richText(page, "interior_photos");
+      if (v) return v;
+      try {
+        const legacy = JSON.parse(richText(page, "gallery_categories"));
+        return (legacy?.interior ?? []).join(",");
+      } catch { return ""; }
+    })(),
+    communityPhotos: (() => {
+      const v = richText(page, "community_photos");
+      if (v) return v;
+      try {
+        const legacy = JSON.parse(richText(page, "gallery_categories"));
+        return (legacy?.community ?? []).join(",");
+      } catch { return ""; }
+    })(),
     heroPhotos: richText(page, "hero_photos"),
     verifiedAt: propDate(page, "verified_at"),
     approvedAt: propDate(page, "approved_at"),
