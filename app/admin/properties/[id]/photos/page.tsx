@@ -189,6 +189,7 @@ export default function PhotoManagerPage() {
   const [coverId, setCoverId] = useState<string>('')         // id of the cover photo
   const [heroPhotos, setHeroPhotos] = useState<string[]>([])
   const [propertyTitle, setPropertyTitle] = useState('')
+  const [propertySlug, setPropertySlug] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -212,6 +213,7 @@ export default function PhotoManagerPage() {
       if (!res.ok) throw new Error('Failed to load')
       const data = await res.json()
       setPropertyTitle(data.titles?.en || 'Property')
+      setPropertySlug(data.slug || '')
 
       const isUrl = (u: string) => /^https?:\/\/.+/.test(u)
       const toArr = (v: unknown): string[] => {
@@ -375,7 +377,17 @@ export default function PhotoManagerPage() {
         throw new Error(err.detail || err.error || `Save failed (${res.status})`)
       }
       setSaved(true)
-      toast.success('Photos saved successfully.')
+
+      // Clear page cache so the web listing reflects the new order immediately
+      if (propertySlug) {
+        fetch('/api/admin/revalidate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: propertySlug }),
+        }).catch(() => {/* ignore revalidation errors */})
+      }
+
+      toast.success('Photos saved — listing page updated.')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed to save')
     } finally {
