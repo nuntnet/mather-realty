@@ -7,12 +7,14 @@ import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 
 async function callAI(prompt: string): Promise<string> {
-  const hermesUrl = process.env.HERMES_URL
+  const hermesUrl    = process.env.HERMES_URL
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  const openaiKey = process.env.OPENAI_API_KEY
+  const openaiKey    = process.env.OPENAI_API_KEY
+  const geminiKey    = process.env.GOOGLE_AI_API_KEY   // Gemini API key
 
   const system = 'You are a professional real estate copywriter for DoubleN Realty, a premium rental platform for expats in Thailand. Return ONLY valid JSON — no markdown, no code blocks, no explanation.'
 
+  // 1. Hermes local adapter (dev)
   if (hermesUrl) {
     const res = await fetch(`${hermesUrl}/v1/chat/completions`, {
       method: 'POST',
@@ -27,6 +29,22 @@ async function callAI(prompt: string): Promise<string> {
     return (await res.json()).choices[0]?.message?.content ?? ''
   }
 
+  // 2. Google Gemini via OpenAI-compatible endpoint
+  if (geminiKey) {
+    const gemini = new OpenAI({
+      apiKey: geminiKey,
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+    })
+    const c = await gemini.chat.completions.create({
+      model: process.env.GEMINI_MODEL ?? 'gemini-2.0-flash',
+      max_tokens: 3000,
+      temperature: 0.7,
+      messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
+    })
+    return c.choices[0]?.message?.content ?? ''
+  }
+
+  // 3. Anthropic Claude
   if (anthropicKey) {
     const a = new Anthropic({ apiKey: anthropicKey })
     const msg = await a.messages.create({
@@ -36,6 +54,7 @@ async function callAI(prompt: string): Promise<string> {
     return msg.content[0]?.type === 'text' ? msg.content[0].text : ''
   }
 
+  // 4. OpenAI
   if (openaiKey) {
     const o = new OpenAI({ apiKey: openaiKey })
     const c = await o.chat.completions.create({
@@ -46,14 +65,15 @@ async function callAI(prompt: string): Promise<string> {
   }
 
   const configured = [
-    process.env.HERMES_URL ? 'HERMES_URL' : null,
-    process.env.ANTHROPIC_API_KEY ? 'ANTHROPIC_API_KEY' : null,
-    process.env.OPENAI_API_KEY ? 'OPENAI_API_KEY' : null,
+    hermesUrl    ? 'HERMES_URL'          : null,
+    geminiKey    ? 'GOOGLE_AI_API_KEY'   : null,
+    anthropicKey ? 'ANTHROPIC_API_KEY'   : null,
+    openaiKey    ? 'OPENAI_API_KEY'      : null,
   ].filter(Boolean)
   throw new Error(
     configured.length
       ? `AI call failed — provider(s) present: ${configured.join(', ')}`
-      : 'No AI provider configured in this environment. Add OPENAI_API_KEY to Vercel project environment variables.'
+      : 'No AI provider configured. Set GOOGLE_AI_API_KEY (Gemini), OPENAI_API_KEY, or ANTHROPIC_API_KEY in Vercel environment variables.'
   )
 }
 

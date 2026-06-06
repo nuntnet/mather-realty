@@ -6,11 +6,12 @@ import { Client } from '@notionhq/client'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
 
-// Priority: HERMES_URL → ANTHROPIC_API_KEY → OPENAI_API_KEY
+// Priority: HERMES_URL → GOOGLE_AI_API_KEY (Gemini) → ANTHROPIC_API_KEY → OPENAI_API_KEY
 async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
-  const hermesUrl = process.env.HERMES_URL
+  const hermesUrl    = process.env.HERMES_URL
+  const geminiKey    = process.env.GOOGLE_AI_API_KEY
   const anthropicKey = process.env.ANTHROPIC_API_KEY
-  const openaiKey = process.env.OPENAI_API_KEY
+  const openaiKey    = process.env.OPENAI_API_KEY
 
   if (hermesUrl) {
     const res = await fetch(`${hermesUrl}/v1/chat/completions`, {
@@ -23,33 +24,41 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<string>
       }),
     })
     if (!res.ok) throw new Error(`Hermes error: ${await res.text()}`)
-    const data = await res.json()
-    return data.choices[0]?.message?.content ?? ''
+    return (await res.json()).choices[0]?.message?.content ?? ''
+  }
+
+  if (geminiKey) {
+    const gemini = new OpenAI({
+      apiKey: geminiKey,
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+    })
+    const c = await gemini.chat.completions.create({
+      model: process.env.GEMINI_MODEL ?? 'gemini-2.0-flash',
+      max_tokens: 2000, temperature: 0.7,
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+    })
+    return c.choices[0]?.message?.content ?? ''
   }
 
   if (anthropicKey) {
     const anthropic = new Anthropic({ apiKey: anthropicKey })
     const message = await anthropic.messages.create({
-      model: 'claude-3-5-haiku-20241022',
-      max_tokens: 2000,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
+      model: 'claude-3-5-haiku-20241022', max_tokens: 2000,
+      system: systemPrompt, messages: [{ role: 'user', content: userPrompt }],
     })
     return message.content[0]?.type === 'text' ? message.content[0].text : ''
   }
 
   if (openaiKey) {
     const openai = new OpenAI({ apiKey: openaiKey })
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      max_tokens: 2000,
+    const c = await openai.chat.completions.create({
+      model: 'gpt-4o-mini', max_tokens: 2000, temperature: 0.7,
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
-      temperature: 0.7,
     })
-    return completion.choices[0]?.message?.content ?? ''
+    return c.choices[0]?.message?.content ?? ''
   }
 
-  throw new Error('No AI provider configured. Set HERMES_URL, ANTHROPIC_API_KEY, or OPENAI_API_KEY.')
+  throw new Error('No AI provider configured. Set GOOGLE_AI_API_KEY (Gemini), ANTHROPIC_API_KEY, or OPENAI_API_KEY.')
 }
 
 export async function POST(req: NextRequest) {
