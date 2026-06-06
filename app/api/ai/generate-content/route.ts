@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 export const maxDuration = 60  // Allow up to 60s for AI generation (requires Vercel Pro)
 import { requireAdmin } from '@/lib/admin-auth'
-import { getProperty } from '@/lib/notion'
 import { Client } from '@notionhq/client'
 import Anthropic from '@anthropic-ai/sdk'
 import OpenAI from 'openai'
@@ -36,7 +35,7 @@ async function callAI(prompt: string): Promise<string> {
       baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/',
     })
     const c = await gemini.chat.completions.create({
-      model: process.env.GEMINI_MODEL ?? 'gemini-2.0-flash',
+      model: process.env.GEMINI_MODEL ?? 'gemini-1.5-flash',
       max_tokens: 3000,
       temperature: 0.7,
       messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
@@ -165,37 +164,37 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
     return NextResponse.json({ success: true })
   }
 
-  // ── GENERATE action — get property and call AI ─────────────────────────────
-  // Retrieve page → get slug → full property
-  let property
+  // ── GENERATE action — read property directly from page (1 Notion call only) ──
+  let ctx: Record<string, unknown>
   try {
     const notion = new Client({ auth: process.env.NOTION_API_KEY })
-    const page = await notion.pages.retrieve({ page_id: propertyId }) as { properties: Record<string, { type: string; rich_text?: Array<{ plain_text: string }> }> }
-    const slugProp = page.properties['slug']
-    const slug = slugProp?.rich_text?.map(r => r.plain_text).join('') ?? ''
-    if (!slug) return NextResponse.json({ error: 'Property has no slug' }, { status: 400 })
-    property = await getProperty(slug, 'en')
-    if (!property) throw new Error('Property not found')
+    const page = await notion.pages.retrieve({ page_id: propertyId }) as { properties: Record<string, unknown> }
+    const p = page.properties as Record<string, { type: string; rich_text?: Array<{ plain_text: string }>; number?: number | null; multi_select?: Array<{ name: string }>; select?: { name: string } | null; phone_number?: string | null }>
+
+    const rt = (key: string) => (p[key]?.rich_text ?? []).map((r: { plain_text: string }) => r.plain_text).join('')
+    const num = (key: string) => p[key]?.number ?? null
+    const ms = (key: string) => (p[key]?.multi_select ?? []).map((o: { name: string }) => o.name)
+    const sel = (key: string) => p[key]?.select?.name ?? ''
+
+    ctx = {
+      title: rt('title_en') || rt('Name') || 'Property',
+      address: rt('address'),
+      city: rt('city'),
+      district: rt('district'),
+      bedrooms: num('bedrooms'),
+      bathrooms: num('bathrooms'),
+      sizeSqm: num('size_sqm'),
+      floors: num('floors'),
+      parkingSpots: num('parking_spots'),
+      priceTHB: num('price_thb'),
+      amenities: ms('amenities').join(', '),
+      highlights: rt('highlights'),
+      perfectFor: ms('perfect_for').join(', '),
+      tags: ms('tags').join(', '),
+      status: sel('status'),
+    }
   } catch (e) {
     return NextResponse.json({ error: `Could not load property: ${(e as Error).message}` }, { status: 500 })
-  }
-
-  const ctx = {
-    title: property!.title.en,
-    address: property.address,
-    city: property.city,
-    district: property.district,
-    bedrooms: property.bedrooms,
-    bathrooms: property.bathrooms,
-    sizeSqm: property.sizeSqm,
-    floors: property.floors,
-    parkingSpots: property.parkingSpots,
-    priceTHB: property.priceTHB,
-    amenities: property.amenities.join(', '),
-    highlights: property.highlights.join(' | '),
-    perfectFor: property.perfectFor.join(', '),
-    tags: property.tags.join(', '),
-    status: property.status,
   }
 
   const prompt = `Property data: ${JSON.stringify(ctx)}
