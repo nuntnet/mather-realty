@@ -27,10 +27,30 @@ export default function DashboardListingsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/landlord/properties")
-      .then(r => r.ok ? r.json() : { listings: [] })
-      .then(d => setListings(d.listings ?? []))
-      .finally(() => setLoading(false));
+    const load = async () => {
+      try {
+        // Try landlord API first (Turso hot-cache)
+        const r = await fetch("/api/landlord/properties");
+        const d = r.ok ? await r.json() : {};
+        const fromTurso = d.listings ?? d.properties ?? [];
+
+        if (fromTurso.length > 0) {
+          setListings(fromTurso);
+          return;
+        }
+
+        // Turso empty — try admin properties API (reads from Notion directly)
+        const r2 = await fetch("/api/admin/properties");
+        const d2 = r2.ok ? await r2.json() : {};
+        const fromNotion = d2.items ?? d2.data ?? [];
+        setListings(fromNotion);
+      } catch {
+        // silently show empty state
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
   }, []);
 
   return (

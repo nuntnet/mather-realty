@@ -42,15 +42,19 @@ export async function GET(req: NextRequest) {
     const mapped = rows.map((p) => ({
       id: p.id,
       slug: p.slug ?? "",
-      titleEn: p.address ?? p.city ?? p.id,
+      // Convert slug to readable title: "indy2-bangna-km7-2bed" → "Indy2 Bangna Km7 2Bed"
+      titleEn: p.slug
+        ? p.slug.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+        : (p.address ?? p.city ?? p.id),
       city: p.city ?? "",
+      district: p.district ?? "",
       priceTHB: p.priceTHB ?? 0,
       status: p.status ?? "pending",
       bedrooms: p.bedrooms ?? 0,
       coverImage: "",
     }));
 
-    return NextResponse.json({ properties: mapped });
+    return NextResponse.json({ listings: mapped, properties: mapped });
   } catch (err) {
     console.error("[landlord/properties] GET error:", err);
     return NextResponse.json(
