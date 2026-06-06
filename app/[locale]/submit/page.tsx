@@ -53,6 +53,8 @@ export default function SubmitPage() {
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [uploadingImages, setUploadingImages] = useState(false)
+  const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const totalSteps = 3
 
@@ -121,8 +123,28 @@ export default function SubmitPage() {
     }
   }
 
+  function validateStep(s: number): boolean {
+    const errs: Partial<Record<keyof FormData, string>> = {}
+    if (s === 1) {
+      if (!form.propertyType) errs.propertyType = 'Property type is required'
+      if (!form.address.trim()) errs.address = 'Address is required'
+      if (!form.city) errs.city = 'City is required'
+      if (!form.price || isNaN(Number(form.price)) || Number(form.price) <= 0) errs.price = 'Valid price is required'
+    }
+    if (s === 3) {
+      if (!form.ownerName.trim()) errs.ownerName = 'Your name is required'
+      if (!form.ownerEmail.trim()) errs.ownerEmail = 'Email is required'
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.ownerEmail)) errs.ownerEmail = 'Enter a valid email address'
+      if (!form.ownerPhone.trim()) errs.ownerPhone = 'Phone number is required'
+    }
+    setErrors(errs)
+    return Object.keys(errs).length === 0
+  }
+
   async function handleSubmit() {
+    if (!validateStep(3)) return
     setSubmitting(true)
+    setSubmitError(null)
     try {
       const { ownerEmail, ownerPhone, ownerName, ownerLine, ownerWhatsapp, images, ...propertyData } = form
       const res = await fetch('/api/submissions', {
@@ -137,7 +159,12 @@ export default function SubmitPage() {
       })
       if (res.ok) {
         setSuccess(true)
+      } else {
+        const d = await res.json().catch(() => ({}))
+        setSubmitError(d.error ?? 'Submission failed. Please try again.')
       }
+    } catch {
+      setSubmitError('Network error. Please check your connection and try again.')
     } finally {
       setSubmitting(false)
     }
@@ -333,16 +360,19 @@ export default function SubmitPage() {
           {step === 3 && (
             <div className="space-y-5">
               <div>
-                <Label>Your Name</Label>
-                <Input className="mt-1.5" placeholder="Full name" value={form.ownerName} onChange={(e) => update('ownerName', e.target.value)} />
+                <Label>Your Name <span className="text-red-500">*</span></Label>
+                <Input className={`mt-1.5 ${errors.ownerName ? 'border-red-400' : ''}`} placeholder="Full name" value={form.ownerName} onChange={(e) => { update('ownerName', e.target.value); setErrors(p => ({ ...p, ownerName: undefined })) }} />
+                {errors.ownerName && <p className="text-xs text-red-500 mt-1">{errors.ownerName}</p>}
               </div>
               <div>
-                <Label>Email</Label>
-                <Input className="mt-1.5" type="email" placeholder="you@example.com" value={form.ownerEmail} onChange={(e) => update('ownerEmail', e.target.value)} />
+                <Label>Email <span className="text-red-500">*</span></Label>
+                <Input className={`mt-1.5 ${errors.ownerEmail ? 'border-red-400' : ''}`} type="email" placeholder="you@example.com" value={form.ownerEmail} onChange={(e) => { update('ownerEmail', e.target.value); setErrors(p => ({ ...p, ownerEmail: undefined })) }} />
+                {errors.ownerEmail && <p className="text-xs text-red-500 mt-1">{errors.ownerEmail}</p>}
               </div>
               <div>
-                <Label>Phone</Label>
-                <Input className="mt-1.5" type="tel" placeholder="+66..." value={form.ownerPhone} onChange={(e) => update('ownerPhone', e.target.value)} />
+                <Label>Phone <span className="text-red-500">*</span></Label>
+                <Input className={`mt-1.5 ${errors.ownerPhone ? 'border-red-400' : ''}`} type="tel" placeholder="+66..." value={form.ownerPhone} onChange={(e) => { update('ownerPhone', e.target.value); setErrors(p => ({ ...p, ownerPhone: undefined })) }} />
+                {errors.ownerPhone && <p className="text-xs text-red-500 mt-1">{errors.ownerPhone}</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -354,6 +384,11 @@ export default function SubmitPage() {
                   <Input className="mt-1.5" placeholder="+66..." value={form.ownerWhatsapp} onChange={(e) => update('ownerWhatsapp', e.target.value)} />
                 </div>
               </div>
+              {submitError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">
+                  {submitError}
+                </div>
+              )}
             </div>
           )}
 
@@ -366,7 +401,7 @@ export default function SubmitPage() {
             ) : <div />}
 
             {step < totalSteps ? (
-              <Button type="button" onClick={() => setStep((s) => s + 1)} className="bg-blue-600 hover:bg-blue-700 text-white">
+              <Button type="button" onClick={() => { if (validateStep(step)) setStep((s) => s + 1) }} className="bg-blue-600 hover:bg-blue-700 text-white">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
