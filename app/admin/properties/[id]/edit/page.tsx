@@ -466,6 +466,51 @@ export default function PropertyEditPage() {
     }
   }
 
+  async function translateAll() {
+    if (!form.titles["en"]?.trim()) {
+      toast.error("Fill in the English title first");
+      return;
+    }
+    setAiLoading((p) => ({ ...p, "translate-all": true }));
+    try {
+      const highlightsEn = form.highlights.split("\n").filter(Boolean).join("\n");
+      const faqEn = form.faq.length > 0 ? form.faq : undefined;
+      const data = await aiPost({
+        propertyId,
+        action: "translate-all",
+        titleEn: form.titles["en"],
+        descriptionEn: form.descriptions["en"] || "",
+        highlightsEn: highlightsEn || undefined,
+        seoEn: form.seoDescription || undefined,
+        faqEn,
+      });
+      if (!data.success) throw new Error(data.error ?? "Translation failed");
+
+      // Update form state with all translations
+      const r = data.results as {
+        titleDesc?: Record<string, { title: string; description: string }>;
+        highlights?: Record<string, string>;
+        seo?: Record<string, string>;
+        faq?: Record<string, Array<{ q: string; a: string }>>;
+      };
+      setForm((f) => {
+        const newTitles = { ...f.titles };
+        const newDescs  = { ...f.descriptions };
+        for (const [loc, v] of Object.entries(r.titleDesc ?? {})) {
+          if (v.title)       newTitles[loc] = v.title;
+          if (v.description) newDescs[loc]  = v.description;
+        }
+        return { ...f, titles: newTitles, descriptions: newDescs };
+      });
+      toast.success(`✅ Translated to ${(data.locales as string[]).length} languages and saved to Notion!`);
+    } catch (e) {
+      if ((e as Error).message !== "Unauthorized")
+        toast.error(e instanceof Error ? e.message : "Translation failed");
+    } finally {
+      setAiLoading((p) => ({ ...p, "translate-all": false }));
+    }
+  }
+
   // Small ✨ button component
   // locale: override which locale to generate in (default: activeLocale)
   function AiBtn({ fieldKey, label = "✨", locale }: { fieldKey: string; label?: string; locale?: string }) {
@@ -524,6 +569,22 @@ export default function PropertyEditPage() {
         {/* ── Locale tabs ──────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
           <SectionTitle>Title &amp; Description</SectionTitle>
+
+          {/* Translate All button */}
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-gray-400">Switch locale tabs to edit each language. Use ✨ to generate/translate individual fields.</p>
+            <button
+              type="button"
+              disabled={!!aiLoading["translate-all"]}
+              onClick={translateAll}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 disabled:opacity-50 transition-colors shrink-0"
+              title="Translate title, description, highlights, SEO, FAQ to all 14 languages at once"
+            >
+              {aiLoading["translate-all"]
+                ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Translating all languages…</>
+                : <><span>🌐</span> Translate All (14 languages)</>}
+            </button>
+          </div>
 
           {/* Locale tabs */}
           <div className="flex flex-wrap gap-1 border-b border-gray-100 pb-3">

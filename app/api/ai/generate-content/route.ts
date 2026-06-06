@@ -106,8 +106,14 @@ export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
 
-  const { propertyId, action, field, locale: reqLocale, data: saveData, locales, titleEn, descriptionEn } = await req.json()
-  if (!propertyId && action !== 'translate') return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
+  const {
+    propertyId, action, field, locale: reqLocale,
+    data: saveData, locales, titleEn, descriptionEn,
+    // translate-all payload
+    highlightsEn, seoEn, faqEn,
+  } = await req.json()
+  if (!propertyId && !['translate','translate-all'].includes(action))
+    return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
 
   // ── TRANSLATE action ─────────────────────────────────────────────────────────
   if (action === 'translate') {
@@ -131,6 +137,99 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
       const raw = await callAI(prompt)
       const translations = parseJSON(raw)
       return NextResponse.json({ success: true, translations })
+    } catch (e) {
+      return NextResponse.json({ error: (e as Error).message }, { status: 502 })
+    }
+  }
+
+  // ── TRANSLATE-ALL action — translate every field to all 14 non-EN locales ────
+  if (action === 'translate-all') {
+    if (!titleEn) return NextResponse.json({ error: 'titleEn is required' }, { status: 400 })
+
+    const ALL_LOCALES = ['th','zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
+    const langList = ALL_LOCALES.map(l => `${l}=${LOCALE_NAMES[l] ?? l}`).join(', ')
+
+    // Helper: translate titles + descriptions for all locales in one call
+    async function translateTitleDesc() {
+      const targetList = ALL_LOCALES.map(l => `"${l}":{"title":"...","description":"..."}`).join(',\n  ')
+      const prompt = `Translate this property listing to: ${langList}
+
+Title (EN): ${titleEn}
+Description (EN): ${descriptionEn ?? '(none)'}
+
+Return ONLY JSON: {\n  ${targetList}\n}`
+      const raw = await callAI(prompt)
+      return parseJSON(raw) as Record<string, { title: string; description: string }>
+    }
+
+    // Helper: translate short text (highlights, SEO) for all locales
+    async function translateShort(label: string, textEn: string) {
+      const targetList = ALL_LOCALES.map(l => `"${l}":"..."`).join(', ')
+      const prompt = `Translate this ${label} text to these languages (${langList}). Keep translations natural and culturally appropriate.
+
+English: ${textEn}
+
+Return ONLY JSON: {${targetList}}`
+      const raw = await callAI(prompt)
+      return parseJSON(raw) as Record<string, string>
+    }
+
+    // Helper: translate FAQ array for all locales
+    async function translateFaq(faqItems: Array<{q: string; a: string}>) {
+      const targetList = ALL_LOCALES.map(l => `"${l}":[{"q":"...","a":"..."}]`).join(',\n  ')
+      const prompt = `Translate these FAQ items to: ${langList}
+
+FAQ (EN): ${JSON.stringify(faqItems)}
+
+Return ONLY JSON: {\n  ${targetList}\n}
+Each locale should have an array of the same number of FAQ items.`
+      const raw = await callAI(prompt)
+      return parseJSON(raw) as Record<string, Array<{q: string; a: string}>>
+    }
+
+    try {
+      // Run translations in parallel (3 calls max at a time)
+      const results: {
+        titleDesc?: Record<string, { title: string; description: string }>
+        highlights?: Record<string, string>
+        seo?: Record<string, string>
+        faq?: Record<string, Array<{q: string; a: string}>>
+      } = {}
+
+      const tasks: Promise<void>[] = [
+        translateTitleDesc().then(r => { results.titleDesc = r }).catch(() => {}),
+      ]
+      if (highlightsEn) tasks.push(translateShort('property highlights (keep as bullet points separated by newlines)', highlightsEn).then(r => { results.highlights = r }).catch(() => {}))
+      if (seoEn) tasks.push(translateShort('SEO meta description (max 160 chars)', seoEn).then(r => { results.seo = r }).catch(() => {}))
+      if (faqEn?.length) tasks.push(translateFaq(faqEn).then(r => { results.faq = r }).catch(() => {}))
+
+      await Promise.all(tasks)
+
+      // Save all translations to Notion
+      if (propertyId) {
+        const notion = new Client({ auth: process.env.NOTION_API_KEY })
+        const rt = (s: string) => ({ rich_text: chunkRichText(s) })
+        const updates: Record<string, unknown> = {}
+
+        for (const loc of ALL_LOCALES) {
+          const safeKey = loc.replace('-', '_')
+          void safeKey // used for response key, not Notion key
+          if (results.titleDesc?.[loc]?.title)       updates[`title_${loc}`]              = rt(results.titleDesc[loc].title)
+          if (results.titleDesc?.[loc]?.description) updates[`description_${loc}`]        = rt(results.titleDesc[loc].description)
+          if (results.highlights?.[loc])             updates[`highlights_${loc}`]          = rt(String(results.highlights[loc]).replace(/\n/g, ' • '))
+          if (results.seo?.[loc])                    updates[`seo_description_${loc}`]     = rt(String(results.seo[loc]))
+          if (results.faq?.[loc]?.length)            updates[`faq_json_${loc}`]            = rt(JSON.stringify(results.faq[loc]))
+        }
+
+        if (Object.keys(updates).length > 0) {
+          await notion.pages.update({
+            page_id: propertyId,
+            properties: updates as Parameters<typeof notion.pages.update>[0]['properties'],
+          }).catch(e => console.error('[translate-all] notion save error:', e))
+        }
+      }
+
+      return NextResponse.json({ success: true, results, locales: ALL_LOCALES })
     } catch (e) {
       return NextResponse.json({ error: (e as Error).message }, { status: 502 })
     }
