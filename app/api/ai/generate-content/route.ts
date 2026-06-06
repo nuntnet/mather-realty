@@ -172,6 +172,7 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
       seo: `Property data: ${ctxStr}\n\nWrite a 150-character SEO meta description (include city, property type, key feature). Return ONLY: {"value": "..."}`,
       highlights: `Property data: ${ctxStr}\n\nList 4-6 key selling highlights as bullet points (each 3-8 words). Return ONLY: {"value": "highlight one\\nhighlight two\\nhighlight three"}`,
       faq: `Property data: ${ctxStr}\n\nGenerate 5 FAQ items relevant to expat renters. Return ONLY: {"value": [{"q": "...", "a": "..."}, ...]}`,
+      personas: `Property data: ${ctxStr}\n\nWrite 2-sentence "perfect for" descriptions for each persona. Return ONLY: {"value": {"family": "...", "expat-couple": "...", "remote-worker": "...", "teacher": "...", "retiree": "..."}}`,
     }
 
     const prompt = FIELD_PROMPTS[field]

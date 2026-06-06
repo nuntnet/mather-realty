@@ -159,6 +159,7 @@ function mapToForm(page: PageObjectResponse) {
     tags: propMultiSelect(page, "tags"),
     faqJson,
     seoDescription: richText(page, "seo_description"),
+    personaDescriptions: richText(page, "persona_descriptions"),
     hasVirtualTour: propBool("has_virtual_tour"),
     gallery: galleryUrls,
     virtualTourUrl: richText(page, "virtual_tour_url") || null,
@@ -223,6 +224,7 @@ const patchSchema = z.object({
   tags: z.array(z.string()).optional(),
   faqJson: z.string().optional(),            // JSON string or ""
   seoDescription: z.string().optional(),
+  personaDescriptions: z.string().optional(), // JSON string or ""
   hasVirtualTour: z.boolean().optional(),
   gallery: z.array(z.string()).optional(),
   virtualTourUrl: z.string().nullable().optional(),
@@ -374,6 +376,11 @@ export async function PATCH(
     // SEO description
     if (data.seoDescription !== undefined) {
       updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
+    }
+
+    // Persona descriptions (JSON string)
+    if (data.personaDescriptions !== undefined) {
+      updates["persona_descriptions"] = { rich_text: toRichText(data.personaDescriptions) };
     }
 
     if (data.hasVirtualTour !== undefined) {

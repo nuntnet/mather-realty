@@ -96,6 +96,7 @@ type PropertyForm = {
   tags: string;             // comma-separated in UI
   faq: FaqItem[];
   seoDescription: string;
+  personaDescriptions: string; // JSON string: { family: "...", "expat-couple": "...", ... }
 };
 
 function emptyForm(): PropertyForm {
@@ -128,6 +129,7 @@ function emptyForm(): PropertyForm {
     tags: "",
     faq: [],
     seoDescription: "",
+    personaDescriptions: "",
   };
 }
 
@@ -247,6 +249,11 @@ export default function PropertyEditPage() {
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
           faq: faqArr,
           seoDescription: data.seoDescription ?? "",
+          personaDescriptions: data.personaDescriptions
+            ? (typeof data.personaDescriptions === "string"
+                ? data.personaDescriptions
+                : JSON.stringify(data.personaDescriptions, null, 2))
+            : "",
         });
       })
       .finally(() => setLoading(false));
@@ -369,6 +376,7 @@ export default function PropertyEditPage() {
         tags: tagsArray,
         faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : "",
         seoDescription: form.seoDescription || "",
+        personaDescriptions: form.personaDescriptions || "",
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
@@ -405,6 +413,7 @@ export default function PropertyEditPage() {
       if (field === "seo")           setForm((f) => ({ ...f, seoDescription: val }));
       if (field === "highlights")    setForm((f) => ({ ...f, highlights: val }));
       if (field === "faq")           setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
+      if (field === "personas")      setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
       toast.success("Generated!");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "AI generation failed");
@@ -1013,6 +1022,28 @@ export default function PropertyEditPage() {
             <p className="text-xs text-gray-400 text-right mt-1">
               {form.seoDescription.length} / 500
             </p>
+          </Field>
+        </div>
+
+        {/* ── Persona Descriptions ─────────────────────────────────────── */}
+        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <SectionTitle>Persona Descriptions</SectionTitle>
+              <p className="text-xs text-gray-400 mt-1">
+                JSON object with keys: family, expat-couple, remote-worker, teacher, retiree
+              </p>
+            </div>
+            <AiBtn fieldKey="personas" label="Generate" />
+          </div>
+          <Field label="Persona Descriptions (JSON)">
+            <textarea
+              rows={8}
+              value={form.personaDescriptions}
+              onChange={(e) => setForm((f) => ({ ...f, personaDescriptions: e.target.value }))}
+              className={`${TEXTAREA_CLS} font-mono text-xs`}
+              placeholder={'{\n  "family": "...",\n  "expat-couple": "...",\n  "remote-worker": "...",\n  "teacher": "..."\n}'}
+            />
           </Field>
         </div>
 
