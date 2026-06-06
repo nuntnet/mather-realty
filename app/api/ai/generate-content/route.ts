@@ -138,34 +138,40 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
 
   // ── SAVE action — write pre-approved content to Notion ─────────────────────
   if (action === 'save') {
-    const notion = new Client({ auth: process.env.NOTION_API_KEY })
-    const updates: Record<string, unknown> = {}
+    try {
+      const notion = new Client({ auth: process.env.NOTION_API_KEY })
+      const updates: Record<string, unknown> = {}
 
-    const rt = (s: string) => ({ rich_text: chunkRichText(s) })
+      const rt = (s: string) => ({ rich_text: chunkRichText(s) })
 
-    // Core fields
-    if (saveData.title_en)    updates.title_en    = rt(saveData.title_en)
-    if (saveData.title_th)    updates.title_th    = rt(saveData.title_th)
-    if (saveData.description_en) updates.description_en = rt(saveData.description_en)
-    if (saveData.description_th) updates.description_th = rt(saveData.description_th)
-    if (saveData.seoDescription) updates.seo_description = rt(saveData.seoDescription)
-    if (saveData.faqItems)    updates.faq_json    = rt(JSON.stringify(saveData.faqItems))
-    if (saveData.personaDescriptions)
-      updates.persona_descriptions = rt(JSON.stringify(saveData.personaDescriptions))
+      // Core fields
+      if (saveData.title_en)    updates.title_en    = rt(saveData.title_en)
+      if (saveData.title_th)    updates.title_th    = rt(saveData.title_th)
+      if (saveData.description_en) updates.description_en = rt(saveData.description_en)
+      if (saveData.description_th) updates.description_th = rt(saveData.description_th)
+      if (saveData.seoDescription) updates.seo_description = rt(saveData.seoDescription)
+      if (saveData.faqItems)    updates.faq_json    = rt(JSON.stringify(saveData.faqItems))
+      if (saveData.personaDescriptions)
+        updates.persona_descriptions = rt(JSON.stringify(saveData.personaDescriptions))
 
-    // Additional locale translations from the translate step
-    const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
-    for (const loc of ALL_LOCALES) {
-      const safeKey = loc.replace('-', '_')
-      if (saveData[`title_${safeKey}`]) updates[`title_${loc}`] = rt(saveData[`title_${safeKey}`])
-      if (saveData[`description_${safeKey}`]) updates[`description_${loc}`] = rt(saveData[`description_${safeKey}`])
+      // Additional locale translations from the translate step
+      const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
+      for (const loc of ALL_LOCALES) {
+        const safeKey = loc.replace('-', '_')
+        if (saveData[`title_${safeKey}`]) updates[`title_${loc}`] = rt(saveData[`title_${safeKey}`])
+        if (saveData[`description_${safeKey}`]) updates[`description_${loc}`] = rt(saveData[`description_${safeKey}`])
+      }
+
+      console.log('[ai/generate-content] save: updating', Object.keys(updates).length, 'fields for', propertyId)
+      await notion.pages.update({
+        page_id: propertyId,
+        properties: updates as Parameters<typeof notion.pages.update>[0]['properties'],
+      })
+      return NextResponse.json({ success: true })
+    } catch (e) {
+      console.error('[ai/generate-content] save error:', e)
+      return NextResponse.json({ error: `Save failed: ${(e as Error).message}` }, { status: 500 })
     }
-
-    await notion.pages.update({
-      page_id: propertyId,
-      properties: updates as Parameters<typeof notion.pages.update>[0]['properties'],
-    })
-    return NextResponse.json({ success: true })
   }
 
   // ── GENERATE action — read property directly from page (1 Notion call only) ──
@@ -198,6 +204,7 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
       status: sel('status'),
     }
   } catch (e) {
+    console.error('[ai/generate-content] notion retrieve error:', e)
     return NextResponse.json({ error: `Could not load property: ${(e as Error).message}` }, { status: 500 })
   }
 
@@ -227,10 +234,13 @@ Generate the following in JSON format:
 }`
 
   try {
+    console.log('[ai/generate-content] calling AI for property', propertyId)
     const raw = await callAI(prompt)
+    console.log('[ai/generate-content] AI response length:', raw.length)
     const generated = parseJSON(raw)
     return NextResponse.json({ success: true, generated })
   } catch (e) {
+    console.error('[ai/generate-content] AI/parse error:', (e as Error).message)
     return NextResponse.json({ error: (e as Error).message }, { status: 502 })
   }
 }
