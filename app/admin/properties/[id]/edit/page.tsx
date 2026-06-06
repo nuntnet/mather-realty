@@ -200,15 +200,18 @@ export default function PropertyEditPage() {
       .then((data) => {
         if (!data) { toast.error("Property not found"); router.push("/admin/properties"); return; }
 
-        // Parse highlights: may be a string joined with " • ", or an array
+        // Parse highlights — now per-locale Record<string, string[]>, show EN in form
         let highlightsStr = "";
-        if (Array.isArray(data.highlights)) {
-          highlightsStr = data.highlights.join("\n");
+        if (typeof data.highlights === "object" && data.highlights !== null && !Array.isArray(data.highlights)) {
+          const enHL = (data.highlights as Record<string, string[]>)["en"] ?? [];
+          highlightsStr = enHL.join("\n");
+        } else if (Array.isArray(data.highlights)) {
+          highlightsStr = (data.highlights as string[]).join("\n");
         } else if (typeof data.highlights === "string" && data.highlights) {
           highlightsStr = data.highlights.split(" • ").join("\n");
         }
 
-        // Parse faq: stored as JSON string or array — always result in FaqItem[]
+        // Parse faq — now per-locale Record<string, FaqItem[]>, show EN in form
         let faqArr: FaqItem[] = [];
         const tryParseFaq = (v: unknown): FaqItem[] => {
           if (Array.isArray(v)) return v as FaqItem[];
@@ -217,7 +220,16 @@ export default function PropertyEditPage() {
           }
           return [];
         };
-        faqArr = tryParseFaq(data.faqJson) || tryParseFaq(data.faq);
+        if (typeof data.faqJson === "object" && data.faqJson !== null && !Array.isArray(data.faqJson)) {
+          faqArr = tryParseFaq((data.faqJson as Record<string, unknown>)["en"]);
+        } else {
+          faqArr = tryParseFaq(data.faqJson) || tryParseFaq(data.faq);
+        }
+
+        // SEO — now per-locale Record<string, string>, show EN in form
+        const seoEn = typeof data.seoDescription === "object" && data.seoDescription !== null
+          ? (data.seoDescription as Record<string, string>)["en"] ?? ""
+          : (data.seoDescription ?? "");
 
         setForm({
           titles: data.titles ?? {},
@@ -248,7 +260,7 @@ export default function PropertyEditPage() {
           perfectFor: data.perfectFor ?? [],
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
           faq: faqArr,
-          seoDescription: data.seoDescription ?? "",
+          seoDescription: seoEn,
           personaDescriptions: data.personaDescriptions
             ? (typeof data.personaDescriptions === "string"
                 ? data.personaDescriptions

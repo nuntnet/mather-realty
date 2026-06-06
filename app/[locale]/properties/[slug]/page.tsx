@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: PropertyDetailPageProps): Pro
   }
 
   const title = property.title[locale] ?? property.title.en ?? slug
-  const description = property.seoDescription ||
+  const description = (property.seoDescription[locale] ?? property.seoDescription['en']) ||
     (property.description[locale] ?? property.description.en ?? '')
   const image = property.coverImage
 
@@ -105,6 +105,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
   const title = property.title[locale] ?? property.title.en ?? slug
   const description = property.description[locale] ?? property.description.en ?? ''
+
+  // Locale-aware content helpers
+  const highlights = property.highlights[locale] ?? property.highlights['en'] ?? []
+  const faqItems = property.faqJson[locale] ?? property.faqJson['en'] ?? null
+  const seoDesc = property.seoDescription[locale] ?? property.seoDescription['en'] ?? ''
 
   // Similar properties (same city, exclude self)
   const allCityProps = await getProperties({ city: property.city }, locale).catch(() => [])
@@ -345,11 +350,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               )}
 
               {/* 3. HIGHLIGHTS */}
-              {property.highlights.length > 0 && (
+              {highlights.length > 0 && (
                 <div className="bg-gradient-to-r from-[#EEF9F9] to-[#E0F4F4] border border-[#92D4D3] rounded-2xl p-6">
                   <h2 className="text-xl font-semibold text-[#1E6B69] mb-4">{t('highlights_title')}</h2>
                   <ul className="space-y-2.5">
-                    {property.highlights.map((highlight, index) => (
+                    {highlights.map((highlight, index) => (
                       <li key={index} className="flex items-start gap-3">
                         <CheckCircle2 className="w-5 h-5 text-[#1E6B69] shrink-0 mt-0.5" />
                         <span className="text-gray-700 leading-relaxed">{highlight}</span>
@@ -441,8 +446,8 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               )}
 
               {/* 11. FAQ */}
-              {property.faqJson && property.faqJson.length > 0 && (
-                <FAQSection faqItems={property.faqJson} propertyTitle={title} />
+              {faqItems && faqItems.length > 0 && (
+                <FAQSection faqItems={faqItems} propertyTitle={title} />
               )}
 
               {/* Similar Properties */}

@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
     floors: property.floors,
     priceTHB: property.priceTHB,
     amenities: property.amenities.join(', '),
-    highlights: property.highlights.join(' • '),
+    highlights: (property.highlights['en'] ?? Object.values(property.highlights)[0] ?? []).join(' • '),
     perfectFor: property.perfectFor,
     tags: property.tags.join(', '),
   }

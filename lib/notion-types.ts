@@ -29,13 +29,13 @@ export interface Property {
   minLeaseTerm: number | null          // minimum lease in months (e.g. 1, 3, 6, 12)
   depositMonths: number | null         // security deposit in months of rent
   heroPhotos: string[]                 // curated list for hero carousel (empty = show all)
-  highlights: string[]                 // bullet-point highlights (split by •)
+  highlights: Record<string, string[]> // per-locale bullet-points {en: [...], ko: [...], ...}
   contactLine: string | null           // LINE ID of owner
   contactPhone: string | null          // Phone/WhatsApp of owner
   perfectFor: string[]                 // e.g. ['teacher', 'family', 'expat-couple']
   personaDescriptions: Record<string, string> | null  // JSON: { teacher: "...", family: "..." }
-  faqJson: Array<{q: string, a: string}> | null       // FAQ items
-  seoDescription: string              // long-form SEO narrative
+  faqJson: Record<string, Array<{q: string, a: string}> | null>  // per-locale FAQ {en: [...], ko: [...]}
+  seoDescription: Record<string, string>  // per-locale SEO {en: '...', ko: '...', ...}
   galleryCategories: {
     exterior: string[]
     interior: string[]

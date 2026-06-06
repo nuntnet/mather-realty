@@ -187,7 +187,40 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
     try {
       const raw = await callAI(prompt)
       const parsed = parseJSON(raw)
-      return NextResponse.json({ success: true, field, value: parsed.value })
+      const value = parsed.value
+
+      // Auto-save per-locale content to Notion for locale-specific fields
+      const localeFields = ['highlights', 'seo', 'faq']
+      if (localeFields.includes(field)) {
+        try {
+          const notion = new Client({ auth: process.env.NOTION_API_KEY })
+          const rt = (s: string) => ({ rich_text: chunkRichText(s) })
+          const updates: Record<string, unknown> = {}
+
+          if (field === 'highlights') {
+            const bulletStr = Array.isArray(value) ? value.join(' • ') : String(value).replace(/\n/g, ' • ')
+            const notionKey = targetLocale === 'en' ? 'highlights' : `highlights_${targetLocale}`
+            updates[notionKey] = rt(bulletStr)
+          } else if (field === 'seo') {
+            const notionKey = targetLocale === 'en' ? 'seo_description' : `seo_description_${targetLocale}`
+            updates[notionKey] = rt(String(value))
+          } else if (field === 'faq') {
+            const notionKey = targetLocale === 'en' ? 'faq_json' : `faq_json_${targetLocale}`
+            updates[notionKey] = rt(JSON.stringify(value))
+          }
+
+          if (Object.keys(updates).length > 0) {
+            await notion.pages.update({
+              page_id: propertyId,
+              properties: updates as Parameters<typeof notion.pages.update>[0]['properties'],
+            })
+          }
+        } catch (saveErr) {
+          console.error('[generate-field] auto-save error (non-fatal):', (saveErr as Error).message)
+        }
+      }
+
+      return NextResponse.json({ success: true, field, locale: targetLocale, value, autoSaved: localeFields.includes(field) })
     } catch (e) {
       return NextResponse.json({ error: (e as Error).message }, { status: 502 })
     }
@@ -221,13 +254,16 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
           ? set('persona_descriptions', rt(JSON.stringify(saveData.personaDescriptions))) : {}),
       }
 
-      // Locale translations
+      // Locale translations (title + description + highlights + seo + faq per locale)
       const ALL_LOCALES = ['zh-CN','zh-TW','ja','ko','ru','de','fr','es','it','nl','sv','ar','hi']
       const localeUpdates: Record<string, unknown> = {}
       for (const loc of ALL_LOCALES) {
         const safeKey = loc.replace('-', '_')
-        if (saveData[`title_${safeKey}`])       Object.assign(localeUpdates, set(`title_${loc}`,       rt(saveData[`title_${safeKey}`])))
-        if (saveData[`description_${safeKey}`]) Object.assign(localeUpdates, set(`description_${loc}`, rt(saveData[`description_${safeKey}`])))
+        if (saveData[`title_${safeKey}`])               Object.assign(localeUpdates, set(`title_${loc}`,              rt(saveData[`title_${safeKey}`])))
+        if (saveData[`description_${safeKey}`])         Object.assign(localeUpdates, set(`description_${loc}`,        rt(saveData[`description_${safeKey}`])))
+        if (saveData[`highlights_${safeKey}`])          Object.assign(localeUpdates, set(`highlights_${loc}`,         rt(saveData[`highlights_${safeKey}`])))
+        if (saveData[`seoDescription_${safeKey}`])      Object.assign(localeUpdates, set(`seo_description_${loc}`,    rt(saveData[`seoDescription_${safeKey}`])))
+        if (saveData[`faqItems_${safeKey}`])            Object.assign(localeUpdates, set(`faq_json_${loc}`,           rt(JSON.stringify(saveData[`faqItems_${safeKey}`]))))
       }
 
       // Save core fields

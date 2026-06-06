@@ -116,15 +116,34 @@ function mapToForm(page: PageObjectResponse) {
     ? galleryFiles
     : richText(page, "gallery_urls").split(",").map((u) => u.trim()).filter(Boolean);
 
-  // Highlights stored as "• item1 • item2" — split into array
-  const highlightsRaw = richText(page, "highlights");
-  const highlights = highlightsRaw
-    ? highlightsRaw.split("•").map(s => s.trim()).filter(Boolean)
-    : [];
+  // Highlights per-locale — English in 'highlights', others in 'highlights_{loc}'
+  const parseHL = (raw: string) => raw ? raw.split("•").map(s => s.trim()).filter(Boolean) : []
+  const highlights: Record<string, string[]> = {}
+  const hlEn = parseHL(richText(page, "highlights"))
+  if (hlEn.length) highlights["en"] = hlEn
+  for (const loc of LOCALES.filter(l => l !== "en")) {
+    const v = parseHL(richText(page, `highlights_${loc}`))
+    if (v.length) highlights[loc] = v
+  }
 
-  // FAQ stored as JSON string
-  let faqJson: Array<{q: string; a: string}> = [];
-  try { faqJson = JSON.parse(richText(page, "faq_json")) ?? []; } catch { faqJson = []; }
+  // FAQ per-locale
+  const tryParseFaqArr = (s: string) => { try { const v = JSON.parse(s); return Array.isArray(v) ? v : []; } catch { return []; } }
+  const faqJson: Record<string, Array<{q: string; a: string}>> = {}
+  const faqEn = tryParseFaqArr(richText(page, "faq_json"))
+  if (faqEn.length) faqJson["en"] = faqEn
+  for (const loc of LOCALES.filter(l => l !== "en")) {
+    const v = tryParseFaqArr(richText(page, `faq_json_${loc}`))
+    if (v.length) faqJson[loc] = v
+  }
+
+  // SEO per-locale
+  const seoDescription: Record<string, string> = {}
+  const seoEn = richText(page, "seo_description")
+  if (seoEn) seoDescription["en"] = seoEn
+  for (const loc of LOCALES.filter(l => l !== "en")) {
+    const v = richText(page, `seo_description_${loc}`)
+    if (v) seoDescription[loc] = v
+  }
 
   // Boolean helper
   const propBool = (key: string) => {
@@ -158,7 +177,7 @@ function mapToForm(page: PageObjectResponse) {
     perfectFor: propMultiSelect(page, "perfect_for"),
     tags: propMultiSelect(page, "tags"),
     faqJson,
-    seoDescription: richText(page, "seo_description"),
+    seoDescription,
     personaDescriptions: richText(page, "persona_descriptions"),
     hasVirtualTour: propBool("has_virtual_tour"),
     gallery: galleryUrls,
@@ -354,10 +373,19 @@ export async function PATCH(
       updates["contact_phone"] = { phone_number: data.contactPhone || null };
     }
 
-    // Highlights: array → bullet string
+    // Highlights — now per-locale: { en: [...], ko: [...] } or legacy array (admin edit)
     if (data.highlights !== undefined) {
-      const bullet = data.highlights.filter(Boolean).join(" • ");
-      updates["highlights"] = { rich_text: toRichText(bullet) };
+      if (Array.isArray(data.highlights)) {
+        // Legacy format from admin edit page (English array)
+        updates["highlights"] = { rich_text: toRichText(data.highlights.filter(Boolean).join(" • ")) };
+      } else if (typeof data.highlights === 'object') {
+        // Per-locale format: { en: [...], ko: [...] }
+        const h = data.highlights as Record<string, string[]>
+        if (h['en']) updates["highlights"] = { rich_text: toRichText(h['en'].filter(Boolean).join(" • ")) }
+        for (const loc of LOCALES.filter(l => l !== 'en')) {
+          if (h[loc]) updates[`highlights_${loc}`] = { rich_text: toRichText(h[loc].filter(Boolean).join(" • ")) }
+        }
+      }
     }
 
     // Perfect For / Tags (multi_select)
@@ -368,14 +396,30 @@ export async function PATCH(
       updates["tags"] = { multi_select: data.tags.map(name => ({ name })) };
     }
 
-    // FAQ (JSON string) — can be long
+    // FAQ — per-locale: { en: [...], ko: [...] } or legacy string
     if (data.faqJson !== undefined) {
-      updates["faq_json"] = { rich_text: toRichText(data.faqJson) };
+      if (typeof data.faqJson === 'string') {
+        updates["faq_json"] = { rich_text: toRichText(data.faqJson) };
+      } else if (typeof data.faqJson === 'object' && !Array.isArray(data.faqJson)) {
+        const f = data.faqJson as Record<string, unknown>
+        if (f['en']) updates["faq_json"] = { rich_text: toRichText(JSON.stringify(f['en'])) }
+        for (const loc of LOCALES.filter(l => l !== 'en')) {
+          if (f[loc]) updates[`faq_json_${loc}`] = { rich_text: toRichText(JSON.stringify(f[loc])) }
+        }
+      }
     }
 
-    // SEO description
+    // SEO description — per-locale: { en: "...", ko: "..." } or legacy string
     if (data.seoDescription !== undefined) {
-      updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
+      if (typeof data.seoDescription === 'string') {
+        updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
+      } else if (typeof data.seoDescription === 'object') {
+        const s = data.seoDescription as Record<string, string>
+        if (s['en']) updates["seo_description"] = { rich_text: toRichText(s['en']) }
+        for (const loc of LOCALES.filter(l => l !== 'en')) {
+          if (s[loc]) updates[`seo_description_${loc}`] = { rich_text: toRichText(s[loc]) }
+        }
+      }
     }
 
     // Persona descriptions (JSON string)

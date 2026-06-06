@@ -233,10 +233,17 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     depositMonths: getPropNumber(page, 'deposit_months') || null,
     heroPhotos: getPropString(page, 'hero_photos')
       .split(',').map(u => u.trim()).filter(Boolean),
-    highlights: getPropString(page, 'highlights')
-      .split('•')
-      .map(s => s.trim())
-      .filter(Boolean),
+    highlights: (() => {
+      const parseHL = (raw: string) => raw.split('•').map(s => s.trim()).filter(Boolean)
+      const rec: Record<string, string[]> = {}
+      const en = getPropString(page, 'highlights')
+      if (en) rec['en'] = parseHL(en)
+      for (const loc of LOCALES.filter(l => l !== 'en')) {
+        const v = getPropString(page, `highlights_${loc}`)
+        if (v) rec[loc] = parseHL(v)
+      }
+      return rec
+    })(),
     contactLine: getPropString(page, 'contact_line') || null,
     contactPhone: getPropString(page, 'contact_phone') || null,
     perfectFor: getPropMultiSelect(page, 'perfect_for'),
@@ -246,11 +253,26 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
       try { return JSON.parse(raw) } catch { return null }
     })(),
     faqJson: (() => {
-      const raw = getPropString(page, 'faq_json')
-      if (!raw) return null
-      try { return JSON.parse(raw) } catch { return null }
+      const tryParse = (raw: string) => { try { return JSON.parse(raw) } catch { return null } }
+      const rec: Record<string, Array<{q: string; a: string}> | null> = {}
+      const en = getPropString(page, 'faq_json')
+      rec['en'] = en ? tryParse(en) : null
+      for (const loc of LOCALES.filter(l => l !== 'en')) {
+        const v = getPropString(page, `faq_json_${loc}`)
+        if (v) rec[loc] = tryParse(v)
+      }
+      return rec
     })(),
-    seoDescription: getPropString(page, 'seo_description'),
+    seoDescription: (() => {
+      const rec: Record<string, string> = {}
+      const en = getPropString(page, 'seo_description')
+      if (en) rec['en'] = en
+      for (const loc of LOCALES.filter(l => l !== 'en')) {
+        const v = getPropString(page, `seo_description_${loc}`)
+        if (v) rec[loc] = v
+      }
+      return rec
+    })(),
     galleryCategories: (() => {
       // Primary: three separate text fields — easy to fill in Notion
       // Add "exterior_photos", "interior_photos", "community_photos" as
