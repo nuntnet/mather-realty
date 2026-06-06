@@ -82,13 +82,13 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
 
   return (
     <>
-      {/* Photo fill — pointer handlers for left/right photo tap */}
+      {/* Embla viewport — pointer handlers live HERE (it's the topmost receiver) */}
       <div
-        className="absolute inset-0"
+        ref={emblaRef}
+        className="absolute inset-0 overflow-hidden"
         onPointerDown={onPhotoPointerDown}
         onPointerUp={onPhotoPointerUp}
-      />
-      <div ref={emblaRef} className="absolute inset-0 overflow-hidden">
+      >
         <div className="flex h-full">
           {photos.length > 0 ? photos.map((img, idx) => (
             <div key={idx} className="relative flex-shrink-0 w-full h-full overflow-hidden">
