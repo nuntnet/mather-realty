@@ -39,6 +39,7 @@ const NAV_LINKS: NavLink[] = [
 
 export default function Navbar({ locale }: NavbarProps) {
   const t = useTranslations("nav");
+  const tAuth = useTranslations("auth");
   const pathname = usePathname();
   const { data: session, isPending } = useSession();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -224,7 +225,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   className="text-destructive flex items-center gap-2 cursor-pointer"
                 >
                   <LogOut className="h-4 w-4" />
-                  Logout
+                  {tAuth("logout")}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -347,7 +348,7 @@ export default function Navbar({ locale }: NavbarProps) {
                   className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-medium text-red-600 hover:bg-red-50 transition-colors min-h-[44px] w-full text-left"
                 >
                   <LogOut className="h-5 w-5 shrink-0" />
-                  Logout
+                  {tAuth("logout")}
                 </button>
               </>
             )}

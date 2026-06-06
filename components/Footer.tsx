@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { site } from "@/lib/site";
 
@@ -19,7 +20,9 @@ const INSTAGRAM_SVG = (
   </svg>
 );
 
-export default function Footer() {
+export default async function Footer() {
+  const t = await getTranslations("footer");
+  const tNav = await getTranslations("nav");
   const year = new Date().getFullYear();
 
   return (
@@ -30,10 +33,10 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-6 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
             <p className="text-lg font-bold text-white leading-snug">
-              Looking for your perfect home in Thailand?
+              {t("looking_for_home")}
             </p>
             <p className="text-sm text-white/50 mt-1">
-              We&apos;re here 24/7 — reach us on LINE or WhatsApp.
+              {t("here_247")}
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
@@ -99,16 +102,16 @@ export default function Footer() {
 
           {/* Col 2: Explore */}
           <div className="space-y-4">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Explore</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">{t("explore")}</h3>
             <ul className="space-y-2.5">
-              {[
-                { label: 'Properties', href: '/properties' as const },
-                { label: 'Blog', href: '/blog' as const },
-                { label: 'How It Works', href: '/how-it-works' as const },
-                { label: 'List Your Property', href: '/submit' as const },
-              ].map(({ label, href }) => (
+              {([
+                { label: tNav("properties"), href: "/properties" },
+                { label: tNav("blog"), href: "/blog" },
+                { label: tNav("howItWorks"), href: "/how-it-works" },
+                { label: tNav("submitListing"), href: "/submit" },
+              ] as { label: string; href: string }[]).map(({ label, href }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
+                  <Link href={href as Parameters<typeof Link>[0]["href"]} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -118,14 +121,14 @@ export default function Footer() {
 
           {/* Col 3: Company */}
           <div className="space-y-4">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Company</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">{t("company")}</h3>
             <ul className="space-y-2.5">
-              {[
-                { label: 'About Us', href: '/about' as const },
-                { label: 'Contact', href: '/contact' as const },
-              ].map(({ label, href }) => (
+              {([
+                { label: t("about_us"), href: "/about" },
+                { label: t("contact_us"), href: "/contact" },
+              ] as { label: string; href: string }[]).map(({ label, href }) => (
                 <li key={href}>
-                  <Link href={href} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
+                  <Link href={href as Parameters<typeof Link>[0]["href"]} className="text-sm text-white/50 hover:text-[#4DB5B2] transition-colors">
                     {label}
                   </Link>
                 </li>
@@ -135,7 +138,7 @@ export default function Footer() {
 
           {/* Col 4: Contact */}
           <div className="space-y-4">
-            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">Contact</h3>
+            <h3 className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/30">{t("contact_us")}</h3>
             <address className="not-italic space-y-2.5 text-sm text-white/50">
               <p>
                 <a href={`mailto:${site.email}`} className="hover:text-[#4DB5B2] transition-colors">
@@ -151,7 +154,7 @@ export default function Footer() {
             </address>
             <div className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#4DB5B2] bg-[#1E6B69]/12 px-3 py-1.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-[#4DB5B2] animate-pulse" />
-              Available 24/7
+              {t("available_badge")}
             </div>
           </div>
 
@@ -162,12 +165,12 @@ export default function Footer() {
       <div className="border-t border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-white/30">
-            © {year} DoubleN Realty · All rights reserved
+            © {year} DoubleN Realty · {t("rights")}
           </p>
           <div className="flex items-center gap-5">
-            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/60 transition-colors">Privacy</Link>
-            <Link href="/terms" className="text-xs text-white/30 hover:text-white/60 transition-colors">Terms</Link>
-            <a href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">Cookies</a>
+            <Link href="/privacy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("privacy")}</Link>
+            <Link href="/terms" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("terms")}</Link>
+            <a href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("cookies")}</a>
           </div>
         </div>
       </div>
