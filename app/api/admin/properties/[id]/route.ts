@@ -441,10 +441,12 @@ export async function PATCH(
         // Legacy: single EN string
         updates["persona_descriptions"] = { rich_text: toRichText(data.personaDescriptions) };
       } else if (typeof data.personaDescriptions === "object") {
-        const pd = data.personaDescriptions as Record<string, string>
-        if (pd["en"]) updates["persona_descriptions"] = { rich_text: toRichText(pd["en"]) };
+        const pd = data.personaDescriptions as Record<string, unknown>
+        // Ensure each value is a string (may arrive as object if AI returned nested JSON)
+        const toStr = (v: unknown) => typeof v === "string" ? v : JSON.stringify(v)
+        if (pd["en"]) updates["persona_descriptions"] = { rich_text: toRichText(toStr(pd["en"])) };
         for (const loc of LOCALES.filter(l => l !== "en")) {
-          if (pd[loc]) updates[`persona_descriptions_${loc}`] = { rich_text: toRichText(pd[loc]) };
+          if (pd[loc]) updates[`persona_descriptions_${loc}`] = { rich_text: toRichText(toStr(pd[loc])) };
         }
       }
     }

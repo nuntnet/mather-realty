@@ -230,8 +230,28 @@ Each locale should have an array of the same number of FAQ items.`
       if (seoEn) tasks.push(translateShort('SEO meta description (max 160 chars)', seoEn).then(r => { results.seo = r }).catch(() => {}))
       if (faqEn?.length) tasks.push(translateFaq(faqEn).then(r => { results.faq = r }).catch(() => {}))
       if (personasEn) {
-        tasks.push(translateShort('persona descriptions JSON object (keep as valid JSON, translate only the string values)', personasEn)
-          .then(r => { results.personas = r }).catch(() => {}))
+        // Use a dedicated prompt that returns locale → JSON-string (not nested object)
+        tasks.push((async () => {
+          const targetList = TARGET_LOCALES.map(l => `"${l}":"<translated JSON string for ${l}>"`).join(',\n  ')
+          const prompt = `Translate the VALUES inside this persona descriptions JSON to ${langName} (${langList}).
+The INPUT is a JSON object where keys are persona types and values are 2-sentence descriptions.
+For each target locale, return the ENTIRE translated JSON object as a JSON-encoded STRING (not a nested object).
+
+Input personas JSON: ${personasEn}
+
+Return ONLY: {
+  ${targetList}
+}
+Each value must be a valid JSON string (escaped), e.g. "{\\"family\\":\\"...\\"}"  — NOT a nested object.`
+          const raw = await callAI(prompt)
+          const parsed = parseJSON(raw) as Record<string, unknown>
+          // Ensure each value is a string
+          const normalized: Record<string, string> = {}
+          for (const [loc, val] of Object.entries(parsed)) {
+            normalized[loc] = typeof val === 'string' ? val : JSON.stringify(val)
+          }
+          results.personas = normalized
+        })().catch(() => {}))
       }
 
       await Promise.all(tasks)

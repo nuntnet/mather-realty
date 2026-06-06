@@ -572,7 +572,11 @@ export default function PropertyEditPage() {
         if (r.highlights?.[targetLocale]) newHL[targetLocale] = String(r.highlights[targetLocale]).split(" • ").join("\n");
         if (r.faq?.[targetLocale]?.length) newFaq[targetLocale] = r.faq[targetLocale];
         if (r.seo?.[targetLocale]) newSeo[targetLocale] = r.seo[targetLocale];
-        if (r.personas?.[targetLocale]) newPersonas[targetLocale] = r.personas[targetLocale];
+        if (r.personas?.[targetLocale]) {
+          const v = r.personas[targetLocale];
+          // Ensure it's a string — AI might return nested object instead of JSON string
+          newPersonas[targetLocale] = typeof v === "string" ? v : JSON.stringify(v, null, 2);
+        }
         return { ...f, titles: newTitles, descriptions: newDescs, highlights: newHL, faq: newFaq, seoDescription: newSeo, personaDescriptions: newPersonas };
       });
 
