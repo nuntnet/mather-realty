@@ -36,7 +36,7 @@ async function callAI(prompt: string): Promise<string> {
     })
     const c = await gemini.chat.completions.create({
       model: process.env.GEMINI_MODEL ?? 'gemini-2.5-flash',
-      max_tokens: 3000,
+      max_tokens: 8192,
       temperature: 0.7,
       messages: [{ role: 'system', content: system }, { role: 'user', content: prompt }],
     })
@@ -77,11 +77,15 @@ async function callAI(prompt: string): Promise<string> {
 }
 
 function parseJSON(raw: string) {
-  try { return JSON.parse(raw) } catch {
-    const match = raw.match(/\{[\s\S]*\}/)
-    if (match) return JSON.parse(match[0])
-    throw new Error('Invalid JSON from AI')
+  // Strip markdown code fences if present
+  const stripped = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '').trim()
+  try { return JSON.parse(stripped) } catch { /* fall through */ }
+  // Try extracting first {...} block (handles leading/trailing text)
+  const match = stripped.match(/\{[\s\S]*\}/)
+  if (match) {
+    try { return JSON.parse(match[0]) } catch { /* fall through */ }
   }
+  throw new Error(`Invalid JSON from AI (length ${raw.length}): ${raw.slice(0, 120)}…`)
 }
 
 function chunkRichText(text: string) {
