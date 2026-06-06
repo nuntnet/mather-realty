@@ -121,7 +121,7 @@ function CardCarousel({
       locale={locale as Parameters<typeof Link>[0]['locale']}
       className={cn(
         'relative block shrink-0 overflow-hidden',
-        isList ? 'w-64 h-full min-h-[180px] max-h-[200px]' : 'w-full',
+        isList ? 'w-56 self-stretch' : 'w-full',
       )}
       tabIndex={-1}
       onMouseEnter={() => setHovering(true)}
@@ -129,7 +129,7 @@ function CardCarousel({
     >
       <div
         ref={emblaRef}
-        className={cn('overflow-hidden', isList ? 'h-full' : 'aspect-[4/3]')}
+        className={cn('overflow-hidden h-full', isList ? 'min-h-[160px]' : 'aspect-[4/3]')}
       >
         <div className="flex h-full">
           {images.map((img, idx) => (
