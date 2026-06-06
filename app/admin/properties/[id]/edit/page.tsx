@@ -455,14 +455,29 @@ export default function PropertyEditPage() {
     try {
       const data = await aiPost({ propertyId, action: "generate-field", field, locale });
       const val = data.value;
-      setIsDirty(true);
-      if (field === "title_en")       setForm((f) => ({ ...f, titles: { ...f.titles, en: val } }));
-      if (field === "description_en") setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } }));
-      if (field === "seo")            setForm((f) => ({ ...f, seoDescription: val }));
-      if (field === "highlights")     setForm((f) => ({ ...f, highlights: val }));
-      if (field === "faq")            setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
-      if (field === "personas")       setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
-      toast.success("Generated!");
+
+      // For title_en / description_en: always update EN form state
+      if (field === "title_en")       { setIsDirty(true); setForm((f) => ({ ...f, titles: { ...f.titles, en: val } })); }
+      if (field === "description_en") { setIsDirty(true); setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } })); }
+
+      // For locale-specific fields (highlights, seo, faq, personas):
+      // - When locale === 'en': update form state (form represents English content)
+      // - When locale !== 'en': content already auto-saved to Notion (highlights_ko etc.)
+      //   do NOT update form state or it will overwrite the English Notion field on Save
+      const isLocaleField = ["seo", "highlights", "faq", "personas"].includes(field);
+      if (isLocaleField && locale === "en") {
+        setIsDirty(true);
+        if (field === "seo")      setForm((f) => ({ ...f, seoDescription: val }));
+        if (field === "highlights") setForm((f) => ({ ...f, highlights: val }));
+        if (field === "faq")      setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
+        if (field === "personas") setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
+      }
+
+      // Auto-saved to Notion already (for locale-specific fields) — confirm to user
+      const savedNote = isLocaleField && locale !== "en" && data.autoSaved
+        ? ` (saved to Notion as ${field}_${locale})`
+        : "";
+      toast.success(`Generated!${savedNote}`);
     } catch (e) {
       if ((e as Error).message !== "Unauthorized")
         toast.error(e instanceof Error ? e.message : "AI generation failed");
