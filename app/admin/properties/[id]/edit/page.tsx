@@ -36,40 +36,17 @@ const STATUS_OPTIONS = [
   { value: "archived",    label: "Archived"    },
 ];
 
+// Must match Notion multi_select option names exactly (case-sensitive)
 const AMENITIES = [
-  "wifi",
-  "air_conditioning",
-  "parking",
-  "swimming_pool",
-  "gym",
-  "laundry",
-  "kitchen",
-  "balcony",
-  "elevator",
-  "security_24h",
-  "pet_friendly",
-  "furnished",
-  "private_garden",
-  "rooftop_access",
-  "concierge",
+  "Pool", "Parking", "WiFi", "Gym", "Security", "EVCharger",
+  "Furnished", "AirCon", "Elevator", "Balcony", "Garden", "PetFriendly",
 ];
 
 const AMENITY_LABELS: Record<string, string> = {
-  wifi: "WiFi",
-  air_conditioning: "Air Conditioning",
-  parking: "Parking",
-  swimming_pool: "Swimming Pool",
-  gym: "Gym",
-  laundry: "Laundry",
-  kitchen: "Kitchen",
-  balcony: "Balcony",
-  elevator: "Elevator",
-  security_24h: "24h Security",
-  pet_friendly: "Pet Friendly",
-  furnished: "Furnished",
-  private_garden: "Private Garden",
-  rooftop_access: "Rooftop Access",
-  concierge: "Concierge",
+  Pool: "Pool", Parking: "Parking", WiFi: "WiFi", Gym: "Gym",
+  Security: "Security", EVCharger: "EV Charger", Furnished: "Furnished",
+  AirCon: "Air Conditioning", Elevator: "Elevator", Balcony: "Balcony",
+  Garden: "Garden", PetFriendly: "Pet Friendly",
 };
 
 const PERFECT_FOR_OPTIONS = [

@@ -22,8 +22,10 @@ export default function LocationPicker({ lat, lng, onLatChange, onLngChange }: L
   const [mapReady, setMapReady] = useState(false)
 
   const initMap = useCallback(async () => {
-    if (!mapRef.current || !window.google?.maps) return
+    if (!mapRef.current) return
     if (mapInstanceRef.current) return
+    // Wait for importLibrary to be available (bootstrap may not be ready yet)
+    if (!window.google?.maps?.importLibrary) return
 
     const startLat = parseFloat(lat) || 13.736717
     const startLng = parseFloat(lng) || 100.523186
@@ -80,14 +82,15 @@ export default function LocationPicker({ lat, lng, onLatChange, onLngChange }: L
     const boot = () => {
       let retries = 0
       const tryInit = () => {
-        if (window.google?.maps) { initMap(); return }
+        // importLibrary may take a tick to appear even after script load
+        if (window.google?.maps?.importLibrary) { initMap(); return }
         if (retries++ < 30) setTimeout(tryInit, 300)
       }
       tryInit()
     }
 
-    // If Google Maps is already loaded (public layout injects it), use it directly
-    if (window.google?.maps) { initMap(); return }
+    // If Maps bootstrap is ready, use it directly
+    if (window.google?.maps?.importLibrary) { initMap(); return }
 
     // Admin layout doesn't include the Maps script — inject it ourselves
     if (apiKey && !document.querySelector('#gmap-admin-script')) {

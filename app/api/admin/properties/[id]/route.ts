@@ -13,10 +13,20 @@ function notion() {
 // ── helpers ────────────────────────────────────────────────────────────────────
 
 function richText(page: PageObjectResponse, key: string): string {
-  const p = page.properties[key] as { type: string; rich_text?: Array<{ plain_text: string }>; title?: Array<{ plain_text: string }> } | undefined;
+  const p = page.properties[key] as {
+    type: string;
+    rich_text?: Array<{ plain_text: string }>;
+    title?: Array<{ plain_text: string }>;
+    phone_number?: string | null;
+    url?: string | null;
+    email?: string | null;
+  } | undefined;
   if (!p) return "";
   if (p.type === "rich_text") return (p.rich_text ?? []).map((r) => r.plain_text).join("");
   if (p.type === "title") return (p.title ?? []).map((r) => r.plain_text).join("");
+  if (p.type === "phone_number") return p.phone_number ?? "";
+  if (p.type === "url") return p.url ?? "";
+  if (p.type === "email") return p.email ?? "";
   return "";
 }
 
