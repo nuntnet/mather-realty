@@ -416,29 +416,58 @@ export async function PATCH(
       updatePayload.properties = updates as Parameters<typeof client.pages.update>[0]["properties"];
     }
 
-    // Cover image lives on the Notion page itself, not a property field
-    if (data.coverImage !== undefined) {
-      (updatePayload as Record<string, unknown>).cover = data.coverImage
-        ? { type: "external", external: { url: data.coverImage } }
-        : null;
+    // Cover image — only set if non-empty URL (avoid accidentally removing covers)
+    if (data.coverImage) {
+      (updatePayload as Record<string, unknown>).cover = {
+        type: "external",
+        external: { url: data.coverImage },
+      };
     }
 
-    if (Object.keys(updatePayload).length > 1) {
-      await client.pages.update(updatePayload);
+    // Run properties update and cover update separately so we can pinpoint failures
+    const results: string[] = [];
+    const errors: string[] = [];
+
+    if (Object.keys(updates).length > 0) {
+      try {
+        await client.pages.update({ page_id: id, properties: updates as Parameters<typeof client.pages.update>[0]["properties"] });
+        results.push(`properties(${Object.keys(updates).join(",")})`);
+      } catch (propErr) {
+        const msg = propErr instanceof Error ? propErr.message : String(propErr);
+        errors.push(`properties: ${msg}`);
+        console.error(`PATCH ${id} properties error:`, msg, JSON.stringify(Object.keys(updates)));
+      }
     }
 
-    return NextResponse.json({ success: true, id });
+    if (data.coverImage) {
+      try {
+        await client.pages.update({
+          page_id: id,
+          cover: { type: "external", external: { url: data.coverImage } },
+        } as Parameters<typeof client.pages.update>[0]);
+        results.push("cover");
+      } catch (coverErr) {
+        const msg = coverErr instanceof Error ? coverErr.message : String(coverErr);
+        errors.push(`cover: ${msg}`);
+        console.error(`PATCH ${id} cover error:`, msg);
+      }
+    }
+
+    if (errors.length > 0) {
+      return NextResponse.json(
+        { error: "Partial update failure", detail: errors.join(" | "), saved: results },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, id, saved: results });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", issues: err.issues }, { status: 400 });
     }
-    // Surface the actual Notion error message for easier debugging
     const message = err instanceof Error ? err.message : String(err);
-    console.error(`PATCH /api/admin/properties/${id} error:`, message);
-    return NextResponse.json(
-      { error: "Failed to update property", detail: message },
-      { status: 500 }
-    );
+    console.error(`PATCH /api/admin/properties/${id} outer error:`, message);
+    return NextResponse.json({ error: "Failed to update property", detail: message }, { status: 500 });
   }
 }
 
