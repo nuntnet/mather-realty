@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
+import SocialPostButton from "@/components/admin/SocialPostButton";
 import { toast } from "sonner";
 import {
   Building2,
@@ -366,6 +367,15 @@ export default function AdminPropertiesPage() {
                           >
                             <Pencil className="w-4 h-4" />
                           </Link>
+                          {property.status === "available" && (
+                            <SocialPostButton
+                              propertyId={property.id}
+                              propertySlug={property.slug ?? property.id}
+                              propertyTitle={property.titleEn ?? 'Property'}
+                              propertyCity={property.city ?? undefined}
+                              priceTHB={property.priceTHB ?? 0}
+                            />
+                          )}
                           {property.status !== "pending" && property.status !== "archived" && (
                             <button
                               onClick={() =>
