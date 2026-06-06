@@ -51,7 +51,22 @@ export async function POST(req: NextRequest) {
   const { propertyId, slug } = await req.json()
   if (!propertyId && !slug) return NextResponse.json({ error: 'propertyId or slug required' }, { status: 400 })
 
-  const property = slug ? await getProperty(slug, 'en') : null
+  let property = null
+  if (slug) {
+    // slug provided directly
+    property = await getProperty(slug, 'en').catch(() => null)
+  } else if (propertyId) {
+    // propertyId is the Notion page ID — retrieve page to get slug, then load full property
+    try {
+      const notion = new Client({ auth: process.env.NOTION_API_KEY })
+      const page = await notion.pages.retrieve({ page_id: propertyId }) as import('@notionhq/client/build/src/api-endpoints').PageObjectResponse
+      const slugProp = page.properties['slug'] as { type: string; rich_text?: Array<{ plain_text: string }> } | undefined
+      const pageSlug = slugProp?.rich_text?.map(r => r.plain_text).join('') ?? ''
+      if (pageSlug) {
+        property = await getProperty(pageSlug, 'en').catch(() => null)
+      }
+    } catch { /* fall through to 404 */ }
+  }
   if (!property) return NextResponse.json({ error: 'Property not found' }, { status: 404 })
 
   if (!process.env.HERMES_URL && !process.env.ANTHROPIC_API_KEY) {

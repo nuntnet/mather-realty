@@ -125,6 +125,10 @@ export default function PhotoManagerPage() {
   const propertyId = params.id as string
 
   const [photos, setPhotos] = useState<PhotoItem[]>([])
+  const [exteriorPhotos, setExteriorPhotos] = useState<string[]>([])
+  const [interiorPhotos, setInteriorPhotos] = useState<string[]>([])
+  const [communityPhotos, setCommunityPhotos] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState<'main' | 'exterior' | 'interior' | 'community'>('main')
   const [propertyTitle, setPropertyTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -145,18 +149,19 @@ export default function PhotoManagerPage() {
       const res = await fetch(`/api/admin/properties/${propertyId}`)
       if (!res.ok) throw new Error('Failed to fetch property')
       const data = await res.json()
-      setPropertyTitle(data.title || data.name || 'Property')
+      setPropertyTitle(data.titles?.en || data.title || data.name || 'Property')
 
-      // Build photo list: cover first, then gallery
-      const coverUrl = data.cover_image || data.coverImage || ''
-      const galleryUrls: string[] = (data.gallery_urls || data.gallery || '')
-        .split(',')
-        .map((u: string) => u.trim())
-        .filter(Boolean)
+      // API returns gallery as string[] already
+      const coverUrl: string = data.coverImage || ''
+      const galleryArr: string[] = Array.isArray(data.gallery)
+        ? data.gallery
+        : typeof data.gallery === 'string'
+          ? data.gallery.split(',').map((u: string) => u.trim()).filter(Boolean)
+          : []
 
       const allUrls = coverUrl
-        ? [coverUrl, ...galleryUrls.filter((u: string) => u !== coverUrl)]
-        : galleryUrls
+        ? [coverUrl, ...galleryArr.filter((u: string) => u !== coverUrl)]
+        : galleryArr
 
       setPhotos(
         allUrls.map((url, idx) => ({
@@ -165,6 +170,16 @@ export default function PhotoManagerPage() {
           isCover: idx === 0,
         })),
       )
+
+      // Gallery categories
+      const toArr = (v: unknown): string[] => {
+        if (Array.isArray(v)) return v
+        if (typeof v === 'string') return v.split(',').map((u: string) => u.trim()).filter(Boolean)
+        return []
+      }
+      setExteriorPhotos(toArr(data.exteriorPhotos))
+      setInteriorPhotos(toArr(data.interiorPhotos))
+      setCommunityPhotos(toArr(data.communityPhotos))
     } catch (e) {
       toast.error('Failed to load photos')
     } finally {
@@ -205,33 +220,36 @@ export default function PhotoManagerPage() {
   }, [])
 
   async function handleSave() {
-    if (photos.length === 0) {
-      toast.error('No photos to save')
-      return
-    }
     setSaving(true)
     try {
-      const coverImage = photos[0].url
-      const galleryUrls = photos
-        .slice(1)
-        .map((p) => p.url)
-        .join(',')
+      const body: Record<string, unknown> = {}
+
+      // Main gallery: first photo = cover
+      if (photos.length > 0) {
+        body.coverImage = photos[0].url
+        body.gallery = photos.slice(1).map((p) => p.url)
+      }
+
+      // Gallery categories (comma-joined for Notion rich_text)
+      body.exteriorPhotos = exteriorPhotos.join(',')
+      body.interiorPhotos = interiorPhotos.join(',')
+      body.communityPhotos = communityPhotos.join(',')
 
       const res = await fetch(`/api/admin/properties/${propertyId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          cover_image: coverImage,
-          gallery_urls: galleryUrls,
-        }),
+        body: JSON.stringify(body),
       })
 
-      if (!res.ok) throw new Error('Save failed')
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error || `Save failed (${res.status})`)
+      }
 
       setSaved(true)
-      toast.success('Photo order saved! Cover photo updated.')
+      toast.success('Photos saved — cover, order and categories updated.')
     } catch (e) {
-      toast.error('Failed to save changes')
+      toast.error(e instanceof Error ? e.message : 'Failed to save changes')
     } finally {
       setSaving(false)
     }
@@ -282,48 +300,129 @@ export default function PhotoManagerPage() {
         </Button>
       </div>
 
-      {/* Instructions */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex items-start gap-3">
-        <Star className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-medium text-blue-900">How to manage photos</p>
-          <p className="text-sm text-blue-700 mt-0.5">
-            <strong>Drag</strong> to reorder · <strong>First photo</strong> becomes the cover/hero image ·
-            Click <strong>Set as Cover</strong> to promote any photo · Click <strong>Remove</strong> to hide from listing
-          </p>
-        </div>
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-gray-200 mb-6">
+        {([
+          { key: 'main', label: `📷 All Photos (${photos.length})` },
+          { key: 'exterior', label: `🏠 Exterior (${exteriorPhotos.length})` },
+          { key: 'interior', label: `🛋️ Interior (${interiorPhotos.length})` },
+          { key: 'community', label: `🏘️ Community (${communityPhotos.length})` },
+        ] as const).map(tab => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              activeTab === tab.key
+                ? 'border-[#1E6B69] text-[#1E6B69]'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Stats */}
-      <div className="flex items-center gap-3 mb-4 text-sm text-gray-500">
-        <span><strong className="text-gray-900">{photos.length}</strong> photos</span>
-        <span>·</span>
-        <span>Cover: <strong className="text-gray-900">{photos[0]?.url?.split('/').pop()?.slice(0, 20)}...</strong></span>
-      </div>
-
-      {/* Photo Grid */}
-      {photos.length === 0 ? (
-        <div className="text-center py-16 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">
-          <p className="text-lg font-medium">No photos</p>
-          <p className="text-sm mt-1">Upload photos via Cloudinary first</p>
-        </div>
-      ) : (
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-          <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {photos.map((photo, idx) => (
-                <SortablePhoto
-                  key={photo.id}
-                  photo={photo}
-                  index={idx}
-                  onSetCover={handleSetCover}
-                  onRemove={handleRemove}
-                />
-              ))}
+      {/* Main tab — drag-and-drop reorder */}
+      {activeTab === 'main' && (
+        <>
+          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 flex items-start gap-3">
+            <Star className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+            <p className="text-sm text-blue-700">
+              <strong>Drag</strong> to reorder · <strong>First photo</strong> = cover/hero ·
+              Hover to <strong>Set as Cover</strong> or <strong>Remove</strong>
+            </p>
+          </div>
+          {photos.length === 0 ? (
+            <div className="text-center py-16 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">
+              <p className="text-lg font-medium">No photos yet</p>
+              <p className="text-sm mt-1">Upload via the Edit page → Cover Image / Gallery sections</p>
             </div>
-          </SortableContext>
-        </DndContext>
+          ) : (
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {photos.map((photo, idx) => (
+                    <SortablePhoto key={photo.id} photo={photo} index={idx}
+                      onSetCover={handleSetCover} onRemove={handleRemove} />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          )}
+        </>
       )}
+
+      {/* Category tabs — simple grid with add/remove */}
+      {(activeTab === 'exterior' || activeTab === 'interior' || activeTab === 'community') && (() => {
+        const catMap = {
+          exterior:  { urls: exteriorPhotos,  setUrls: setExteriorPhotos,  label: '🏠 Exterior',  hint: 'Façade, garden, entrance, parking' },
+          interior:  { urls: interiorPhotos,  setUrls: setInteriorPhotos,  label: '🛋️ Interior',  hint: 'Living room, bedroom, kitchen, bathroom' },
+          community: { urls: communityPhotos, setUrls: setCommunityPhotos, label: '🏘️ Community', hint: 'Pool, gym, lobby, rooftop, neighbourhood' },
+        }
+        const cat = catMap[activeTab]
+        return (
+          <div>
+            <p className="text-sm text-gray-500 mb-4">{cat.hint} — photos shown when visitors filter by this tab.</p>
+            {cat.urls.length === 0 ? (
+              <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl mb-4">
+                <p className="font-medium">No photos in this category</p>
+                <p className="text-sm mt-1">Paste Cloudinary URLs below to add</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                {cat.urls.map((url, idx) => (
+                  <div key={idx} className="relative group rounded-xl overflow-hidden border border-gray-200">
+                    <div className="relative aspect-[4/3] bg-gray-100">
+                      <img src={url} alt={`${activeTab} ${idx + 1}`}
+                        className="w-full h-full object-cover" />
+                      <button
+                        onClick={() => cat.setUrls(prev => prev.filter((_, i) => i !== idx))}
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-red-600 text-white rounded-lg p-1.5 transition-opacity"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            {/* Add URLs from main gallery */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Add from main gallery</p>
+              <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-6 gap-2">
+                {photos.map((photo, idx) => {
+                  const alreadyIn = cat.urls.includes(photo.url)
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        if (!alreadyIn) cat.setUrls(prev => [...prev, photo.url])
+                        else cat.setUrls(prev => prev.filter(u => u !== photo.url))
+                        setSaved(false)
+                      }}
+                      className={`relative aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all ${
+                        alreadyIn ? 'border-[#1E6B69] ring-2 ring-[#1E6B69]/30' : 'border-transparent hover:border-gray-300'
+                      }`}
+                      title={alreadyIn ? 'Click to remove' : 'Click to add'}
+                    >
+                      <img src={photo.url} alt="" className="w-full h-full object-cover" />
+                      {alreadyIn && (
+                        <div className="absolute inset-0 bg-[#1E6B69]/20 flex items-center justify-center">
+                          <CheckCircle2 className="w-5 h-5 text-[#1E6B69]" />
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+              {photos.length === 0 && (
+                <p className="text-sm text-gray-400">Upload photos via Edit page first.</p>
+              )}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }

@@ -22,7 +22,7 @@ export default function GeneratePersonasPage({ params }: Props) {
       const res = await fetch("/api/ai/generate-personas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: id }),
+        body: JSON.stringify({ propertyId: id }),
       });
       const data = await res.json();
       if (!res.ok) {
