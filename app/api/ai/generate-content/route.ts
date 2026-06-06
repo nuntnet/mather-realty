@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
 
-  const { propertyId, action, field, data: saveData, locales, titleEn, descriptionEn } = await req.json()
+  const { propertyId, action, field, locale: reqLocale, data: saveData, locales, titleEn, descriptionEn } = await req.json()
   if (!propertyId && action !== 'translate') return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
 
   // ── TRANSLATE action ─────────────────────────────────────────────────────────
@@ -166,13 +166,19 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
 
     const ctxStr = JSON.stringify(ctx)
 
+    // Resolve language name for the prompt
+    const targetLocale = reqLocale ?? 'en'
+    const langName = targetLocale === 'en' ? 'English'
+      : LOCALE_NAMES[targetLocale] ?? targetLocale
+    const langInstr = targetLocale === 'en' ? 'in English' : `in ${langName} (locale: ${targetLocale})`
+
     const FIELD_PROMPTS: Record<string, string> = {
-      title_en: `Property data: ${ctxStr}\n\nWrite a catchy English property listing title (6-10 words, highlight best feature). Return ONLY a JSON object: {"value": "..."}`,
-      description_en: `Property data: ${ctxStr}\n\nWrite an English property description (4-6 sentences, 120-180 words). Start with best feature, mention location, lifestyle, amenities, end with CTA. Return ONLY: {"value": "..."}`,
-      seo: `Property data: ${ctxStr}\n\nWrite a 150-character SEO meta description (include city, property type, key feature). Return ONLY: {"value": "..."}`,
-      highlights: `Property data: ${ctxStr}\n\nList 4-6 key selling highlights as bullet points (each 3-8 words). Return ONLY: {"value": "highlight one\\nhighlight two\\nhighlight three"}`,
-      faq: `Property data: ${ctxStr}\n\nGenerate 5 FAQ items relevant to expat renters. Return ONLY: {"value": [{"q": "...", "a": "..."}, ...]}`,
-      personas: `Property data: ${ctxStr}\n\nWrite 2-sentence "perfect for" descriptions for each persona. Return ONLY: {"value": {"family": "...", "expat-couple": "...", "remote-worker": "...", "teacher": "...", "retiree": "..."}}`,
+      title_en:        `Property data: ${ctxStr}\n\nWrite a catchy property listing title ${langInstr} (6-10 words, highlight best feature). Return ONLY a JSON object: {"value": "..."}`,
+      description_en:  `Property data: ${ctxStr}\n\nWrite a property description ${langInstr} (4-6 sentences, 120-180 words). Start with best feature, mention location, lifestyle, amenities, end with CTA. Return ONLY: {"value": "..."}`,
+      seo:             `Property data: ${ctxStr}\n\nWrite a 150-character SEO meta description ${langInstr} (include city, property type, key feature). Return ONLY: {"value": "..."}`,
+      highlights:      `Property data: ${ctxStr}\n\nList 4-6 key selling highlights ${langInstr} as short bullet points (each 3-8 words). Return ONLY: {"value": "highlight one\\nhighlight two\\nhighlight three"}`,
+      faq:             `Property data: ${ctxStr}\n\nGenerate 5 FAQ items relevant to expat renters, written ${langInstr}. Return ONLY: {"value": [{"q": "...", "a": "..."}, ...]}`,
+      personas:        `Property data: ${ctxStr}\n\nWrite 2-sentence "perfect for" descriptions for each persona, ${langInstr}. Return ONLY: {"value": {"family": "...", "expat-couple": "...", "remote-worker": "...", "teacher": "...", "retiree": "..."}}`,
     }
 
     const prompt = FIELD_PROMPTS[field]

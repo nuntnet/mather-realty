@@ -397,26 +397,38 @@ export default function PropertyEditPage() {
   };
 
   // ── AI helpers ───────────────────────────────────────────────────────────────
-  async function generateField(field: string) {
+
+  async function aiPost(body: Record<string, unknown>) {
+    const res = await fetch("/api/ai/generate-content", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 401) {
+      toast.error("Session expired — please refresh the page and log in again.");
+      throw new Error("Unauthorized");
+    }
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error ?? `Error ${res.status}`);
+    return data;
+  }
+
+  async function generateField(field: string, locale = activeLocale) {
     setAiLoading((p) => ({ ...p, [field]: true }));
     try {
-      const res = await fetch("/api/ai/generate-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ propertyId, action: "generate-field", field }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const data = await aiPost({ propertyId, action: "generate-field", field, locale });
       const val = data.value;
-      if (field === "title_en")      setForm((f) => ({ ...f, titles: { ...f.titles, en: val } }));
+      if (field === "title_en")       setForm((f) => ({ ...f, titles: { ...f.titles, en: val } }));
       if (field === "description_en") setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } }));
-      if (field === "seo")           setForm((f) => ({ ...f, seoDescription: val }));
-      if (field === "highlights")    setForm((f) => ({ ...f, highlights: val }));
-      if (field === "faq")           setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
-      if (field === "personas")      setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
+      if (field === "seo")            setForm((f) => ({ ...f, seoDescription: val }));
+      if (field === "highlights")     setForm((f) => ({ ...f, highlights: val }));
+      if (field === "faq")            setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
+      if (field === "personas")       setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
       toast.success("Generated!");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "AI generation failed");
+      if ((e as Error).message !== "Unauthorized")
+        toast.error(e instanceof Error ? e.message : "AI generation failed");
     } finally {
       setAiLoading((p) => ({ ...p, [field]: false }));
     }
@@ -429,39 +441,37 @@ export default function PropertyEditPage() {
       const titleEn = form.titles["en"] || "";
       const descEn  = form.descriptions["en"] || "";
       if (!titleEn && !descEn) { toast.error("Fill in the English title/description first"); return; }
-      const res = await fetch("/api/ai/generate-content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "translate", titleEn, descriptionEn: descEn, locales: [locale] }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const data = await aiPost({ action: "translate", titleEn, descriptionEn: descEn, locales: [locale] });
       const t = data.translations?.[locale];
       if (t?.title)       setForm((f) => ({ ...f, titles:       { ...f.titles,       [locale]: t.title } }));
       if (t?.description) setForm((f) => ({ ...f, descriptions: { ...f.descriptions, [locale]: t.description } }));
       toast.success(`Translated to ${locale}!`);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Translation failed");
+      if ((e as Error).message !== "Unauthorized")
+        toast.error(e instanceof Error ? e.message : "Translation failed");
     } finally {
       setAiLoading((p) => ({ ...p, [key]: false }));
     }
   }
 
   // Small ✨ button component
-  function AiBtn({ fieldKey, label = "✨" }: { fieldKey: string; label?: string }) {
+  // locale: override which locale to generate in (default: activeLocale)
+  function AiBtn({ fieldKey, label = "✨", locale }: { fieldKey: string; label?: string; locale?: string }) {
+    const effectiveLocale = locale ?? (fieldKey.startsWith("translate-") ? fieldKey.replace("translate-", "") : activeLocale);
     const busy = !!aiLoading[fieldKey];
+    const localeTag = effectiveLocale !== "en" ? ` [${effectiveLocale.toUpperCase()}]` : "";
     return (
       <button
         type="button"
         disabled={busy}
         onClick={() => fieldKey.startsWith("translate-")
           ? translateLocale(fieldKey.replace("translate-", ""))
-          : generateField(fieldKey)}
+          : generateField(fieldKey, effectiveLocale)}
         className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-lg border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 disabled:opacity-50 transition-colors shrink-0"
-        title={busy ? "Generating…" : label}
+        title={busy ? "Generating…" : `${label}${localeTag}`}
       >
         {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-        {busy ? "…" : label}
+        {busy ? "…" : `${label}${localeTag}`}
       </button>
     );
   }
