@@ -96,7 +96,7 @@ type PropertyForm = {
   tags: string;                             // comma-separated in UI
   faq: Record<string, FaqItem[]>;          // locale → FAQ items
   seoDescription: Record<string, string>;  // locale → SEO text
-  personaDescriptions: string;             // JSON (EN only, not locale-split yet)
+  personaDescriptions: Record<string, string>; // locale → JSON string per locale
 };
 
 function emptyForm(): PropertyForm {
@@ -129,7 +129,7 @@ function emptyForm(): PropertyForm {
     tags: "",
     faq: {},
     seoDescription: {},
-    personaDescriptions: "",
+    personaDescriptions: {},
   };
 }
 
@@ -274,11 +274,16 @@ export default function PropertyEditPage() {
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
           faq: faqByLocale,
           seoDescription: seoByLocale,
-          personaDescriptions: data.personaDescriptions
-            ? (typeof data.personaDescriptions === "string"
-                ? data.personaDescriptions
-                : JSON.stringify(data.personaDescriptions, null, 2))
-            : "",
+          // personaDescriptions: now per-locale Record<locale, string>
+          personaDescriptions: (() => {
+            const raw = data.personaDescriptions
+            if (!raw) return {}
+            // API returns Record<locale, string> already
+            if (typeof raw === "object" && !Array.isArray(raw)) return raw as Record<string, string>
+            // Legacy: single JSON string → put in 'en'
+            if (typeof raw === "string" && raw) return { en: raw }
+            return {}
+          })(),
         });
       })
       .finally(() => setLoading(false));
@@ -431,7 +436,7 @@ export default function PropertyEditPage() {
         faqJson: Object.keys(form.faq).length > 0 ? form.faq : {},
         // seoDescription: per-locale Record<string, string>
         seoDescription: form.seoDescription,
-        personaDescriptions: form.personaDescriptions || "",
+        personaDescriptions: form.personaDescriptions,
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
@@ -488,7 +493,7 @@ export default function PropertyEditPage() {
         if (field === "seo")       setForm((f) => ({ ...f, seoDescription: { ...f.seoDescription, [locale]: typeof val === "string" ? val : "" } }));
         if (field === "highlights") setForm((f) => ({ ...f, highlights: { ...f.highlights, [locale]: typeof val === "string" ? val : (Array.isArray(val) ? (val as string[]).join("\n") : "") } }));
         if (field === "faq")       setForm((f) => ({ ...f, faq: { ...f.faq, [locale]: Array.isArray(val) ? val : [] } }));
-        if (field === "personas")  setForm((f) => ({ ...f, personaDescriptions: typeof val === "string" ? val : JSON.stringify(val, null, 2) }));
+        if (field === "personas")  setForm((f) => ({ ...f, personaDescriptions: { ...f.personaDescriptions, [locale]: typeof val === "string" ? val : JSON.stringify(val, null, 2) } }));
       }
 
       toast.success(`Generated!`);
@@ -531,6 +536,7 @@ export default function PropertyEditPage() {
     try {
       const highlightsEn = (form.highlights["en"] ?? "").split("\n").filter(Boolean).join("\n");
       const faqEn = (form.faq["en"] ?? []).length > 0 ? form.faq["en"] : undefined;
+      const personasEn = form.personaDescriptions["en"] || undefined;
       const data = await aiPost({
         propertyId,
         action: "translate-all",
@@ -540,6 +546,7 @@ export default function PropertyEditPage() {
         highlightsEn: highlightsEn || undefined,
         seoEn: form.seoDescription["en"] || undefined,
         faqEn,
+        personasEn,
       });
       if (!data.success) throw new Error(data.error ?? "Translation failed");
 
@@ -548,28 +555,32 @@ export default function PropertyEditPage() {
         highlights?: Record<string, string>;
         seo?: Record<string, string>;
         faq?: Record<string, Array<{ q: string; a: string }>>;
+        personas?: Record<string, string>;
       };
 
       // Update form state for the target locale (all per-locale fields)
       setForm((f) => {
-        const newTitles = { ...f.titles };
-        const newDescs  = { ...f.descriptions };
-        const newHL     = { ...f.highlights };
-        const newFaq    = { ...f.faq };
-        const newSeo    = { ...f.seoDescription };
+        const newTitles   = { ...f.titles };
+        const newDescs    = { ...f.descriptions };
+        const newHL       = { ...f.highlights };
+        const newFaq      = { ...f.faq };
+        const newSeo      = { ...f.seoDescription };
+        const newPersonas = { ...f.personaDescriptions };
         const td = r.titleDesc?.[targetLocale];
         if (td?.title)       newTitles[targetLocale] = td.title;
         if (td?.description) newDescs[targetLocale]  = td.description;
         if (r.highlights?.[targetLocale]) newHL[targetLocale] = String(r.highlights[targetLocale]).split(" • ").join("\n");
         if (r.faq?.[targetLocale]?.length) newFaq[targetLocale] = r.faq[targetLocale];
         if (r.seo?.[targetLocale]) newSeo[targetLocale] = r.seo[targetLocale];
-        return { ...f, titles: newTitles, descriptions: newDescs, highlights: newHL, faq: newFaq, seoDescription: newSeo };
+        if (r.personas?.[targetLocale]) newPersonas[targetLocale] = r.personas[targetLocale];
+        return { ...f, titles: newTitles, descriptions: newDescs, highlights: newHL, faq: newFaq, seoDescription: newSeo, personaDescriptions: newPersonas };
       });
 
       const fields = ["title & description",
         r.highlights?.[targetLocale] ? "highlights" : "",
         r.seo?.[targetLocale] ? "SEO" : "",
         r.faq?.[targetLocale] ? "FAQ" : "",
+        r.personas?.[targetLocale] ? "personas" : "",
       ].filter(Boolean).join(", ");
 
       toast.success(`✅ Translated ${fields} to ${targetLocale.toUpperCase()} and saved to Notion!`);
@@ -1180,18 +1191,18 @@ export default function PropertyEditPage() {
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <SectionTitle>Persona Descriptions</SectionTitle>
+              <SectionTitle>Persona Descriptions <span className="text-[#1E6B69] font-bold text-xs ml-1">[{activeLocale.toUpperCase()}]</span></SectionTitle>
               <p className="text-xs text-gray-400 mt-1">
-                JSON object with keys: family, expat-couple, remote-worker, teacher, retiree
+                Per-language JSON — switch locale tab to edit each language.
               </p>
             </div>
             <AiBtn fieldKey="personas" label="Generate" />
           </div>
-          <Field label="Persona Descriptions (JSON)">
+          <Field label={`Persona Descriptions (${activeLocale.toUpperCase()}) — JSON`}>
             <textarea
               rows={8}
-              value={form.personaDescriptions}
-              onChange={(e) => setForm((f) => ({ ...f, personaDescriptions: e.target.value }))}
+              value={form.personaDescriptions[activeLocale] ?? ""}
+              onChange={(e) => dirtySetForm((f) => ({ ...f, personaDescriptions: { ...f.personaDescriptions, [activeLocale]: e.target.value } }))}
               className={`${TEXTAREA_CLS} font-mono text-xs`}
               placeholder={'{\n  "family": "...",\n  "expat-couple": "...",\n  "remote-worker": "...",\n  "teacher": "..."\n}'}
             />

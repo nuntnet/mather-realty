@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
     propertyId, action, field, locale: reqLocale,
     data: saveData, locales, titleEn, descriptionEn,
     // translate-all payload
-    highlightsEn, seoEn, faqEn,
+    highlightsEn, seoEn, faqEn, personasEn,
     targetLocale,  // single locale for translate-all (replaces ALL_LOCALES)
   } = await req.json()
   if (!propertyId && !['translate','translate-all'].includes(action))
@@ -220,6 +220,7 @@ Each locale should have an array of the same number of FAQ items.`
         highlights?: Record<string, string>
         seo?: Record<string, string>
         faq?: Record<string, Array<{q: string; a: string}>>
+        personas?: Record<string, string>
       } = {}
 
       const tasks: Promise<void>[] = [
@@ -228,6 +229,10 @@ Each locale should have an array of the same number of FAQ items.`
       if (highlightsEn) tasks.push(translateShort('property highlights (keep as bullet points separated by newlines)', highlightsEn).then(r => { results.highlights = r }).catch(() => {}))
       if (seoEn) tasks.push(translateShort('SEO meta description (max 160 chars)', seoEn).then(r => { results.seo = r }).catch(() => {}))
       if (faqEn?.length) tasks.push(translateFaq(faqEn).then(r => { results.faq = r }).catch(() => {}))
+      if (personasEn) {
+        tasks.push(translateShort('persona descriptions JSON object (keep as valid JSON, translate only the string values)', personasEn)
+          .then(r => { results.personas = r }).catch(() => {}))
+      }
 
       await Promise.all(tasks)
 
@@ -240,11 +245,12 @@ Each locale should have an array of the same number of FAQ items.`
         for (const loc of TARGET_LOCALES) {
           const safeKey = loc.replace('-', '_')
           void safeKey // used for response key, not Notion key
-          if (results.titleDesc?.[loc]?.title)       updates[`title_${loc}`]              = rt(results.titleDesc[loc].title)
-          if (results.titleDesc?.[loc]?.description) updates[`description_${loc}`]        = rt(results.titleDesc[loc].description)
-          if (results.highlights?.[loc])             updates[`highlights_${loc}`]          = rt(String(results.highlights[loc]).replace(/\n/g, ' • '))
-          if (results.seo?.[loc])                    updates[`seo_description_${loc}`]     = rt(String(results.seo[loc]))
-          if (results.faq?.[loc]?.length)            updates[`faq_json_${loc}`]            = rt(JSON.stringify(results.faq[loc]))
+          if (results.titleDesc?.[loc]?.title)       updates[`title_${loc}`]                     = rt(results.titleDesc[loc].title)
+          if (results.titleDesc?.[loc]?.description) updates[`description_${loc}`]               = rt(results.titleDesc[loc].description)
+          if (results.highlights?.[loc])             updates[`highlights_${loc}`]                 = rt(String(results.highlights[loc]).replace(/\n/g, ' • '))
+          if (results.seo?.[loc])                    updates[`seo_description_${loc}`]            = rt(String(results.seo[loc]))
+          if (results.faq?.[loc]?.length)            updates[`faq_json_${loc}`]                   = rt(JSON.stringify(results.faq[loc]))
+          if (results.personas?.[loc])               updates[`persona_descriptions_${loc}`]       = rt(String(results.personas[loc]))
         }
 
         if (Object.keys(updates).length > 0) {
@@ -315,7 +321,7 @@ Each locale should have an array of the same number of FAQ items.`
       const value = parsed.value
 
       // Auto-save per-locale content to Notion for locale-specific fields
-      const localeFields = ['highlights', 'seo', 'faq']
+      const localeFields = ['highlights', 'seo', 'faq', 'personas']
       if (localeFields.includes(field)) {
         try {
           const notion = new Client({ auth: process.env.NOTION_API_KEY })
@@ -332,6 +338,10 @@ Each locale should have an array of the same number of FAQ items.`
           } else if (field === 'faq') {
             const notionKey = targetLocale === 'en' ? 'faq_json' : `faq_json_${targetLocale}`
             updates[notionKey] = rt(JSON.stringify(value))
+          } else if (field === 'personas') {
+            const personaStr = typeof value === 'string' ? value : JSON.stringify(value)
+            const notionKey = targetLocale === 'en' ? 'persona_descriptions' : `persona_descriptions_${targetLocale}`
+            updates[notionKey] = rt(personaStr)
           }
 
           if (Object.keys(updates).length > 0) {

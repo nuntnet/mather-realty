@@ -178,7 +178,17 @@ function mapToForm(page: PageObjectResponse) {
     tags: propMultiSelect(page, "tags"),
     faqJson,
     seoDescription,
-    personaDescriptions: richText(page, "persona_descriptions"),
+    // personaDescriptions: per-locale Record<locale, string>
+    personaDescriptions: (() => {
+      const rec: Record<string, string> = {}
+      const en = richText(page, "persona_descriptions")
+      if (en) rec["en"] = en
+      for (const loc of LOCALES.filter(l => l !== "en")) {
+        const v = richText(page, `persona_descriptions_${loc}`)
+        if (v) rec[loc] = v
+      }
+      return rec
+    })(),
     hasVirtualTour: propBool("has_virtual_tour"),
     gallery: galleryUrls,
     virtualTourUrl: richText(page, "virtual_tour_url") || null,
@@ -246,7 +256,7 @@ const patchSchema = z.object({
   faqJson: z.union([z.string(), z.record(z.unknown())]).optional(),
   // seoDescription: legacy = string, new = Record<locale, string>
   seoDescription: z.union([z.string(), z.record(z.string())]).optional(),
-  personaDescriptions: z.string().optional(), // JSON string or ""
+  personaDescriptions: z.union([z.string(), z.record(z.string())]).optional(), // string (EN legacy) or Record<locale, string>
   hasVirtualTour: z.boolean().optional(),
   gallery: z.array(z.string()).optional(),
   virtualTourUrl: z.string().nullable().optional(),
@@ -425,9 +435,18 @@ export async function PATCH(
       }
     }
 
-    // Persona descriptions (JSON string)
+    // Persona descriptions — per-locale Record<locale, string> or legacy single string
     if (data.personaDescriptions !== undefined) {
-      updates["persona_descriptions"] = { rich_text: toRichText(data.personaDescriptions) };
+      if (typeof data.personaDescriptions === "string") {
+        // Legacy: single EN string
+        updates["persona_descriptions"] = { rich_text: toRichText(data.personaDescriptions) };
+      } else if (typeof data.personaDescriptions === "object") {
+        const pd = data.personaDescriptions as Record<string, string>
+        if (pd["en"]) updates["persona_descriptions"] = { rich_text: toRichText(pd["en"]) };
+        for (const loc of LOCALES.filter(l => l !== "en")) {
+          if (pd[loc]) updates[`persona_descriptions_${loc}`] = { rich_text: toRichText(pd[loc]) };
+        }
+      }
     }
 
     if (data.hasVirtualTour !== undefined) {
