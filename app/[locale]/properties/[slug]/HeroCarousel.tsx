@@ -1,9 +1,17 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
+import Image from 'next/image'
 import useEmblaCarousel from 'embla-carousel-react'
 import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import PropertyDetailActions from './PropertyDetailActions'
+
+/** Add Cloudinary quality+format optimisation if URL is from Cloudinary */
+function optimiseUrl(url: string): string {
+  if (!url.includes('res.cloudinary.com')) return url
+  // Insert q_auto,f_auto,w_1920 after /upload/
+  return url.replace('/upload/', '/upload/q_auto,f_auto,w_1920/')
+}
 
 interface HeroCarouselProps {
   images: string[]
@@ -56,12 +64,14 @@ export default function HeroCarousel({
           <div className="flex h-full">
             {images.map((img, idx) => (
               <div key={idx} className="relative flex-shrink-0 w-full h-full">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={img}
+                <Image
+                  src={optimiseUrl(img)}
                   alt={`${title} — photo ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                  style={{ imageRendering: 'auto', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
+                  fill
+                  priority={idx === 0}
+                  className="object-cover"
+                  sizes="100vw"
+                  quality={90}
                   draggable={false}
                 />
               </div>
