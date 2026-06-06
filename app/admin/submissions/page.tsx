@@ -1,57 +1,23 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
 import { toast } from "sonner";
-import { ClipboardList, CheckCircle2, XCircle } from "lucide-react";
+import { ClipboardList, CheckCircle2, XCircle, ChevronRight } from "lucide-react";
 import Pagination from "@/components/admin/Pagination";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type SubmissionData = {
-  // legacy / admin-generated
   titleEn?: string;
-  priceTHB?: number;
-  sizeSqm?: number;
-  description?: string;
-  // current form fields
   propertyType?: string;
   address?: string;
   city?: string;
   district?: string;
-  price?: string | number;
-  size?: string | number;
-  bedrooms?: string | number;
-  bathrooms?: string | number;
-  floors?: string | number;
-  parkingSpots?: string | number;
-  availableFrom?: string;
-  minLeaseTerm?: string | number;
-  depositMonths?: string | number;
-  amenities?: string[];
-  perfectFor?: string[];
-  highlights?: string;
-  description_en?: string;
-  virtualTourUrl?: string;
-  // owner extras (stored inside dataJson)
-  ownerName?: string;
-  ownerLine?: string;
-  ownerWhatsapp?: string;
   [key: string]: unknown;
 };
 
@@ -78,9 +44,9 @@ const STATUS_TABS: { value: StatusFilter; label: string }[] = [
 ];
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
-  pending:  { label: "Pending",  cls: "bg-amber-100 text-amber-700"       },
-  approved: { label: "Approved", cls: "bg-emerald-100 text-emerald-700"   },
-  rejected: { label: "Rejected", cls: "bg-red-100 text-red-600"           },
+  pending:  { label: "Pending",  cls: "bg-amber-100 text-amber-700"     },
+  approved: { label: "Approved", cls: "bg-emerald-100 text-emerald-700" },
+  rejected: { label: "Rejected", cls: "bg-red-100 text-red-600"         },
 };
 
 const PAGE_SIZE = 20;
@@ -92,14 +58,6 @@ function parseData(json: string | null): SubmissionData {
   try { return JSON.parse(json); } catch { return {}; }
 }
 
-function parseImages(json: string | null): string[] {
-  if (!json) return [];
-  try {
-    const v = JSON.parse(json);
-    return Array.isArray(v) ? v : [];
-  } catch { return []; }
-}
-
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default function AdminSubmissionsPage() {
@@ -107,7 +65,6 @@ export default function AdminSubmissionsPage() {
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState<Submission | null>(null);
   const [confirmAction, setConfirmAction] = useState<{
     type: "approve" | "reject";
     submission: Submission;
@@ -131,47 +88,27 @@ export default function AdminSubmissionsPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleApprove = async (submission: Submission) => {
+  const handleAction = async (type: "approve" | "reject", submission: Submission) => {
     setActioning(true);
     try {
       const res = await fetch("/api/admin/submissions", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: submission.id, action: "approve" }),
+        body: JSON.stringify({ id: submission.id, action: type }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Submission approved — Notion page created.");
-      fetchSubmissions();
-      if (selected?.id === submission.id) setSelected(null);
-    } catch {
-      toast.error("Approval failed. Please try again.");
-    } finally {
-      setActioning(false);
-      setConfirmAction(null);
-    }
-  };
-
-  const handleReject = async (submission: Submission) => {
-    setActioning(true);
-    try {
-      const res = await fetch("/api/admin/submissions", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: submission.id, action: "reject" }),
-      });
-      if (!res.ok) throw new Error();
-      toast.success("Submission rejected.");
+      toast.success(type === "approve"
+        ? "Submission approved — Notion page created."
+        : "Submission rejected.");
       setItems((prev) =>
         prev.map((s) =>
           s.id === submission.id
-            ? { ...s, status: "rejected", reviewedAt: new Date().toISOString() }
+            ? { ...s, status: type === "approve" ? "approved" : "rejected" }
             : s
         )
       );
-      if (selected?.id === submission.id)
-        setSelected((s) => s ? { ...s, status: "rejected" } : s);
     } catch {
-      toast.error("Rejection failed. Please try again.");
+      toast.error(`${type === "approve" ? "Approval" : "Rejection"} failed. Please try again.`);
     } finally {
       setActioning(false);
       setConfirmAction(null);
@@ -183,9 +120,7 @@ export default function AdminSubmissionsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-[#131F3C]">Submissions</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
-          Review listing submissions from landlords
-        </p>
+        <p className="text-sm text-gray-500 mt-0.5">Review listing submissions from landlords</p>
       </div>
 
       {/* Status tabs */}
@@ -195,22 +130,18 @@ export default function AdminSubmissionsPage() {
             ? items.length
             : items.filter((s) => s.status === tab.value).length;
           return (
-            <button
-              key={tab.value}
+            <button key={tab.value}
               onClick={() => { setStatusFilter(tab.value); setPage(1); }}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 statusFilter === tab.value
                   ? "bg-white text-[#131F3C] shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
-              }`}
-            >
+              }`}>
               {tab.label}
               {count > 0 && (
                 <span className={`ml-1.5 text-xs px-1.5 rounded-full ${
                   statusFilter === tab.value ? "bg-gray-100 text-gray-600" : "bg-gray-200 text-gray-500"
-                }`}>
-                  {count}
-                </span>
+                }`}>{count}</span>
               )}
             </button>
           );
@@ -233,58 +164,34 @@ export default function AdminSubmissionsPage() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/50">
-                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">
-                    Submitter
-                  </th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">
-                    Property Title
-                  </th>
-                  <th className="text-left text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">
-                    Submitted
-                  </th>
-                  <th className="text-center text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="text-right text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th className="text-left text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">Submitter</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">Property</th>
+                  <th className="text-left text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">Submitted</th>
+                  <th className="text-center text-xs font-semibold text-gray-500 px-4 py-3 uppercase tracking-wider">Status</th>
+                  <th className="text-right text-xs font-semibold text-gray-500 px-5 py-3 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {paginated.map((sub) => {
                   const data = parseData(sub.dataJson);
                   const badge = STATUS_BADGE[sub.status] ?? { label: sub.status, cls: "bg-gray-100 text-gray-500" };
+                  const title = data.titleEn ?? data.propertyType ?? null;
+                  const location = [data.district, data.city].filter(Boolean).join(", ") || data.address || "—";
                   return (
-                    <tr
-                      key={sub.id}
-                      className="hover:bg-gray-50/50 transition-colors cursor-pointer"
-                      onClick={() => setSelected(sub)}
-                    >
+                    <tr key={sub.id} className="hover:bg-gray-50/50 transition-colors group">
                       <td className="px-5 py-3.5">
-                        <p className="text-sm font-medium text-[#131F3C]">
-                          {sub.ownerEmail ?? "—"}
-                        </p>
-                        {sub.ownerPhone && (
-                          <p className="text-xs text-gray-400 mt-0.5">{sub.ownerPhone}</p>
-                        )}
+                        <p className="text-sm font-medium text-[#131F3C]">{sub.ownerEmail ?? "—"}</p>
+                        {sub.ownerPhone && <p className="text-xs text-gray-400 mt-0.5">{sub.ownerPhone}</p>}
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="text-sm text-gray-700 line-clamp-1">
-                          {data.titleEn ?? data.propertyType ?? (
-                            <span className="text-gray-400 italic">Untitled</span>
-                          )}
+                          {title ?? <span className="text-gray-400 italic">Untitled</span>}
                         </p>
-                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
-                          {[data.district, data.city].filter(Boolean).join(", ") || data.address || "—"}
-                        </p>
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{location}</p>
                       </td>
                       <td className="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
                         {sub.submittedAt
-                          ? new Date(sub.submittedAt).toLocaleDateString("en-GB", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })
+                          ? new Date(sub.submittedAt).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
                           : "—"}
                       </td>
                       <td className="px-4 py-3.5 text-center">
@@ -292,39 +199,28 @@ export default function AdminSubmissionsPage() {
                           {badge.label}
                         </span>
                       </td>
-                      <td
-                        className="px-5 py-3.5"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => setSelected(sub)}
-                            className="px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600"
-                          >
-                            Review
-                          </button>
                           {sub.status === "pending" && (
                             <>
                               <button
-                                onClick={() =>
-                                  setConfirmAction({ type: "approve", submission: sub })
-                                }
+                                onClick={(e) => { e.stopPropagation(); setConfirmAction({ type: "approve", submission: sub }); }}
                                 className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
-                                title="Approve"
-                              >
+                                title="Approve">
                                 <CheckCircle2 className="w-4 h-4" />
                               </button>
                               <button
-                                onClick={() =>
-                                  setConfirmAction({ type: "reject", submission: sub })
-                                }
+                                onClick={(e) => { e.stopPropagation(); setConfirmAction({ type: "reject", submission: sub }); }}
                                 className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Reject"
-                              >
+                                title="Reject">
                                 <XCircle className="w-4 h-4" />
                               </button>
                             </>
                           )}
+                          <Link href={`/admin/submissions/${sub.id}`}
+                            className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-gray-600">
+                            View <ChevronRight className="w-3 h-3" />
+                          </Link>
                         </div>
                       </td>
                     </tr>
@@ -335,251 +231,31 @@ export default function AdminSubmissionsPage() {
           </div>
         )}
         <div className="px-5 pb-4">
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            totalItems={filtered.length}
-            pageSize={PAGE_SIZE}
-            onPageChange={setPage}
-          />
+          <Pagination page={page} totalPages={totalPages} totalItems={filtered.length}
+            pageSize={PAGE_SIZE} onPageChange={setPage} />
         </div>
       </div>
 
-      {/* Review drawer */}
-      <Sheet open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>Submission #{selected?.id}</SheetTitle>
-          </SheetHeader>
-
-          {selected && (() => {
-            const data = parseData(selected.dataJson);
-            const images = parseImages(selected.imagesJson);
-            const badge = STATUS_BADGE[selected.status] ?? { label: selected.status, cls: "bg-gray-100 text-gray-500" };
-
-            return (
-              <div className="mt-6 space-y-6">
-                {/* Status */}
-                <div className="flex items-center gap-3">
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${badge.cls}`}>
-                    {badge.label}
-                  </span>
-                  <span className="text-xs text-gray-400">
-                    Submitted {selected.submittedAt
-                      ? new Date(selected.submittedAt).toLocaleString("en-GB")
-                      : "—"}
-                  </span>
-                </div>
-
-                {/* Owner */}
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Owner</p>
-                  <div className="bg-gray-50 rounded-xl p-4 space-y-1.5 text-sm">
-                    {data.ownerName && <p><span className="font-medium text-gray-600">Name: </span>{data.ownerName}</p>}
-                    {selected.ownerEmail && (
-                      <p><span className="font-medium text-gray-600">Email: </span>
-                        <a href={`mailto:${selected.ownerEmail}`} className="text-blue-600 hover:underline">{selected.ownerEmail}</a>
-                      </p>
-                    )}
-                    {selected.ownerPhone && <p><span className="font-medium text-gray-600">Phone: </span>{selected.ownerPhone}</p>}
-                    {data.ownerLine && <p><span className="font-medium text-gray-600">LINE: </span>{data.ownerLine}</p>}
-                    {data.ownerWhatsapp && <p><span className="font-medium text-gray-600">WhatsApp: </span>{data.ownerWhatsapp}</p>}
-                  </div>
-                </div>
-
-                {/* Property details */}
-                <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Property Details</p>
-                  <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-                    {/* Type + Address */}
-                    {data.propertyType && <p><span className="font-medium text-gray-600">Type: </span>{data.propertyType}</p>}
-                    {data.address && <p><span className="font-medium text-gray-600">Address: </span>{data.address}</p>}
-                    {(data.city || data.district) && (
-                      <p><span className="font-medium text-gray-600">Location: </span>
-                        {[data.district, data.city].filter(Boolean).join(", ")}
-                      </p>
-                    )}
-
-                    {/* Price */}
-                    {(data.price != null || data.priceTHB != null) && (
-                      <p><span className="font-medium text-gray-600">Price: </span>
-                        ฿{Number(data.price ?? data.priceTHB).toLocaleString()} / month
-                      </p>
-                    )}
-
-                    {/* Numeric specs */}
-                    <div className="flex flex-wrap gap-x-5 gap-y-1">
-                      {(data.bedrooms != null && data.bedrooms !== "") && <p><span className="font-medium text-gray-600">Beds: </span>{data.bedrooms}</p>}
-                      {(data.bathrooms != null && data.bathrooms !== "") && <p><span className="font-medium text-gray-600">Baths: </span>{data.bathrooms}</p>}
-                      {(data.size != null && data.size !== "") && <p><span className="font-medium text-gray-600">Size: </span>{data.size} sqm</p>}
-                      {(data.sizeSqm != null) && !data.size && <p><span className="font-medium text-gray-600">Size: </span>{data.sizeSqm} sqm</p>}
-                      {(data.floors != null && data.floors !== "") && <p><span className="font-medium text-gray-600">Floor: </span>{data.floors}</p>}
-                      {(data.parkingSpots != null && data.parkingSpots !== "") && <p><span className="font-medium text-gray-600">Parking: </span>{data.parkingSpots}</p>}
-                    </div>
-
-                    {/* Lease terms */}
-                    <div className="flex flex-wrap gap-x-5 gap-y-1">
-                      {data.availableFrom && <p><span className="font-medium text-gray-600">Available: </span>{data.availableFrom}</p>}
-                      {(data.minLeaseTerm != null && data.minLeaseTerm !== "") && (
-                        <p><span className="font-medium text-gray-600">Min lease: </span>{data.minLeaseTerm} month{Number(data.minLeaseTerm) !== 1 ? "s" : ""}</p>
-                      )}
-                      {(data.depositMonths != null && data.depositMonths !== "") && (
-                        <p><span className="font-medium text-gray-600">Deposit: </span>{data.depositMonths} month{Number(data.depositMonths) !== 1 ? "s" : ""}</p>
-                      )}
-                    </div>
-
-                    {/* Perfect for */}
-                    {Array.isArray(data.perfectFor) && data.perfectFor.length > 0 && (
-                      <div>
-                        <p className="font-medium text-gray-600 mb-1">Perfect for:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {data.perfectFor.map((v) => (
-                            <span key={v} className="text-xs bg-emerald-50 border border-emerald-200 text-emerald-700 px-2 py-0.5 rounded-full capitalize">
-                              {String(v).replace(/-/g, " ")}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Amenities */}
-                    {Array.isArray(data.amenities) && data.amenities.length > 0 && (
-                      <div>
-                        <p className="font-medium text-gray-600 mb-1">Amenities:</p>
-                        <div className="flex flex-wrap gap-1">
-                          {data.amenities.map((a) => (
-                            <span key={String(a)} className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded-full text-gray-600">
-                              {String(a)}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Highlights */}
-                    {data.highlights && (
-                      <div className="pt-1 border-t border-gray-100">
-                        <p className="font-medium text-gray-600 mb-1">Highlights:</p>
-                        <ul className="space-y-0.5">
-                          {String(data.highlights).split("\n").filter(Boolean).map((line, i) => (
-                            <li key={i} className="text-xs text-gray-600 flex gap-1.5"><span className="text-gray-400">•</span>{line}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Description */}
-                    {(data.description_en || data.description) && (
-                      <div className="pt-1 border-t border-gray-100">
-                        <p className="font-medium text-gray-600 mb-1">Description:</p>
-                        <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
-                          {String(data.description_en ?? data.description)}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Virtual tour */}
-                    {data.virtualTourUrl && (
-                      <p className="pt-1 border-t border-gray-100">
-                        <span className="font-medium text-gray-600">Virtual tour: </span>
-                        <a href={String(data.virtualTourUrl)} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs break-all">
-                          {String(data.virtualTourUrl)}
-                        </a>
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Images */}
-                {images.length > 0 && (
-                  <div>
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                      Images ({images.length})
-                    </p>
-                    <div className="grid grid-cols-3 gap-2">
-                      {images.map((url, i) => (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          key={i}
-                          src={url}
-                          alt={`Submission image ${i + 1}`}
-                          className="w-full aspect-square object-cover rounded-lg border border-gray-100"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Actions */}
-                {selected.status === "pending" && (
-                  <div className="flex gap-3 pt-2 border-t border-gray-100">
-                    <button
-                      onClick={() =>
-                        setConfirmAction({ type: "approve", submission: selected })
-                      }
-                      disabled={actioning}
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-medium rounded-xl hover:bg-emerald-700 disabled:opacity-60 transition-colors"
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      Approve
-                    </button>
-                    <button
-                      onClick={() =>
-                        setConfirmAction({ type: "reject", submission: selected })
-                      }
-                      disabled={actioning}
-                      className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 disabled:opacity-60 transition-colors"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      Reject
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </SheetContent>
-      </Sheet>
-
       {/* Confirm dialog */}
-      <AlertDialog
-        open={!!confirmAction}
-        onOpenChange={(o) => !o && setConfirmAction(null)}
-      >
+      <AlertDialog open={!!confirmAction} onOpenChange={(o) => !o && setConfirmAction(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {confirmAction?.type === "approve"
-                ? "Approve submission?"
-                : "Reject submission?"}
+              {confirmAction?.type === "approve" ? "Approve submission?" : "Reject submission?"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {confirmAction?.type === "approve"
                 ? "A new Notion page will be created for this property and it will be queued for publishing."
-                : "The submission will be marked as rejected. The landlord will not be notified automatically."}
+                : "The submission will be marked as rejected."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => {
-                if (!confirmAction) return;
-                if (confirmAction.type === "approve")
-                  handleApprove(confirmAction.submission);
-                else handleReject(confirmAction.submission);
-              }}
+              onClick={() => confirmAction && handleAction(confirmAction.type, confirmAction.submission)}
               disabled={actioning}
-              className={
-                confirmAction?.type === "approve"
-                  ? "bg-emerald-600 hover:bg-emerald-700"
-                  : "bg-red-600 hover:bg-red-700"
-              }
-            >
-              {actioning
-                ? "Processing..."
-                : confirmAction?.type === "approve"
-                ? "Approve"
-                : "Reject"}
+              className={confirmAction?.type === "approve" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-red-600 hover:bg-red-700"}>
+              {actioning ? "Processing..." : confirmAction?.type === "approve" ? "Approve" : "Reject"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
