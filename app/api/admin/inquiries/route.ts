@@ -40,7 +40,8 @@ export async function GET(req: NextRequest) {
     ).get();
 
     return NextResponse.json({
-      data: rows,
+      items: rows,   // page reads data?.items
+      data: rows,    // backward compat
       total: Number(total?.count ?? 0),
       page,
       pageSize: limit,

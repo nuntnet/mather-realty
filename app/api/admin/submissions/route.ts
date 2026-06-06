@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     ).get();
 
     return NextResponse.json({
+      items: rows,
       data: rows,
       total: Number(total?.count ?? 0),
       page,
