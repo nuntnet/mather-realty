@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
   const denied = await requireAdmin()
   if (denied) return denied
 
-  const { propertyId, action, data: saveData, locales, titleEn, descriptionEn } = await req.json()
+  const { propertyId, action, field, data: saveData, locales, titleEn, descriptionEn } = await req.json()
   if (!propertyId && action !== 'translate') return NextResponse.json({ error: 'propertyId required' }, { status: 400 })
 
   // ── TRANSLATE action ─────────────────────────────────────────────────────────
@@ -131,6 +131,56 @@ Return ONLY a JSON object with locale codes as keys. Keep titles under 10 words.
       const raw = await callAI(prompt)
       const translations = parseJSON(raw)
       return NextResponse.json({ success: true, translations })
+    } catch (e) {
+      return NextResponse.json({ error: (e as Error).message }, { status: 502 })
+    }
+  }
+
+  // ── GENERATE-FIELD action — generate ONE field cheaply ───────────────────────
+  // field: 'title_en' | 'description_en' | 'seo' | 'faq' | 'highlights'
+  if (action === 'generate-field') {
+    if (!field) return NextResponse.json({ error: 'field is required' }, { status: 400 })
+
+    // Load property context from Notion (same as generate action)
+    let ctx: Record<string, unknown>
+    try {
+      const notion = new Client({ auth: process.env.NOTION_API_KEY })
+      const page = await notion.pages.retrieve({ page_id: propertyId }) as { properties: Record<string, unknown> }
+      const p = page.properties as Record<string, { type: string; rich_text?: Array<{ plain_text: string }>; number?: number | null; multi_select?: Array<{ name: string }>; select?: { name: string } | null }>
+      const rt = (key: string) => (p[key]?.rich_text ?? []).map((r: { plain_text: string }) => r.plain_text).join('')
+      const num = (key: string) => p[key]?.number ?? null
+      const ms = (key: string) => (p[key]?.multi_select ?? []).map((o: { name: string }) => o.name)
+      ctx = {
+        title: rt('title_en') || 'Property',
+        address: rt('address'), city: rt('city'), district: rt('district'),
+        bedrooms: num('bedrooms'), bathrooms: num('bathrooms'),
+        sizeSqm: num('size_sqm'), floors: num('floors'),
+        priceTHB: num('price_thb'),
+        amenities: ms('amenities').join(', '),
+        perfectFor: ms('perfect_for').join(', '),
+        tags: ms('tags').join(', '),
+      }
+    } catch (e) {
+      return NextResponse.json({ error: `Could not load property: ${(e as Error).message}` }, { status: 500 })
+    }
+
+    const ctxStr = JSON.stringify(ctx)
+
+    const FIELD_PROMPTS: Record<string, string> = {
+      title_en: `Property data: ${ctxStr}\n\nWrite a catchy English property listing title (6-10 words, highlight best feature). Return ONLY a JSON object: {"value": "..."}`,
+      description_en: `Property data: ${ctxStr}\n\nWrite an English property description (4-6 sentences, 120-180 words). Start with best feature, mention location, lifestyle, amenities, end with CTA. Return ONLY: {"value": "..."}`,
+      seo: `Property data: ${ctxStr}\n\nWrite a 150-character SEO meta description (include city, property type, key feature). Return ONLY: {"value": "..."}`,
+      highlights: `Property data: ${ctxStr}\n\nList 4-6 key selling highlights as bullet points (each 3-8 words). Return ONLY: {"value": "highlight one\\nhighlight two\\nhighlight three"}`,
+      faq: `Property data: ${ctxStr}\n\nGenerate 5 FAQ items relevant to expat renters. Return ONLY: {"value": [{"q": "...", "a": "..."}, ...]}`,
+    }
+
+    const prompt = FIELD_PROMPTS[field]
+    if (!prompt) return NextResponse.json({ error: `Unknown field: ${field}` }, { status: 400 })
+
+    try {
+      const raw = await callAI(prompt)
+      const parsed = parseJSON(raw)
+      return NextResponse.json({ success: true, field, value: parsed.value })
     } catch (e) {
       return NextResponse.json({ error: (e as Error).message }, { status: 502 })
     }

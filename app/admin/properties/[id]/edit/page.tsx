@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { ChevronLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
+import { ChevronLeft, Loader2, Plus, Save, Trash2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Switch } from "@/components/ui/switch";
 import LocationPicker from "@/components/admin/LocationPicker";
@@ -187,6 +187,7 @@ export default function PropertyEditPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
+  const [aiLoading, setAiLoading] = useState<Record<string, boolean>>({});
 
   // Load existing property
   useEffect(() => {
@@ -387,6 +388,75 @@ export default function PropertyEditPage() {
     }
   };
 
+  // ── AI helpers ───────────────────────────────────────────────────────────────
+  async function generateField(field: string) {
+    setAiLoading((p) => ({ ...p, [field]: true }));
+    try {
+      const res = await fetch("/api/ai/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ propertyId, action: "generate-field", field }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const val = data.value;
+      if (field === "title_en")      setForm((f) => ({ ...f, titles: { ...f.titles, en: val } }));
+      if (field === "description_en") setForm((f) => ({ ...f, descriptions: { ...f.descriptions, en: val } }));
+      if (field === "seo")           setForm((f) => ({ ...f, seoDescription: val }));
+      if (field === "highlights")    setForm((f) => ({ ...f, highlights: val }));
+      if (field === "faq")           setForm((f) => ({ ...f, faq: Array.isArray(val) ? val : [] }));
+      toast.success("Generated!");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "AI generation failed");
+    } finally {
+      setAiLoading((p) => ({ ...p, [field]: false }));
+    }
+  }
+
+  async function translateLocale(locale: string) {
+    const key = `translate-${locale}`;
+    setAiLoading((p) => ({ ...p, [key]: true }));
+    try {
+      const titleEn = form.titles["en"] || "";
+      const descEn  = form.descriptions["en"] || "";
+      if (!titleEn && !descEn) { toast.error("Fill in the English title/description first"); return; }
+      const res = await fetch("/api/ai/generate-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "translate", titleEn, descriptionEn: descEn, locales: [locale] }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? `Error ${res.status}`);
+      const t = data.translations?.[locale];
+      if (t?.title)       setForm((f) => ({ ...f, titles:       { ...f.titles,       [locale]: t.title } }));
+      if (t?.description) setForm((f) => ({ ...f, descriptions: { ...f.descriptions, [locale]: t.description } }));
+      toast.success(`Translated to ${locale}!`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Translation failed");
+    } finally {
+      setAiLoading((p) => ({ ...p, [key]: false }));
+    }
+  }
+
+  // Small ✨ button component
+  function AiBtn({ fieldKey, label = "✨" }: { fieldKey: string; label?: string }) {
+    const busy = !!aiLoading[fieldKey];
+    return (
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => fieldKey.startsWith("translate-")
+          ? translateLocale(fieldKey.replace("translate-", ""))
+          : generateField(fieldKey)}
+        className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-medium rounded-lg border border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 disabled:opacity-50 transition-colors shrink-0"
+        title={busy ? "Generating…" : label}
+      >
+        {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+        {busy ? "…" : label}
+      </button>
+    );
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -446,24 +516,40 @@ export default function PropertyEditPage() {
           </div>
 
           <Field label={`Title (${activeLocale.toUpperCase()})`} required={activeLocale === "en"}>
-            <input
-              type="text"
-              value={form.titles[activeLocale] ?? ""}
-              onChange={(e) => setLocaleField("titles", e.target.value)}
-              className={INPUT_CLS}
-              placeholder={`Property title in ${activeLocale}`}
-            />
+            <div className="flex gap-2 items-start">
+              <input
+                type="text"
+                value={form.titles[activeLocale] ?? ""}
+                onChange={(e) => setLocaleField("titles", e.target.value)}
+                className={INPUT_CLS}
+                placeholder={`Property title in ${activeLocale}`}
+              />
+              {activeLocale === "en"
+                ? <AiBtn fieldKey="title_en" label="Generate" />
+                : <AiBtn fieldKey={`translate-${activeLocale}`} label="Translate" />}
+            </div>
           </Field>
 
           <Field label={`Description (${activeLocale.toUpperCase()})`}>
-            <textarea
-              rows={4}
-              value={form.descriptions[activeLocale] ?? ""}
-              onChange={(e) => setLocaleField("descriptions", e.target.value)}
-              className={TEXTAREA_CLS}
-              placeholder={`Property description in ${activeLocale}`}
-            />
+            <div className="flex gap-2 items-start">
+              <textarea
+                rows={4}
+                value={form.descriptions[activeLocale] ?? ""}
+                onChange={(e) => setLocaleField("descriptions", e.target.value)}
+                className={TEXTAREA_CLS}
+                placeholder={`Property description in ${activeLocale}`}
+              />
+              {activeLocale === "en"
+                ? <AiBtn fieldKey="description_en" label="Generate" />
+                : <AiBtn fieldKey={`translate-${activeLocale}`} label="Translate" />}
+            </div>
           </Field>
+
+          {activeLocale !== "en" && (
+            <div className="flex justify-end">
+              <AiBtn fieldKey={`translate-${activeLocale}`} label={`Translate both from EN`} />
+            </div>
+          )}
         </div>
 
         {/* ── Location ─────────────────────────────────────────────────── */}
@@ -745,7 +831,10 @@ export default function PropertyEditPage() {
 
         {/* ── Highlights ───────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-          <SectionTitle>Highlights</SectionTitle>
+          <div className="flex items-center justify-between">
+            <SectionTitle>Highlights</SectionTitle>
+            <AiBtn fieldKey="highlights" label="Generate" />
+          </div>
           <p className="text-xs text-gray-400">
             One highlight per line. These are displayed as bullet points on the property page.
           </p>
@@ -836,14 +925,17 @@ export default function PropertyEditPage() {
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-5">
           <div className="flex items-center justify-between">
             <SectionTitle>FAQ</SectionTitle>
-            <button
-              type="button"
-              onClick={addFaqItem}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#131F3C] text-white text-xs font-medium hover:bg-[#1f2d52] transition-colors"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Add Q&amp;A
-            </button>
+            <div className="flex gap-2">
+              <AiBtn fieldKey="faq" label="Generate FAQs" />
+              <button
+                type="button"
+                onClick={addFaqItem}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#131F3C] text-white text-xs font-medium hover:bg-[#1f2d52] transition-colors"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Q&amp;A
+              </button>
+            </div>
           </div>
 
           {form.faq.length === 0 && (
@@ -904,7 +996,10 @@ export default function PropertyEditPage() {
 
         {/* ── SEO ──────────────────────────────────────────────────────── */}
         <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-          <SectionTitle>SEO</SectionTitle>
+          <div className="flex items-center justify-between">
+            <SectionTitle>SEO</SectionTitle>
+            <AiBtn fieldKey="seo" label="Generate" />
+          </div>
 
           <Field label="SEO Description">
             <textarea
