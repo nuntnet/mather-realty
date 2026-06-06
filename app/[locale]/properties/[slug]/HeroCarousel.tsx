@@ -77,8 +77,10 @@ export default function HeroCarousel({
       )}
 
       {/* ── Vignettes ──────────────────────────────────────── */}
-      <div className="absolute inset-x-0 top-0 h-36 bg-gradient-to-b from-black/55 to-transparent pointer-events-none z-10" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none z-10" />
+      {/* Top: very light — floating buttons have their own frosted glass */}
+      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/30 to-transparent pointer-events-none z-10" />
+      {/* Bottom: only covers lower 55% — keeps top of image bright */}
+      <div className="absolute inset-x-0 bottom-0 h-[55%] bg-gradient-to-t from-black/80 via-black/35 to-transparent pointer-events-none z-10" />
 
       {/* ── Floating nav ───────────────────────────────────── */}
       <div className="absolute top-3 left-0 right-0 px-4 flex items-center justify-between z-20">
