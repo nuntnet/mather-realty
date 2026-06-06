@@ -314,7 +314,7 @@ export default function PhotoManagerPage() {
       })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.error || `Save failed (${res.status})`)
+        throw new Error(err.detail || err.error || `Save failed (${res.status})`)
       }
       setSaved(true)
       toast.success('Photos saved — categories, order and hero updated.')

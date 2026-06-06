@@ -296,7 +296,7 @@ export async function PATCH(
       ["depositMonths", "deposit_months"],
     ];
     for (const [formKey, notionKey] of numFields) {
-      if (data[formKey] !== undefined) {
+      if (data[formKey] !== undefined && existingProps[notionKey] !== undefined) {
         updates[notionKey] = { number: data[formKey] ?? null };
       }
     }
@@ -340,23 +340,30 @@ export async function PATCH(
       updates["seo_description"] = { rich_text: toRichText(data.seoDescription) };
     }
 
-    // Has virtual tour (checkbox)
-    if (data.hasVirtualTour !== undefined) {
+    // Has virtual tour (checkbox) — only if property exists
+    if (data.hasVirtualTour !== undefined && existingProps["has_virtual_tour"]) {
       updates["has_virtual_tour"] = { checkbox: data.hasVirtualTour };
     }
 
-    // Gallery category photo URL strings — chunked to respect Notion 2000-char limit
+    // Gallery category photo URL strings — chunked + only if property exists in DB
+    // (if user hasn't added these Notion properties yet, skip gracefully)
+    const setPropIfExists = (notionKey: string, value: unknown) => {
+      if (existingProps[notionKey] !== undefined) {
+        updates[notionKey] = value;
+      }
+    };
+
     if (data.exteriorPhotos !== undefined) {
-      updates["exterior_photos"] = { rich_text: toRichText(data.exteriorPhotos) };
+      setPropIfExists("exterior_photos", { rich_text: toRichText(data.exteriorPhotos) });
     }
     if (data.interiorPhotos !== undefined) {
-      updates["interior_photos"] = { rich_text: toRichText(data.interiorPhotos) };
+      setPropIfExists("interior_photos", { rich_text: toRichText(data.interiorPhotos) });
     }
     if (data.communityPhotos !== undefined) {
-      updates["community_photos"] = { rich_text: toRichText(data.communityPhotos) };
+      setPropIfExists("community_photos", { rich_text: toRichText(data.communityPhotos) });
     }
     if (data.heroPhotos !== undefined) {
-      updates["hero_photos"] = { rich_text: toRichText(data.heroPhotos) };
+      setPropIfExists("hero_photos", { rich_text: toRichText(data.heroPhotos) });
     }
 
     // Status (select or status type)
@@ -425,8 +432,13 @@ export async function PATCH(
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: "Validation failed", issues: err.issues }, { status: 400 });
     }
-    console.error(`PATCH /api/admin/properties/${id} error:`, err);
-    return NextResponse.json({ error: "Failed to update property" }, { status: 500 });
+    // Surface the actual Notion error message for easier debugging
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`PATCH /api/admin/properties/${id} error:`, message);
+    return NextResponse.json(
+      { error: "Failed to update property", detail: message },
+      { status: 500 }
+    );
   }
 }
 
