@@ -28,6 +28,7 @@ export interface Property {
   parkingSpots: number                 // number of parking spaces
   minLeaseTerm: number | null          // minimum lease in months (e.g. 1, 3, 6, 12)
   depositMonths: number | null         // security deposit in months of rent
+  heroPhotos: string[]                 // curated list for hero carousel (empty = show all)
   highlights: string[]                 // bullet-point highlights (split by •)
   contactLine: string | null           // LINE ID of owner
   contactPhone: string | null          // Phone/WhatsApp of owner

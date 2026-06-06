@@ -128,7 +128,8 @@ export default function PhotoManagerPage() {
   const [exteriorPhotos, setExteriorPhotos] = useState<string[]>([])
   const [interiorPhotos, setInteriorPhotos] = useState<string[]>([])
   const [communityPhotos, setCommunityPhotos] = useState<string[]>([])
-  const [activeTab, setActiveTab] = useState<'main' | 'exterior' | 'interior' | 'community'>('main')
+  const [heroPhotos, setHeroPhotos] = useState<string[]>([])
+  const [activeTab, setActiveTab] = useState<'main' | 'hero' | 'exterior' | 'interior' | 'community'>('main')
   const [propertyTitle, setPropertyTitle] = useState('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -180,6 +181,7 @@ export default function PhotoManagerPage() {
       setExteriorPhotos(toArr(data.exteriorPhotos))
       setInteriorPhotos(toArr(data.interiorPhotos))
       setCommunityPhotos(toArr(data.communityPhotos))
+      setHeroPhotos(toArr(data.heroPhotos))
     } catch (e) {
       toast.error('Failed to load photos')
     } finally {
@@ -234,6 +236,7 @@ export default function PhotoManagerPage() {
       body.exteriorPhotos = exteriorPhotos.join(',')
       body.interiorPhotos = interiorPhotos.join(',')
       body.communityPhotos = communityPhotos.join(',')
+      body.heroPhotos = heroPhotos.join(',')
 
       const res = await fetch(`/api/admin/properties/${propertyId}`, {
         method: 'PATCH',
@@ -303,9 +306,10 @@ export default function PhotoManagerPage() {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-gray-200 mb-6">
         {([
-          { key: 'main', label: `📷 All Photos (${photos.length})` },
-          { key: 'exterior', label: `🏠 Exterior (${exteriorPhotos.length})` },
-          { key: 'interior', label: `🛋️ Interior (${interiorPhotos.length})` },
+          { key: 'main',      label: `📷 All Photos (${photos.length})` },
+          { key: 'hero',      label: `🎠 Hero Carousel (${heroPhotos.length || 'all'})` },
+          { key: 'exterior',  label: `🏠 Exterior (${exteriorPhotos.length})` },
+          { key: 'interior',  label: `🛋️ Interior (${interiorPhotos.length})` },
           { key: 'community', label: `🏘️ Community (${communityPhotos.length})` },
         ] as const).map(tab => (
           <button
@@ -351,6 +355,96 @@ export default function PhotoManagerPage() {
           )}
         </>
       )}
+
+      {/* Hero Carousel tab — pick which photos appear in the fullscreen hero swipe */}
+      {activeTab === 'hero' && (() => {
+        const allAvailable = [
+          ...photos.map(p => p.url),
+          ...exteriorPhotos,
+          ...interiorPhotos,
+          ...communityPhotos,
+        ].filter((u, i, arr) => arr.indexOf(u) === i) // dedupe
+
+        return (
+          <div>
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 flex items-start gap-3">
+              <span className="text-lg shrink-0">🎠</span>
+              <div>
+                <p className="text-sm font-semibold text-amber-900">Hero Carousel</p>
+                <p className="text-sm text-amber-700 mt-0.5">
+                  เลือกรูปที่ต้องการให้แสดงใน hero slider ด้านบนสุดของหน้า property.{' '}
+                  <strong>ถ้าไม่เลือก = แสดงทุกรูป</strong> (cover + gallery + categories ทั้งหมด)
+                </p>
+              </div>
+            </div>
+
+            {/* Quick actions */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => { setHeroPhotos(allAvailable); setSaved(false) }}
+                className="text-xs px-3 py-1.5 bg-[#1E6B69] text-white rounded-lg hover:bg-[#18605E] transition-colors"
+              >
+                Select all ({allAvailable.length})
+              </button>
+              <button
+                onClick={() => { setHeroPhotos([]); setSaved(false) }}
+                className="text-xs px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Clear (show all)
+              </button>
+            </div>
+
+            {allAvailable.length === 0 ? (
+              <div className="text-center py-12 text-gray-400 border-2 border-dashed border-gray-200 rounded-2xl">
+                <p className="font-medium">No photos available yet</p>
+                <p className="text-sm mt-1">Upload photos first via the Edit page</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {allAvailable.map((url, idx) => {
+                  const selected = heroPhotos.includes(url)
+                  const position = heroPhotos.indexOf(url)
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setHeroPhotos(prev =>
+                          selected ? prev.filter(u => u !== url) : [...prev, url]
+                        )
+                        setSaved(false)
+                      }}
+                      className={`relative aspect-[4/3] rounded-xl overflow-hidden border-2 transition-all ${
+                        selected
+                          ? 'border-[#F4581A] ring-2 ring-[#F4581A]/30 shadow-md'
+                          : 'border-gray-200 hover:border-gray-400 opacity-60 hover:opacity-80'
+                      }`}
+                    >
+                      <img src={url} alt="" className="w-full h-full object-cover" />
+                      {selected && (
+                        <div className="absolute inset-0 bg-[#F4581A]/10 flex items-end justify-end p-2">
+                          <span className="bg-[#F4581A] text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center shadow">
+                            {position + 1}
+                          </span>
+                        </div>
+                      )}
+                      {!selected && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full border-2 border-white/60 bg-black/20" />
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
+            {heroPhotos.length > 0 && (
+              <p className="text-xs text-gray-500 mt-3">
+                เลือกแล้ว {heroPhotos.length} รูป · จะแสดงในลำดับที่เลือก (รูปแรก = แรกสุดใน carousel)
+              </p>
+            )}
+          </div>
+        )
+      })()}
 
       {/* Category tabs — simple grid with add/remove */}
       {(activeTab === 'exterior' || activeTab === 'interior' || activeTab === 'community') && (() => {

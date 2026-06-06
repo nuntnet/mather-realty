@@ -194,16 +194,18 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
       <div className="min-h-screen bg-[#f1f4f0] pt-16 pb-28 lg:pb-0">
 
-        {/* HERO — swipeable photo carousel (cover + all gallery/category photos) */}
+        {/* HERO — swipeable photo carousel */}
         <HeroCarousel
           images={(() => {
+            // Admin-curated list takes priority
+            if (property.heroPhotos?.length) return property.heroPhotos
+            // Fallback: cover + gallery + all categories (deduplicated)
             const all = new Set<string>()
             if (property.coverImage) all.add(property.coverImage)
             property.gallery.forEach(u => all.add(u))
-            // Also include any photos from category fields not already in gallery
             if (property.galleryCategories) {
-              const cats = property.galleryCategories
-              ;[...cats.exterior, ...cats.interior, ...cats.community].forEach(u => all.add(u))
+              const { exterior, interior, community } = property.galleryCategories
+              ;[...exterior, ...interior, ...community].forEach(u => all.add(u))
             }
             return [...all].filter(Boolean)
           })()}

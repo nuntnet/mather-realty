@@ -231,6 +231,8 @@ function mapProperty(page: PageObjectResponse, locale = 'en'): Property {
     parkingSpots: getPropNumber(page, 'parking_spots') || 0,
     minLeaseTerm: getPropNumber(page, 'min_lease_months') || null,
     depositMonths: getPropNumber(page, 'deposit_months') || null,
+    heroPhotos: getPropString(page, 'hero_photos')
+      .split(',').map(u => u.trim()).filter(Boolean),
     highlights: getPropString(page, 'highlights')
       .split('•')
       .map(s => s.trim())

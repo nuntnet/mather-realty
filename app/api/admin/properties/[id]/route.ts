@@ -127,6 +127,7 @@ function mapToForm(page: PageObjectResponse) {
     exteriorPhotos: richText(page, "exterior_photos"),
     interiorPhotos: richText(page, "interior_photos"),
     communityPhotos: richText(page, "community_photos"),
+    heroPhotos: richText(page, "hero_photos"),
     verifiedAt: propDate(page, "verified_at"),
     approvedAt: propDate(page, "approved_at"),
     slug: richText(page, "slug"),
@@ -167,6 +168,7 @@ const patchSchema = z.object({
   exteriorPhotos: z.string().optional(),     // comma-separated
   interiorPhotos: z.string().optional(),
   communityPhotos: z.string().optional(),
+  heroPhotos: z.string().optional(),    // comma-separated, empty = show all
   verified: z.boolean().optional(),
   approvedAt: z.string().nullable().optional(),
   coverImage: z.string().nullable().optional(),
@@ -328,6 +330,9 @@ export async function PATCH(
     }
     if (data.communityPhotos !== undefined) {
       updates["community_photos"] = { rich_text: [{ text: { content: data.communityPhotos } }] };
+    }
+    if (data.heroPhotos !== undefined) {
+      updates["hero_photos"] = { rich_text: [{ text: { content: data.heroPhotos } }] };
     }
 
     // Status (select or status type)
