@@ -75,16 +75,31 @@ export default function LocationPicker({ lat, lng, onLatChange, onLngChange }: L
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    let retryCount = 0
-    const tryInit = () => {
-      if (window.google?.maps) {
-        initMap()
-      } else if (retryCount < 20) {
-        retryCount++
-        setTimeout(tryInit, 300)
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
+    const boot = () => {
+      let retries = 0
+      const tryInit = () => {
+        if (window.google?.maps) { initMap(); return }
+        if (retries++ < 30) setTimeout(tryInit, 300)
       }
+      tryInit()
     }
-    tryInit()
+
+    // If Google Maps is already loaded (public layout injects it), use it directly
+    if (window.google?.maps) { initMap(); return }
+
+    // Admin layout doesn't include the Maps script — inject it ourselves
+    if (apiKey && !document.querySelector('#gmap-admin-script')) {
+      const script = document.createElement('script')
+      script.id = 'gmap-admin-script'
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,marker&loading=async`
+      script.async = true
+      script.onload = boot
+      document.head.appendChild(script)
+    } else {
+      boot()
+    }
   }, [initMap])
 
   // Sync external lat/lng changes to marker
