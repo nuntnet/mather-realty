@@ -147,9 +147,12 @@ export default function InquiryForm({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ...data,
           propertyId,
-          propertyTitle,
+          name: data.name,
+          contact: data.contactValue,   // API expects "contact", form uses "contactValue"
+          contactType: data.contactType,
+          preferredDate: data.preferredDate,
+          message: data.message,
         }),
       })
 

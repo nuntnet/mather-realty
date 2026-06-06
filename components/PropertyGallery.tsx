@@ -148,36 +148,46 @@ export default function PropertyGallery({
     <>
       {/* ── Category Tabs ────────────────────────────────────────────────────── */}
       {availableTabs.length > 0 && (
-        <div className="flex gap-2 px-4 pt-4 pb-1 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-1.5 px-1 pt-3 pb-1 overflow-x-auto scrollbar-hide">
           {/* All tab */}
           <button
             onClick={() => setActiveTab('all')}
             className={cn(
-              'shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
+              'shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200',
               activeTab === 'all'
                 ? 'bg-[#1d211c] text-white shadow-sm'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                : 'bg-[#f1f4f0] text-[#5e6360] hover:bg-[#e2e5e0] hover:text-[#1d211c]',
             )}
           >
-            All {allImages.length}
+            All
+            <span className={cn('text-[11px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center',
+              activeTab === 'all' ? 'bg-white/20' : 'bg-[#1d211c]/10'
+            )}>
+              {allImages.length}
+            </span>
           </button>
-          {availableTabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={cn(
-                'shrink-0 px-4 py-1.5 rounded-full text-sm font-medium transition-all duration-200',
-                tab === activeTab
-                  ? 'bg-[#1E6B69] text-white shadow-sm'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-              )}
-            >
-              {CATEGORY_LABELS[tab]}
-              <span className="ml-1.5 text-xs opacity-60">
-                {galleryCategories?.[tab]?.length ?? 0}
-              </span>
-            </button>
-          ))}
+          {availableTabs.map((tab) => {
+            const count = galleryCategories?.[tab]?.length ?? 0
+            return (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'shrink-0 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[13px] font-semibold transition-all duration-200',
+                  tab === activeTab
+                    ? 'bg-[#1E6B69] text-white shadow-sm'
+                    : 'bg-[#f1f4f0] text-[#5e6360] hover:bg-[#E0F4F4] hover:text-[#1E6B69]',
+                )}
+              >
+                {CATEGORY_LABELS[tab]}
+                <span className={cn('text-[11px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center',
+                  tab === activeTab ? 'bg-white/25' : 'bg-[#1E6B69]/12 text-[#1E6B69]'
+                )}>
+                  {count}
+                </span>
+              </button>
+            )
+          })}
         </div>
       )}
 
@@ -239,7 +249,7 @@ export default function PropertyGallery({
           )}
 
           {/* Counter top-right */}
-          <div className="absolute top-3 right-3 z-10 bg-black/50 text-white text-xs font-medium px-2.5 py-1 rounded-full backdrop-blur-sm select-none">
+          <div className="absolute top-3 right-3 z-10 bg-black/40 backdrop-blur-sm text-white text-[11px] font-semibold px-2.5 py-1 rounded-full select-none tracking-wide">
             {selectedIndex + 1} / {displayImages.length}
           </div>
 
@@ -275,10 +285,10 @@ export default function PropertyGallery({
             )}
             <button
               onClick={() => { setSelectedIndex(selectedIndex); setLightboxOpen(true) }}
-              className="flex items-center gap-1.5 bg-white/90 hover:bg-white text-gray-800 text-xs font-medium px-2.5 py-1.5 rounded-lg shadow backdrop-blur-sm border border-white/20"
+              className="flex items-center gap-1.5 bg-black/45 hover:bg-black/60 backdrop-blur-sm text-white text-[11px] font-semibold px-3 py-1.5 rounded-full transition-colors"
             >
-              <Grid2X2 className="w-3.5 h-3.5" />
-              <span>All {displayImages.length}</span>
+              <Grid2X2 className="w-3 h-3" />
+              All {displayImages.length}
             </button>
           </div>
         </motion.div>

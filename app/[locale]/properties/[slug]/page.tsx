@@ -467,7 +467,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
             {/* ── RIGHT COLUMN — Contact Card (sticky) ── */}
             <div className="lg:col-span-1">
-              <div className="sticky top-[130px]">
+              <div className="sticky top-[130px] max-h-[calc(100vh-150px)] overflow-y-auto scrollbar-hide">
                 <div className="rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
 
                   {/* Card header — price + status */}
