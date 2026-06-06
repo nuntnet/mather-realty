@@ -159,6 +159,11 @@ export default function Navbar({ locale }: NavbarProps) {
 
         {/* Right side */}
         <div className="flex items-center gap-2">
+          {/* Language selector — desktop only */}
+          <div className="hidden md:block">
+            <LangSelector />
+          </div>
+
           {/* CTA: List Your Property */}
           <Button
             asChild
