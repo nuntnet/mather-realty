@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ChevronLeft, Loader2, Plus, Save, Trash2 } from "lucide-react";
 import Link from "next/link";
-import ImageUploader from "@/components/admin/ImageUploader";
 import { Switch } from "@/components/ui/switch";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -103,8 +102,6 @@ type PropertyForm = {
   sizeSqm: string;
   amenities: string[];
   status: string;
-  coverImage: string;
-  gallery: string[];
   virtualTourUrl: string;
   verified: boolean;
   // New fields
@@ -121,9 +118,6 @@ type PropertyForm = {
   tags: string;             // comma-separated in UI
   faq: FaqItem[];
   seoDescription: string;
-  exteriorPhotos: string[];
-  interiorPhotos: string[];
-  communityPhotos: string[];
 };
 
 function emptyForm(): PropertyForm {
@@ -141,8 +135,6 @@ function emptyForm(): PropertyForm {
     sizeSqm: "",
     amenities: [],
     status: "pending",
-    coverImage: "",
-    gallery: [],
     virtualTourUrl: "",
     verified: false,
     availableFrom: "",
@@ -158,9 +150,6 @@ function emptyForm(): PropertyForm {
     tags: "",
     faq: [],
     seoDescription: "",
-    exteriorPhotos: [],
-    interiorPhotos: [],
-    communityPhotos: [],
   };
 }
 
@@ -263,8 +252,6 @@ export default function PropertyEditPage() {
           sizeSqm: data.sizeSqm != null ? String(data.sizeSqm) : "",
           amenities: data.amenities ?? [],
           status: data.status ?? "pending",
-          coverImage: data.coverImage ?? "",
-          gallery: data.gallery ?? [],
           virtualTourUrl: data.virtualTourUrl ?? "",
           verified: !!data.verifiedAt,
           // New fields
@@ -281,21 +268,6 @@ export default function PropertyEditPage() {
           tags: Array.isArray(data.tags) ? data.tags.join(", ") : (data.tags ?? ""),
           faq: faqArr,
           seoDescription: data.seoDescription ?? "",
-          exteriorPhotos: Array.isArray(data.exteriorPhotos)
-            ? data.exteriorPhotos
-            : (typeof data.exteriorPhotos === "string"
-                ? data.exteriorPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
-                : []),
-          interiorPhotos: Array.isArray(data.interiorPhotos)
-            ? data.interiorPhotos
-            : (typeof data.interiorPhotos === "string"
-                ? data.interiorPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
-                : []),
-          communityPhotos: Array.isArray(data.communityPhotos)
-            ? data.communityPhotos
-            : (typeof data.communityPhotos === "string"
-                ? data.communityPhotos.split(",").map((u: string) => u.trim()).filter(Boolean)
-                : []),
         });
       })
       .finally(() => setLoading(false));
@@ -402,8 +374,6 @@ export default function PropertyEditPage() {
         sizeSqm: form.sizeSqm ? parseFloat(form.sizeSqm) : null,
         amenities: form.amenities,
         status: form.status,
-        coverImage: form.coverImage || null,
-        gallery: form.gallery,
         virtualTourUrl: form.virtualTourUrl || null,
         verified: form.verified,
         // New fields
@@ -420,10 +390,6 @@ export default function PropertyEditPage() {
         tags: tagsArray,
         faqJson: form.faq.length > 0 ? JSON.stringify(form.faq) : "",
         seoDescription: form.seoDescription || "",
-        // Join arrays → comma-separated strings for Notion rich_text
-        exteriorPhotos: form.exteriorPhotos.join(","),
-        interiorPhotos: form.interiorPhotos.join(","),
-        communityPhotos: form.communityPhotos.join(","),
       };
 
       const url = isNew ? "/api/admin/properties" : `/api/admin/properties/${propertyId}`;
@@ -987,71 +953,26 @@ export default function PropertyEditPage() {
           </Field>
         </div>
 
-        {/* ── Cover Image ──────────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-          <SectionTitle>Cover Image</SectionTitle>
-          <p className="text-xs text-gray-400">
-            Shown as the hero image on the property listing. Stored as the Notion page cover.
-          </p>
-          <ImageUploader
-            value={form.coverImage ? [form.coverImage] : []}
-            onChange={(urls) => setForm((f) => ({ ...f, coverImage: urls[0] ?? "" }))}
-            multiple={false}
-            label="Upload cover photo"
-          />
-        </div>
-
-        {/* ── Gallery ──────────────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-4">
-          <SectionTitle>Gallery Photos</SectionTitle>
-          <p className="text-xs text-gray-400">
-            Additional photos shown in the gallery carousel on the property page.
-          </p>
-          <ImageUploader
-            value={form.gallery}
-            onChange={(urls) => setForm((f) => ({ ...f, gallery: urls }))}
-            multiple
-            label="Upload gallery photos"
-          />
-        </div>
-
-        {/* ── Gallery Categories ────────────────────────────────────────── */}
-        <div className="bg-white rounded-xl border border-gray-100 p-6 space-y-6">
-          <div>
-            <SectionTitle>Gallery Categories</SectionTitle>
-            <p className="text-xs text-gray-400 mt-1.5">
-              Categorise photos so users can browse by Exterior / Interior / Community tabs on the property page.
-              Photos added here also appear in the main swipeable hero carousel.
-            </p>
+        {/* ── Photos — managed separately ──────────────────────────────── */}
+        {!isNew && (
+          <div className="bg-white rounded-xl border border-gray-100 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <SectionTitle>Photos</SectionTitle>
+                <p className="text-xs text-gray-400 mt-1">
+                  Manage cover image, gallery order, and category tabs (Exterior / Interior / Community)
+                  in the dedicated Photo Manager.
+                </p>
+              </div>
+              <Link
+                href={`/admin/properties/${propertyId}/photos`}
+                className="flex items-center gap-2 bg-[#1E6B69] hover:bg-[#18605E] text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition-colors shrink-0 ml-4"
+              >
+                🖼 Manage Photos →
+              </Link>
+            </div>
           </div>
-
-          <Field label="🏠 Exterior — façade, garden, entrance, parking">
-            <ImageUploader
-              value={form.exteriorPhotos}
-              onChange={(urls) => setForm((f) => ({ ...f, exteriorPhotos: urls }))}
-              multiple
-              label="Upload exterior photos"
-            />
-          </Field>
-
-          <Field label="🛋️ Interior — living room, bedroom, kitchen, bathroom">
-            <ImageUploader
-              value={form.interiorPhotos}
-              onChange={(urls) => setForm((f) => ({ ...f, interiorPhotos: urls }))}
-              multiple
-              label="Upload interior photos"
-            />
-          </Field>
-
-          <Field label="🏘️ Community — pool, gym, lobby, rooftop, neighbourhood">
-            <ImageUploader
-              value={form.communityPhotos}
-              onChange={(urls) => setForm((f) => ({ ...f, communityPhotos: urls }))}
-              multiple
-              label="Upload community photos"
-            />
-          </Field>
-        </div>
+        )}
 
         {/* ── Submit ───────────────────────────────────────────────────── */}
         <div className="flex items-center justify-end gap-3 pb-8">
