@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
+import NextLink from "next/link"; // used for non-locale routes like /admin
 import { Menu, X, Building2, BookOpen, Info, Home, LayoutDashboard, LogIn, LogOut, ShieldCheck, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -198,10 +199,10 @@ export default function Navbar({ locale }: NavbarProps) {
                 {isAdmin && (
                   <>
                     <DropdownMenuItem asChild>
-                      <Link href="/admin" className="flex items-center gap-2">
+                      <NextLink href="/admin" className="flex items-center gap-2">
                         <ShieldCheck className="h-4 w-4" />
                         {t("admin")}
-                      </Link>
+                      </NextLink>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                   </>
@@ -318,14 +319,14 @@ export default function Navbar({ locale }: NavbarProps) {
             {!isPending && isLoggedIn && (
               <>
                 {isAdmin && (
-                  <Link
+                  <NextLink
                     href="/admin"
                     onClick={() => setMobileOpen(false)}
                     className="flex items-center gap-3 px-4 py-2 rounded-full text-base font-medium text-[#5e6360] hover:bg-[#e2e5e0]/50 transition-colors min-h-[44px]"
                   >
                     <ShieldCheck className="h-5 w-5 shrink-0" />
                     {t("admin")}
-                  </Link>
+                  </NextLink>
                 )}
                 <Link
                   href="/dashboard"
