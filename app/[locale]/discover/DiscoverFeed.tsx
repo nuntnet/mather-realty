@@ -91,12 +91,10 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
       <div ref={emblaRef} className="absolute inset-0 overflow-hidden">
         <div className="flex h-full">
           {photos.length > 0 ? photos.map((img, idx) => (
-            <div key={idx} className="relative flex-shrink-0 w-full h-full">
+            <div key={idx} className="relative flex-shrink-0 w-full h-full overflow-hidden">
               <Image
                 src={img} alt={`Photo ${idx + 1}`} fill
                 className={cn('object-cover transition-transform duration-700',
-                  // scale-105 only for standby photos WITHIN the active card
-                  // inactive cards stay at scale-100 → no 5% bleed into adjacent snap slots
                   isActive ? (idx === photoIndex ? 'scale-100' : 'scale-105') : 'scale-100'
                 )}
                 priority={isActive && idx === 0}
