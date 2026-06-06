@@ -24,16 +24,34 @@ import {
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 type SubmissionData = {
+  // legacy / admin-generated
   titleEn?: string;
+  priceTHB?: number;
+  sizeSqm?: number;
+  description?: string;
+  // current form fields
+  propertyType?: string;
   address?: string;
   city?: string;
   district?: string;
-  priceTHB?: number;
-  bedrooms?: number;
-  bathrooms?: number;
-  sizeSqm?: number;
+  price?: string | number;
+  size?: string | number;
+  bedrooms?: string | number;
+  bathrooms?: string | number;
+  floors?: string | number;
+  parkingSpots?: string | number;
+  availableFrom?: string;
+  minLeaseTerm?: string | number;
+  depositMonths?: string | number;
   amenities?: string[];
-  description?: string;
+  perfectFor?: string[];
+  highlights?: string;
+  description_en?: string;
+  virtualTourUrl?: string;
+  // owner extras (stored inside dataJson)
+  ownerName?: string;
+  ownerLine?: string;
+  ownerWhatsapp?: string;
   [key: string]: unknown;
 };
 
@@ -252,13 +270,13 @@ export default function AdminSubmissionsPage() {
                       </td>
                       <td className="px-4 py-3.5">
                         <p className="text-sm text-gray-700 line-clamp-1">
-                          {data.titleEn ?? (
+                          {data.titleEn ?? data.propertyType ?? (
                             <span className="text-gray-400 italic">Untitled</span>
                           )}
                         </p>
-                        {data.city && (
-                          <p className="text-xs text-gray-400 mt-0.5">{data.city}</p>
-                        )}
+                        <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">
+                          {[data.district, data.city].filter(Boolean).join(", ") || data.address || "—"}
+                        </p>
                       </td>
                       <td className="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
                         {sub.submittedAt
@@ -355,75 +373,119 @@ export default function AdminSubmissionsPage() {
 
                 {/* Owner */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                    Owner
-                  </p>
-                  <div className="bg-gray-50 rounded-xl p-4 space-y-1.5">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Owner</p>
+                  <div className="bg-gray-50 rounded-xl p-4 space-y-1.5 text-sm">
+                    {data.ownerName && <p><span className="font-medium text-gray-600">Name: </span>{data.ownerName}</p>}
                     {selected.ownerEmail && (
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">Email: </span>
-                        <a href={`mailto:${selected.ownerEmail}`} className="text-blue-600 hover:underline">
-                          {selected.ownerEmail}
-                        </a>
+                      <p><span className="font-medium text-gray-600">Email: </span>
+                        <a href={`mailto:${selected.ownerEmail}`} className="text-blue-600 hover:underline">{selected.ownerEmail}</a>
                       </p>
                     )}
-                    {selected.ownerPhone && (
-                      <p className="text-sm text-gray-700">
-                        <span className="font-medium">Phone: </span>
-                        {selected.ownerPhone}
-                      </p>
-                    )}
+                    {selected.ownerPhone && <p><span className="font-medium text-gray-600">Phone: </span>{selected.ownerPhone}</p>}
+                    {data.ownerLine && <p><span className="font-medium text-gray-600">LINE: </span>{data.ownerLine}</p>}
+                    {data.ownerWhatsapp && <p><span className="font-medium text-gray-600">WhatsApp: </span>{data.ownerWhatsapp}</p>}
                   </div>
                 </div>
 
                 {/* Property details */}
                 <div>
-                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                    Property Details
-                  </p>
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Property Details</p>
                   <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-                    {data.titleEn && (
-                      <p><span className="font-medium text-gray-600">Title: </span>{data.titleEn}</p>
-                    )}
-                    {data.address && (
-                      <p><span className="font-medium text-gray-600">Address: </span>{data.address}</p>
-                    )}
+                    {/* Type + Address */}
+                    {data.propertyType && <p><span className="font-medium text-gray-600">Type: </span>{data.propertyType}</p>}
+                    {data.address && <p><span className="font-medium text-gray-600">Address: </span>{data.address}</p>}
                     {(data.city || data.district) && (
-                      <p>
-                        <span className="font-medium text-gray-600">Location: </span>
+                      <p><span className="font-medium text-gray-600">Location: </span>
                         {[data.district, data.city].filter(Boolean).join(", ")}
                       </p>
                     )}
-                    {data.priceTHB != null && (
-                      <p>
-                        <span className="font-medium text-gray-600">Price: </span>
-                        ฿{Number(data.priceTHB).toLocaleString()} / month
+
+                    {/* Price */}
+                    {(data.price != null || data.priceTHB != null) && (
+                      <p><span className="font-medium text-gray-600">Price: </span>
+                        ฿{Number(data.price ?? data.priceTHB).toLocaleString()} / month
                       </p>
                     )}
-                    <div className="flex flex-wrap gap-4">
-                      {data.bedrooms != null && (
-                        <p><span className="font-medium text-gray-600">Beds: </span>{data.bedrooms}</p>
+
+                    {/* Numeric specs */}
+                    <div className="flex flex-wrap gap-x-5 gap-y-1">
+                      {(data.bedrooms != null && data.bedrooms !== "") && <p><span className="font-medium text-gray-600">Beds: </span>{data.bedrooms}</p>}
+                      {(data.bathrooms != null && data.bathrooms !== "") && <p><span className="font-medium text-gray-600">Baths: </span>{data.bathrooms}</p>}
+                      {(data.size != null && data.size !== "") && <p><span className="font-medium text-gray-600">Size: </span>{data.size} sqm</p>}
+                      {(data.sizeSqm != null) && !data.size && <p><span className="font-medium text-gray-600">Size: </span>{data.sizeSqm} sqm</p>}
+                      {(data.floors != null && data.floors !== "") && <p><span className="font-medium text-gray-600">Floor: </span>{data.floors}</p>}
+                      {(data.parkingSpots != null && data.parkingSpots !== "") && <p><span className="font-medium text-gray-600">Parking: </span>{data.parkingSpots}</p>}
+                    </div>
+
+                    {/* Lease terms */}
+                    <div className="flex flex-wrap gap-x-5 gap-y-1">
+                      {data.availableFrom && <p><span className="font-medium text-gray-600">Available: </span>{data.availableFrom}</p>}
+                      {(data.minLeaseTerm != null && data.minLeaseTerm !== "") && (
+                        <p><span className="font-medium text-gray-600">Min lease: </span>{data.minLeaseTerm} month{Number(data.minLeaseTerm) !== 1 ? "s" : ""}</p>
                       )}
-                      {data.bathrooms != null && (
-                        <p><span className="font-medium text-gray-600">Baths: </span>{data.bathrooms}</p>
-                      )}
-                      {data.sizeSqm != null && (
-                        <p><span className="font-medium text-gray-600">Size: </span>{data.sizeSqm} sqm</p>
+                      {(data.depositMonths != null && data.depositMonths !== "") && (
+                        <p><span className="font-medium text-gray-600">Deposit: </span>{data.depositMonths} month{Number(data.depositMonths) !== 1 ? "s" : ""}</p>
                       )}
                     </div>
-                    {data.description && (
-                      <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-wrap pt-1 border-t border-gray-100 mt-1">
-                        {data.description}
-                      </p>
-                    )}
-                    {Array.isArray(data.amenities) && data.amenities.length > 0 && (
-                      <div className="flex flex-wrap gap-1 pt-1">
-                        {data.amenities.map((a) => (
-                          <span key={String(a)} className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded-full text-gray-600 capitalize">
-                            {String(a).replace(/_/g, " ")}
-                          </span>
-                        ))}
+
+                    {/* Perfect for */}
+                    {Array.isArray(data.perfectFor) && data.perfectFor.length > 0 && (
+                      <div>
+                        <p className="font-medium text-gray-600 mb-1">Perfect for:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {data.perfectFor.map((v) => (
+                            <span key={v} className="text-xs bg-emerald-50 border border-emerald-200 text-emerald-700 px-2 py-0.5 rounded-full capitalize">
+                              {String(v).replace(/-/g, " ")}
+                            </span>
+                          ))}
+                        </div>
                       </div>
+                    )}
+
+                    {/* Amenities */}
+                    {Array.isArray(data.amenities) && data.amenities.length > 0 && (
+                      <div>
+                        <p className="font-medium text-gray-600 mb-1">Amenities:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {data.amenities.map((a) => (
+                            <span key={String(a)} className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded-full text-gray-600">
+                              {String(a)}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Highlights */}
+                    {data.highlights && (
+                      <div className="pt-1 border-t border-gray-100">
+                        <p className="font-medium text-gray-600 mb-1">Highlights:</p>
+                        <ul className="space-y-0.5">
+                          {String(data.highlights).split("\n").filter(Boolean).map((line, i) => (
+                            <li key={i} className="text-xs text-gray-600 flex gap-1.5"><span className="text-gray-400">•</span>{line}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    {(data.description_en || data.description) && (
+                      <div className="pt-1 border-t border-gray-100">
+                        <p className="font-medium text-gray-600 mb-1">Description:</p>
+                        <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-wrap">
+                          {String(data.description_en ?? data.description)}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Virtual tour */}
+                    {data.virtualTourUrl && (
+                      <p className="pt-1 border-t border-gray-100">
+                        <span className="font-medium text-gray-600">Virtual tour: </span>
+                        <a href={String(data.virtualTourUrl)} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-xs break-all">
+                          {String(data.virtualTourUrl)}
+                        </a>
+                      </p>
                     )}
                   </div>
                 </div>
