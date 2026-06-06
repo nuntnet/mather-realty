@@ -114,9 +114,11 @@ function PhotoCarousel({ property, isActive }: { property: Property; isActive: b
         </div>
       </div>
 
-      {/* Story-style progress bars — top */}
+      {/* Story-style progress bars — below header
+          mobile: top-16 (64px, below 56px header)
+          desktop: top-28 (112px, below stacked chevron header ~100px) */}
       {photos.length > 1 && (
-        <div className="absolute top-[4.5rem] left-4 right-4 z-20 flex gap-1">
+        <div className="absolute top-16 lg:top-28 left-4 right-4 z-20 flex gap-1">
           {photos.slice(0, 12).map((_, idx) => (
             <div
               key={idx}
@@ -198,9 +200,9 @@ function PropertyCard({
       {/* Dark gradient */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-black/35 pointer-events-none z-10" />
 
-      {/* Status badge */}
+      {/* Status badge — below progress bars */}
       {property.status === 'available' && (
-        <div className="absolute top-20 left-4 z-20">
+        <div className="absolute top-[5.5rem] lg:top-36 left-4 z-20">
           <span className="bg-[#1E6B69]/90 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full">
             ● Available
           </span>
@@ -426,9 +428,8 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             <h1 className="text-white font-bold text-base drop-shadow lg:hidden">
               Double<span className="text-[#4DB5B2]">N</span> Realty
             </h1>
-            <p className="hidden lg:block text-white/60 text-xs font-medium">
-              {activeIndex + 1} / {properties.length}
-            </p>
+            {/* counter removed — sidebar shows "1 of N properties" */}
+            <div className="hidden lg:block w-10" />
 
             {/* Mobile: vertical dots for property progress */}
             <div className="flex flex-col gap-1 lg:hidden">

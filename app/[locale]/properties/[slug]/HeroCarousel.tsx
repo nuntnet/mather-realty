@@ -61,6 +61,7 @@ export default function HeroCarousel({
                   src={img}
                   alt={`${title} — photo ${idx + 1}`}
                   className="w-full h-full object-cover"
+                  style={{ imageRendering: 'auto', backfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
                   draggable={false}
                 />
               </div>
@@ -85,12 +86,7 @@ export default function HeroCarousel({
           <ArrowLeft className="w-5 h-5" />
         </a>
 
-        {/* Photo counter — centre */}
-        {images.length > 1 && (
-          <span className="absolute left-1/2 -translate-x-1/2 bg-black/30 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full select-none">
-            {selectedIndex + 1} / {images.length}
-          </span>
-        )}
+        {/* Counter removed — dots below serve this purpose */}
 
         <PropertyDetailActions title={title} variant="glass" />
       </div>
