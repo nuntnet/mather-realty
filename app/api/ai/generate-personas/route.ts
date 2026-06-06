@@ -3,25 +3,21 @@ import { requireAdmin } from '@/lib/admin-auth'
 import { getProperty } from '@/lib/notion'
 import { Client } from '@notionhq/client'
 import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 
-// Dual-mode: Hermes local adapter (dev) or Anthropic SDK (production)
-// - HERMES_URL set (e.g. http://127.0.0.1:8999) → use Hermes OpenAI-compatible adapter
-// - ANTHROPIC_API_KEY set → use Anthropic SDK directly
+// Priority: HERMES_URL → ANTHROPIC_API_KEY → OPENAI_API_KEY
 async function callAI(systemPrompt: string, userPrompt: string): Promise<string> {
   const hermesUrl = process.env.HERMES_URL
   const anthropicKey = process.env.ANTHROPIC_API_KEY
+  const openaiKey = process.env.OPENAI_API_KEY
 
   if (hermesUrl) {
-    // Hermes adapter: OpenAI-compatible API from Hermes UI
     const res = await fetch(`${hermesUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer no-key' },
       body: JSON.stringify({
         model: process.env.HERMES_MODEL ?? 'cc/sonnet',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-        ],
+        messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
         temperature: 0.7,
       }),
     })
@@ -41,7 +37,18 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<string>
     return message.content[0]?.type === 'text' ? message.content[0].text : ''
   }
 
-  throw new Error('No AI provider configured. Set HERMES_URL or ANTHROPIC_API_KEY.')
+  if (openaiKey) {
+    const openai = new OpenAI({ apiKey: openaiKey })
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      max_tokens: 2000,
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userPrompt }],
+      temperature: 0.7,
+    })
+    return completion.choices[0]?.message?.content ?? ''
+  }
+
+  throw new Error('No AI provider configured. Set HERMES_URL, ANTHROPIC_API_KEY, or OPENAI_API_KEY.')
 }
 
 export async function POST(req: NextRequest) {

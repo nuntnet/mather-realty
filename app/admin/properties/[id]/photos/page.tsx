@@ -281,50 +281,53 @@ export default function PhotoManagerPage() {
   const handleDragOver = useCallback((e: DragOverEvent) => {
     const { active, over } = e
     if (!over) return
+
     const fromCol = findColumn(active.id)
-    // Target column: column key directly, OR derived from the hovered photo's id
-    const toCol = COLUMN_IDS.has(over.id as string)
+    const isOverColZone = COLUMN_IDS.has(over.id as string)
+    const toCol = isOverColZone
       ? (over.id as ColumnKey)
-      : (findColumn(over.id) ?? (COLUMN_IDS.has(colFromId(over.id)) ? colFromId(over.id) as ColumnKey : null))
+      : (findColumn(over.id) ?? null)
 
-    if (!fromCol || !toCol || fromCol === toCol) return
+    if (!fromCol || !toCol) return
 
-    setColumns(prev => {
-      const src = [...prev[fromCol]]
-      const dst = [...prev[toCol]]
-      const idx = src.findIndex(p => p.id === active.id)
-      if (idx === -1) return prev
-      const [moved] = src.splice(idx, 1)
-      dst.push(moved)
-      return { ...prev, [fromCol]: src, [toCol]: dst }
-    })
+    if (fromCol === toCol) {
+      // ── Same-column reorder ──────────────────────────────────────────
+      // Update position live during drag so user sees the swap happen
+      if (isOverColZone) return // dragging over empty space in same col → no change
+      setColumns(prev => {
+        const arr = [...prev[fromCol]]
+        const oldIdx = arr.findIndex(p => p.id === active.id)
+        const newIdx = arr.findIndex(p => p.id === over.id)
+        if (oldIdx === -1 || newIdx === -1 || oldIdx === newIdx) return prev
+        return { ...prev, [fromCol]: arrayMove(arr, oldIdx, newIdx) }
+      })
+    } else {
+      // ── Cross-column move — insert at hovered position ───────────────
+      setColumns(prev => {
+        const src = [...prev[fromCol]]
+        const dst = [...prev[toCol]]
+        const srcIdx = src.findIndex(p => p.id === active.id)
+        if (srcIdx === -1) return prev
+        const [moved] = src.splice(srcIdx, 1)
+
+        // Insert before the hovered photo rather than appending to end
+        const overIdx = dst.findIndex(p => p.id === over.id)
+        if (overIdx !== -1) {
+          dst.splice(overIdx, 0, moved)
+        } else {
+          dst.push(moved)
+        }
+        return { ...prev, [fromCol]: src, [toCol]: dst }
+      })
+    }
     setSaved(false)
   }, [columns])
 
   const handleDragEnd = useCallback((e: DragEndEvent) => {
-    const { active, over } = e
+    // State is already correct from handleDragOver — just reset overlay
     setActiveId(null); setActiveUrl('')
-    if (!over) return
-
-    const fromCol = findColumn(active.id)
-    if (!fromCol) return
-
-    // If dropped on a column zone (not a photo), nothing to reorder
-    if (COLUMN_IDS.has(over.id as string)) return
-
-    // Same-column reorder
-    const toCol = findColumn(over.id)
-    if (!toCol || toCol !== fromCol) return
-
-    setColumns(prev => {
-      const arr = [...prev[fromCol]]
-      const oldIdx = arr.findIndex(p => p.id === active.id)
-      const newIdx = arr.findIndex(p => p.id === over.id)
-      if (oldIdx === -1 || newIdx === -1) return prev
-      return { ...prev, [fromCol]: arrayMove(arr, oldIdx, newIdx) }
-    })
     setSaved(false)
-  }, [columns])
+  }, [])
 
   const handleRemove = useCallback((id: string) => {
     setColumns(prev => {
