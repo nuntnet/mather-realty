@@ -29,10 +29,10 @@ export default function FAQSection({ faqItems, propertyTitle }: FAQSectionProps)
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      <h2 className="text-2xl font-semibold mb-6">Frequently Asked Questions</h2>
-      <Accordion type="single" collapsible className="w-full space-y-1">
+      <h2 className="text-2xl font-serif font-medium text-[#1A2624] mb-6">Frequently Asked Questions</h2>
+      <Accordion type="single" collapsible className="w-full space-y-2">
         {faqItems.map((item, index) => (
-          <AccordionItem key={index} value={`faq-${index}`} className="border rounded-lg px-4">
+          <AccordionItem key={index} value={`faq-${index}`} className="border border-[#E2DDD7] rounded-lg px-4 last:!border-b">
             <AccordionTrigger className="text-left text-base font-medium py-4 hover:no-underline">
               {item.q}
             </AccordionTrigger>
