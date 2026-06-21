@@ -7,7 +7,7 @@ import { HERO_IMAGE } from '@/lib/images'
 import PropertyCard from '@/components/PropertyCard'
 import HomeSearchBar from './HomeSearchBar'
 import { Link } from '@/i18n/navigation'
-import { Building2, Search, MessageCircle, Home, ArrowRight, Compass } from 'lucide-react'
+import { Building2, Search, MessageCircle, Home, ArrowRight, Compass, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface HomePageProps {
@@ -227,7 +227,7 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Text + CTA */}
           <div className="flex-1 text-center sm:text-left">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#4DB5B2] bg-[#4DB5B2]/15 px-3 py-1 rounded-full mb-4">
-              ✨ New feature
+              <Sparkles className="size-3" strokeWidth={2} /> New feature
             </span>
             <h2 className="text-3xl sm:text-4xl font-serif font-medium text-white leading-tight mb-3">
               Swipe to find<br className="hidden sm:block" /> your dream home
