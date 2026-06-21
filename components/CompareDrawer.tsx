@@ -151,13 +151,13 @@ export default function CompareDrawer({
                 <Row
                   label="Bedrooms"
                   values={properties.map((p) => (
-                    <span key={p.id}>🛏 {p.bedrooms}</span>
+                    <span key={p.id}>{p.bedrooms}</span>
                   ))}
                 />
                 <Row
                   label="Bathrooms"
                   values={properties.map((p) => (
-                    <span key={p.id}>🚿 {p.bathrooms}</span>
+                    <span key={p.id}>{p.bathrooms}</span>
                   ))}
                 />
                 <Row
