@@ -272,24 +272,25 @@ export default async function HomePage({ params }: HomePageProps) {
         )}
       </section>
 
-      {/* How It Works */}
-      <section className="bg-gray-50 py-16 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-4">How It Works</h2>
-          <p className="text-gray-500 mb-12">
+      {/* How It Works — editorial numbered steps */}
+      <section className="bg-[#F7F4EF] py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-2">How It Works</h2>
+          <p className="text-[#6B8280] mb-14">
             Finding your next home in Thailand is easy with DoubleN Realty
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             {steps.map((step, i) => (
-              <div key={i} className="flex flex-col items-center bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <div className="w-16 h-16 rounded-full bg-[#1E6B69]/10 flex items-center justify-center mb-4">
-                  {step.icon}
+              <div key={i}>
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="font-serif text-5xl leading-none text-[#C9935A]">
+                    0{i + 1}
+                  </span>
+                  <span className="h-px flex-1 bg-[#E2DDD7]" />
                 </div>
-                <div className="w-8 h-8 rounded-full bg-[#1E6B69] text-white text-sm font-bold flex items-center justify-center mb-3">
-                  {i + 1}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-gray-500 text-sm text-center">{step.description}</p>
+                <div className="text-[#1E6B69] mb-3">{step.icon}</div>
+                <h3 className="font-serif text-2xl text-[#1A2624] mb-2">{step.title}</h3>
+                <p className="text-[#6B8280] text-sm leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
