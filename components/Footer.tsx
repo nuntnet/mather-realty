@@ -170,7 +170,7 @@ export default async function Footer() {
           <div className="flex items-center gap-5">
             <Link href="/privacy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("privacy")}</Link>
             <Link href="/terms" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("terms")}</Link>
-            <a href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("cookies")}</a>
+            <Link href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("cookies")}</Link>
           </div>
         </div>
       </div>
