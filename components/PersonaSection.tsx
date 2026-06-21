@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
+import { Users } from "lucide-react"
 
 interface PersonaSectionProps {
   perfectFor: string[]
@@ -19,37 +20,37 @@ const PERSONAS: Record<string, { label: string; emoji: string; color: string; fa
   "expat-couple": {
     label: "Expat Couples",
     emoji: "👫",
-    color: "bg-pink-50 border-pink-200 text-pink-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "A comfortable, fully-furnished home perfect for couples starting life in Bangkok.",
   },
   "family": {
     label: "Families",
     emoji: "👨‍👩‍👧",
-    color: "bg-green-50 border-green-200 text-green-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Spacious home with community amenities ideal for families with children.",
   },
   "airline-crew": {
     label: "Airline Crew",
     emoji: "✈️",
-    color: "bg-orange-50 border-orange-200 text-orange-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Convenient access to Suvarnabhumi Airport for airline professionals.",
   },
   "remote-worker": {
     label: "Remote Workers",
     emoji: "💻",
-    color: "bg-[#FBF6F0] border-[#E5BC8E] text-[#8A5E32]",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Quiet, comfortable space with amenities for productive remote work.",
   },
   "digital-nomad": {
     label: "Digital Nomads",
     emoji: "🌏",
-    color: "bg-yellow-50 border-yellow-200 text-yellow-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Flexible, fully-furnished option for location-independent professionals.",
   },
   "business-expat": {
     label: "Business Expats",
     emoji: "💼",
-    color: "bg-gray-50 border-gray-200 text-gray-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Professional address in Bangkok's sought-after Bangna corridor.",
   },
 }
@@ -65,7 +66,7 @@ export default function PersonaSection({
   if (validPersonas.length === 0) return null
 
   const active = PERSONAS[activePersona]
-  const activeColor = active?.color ?? "bg-gray-50 border-gray-200 text-gray-800"
+  const activeColor = active?.color ?? "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]"
 
   const descriptionText =
     personaDescriptions?.[activePersona] ?? active?.fallback ?? ""
@@ -74,8 +75,9 @@ export default function PersonaSection({
 
   return (
     <section className="rounded-2xl bg-gradient-to-br from-[#E8F6F5] to-[#F7F4EF] p-6 md:p-8">
-      <h2 className="mb-5 text-xl font-semibold text-gray-900">
-        🎯 Who is this home perfect for?
+      <h2 className="mb-5 flex items-center gap-2.5 font-serif text-2xl text-[#1A2624]">
+        <Users className="size-5 text-[#1E6B69]" strokeWidth={1.5} />
+        Who is this home perfect for?
       </h2>
 
       {/* Persona tabs */}
@@ -95,7 +97,6 @@ export default function PersonaSection({
                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
               ].join(" ")}
             >
-              <span>{persona.emoji}</span>
               <span>{persona.label}</span>
             </button>
           )
