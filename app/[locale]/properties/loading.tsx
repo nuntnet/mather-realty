@@ -21,7 +21,7 @@ export default function PropertiesLoading() {
                   <div className="h-10 w-full bg-gray-100 rounded-lg" />
                 </div>
               ))}
-              <div className="h-11 w-full bg-blue-100 rounded-lg mt-2" />
+              <div className="h-11 w-full bg-[#cde9e8] rounded-lg mt-2" />
             </div>
           </aside>
 

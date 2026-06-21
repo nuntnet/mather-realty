@@ -107,7 +107,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
           <a
             href="?"
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-              !activeCategory ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+              !activeCategory ? 'bg-[#1E6B69] text-white' : 'text-gray-600 hover:bg-gray-100'
             }`}
           >
             All
@@ -117,7 +117,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
               key={cat}
               href={`?category=${cat}`}
               className={`flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                activeCategory === cat ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                activeCategory === cat ? 'bg-[#1E6B69] text-white' : 'text-gray-600 hover:bg-gray-100'
               }`}
             >
               {t(`categories.${cat}`)}
@@ -151,7 +151,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                   </div>
                   <div className="flex flex-col flex-1 p-5">
                     <div className="flex items-center gap-3 mb-3">
-                      <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <span className="text-xs font-medium text-[#1E6B69] bg-[#E8F6F5] px-2 py-0.5 rounded-full flex items-center gap-1">
                         <Tag className="w-3 h-3" />
                         {t(`categories.${article.category}`)}
                       </span>
@@ -162,15 +162,15 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                     <p className="text-sm text-gray-500 line-clamp-3 flex-1">
                       {article.excerpt}
                     </p>
-                    <div className="mt-4 text-xs font-medium text-blue-500">Coming soon</div>
+                    <div className="mt-4 text-xs font-medium text-[#2A8A88]">Coming soon</div>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Coming soon banner */}
-            <div className="flex flex-col items-center gap-4 bg-blue-50 border border-blue-100 rounded-2xl px-6 py-10 text-center">
-              <Bell className="w-8 h-8 text-blue-500" />
+            <div className="flex flex-col items-center gap-4 bg-[#E8F6F5] border border-[#cde9e8] rounded-2xl px-6 py-10 text-center">
+              <Bell className="w-8 h-8 text-[#2A8A88]" />
               <h3 className="text-xl font-semibold text-gray-900">More articles coming soon</h3>
               <p className="text-gray-500 max-w-md">
                 We are working on in-depth guides to help expats navigate renting in Thailand.
@@ -178,7 +178,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
               </p>
               <a
                 href="mailto:hello@doublen-realty.com?subject=Blog%20Updates"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-[#1E6B69] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#18605E] transition-colors"
               >
                 <Bell className="w-4 h-4" />
                 Subscribe for updates
@@ -205,12 +205,12 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                 )}
                 <div className="flex flex-col flex-1 p-5">
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <span className="text-xs font-medium text-[#1E6B69] bg-[#E8F6F5] px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Tag className="w-3 h-3" />
                       {t(`categories.${post.category}`)}
                     </span>
                   </div>
-                  <h2 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <h2 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-[#1E6B69] transition-colors">
                     {getTitle(post)}
                   </h2>
                   <p className="text-sm text-gray-500 line-clamp-3 flex-1">

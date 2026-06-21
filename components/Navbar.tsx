@@ -123,10 +123,10 @@ export default function Navbar({ locale }: NavbarProps) {
           className="flex items-center shrink-0 hover:opacity-80 transition-opacity"
           aria-label="DoubleN Realty — Home"
         >
-          <span className="font-lexend font-extrabold tracking-tight leading-none text-[1.35rem]">
-            <span className="text-[#1d211c]">Double</span>
-            <span className="text-[#F4581A]">N</span>
-            <span className="hidden sm:inline text-[#1d211c]"> Realty</span>
+          <span className="font-serif font-semibold tracking-tight leading-none text-[1.5rem]">
+            <span className="text-[#1A2624]">Double</span>
+            <span className="text-[#C9935A]">N</span>
+            <span className="hidden sm:inline text-[#1A2624]"> Realty</span>
           </span>
         </Link>
 

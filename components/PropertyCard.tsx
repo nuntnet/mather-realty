@@ -256,7 +256,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
   return (
     <article
       className={cn(
-        'group relative rounded-3xl bg-white shadow-sm border border-[#e2e5e0] overflow-hidden',
+        'group relative rounded-xl bg-white shadow-sm border border-[#e2e5e0] overflow-hidden',
         'transition-all duration-200 ease-out hover:-translate-y-1.5 hover:shadow-xl hover:shadow-black/8',
         'w-full',
         isList ? 'flex flex-row' : 'flex flex-col',
@@ -291,7 +291,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             className="block"
           >
             <h3
-              className="font-lexend font-semibold text-[#1d211c] text-base leading-snug line-clamp-2 hover:text-[#124E4C] transition-colors"
+              className="font-serif font-medium text-[#1A2624] text-lg leading-snug line-clamp-2 hover:text-[#1E6B69] transition-colors"
               title={title}
             >
               {title}
@@ -305,10 +305,10 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         {/* Price — THB primary + USD hint for non-Thai locales */}
         <div className="flex flex-col gap-0.5">
           <div className="flex items-baseline gap-1">
-            <span className="font-lexend text-2xl font-bold text-[#124E4C]">
+            <span className="text-2xl font-bold tracking-tight text-[#1A2624]">
               {formatPrice(property.priceTHB, locale)}
             </span>
-            <span className="text-sm text-[#898e87]">{t('perMonth')}</span>
+            <span className="text-sm text-[#9BAEAC]">{t('perMonth')}</span>
           </div>
           {locale !== 'th' && (
             <span className="text-xs text-[#898e87]">{approxUsd(property.priceTHB)}/mo USD</span>
@@ -359,7 +359,7 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
         <div className="flex items-center gap-2 pt-1 mt-auto">
           <Button
             asChild size="sm" variant="default"
-            className="flex-1 h-11 text-sm bg-[#1E6B69] hover:bg-[#18605E] text-white shadow-sm rounded-full"
+            className="flex-1 h-11 text-sm bg-[#1E6B69] hover:bg-[#18605E] text-white shadow-sm rounded-xl"
           >
             <Link href={`/properties/${property.slug}#inquiry`} locale={locale as Parameters<typeof Link>[0]['locale']}>
               {t('scheduleViewing')}
@@ -371,11 +371,11 @@ export default function PropertyCard({ property, locale, view = 'grid' }: Proper
             className={cn(
               'size-11 rounded-full flex items-center justify-center border transition-colors',
               isSaved
-                ? 'bg-red-50 border-red-200 text-red-500 hover:bg-red-100'
-                : 'bg-white border-[#d9ddd8] text-[#898e87] hover:bg-[#f1f4f0] hover:text-red-400',
+                ? 'bg-[#FBF6F0] border-[#E5BC8E] text-[#C9935A] hover:bg-[#F6E8D8]'
+                : 'bg-white border-[#d9ddd8] text-[#898e87] hover:bg-[#f1f4f0] hover:text-[#C9935A]',
             )}
           >
-            <Heart className={cn('size-5', isSaved && 'fill-current')} />
+            <Heart className={cn('size-5', isSaved && 'fill-current animate-pop')} />
           </button>
         </div>
       </div>

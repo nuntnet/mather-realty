@@ -120,24 +120,24 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900 text-white overflow-hidden">
+      <section className="relative -mt-16 pt-16 bg-gradient-to-br from-[#0F1C1B] via-[#16302E] to-[#0F1C1B] text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-400 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2A8A88] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9935A] rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 py-24 text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-blue-500/20 text-blue-200 text-sm font-medium mb-6 border border-blue-500/30">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#2A8A88]/20 text-[#A7D8D6] text-sm font-medium mb-6 border border-[#2A8A88]/30">
             Simple. Transparent. No Fees.
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-serif font-medium text-white mb-6 leading-[1.08]">
             How DoubleN Realty Works
           </h1>
-          <p className="text-blue-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#A7D8D6] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Finding a rental home in Thailand as an expat has never been easier.
             Whether you&apos;re looking to rent or list a property, we&apos;ve made it simple in just 3 steps.
           </p>
           <div className="flex justify-center mt-10">
-            <ChevronDown className="w-6 h-6 text-blue-300 animate-bounce" />
+            <ChevronDown className="w-6 h-6 text-[#7FCECC] animate-bounce" />
           </div>
         </div>
       </section>
@@ -145,7 +145,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       {/* For Tenants */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold mb-4 border border-blue-100">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8F6F5] text-[#18605E] text-sm font-semibold mb-4 border border-[#cde9e8]">
             <Search className="w-4 h-4" /> For Tenants
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Find your perfect home in 3 steps</h2>
@@ -181,7 +181,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
                 <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
               </div>
               {/* Accent bar */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2A8A88] to-[#1E6B69] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </div>
           ))}
         </div>
@@ -252,7 +252,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
                 className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <h3 className="font-semibold text-gray-900 mb-2 flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#cde9e8] text-[#18605E] text-xs font-bold flex items-center justify-center mt-0.5">
                     {i + 1}
                   </span>
                   {item.question}
@@ -265,15 +265,15 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-20">
+      <section className="bg-gradient-to-br from-[#1E6B69] to-[#18605E] text-white py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to find your home?</h2>
-          <p className="text-blue-200 text-lg mb-8">
+          <h2 className="text-4xl md:text-5xl font-serif font-medium text-white mb-4">Ready to find your home?</h2>
+          <p className="text-[#A7D8D6] text-lg mb-8">
             Join thousands of expats who have found their perfect rental in Thailand.
           </p>
           <Link
             href={`/${locale}/properties`}
-            className="inline-flex items-center gap-2 bg-white text-blue-700 font-semibold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
+            className="inline-flex items-center gap-2 bg-white text-[#18605E] font-semibold px-8 py-4 rounded-2xl hover:bg-[#E8F6F5] transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
           >
             Browse Properties
             <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current">

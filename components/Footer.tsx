@@ -69,9 +69,9 @@ export default async function Footer() {
           {/* Col 1: Brand */}
           <div className="lg:col-span-1 space-y-5">
             <Link href="/" aria-label="DoubleN Realty" className="inline-block hover:opacity-80 transition-opacity">
-              <span className="font-extrabold tracking-tight text-2xl leading-none">
+              <span className="font-serif font-semibold tracking-tight text-2xl leading-none">
                 <span className="text-white">Double</span>
-                <span className="text-[#F4581A]">N</span>
+                <span className="text-[#C9935A]">N</span>
                 <span className="text-white"> Realty</span>
               </span>
             </Link>

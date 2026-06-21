@@ -140,7 +140,7 @@ export default async function HomePage({ params }: HomePageProps) {
       />
       {/* Hero */}
       <section
-        className="relative min-h-[75vh] flex items-center text-white px-4"
+        className="relative -mt-16 min-h-[75vh] flex items-center text-white px-4"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
@@ -156,7 +156,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
         <div className="relative max-w-4xl mx-auto text-center w-full py-24">
           {/* text-white overrides the base h1 teal rule */}
-          <h1 className="text-white text-4xl md:text-6xl font-lexend font-extrabold tracking-tight mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-white text-5xl md:text-7xl font-serif font-medium mb-6 leading-[1.05] drop-shadow-lg">
             {t('hero_title')}
           </h1>
           <p className="text-xl md:text-2xl text-white/80 mb-10 drop-shadow">
@@ -175,7 +175,7 @@ export default async function HomePage({ params }: HomePageProps) {
               500+ Expats Helped
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F4581A] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C9935A] inline-block" />
               Bangkok · Chiang Mai · Phuket
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
@@ -209,7 +209,7 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Stacked-cards visual — three depth layers with teal/orange accent */}
           <div className="relative shrink-0 w-36 h-52 sm:order-last">
             {/* Back card — orange accent */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F4581A] to-[#B43E10] rounded-2xl shadow-lg rotate-6 opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#C9935A] to-[#8A5E32] rounded-2xl shadow-lg rotate-6 opacity-50" />
             {/* Mid card — muted teal */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#18605E] to-[#0C3837] rounded-2xl shadow-lg rotate-2 opacity-80" />
             {/* Front card — primary teal */}
@@ -229,7 +229,7 @@ export default async function HomePage({ params }: HomePageProps) {
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#4DB5B2] bg-[#4DB5B2]/15 px-3 py-1 rounded-full mb-4">
               ✨ New feature
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
+            <h2 className="text-3xl sm:text-4xl font-serif font-medium text-white leading-tight mb-3">
               Swipe to find<br className="hidden sm:block" /> your dream home
             </h2>
             <p className="text-white/50 text-sm sm:text-base mb-6 max-w-sm mx-auto sm:mx-0">
@@ -238,7 +238,7 @@ export default async function HomePage({ params }: HomePageProps) {
             </p>
             <Link
               href="/discover"
-              className="inline-flex items-center gap-2 bg-[#F4581A] hover:bg-[#D84C14] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#F4581A]/20"
+              className="inline-flex items-center gap-2 bg-[#C9935A] hover:bg-[#B07840] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#C9935A]/25"
             >
               <Compass className="w-5 h-5" />
               Try Discover Mode
@@ -251,7 +251,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Featured Properties */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-lexend font-bold text-[#1E6B69]">{t('featured_title')}</h2>
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624]">{t('featured_title')}</h2>
           <Link href="/properties" className="flex items-center gap-1 text-[#124E4C] hover:text-[#1E6B69] font-medium">
             {t('view_all')}
             <ArrowRight className="w-4 h-4" />
@@ -275,7 +275,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* How It Works */}
       <section className="bg-gray-50 py-16 px-4">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#1E6B69] mb-4">How It Works</h2>
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-4">How It Works</h2>
           <p className="text-gray-500 mb-12">
             Finding your next home in Thailand is easy with DoubleN Realty
           </p>
@@ -300,7 +300,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="bg-gradient-to-r from-[#0C3837] to-[#1E6B69] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <Building2 className="w-12 h-12 mx-auto mb-4 text-green-200" />
-          <h2 className="text-3xl font-bold text-white mb-4">Are you a landlord?</h2>
+          <h2 className="text-4xl font-serif font-medium text-white mb-4">Are you a landlord?</h2>
           <p className="text-green-100 text-lg mb-8">
             List your property and reach thousands of expats looking for rental homes in Thailand.
             It&apos;s free to get started.

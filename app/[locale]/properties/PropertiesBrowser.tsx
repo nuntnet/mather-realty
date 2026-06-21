@@ -197,7 +197,7 @@ export default function PropertiesBrowser({
           <span className="text-gray-900 font-semibold">{sorted.length}</span>{' '}
           {sorted.length === 1 ? 'property' : 'properties'} found
           {cityLabel && (
-            <> in <span className="text-blue-700">{cityLabel}</span></>
+            <> in <span className="text-[#18605E]">{cityLabel}</span></>
           )}
         </h2>
       </div>
@@ -219,7 +219,7 @@ export default function PropertiesBrowser({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={() => handleDismissChip(chip.key)}
-                className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#A7D8D6] bg-[#E8F6F5] px-3 py-1 text-xs font-medium text-[#18605E] hover:bg-[#cde9e8] transition-colors"
               >
                 {chip.label}
                 <X className="w-3 h-3" />
@@ -232,7 +232,7 @@ export default function PropertiesBrowser({
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 onClick={() => setSearchQuery('')}
-                className="inline-flex items-center gap-1.5 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#A7D8D6] bg-[#E8F6F5] px-3 py-1 text-xs font-medium text-[#18605E] hover:bg-[#cde9e8] transition-colors"
               >
                 &ldquo;{searchQuery}&rdquo;
                 <X className="w-3 h-3" />
@@ -254,7 +254,7 @@ export default function PropertiesBrowser({
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-gray-400 hidden sm:block" />
           <select
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#2A8A88]/20"
             value={sort}
             onChange={(e) => {
               const newSort = e.target.value
@@ -281,7 +281,7 @@ export default function PropertiesBrowser({
               aria-label={v}
               className={`p-2 transition-colors ${
                 view === v
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#1E6B69] text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
             >
@@ -388,7 +388,7 @@ export default function PropertiesBrowser({
                       }}
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                         p === page
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-[#1E6B69] text-white'
                           : 'border border-gray-200 bg-white hover:bg-gray-50'
                       }`}
                     >

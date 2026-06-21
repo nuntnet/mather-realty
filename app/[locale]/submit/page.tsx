@@ -225,10 +225,10 @@ export default function SubmitPage() {
           {[1, 2, 3].map((s) => (
             <div key={s} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                ${step === s ? 'bg-blue-600 text-white' : step > s ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
+                ${step === s ? 'bg-[#1E6B69] text-white' : step > s ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}>
                 {step > s ? <CheckCircle2 className="w-4 h-4" /> : s}
               </div>
-              <span className={`text-sm font-medium ${step === s ? 'text-blue-600' : 'text-gray-400'}`}>
+              <span className={`text-sm font-medium ${step === s ? 'text-[#1E6B69]' : 'text-gray-400'}`}>
                 {s === 1 ? t('step1') : s === 2 ? t('step2') : t('step3')}
               </span>
               {s < 3 && <div className="w-8 h-0.5 bg-gray-200" />}
@@ -249,7 +249,7 @@ export default function SubmitPage() {
                   {PROPERTY_TYPES.map((type) => (
                     <button key={type} type="button" onClick={() => { update('propertyType', type); setErrors(p => ({ ...p, propertyType: undefined })) }}
                       className={`px-3 py-2 rounded-xl text-sm font-medium border transition-colors
-                        ${form.propertyType === type ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}
+                        ${form.propertyType === type ? 'border-[#1E6B69] bg-[#E8F6F5] text-[#1E6B69]' : 'border-gray-200 hover:border-gray-300'}
                         ${errors.propertyType ? 'border-red-300' : ''}`}>
                       {type}
                     </button>
@@ -357,7 +357,7 @@ export default function SubmitPage() {
                   {AMENITY_OPTIONS.map((a) => (
                     <button key={a} type="button" onClick={() => toggleChip('amenities', a)}
                       className={`px-2 py-1.5 rounded-xl text-xs font-medium border transition-colors
-                        ${form.amenities.includes(a) ? 'border-blue-600 bg-blue-50 text-blue-600' : 'border-gray-200 hover:border-gray-300'}`}>
+                        ${form.amenities.includes(a) ? 'border-[#1E6B69] bg-[#E8F6F5] text-[#1E6B69]' : 'border-gray-200 hover:border-gray-300'}`}>
                       {a}
                     </button>
                   ))}
@@ -412,7 +412,7 @@ export default function SubmitPage() {
                   <Upload className="w-8 h-8 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-500 mb-3">Upload photos of your property</p>
                   <label className="cursor-pointer">
-                    <span className="bg-blue-600 text-white text-sm px-4 py-2 rounded-lg hover:bg-blue-700">
+                    <span className="bg-[#1E6B69] text-white text-sm px-4 py-2 rounded-lg hover:bg-[#18605E]">
                       {uploadingImages ? 'Uploading...' : 'Choose Files'}
                     </span>
                     <input type="file" accept="image/*" multiple className="hidden"
@@ -498,12 +498,12 @@ export default function SubmitPage() {
 
             {step < totalSteps ? (
               <Button type="button" onClick={() => { if (validateStep(step)) setStep((s) => s + 1) }}
-                className="bg-blue-600 hover:bg-blue-700 text-white">
+                className="bg-[#1E6B69] hover:bg-[#18605E] text-white">
                 Next <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             ) : (
               <Button type="button" onClick={handleSubmit} disabled={submitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white">
+                className="bg-[#1E6B69] hover:bg-[#18605E] text-white">
                 {submitting ? 'Submitting...' : t('submit')}
               </Button>
             )}

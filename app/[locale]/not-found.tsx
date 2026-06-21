@@ -16,7 +16,7 @@ export default function NotFound() {
         </div>
 
         {/* 404 label */}
-        <p className="text-sm font-semibold uppercase tracking-widest text-blue-500 mb-2">
+        <p className="text-sm font-semibold uppercase tracking-widest text-[#2A8A88] mb-2">
           404 — Not Found
         </p>
 
@@ -35,7 +35,7 @@ export default function NotFound() {
           <Button
             asChild
             size="lg"
-            className="w-full sm:w-auto gap-2 h-12 text-base bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white border-0"
+            className="w-full sm:w-auto gap-2 h-12 text-base bg-gradient-to-r from-[#1E6B69] to-[#2A8A88] hover:from-[#18605E] hover:to-[#1E6B69] text-white border-0"
           >
             <Link href="/">
               <Home className="h-5 w-5" />

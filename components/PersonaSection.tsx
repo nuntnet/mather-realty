@@ -13,7 +13,7 @@ const PERSONAS: Record<string, { label: string; emoji: string; color: string; fa
   "teacher": {
     label: "International School Teachers",
     emoji: "👩‍🏫",
-    color: "bg-blue-50 border-blue-200 text-blue-800",
+    color: "bg-[#E8F6F5] border-[#A7D8D6] text-[#124E4C]",
     fallback: "Conveniently located near several international schools in the Bangna area.",
   },
   "expat-couple": {
@@ -37,7 +37,7 @@ const PERSONAS: Record<string, { label: string; emoji: string; color: string; fa
   "remote-worker": {
     label: "Remote Workers",
     emoji: "💻",
-    color: "bg-purple-50 border-purple-200 text-purple-800",
+    color: "bg-[#FBF6F0] border-[#E5BC8E] text-[#8A5E32]",
     fallback: "Quiet, comfortable space with amenities for productive remote work.",
   },
   "digital-nomad": {
@@ -73,7 +73,7 @@ export default function PersonaSection({
   const isGenerating = personaDescriptions === null
 
   return (
-    <section className="rounded-2xl bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8">
+    <section className="rounded-2xl bg-gradient-to-br from-[#E8F6F5] to-[#F7F4EF] p-6 md:p-8">
       <h2 className="mb-5 text-xl font-semibold text-gray-900">
         🎯 Who is this home perfect for?
       </h2>
@@ -91,7 +91,7 @@ export default function PersonaSection({
               className={[
                 "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? `${persona.color} shadow-sm ring-2 ring-offset-1 ring-indigo-300`
+                  ? `${persona.color} shadow-sm ring-2 ring-offset-1 ring-[#7FCECC]`
                   : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:bg-gray-50",
               ].join(" ")}
             >

@@ -137,7 +137,7 @@ export default function HeroCarousel({
               {statusLabel}
             </span>
             {verified && (
-              <span className="flex items-center gap-1 text-xs font-semibold text-white bg-blue-600/80 backdrop-blur-sm px-3 py-1 rounded-full">
+              <span className="flex items-center gap-1 text-xs font-semibold text-white bg-[#1E6B69]/80 backdrop-blur-sm px-3 py-1 rounded-full">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 {verifiedLabel}
               </span>

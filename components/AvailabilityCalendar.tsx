@@ -87,7 +87,7 @@ export default function AvailabilityCalendar({
       <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
         <div className="px-5 pt-4 pb-2 border-b border-gray-100">
           <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2">
-            <CalendarDays className="w-4 h-4 text-blue-600" />
+            <CalendarDays className="w-4 h-4 text-[#1E6B69]" />
             Availability Calendar
           </h3>
         </div>

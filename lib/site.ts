@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 export const site = {
   name: 'DoubleN Realty',
-  tagline: 'Find Your Home in Thailand',
-  description: 'Premium rental properties in Thailand for expats and foreigners',
+  tagline: "Thailand's rental platform for expats",
+  description:
+    "Find verified rental properties in Thailand. English-friendly listings in Bangkok, Chiang Mai & Phuket — built for expats and foreigners.",
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://doublen-realty.com',
   email: 'janjiranui@gmail.com',
   social: {
