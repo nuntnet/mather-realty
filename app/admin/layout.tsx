@@ -106,9 +106,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Logo */}
         <div className="h-14 border-b border-gray-100 px-4 flex items-center gap-2.5">
           <div>
-            <span className="font-lexend font-extrabold tracking-tight text-base leading-none">
-              <span className="text-[#1d211c]">Double</span>
-              <span className="text-[#F4581A]">N</span>
+            <span className="font-cormorant font-medium uppercase tracking-[0.15em] text-xl leading-none text-[#1A2624]">
+              Mather
             </span>
             <div className="text-[9px] text-gray-400 uppercase tracking-widest leading-tight mt-0.5">
               Admin Panel

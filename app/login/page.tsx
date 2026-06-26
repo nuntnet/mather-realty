@@ -42,14 +42,14 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#E8F6F5] to-white flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         {/* Logo / brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mb-3 shadow-lg">
-            <span className="text-white font-bold text-xl">DN</span>
+          <div className="w-14 h-14 rounded-2xl bg-[#0F1C1B] flex items-center justify-center mb-3 shadow-lg">
+            <span className="font-cormorant font-medium text-3xl text-[#F7F4EF] leading-none">M</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">{SITE_NAME}</h1>
+          <h1 className="font-cormorant font-medium uppercase tracking-[0.15em] text-3xl text-[#1A2624]">{SITE_NAME}</h1>
           <p className="text-sm text-gray-500 mt-1">Sign in to your account</p>
         </div>
 
@@ -90,7 +90,7 @@ function LoginForm() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11"
+              className="w-full bg-[#1E6B69] hover:bg-[#18605E] text-white font-semibold h-11"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -109,7 +109,7 @@ function LoginForm() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="text-blue-600 hover:underline font-medium">
+              <Link href="/register" className="text-[#1E6B69] hover:underline font-medium">
                 Register
               </Link>
             </p>
@@ -124,7 +124,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1E6B69] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <LoginForm />
