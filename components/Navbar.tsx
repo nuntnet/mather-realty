@@ -123,9 +123,8 @@ export default function Navbar({ locale }: NavbarProps) {
           className="flex items-center shrink-0 hover:opacity-80 transition-opacity"
           aria-label="Mather — Home"
         >
-          <span className="font-serif font-semibold tracking-tight leading-none text-[1.5rem]">
-            <span className="text-[#C9935A]">M</span>
-            <span className="text-[#1A2624]">ather</span>
+          <span className="font-cormorant font-medium uppercase tracking-[0.18em] leading-none text-[1.6rem] text-[#1A2624]">
+            Mather
           </span>
         </Link>
 
