@@ -61,14 +61,14 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-[#E8F6F5] to-white flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center mb-3 shadow-lg">
-            <span className="text-white font-bold text-xl">DN</span>
+          <div className="w-14 h-14 rounded-2xl bg-[#0F1C1B] flex items-center justify-center mb-3 shadow-lg">
+            <span className="font-cormorant font-medium text-3xl text-[#F7F4EF] leading-none">M</span>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">{SITE_NAME}</h1>
+          <h1 className="font-cormorant font-medium uppercase tracking-[0.15em] text-3xl text-[#1A2624]">{SITE_NAME}</h1>
           <p className="text-sm text-gray-500 mt-1">Create your account</p>
         </div>
 
@@ -88,7 +88,7 @@ export default function RegisterPage() {
                 onClick={() => setRole("tenant")}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors ${
                   role === "tenant"
-                    ? "border-blue-600 bg-blue-50 text-blue-600"
+                    ? "border-[#1E6B69] bg-[#E8F6F5] text-[#1E6B69]"
                     : "border-gray-200 text-gray-500 hover:border-gray-300"
                 }`}
               >
@@ -101,7 +101,7 @@ export default function RegisterPage() {
                 onClick={() => setRole("landlord")}
                 className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-colors ${
                   role === "landlord"
-                    ? "border-blue-600 bg-blue-50 text-blue-600"
+                    ? "border-[#1E6B69] bg-[#E8F6F5] text-[#1E6B69]"
                     : "border-gray-200 text-gray-500 hover:border-gray-300"
                 }`}
               >
@@ -170,7 +170,7 @@ export default function RegisterPage() {
             <Button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold h-11 mt-2"
+              className="w-full bg-[#1E6B69] hover:bg-[#18605E] text-white font-semibold h-11 mt-2"
             >
               {loading ? (
                 <span className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-500">
               Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 hover:underline font-medium">
+              <Link href="/login" className="text-[#1E6B69] hover:underline font-medium">
                 Sign In
               </Link>
             </p>

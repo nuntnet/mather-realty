@@ -81,6 +81,18 @@ function localeToSuffix(locale: string): string {
   return locale.replace(/-/g, '_')
 }
 
+/**
+ * Algolia caps records at 10KB. Full property descriptions × 15 locales blow
+ * past that, so index only a search-friendly excerpt. The full description
+ * still renders on the property page (from Notion); search ranks on
+ * title/city/district/amenities + this snippet.
+ */
+const DESC_SNIPPET_CHARS = 150
+function descSnippet(text: string): string {
+  if (text.length <= DESC_SNIPPET_CHARS) return text
+  return text.slice(0, DESC_SNIPPET_CHARS).trimEnd() + '…'
+}
+
 /** Build the flat Algolia record from a Property object. */
 export function buildAlgoliaRecord(property: Property): AlgoliaPropertyRecord {
   const record: Record<string, unknown> = {
@@ -110,7 +122,7 @@ export function buildAlgoliaRecord(property: Property): AlgoliaPropertyRecord {
   for (const locale of LOCALES) {
     const suffix = localeToSuffix(locale)
     record[`title_${suffix}`] = property.title[locale] ?? property.title['en'] ?? ''
-    record[`description_${suffix}`] = property.description[locale] ?? property.description['en'] ?? ''
+    record[`description_${suffix}`] = descSnippet(property.description[locale] ?? property.description['en'] ?? '')
   }
 
   return record as AlgoliaPropertyRecord
