@@ -30,6 +30,8 @@ const config: Config = {
         sans: ["var(--font-ibm-plex-thai)", "var(--font-jakarta)", "var(--font-inter)", "system-ui", "sans-serif"],
         // Display / headings — editorial serif (Lora, see DESIGN.md)
         serif: ["var(--font-lora)", "Georgia", "serif"],
+        // Logo wordmark only — high-contrast elegant serif
+        cormorant: ["var(--font-cormorant)", "Georgia", "serif"],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
         lexend: ["var(--font-lexend)", "system-ui", "sans-serif"],
         jakarta: ["var(--font-jakarta)", "system-ui", "sans-serif"],

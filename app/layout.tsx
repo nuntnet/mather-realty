@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
-import { IBM_Plex_Sans_Thai, Inter, Lexend, Lora, Plus_Jakarta_Sans } from "next/font/google";
+import { IBM_Plex_Sans_Thai, Inter, Lexend, Lora, Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
@@ -31,6 +31,14 @@ const lora = Lora({
   subsets: ["latin"],
   weight: ["400", "500", "600"],
   style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Logo wordmark — high-contrast elegant serif (uppercase "MATHER")
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
   display: "swap",
 });
 
@@ -70,7 +78,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
-      <body className={`${inter.variable} ${ibmPlexSansThai.variable} ${lexend.variable} ${lora.variable} ${jakarta.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${ibmPlexSansThai.variable} ${lexend.variable} ${lora.variable} ${cormorant.variable} ${jakarta.variable} font-sans antialiased`}>
         {children}
         <Toaster richColors position="top-right" />
       </body>
