@@ -1,4 +1,4 @@
-# Design System — DoubleN Realty
+# Design System — Mather
 
 > Source of truth for all visual, motion, and interaction decisions.
 > Read this before touching any UI. Do not deviate without explicit user approval.

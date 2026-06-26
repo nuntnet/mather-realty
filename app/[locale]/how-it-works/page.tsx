@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: HowItWorksPageProps): Promise
   return {
     title: `How It Works | ${SITE_NAME}`,
     description:
-      'Learn how DoubleN Realty works for expat tenants and landlords in Thailand. Find, inquire, and move into your rental home in 3 simple steps.',
+      'Learn how Mather works for expat tenants and landlords in Thailand. Find, inquire, and move into your rental home in 3 simple steps.',
     alternates: { canonical: `${SITE_URL}/${locale}/how-it-works` },
   }
 }
@@ -88,7 +88,7 @@ const LANDLORD_STEPS = [
 
 const FAQ_ITEMS = [
   {
-    question: 'Is DoubleN Realty free to use for tenants?',
+    question: 'Is Mather free to use for tenants?',
     answer: 'Yes, completely free. Tenants can browse, save listings, and contact landlords at no cost.',
   },
   {
@@ -130,7 +130,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
             Simple. Transparent. No Fees.
           </span>
           <h1 className="text-5xl md:text-6xl font-serif font-medium text-white mb-6 leading-[1.08]">
-            How DoubleN Realty Works
+            How Mather Works
           </h1>
           <p className="text-[#A7D8D6] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Finding a rental home in Thailand as an expat has never been easier.

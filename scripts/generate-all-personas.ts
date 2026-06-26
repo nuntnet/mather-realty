@@ -104,7 +104,7 @@ async function generateForProperty(page: {id: string; properties: Record<string,
     contactPhone: contactPhone ? `+66${contactPhone.replace(/^0/, '')}` : '',
   }
 
-  const systemPrompt = `You are an expert real estate copywriter for DoubleN Realty, a premium rental platform for expats in Thailand (Bangna area focus). Write compelling, SEO-rich content in natural English that includes location keywords and lifestyle context. Return only valid JSON — no markdown, no backticks.`
+  const systemPrompt = `You are an expert real estate copywriter for Mather, a premium rental platform for expats in Thailand (Bangna area focus). Write compelling, SEO-rich content in natural English that includes location keywords and lifestyle context. Return only valid JSON — no markdown, no backticks.`
 
   const userPrompt = `Property: ${JSON.stringify(ctx, null, 2)}
 
@@ -167,7 +167,7 @@ Only output valid JSON.`
 // ── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log('🤖 DoubleN Realty — AI Persona Generator')
+  console.log('🤖 Mather — AI Persona Generator')
   console.log(`   Hermes: ${HERMES_URL} (model: ${HERMES_MODEL})`)
   console.log(`   Notion DB: ${DB_ID}\n`)
 

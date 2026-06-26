@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   }
 
   return {
-    title: 'Find Rental Properties in Thailand | DoubleN Realty',
+    title: 'Find Rental Properties in Thailand',
     description:
       'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
     keywords: ['rental properties Thailand', 'expat housing Thailand', 'Bangkok rent'],
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
       languages: alternates,
     },
     openGraph: {
-      title: 'Find Rental Properties in Thailand | DoubleN Realty',
+      title: 'Find Rental Properties in Thailand | Mather',
       description:
         'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
       url: `${SITE_URL}/${locale}`,
@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
           url: HERO_IMAGE,
           width: 1920,
           height: 1080,
-          alt: 'Rental Properties in Thailand — DoubleN Realty',
+          alt: 'Rental Properties in Thailand — Mather',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Find Rental Properties in Thailand | DoubleN Realty',
+      title: 'Find Rental Properties in Thailand | Mather',
       description:
         'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
       images: [HERO_IMAGE],
@@ -90,7 +90,7 @@ export default async function HomePage({ params }: HomePageProps) {
     '@graph': [
       {
         '@type': 'WebSite',
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         potentialAction: {
           '@type': 'SearchAction',
@@ -104,21 +104,21 @@ export default async function HomePage({ params }: HomePageProps) {
       {
         '@type': 'Organization',
         '@id': `${SITE_URL}/#organization`,
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` },
         description: 'Premium rental platform for expats and foreigners in Thailand',
-        email: 'hello@doublen-realty.com',
+        email: 'hello@mather.to',
         areaServed: { '@type': 'Country', name: 'Thailand' },
         sameAs: [],
       },
       {
         '@type': ['LocalBusiness', 'RealEstateAgent'],
         '@id': `${SITE_URL}/#localbusiness`,
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         description: 'Rental property platform for expats in Thailand. Verified listings in Bangkok, Chiang Mai, Phuket and beyond.',
-        email: 'hello@doublen-realty.com',
+        email: 'hello@mather.to',
         areaServed: [
           { '@type': 'City', name: 'Bangkok' },
           { '@type': 'City', name: 'Chiang Mai' },
@@ -277,7 +277,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-2">How It Works</h2>
           <p className="text-[#6B8280] mb-14">
-            Finding your next home in Thailand is easy with DoubleN Realty
+            Finding your next home in Thailand is easy with Mather
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             {steps.map((step, i) => (

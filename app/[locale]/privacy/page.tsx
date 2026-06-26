@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | DoubleN Realty',
+  title: 'Privacy Policy',
   description:
-    'Learn how DoubleN Realty collects, uses, and protects your personal information in accordance with Thai PDPA law.',
+    'Learn how Mather collects, uses, and protects your personal information in accordance with Thai PDPA law.',
 }
 
 export default async function PrivacyPage({
@@ -24,10 +24,10 @@ export default async function PrivacyPage({
       <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed">
 
         <p>
-          DoubleN Realty (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is committed to
+          Mather (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is committed to
           protecting your privacy. This Privacy Policy describes how we collect, use, share, and
           protect personal information when you use our platform at{' '}
-          <strong>doublen-realty.com</strong> — a rental property marketplace connecting expats and
+          <strong>mather.to</strong> — a rental property marketplace connecting expats and
           foreigners in Thailand with local landlords.
         </p>
         <p>
@@ -39,10 +39,10 @@ export default async function PrivacyPage({
         {/* 1 */}
         <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">1. Data Controller</h2>
         <p>
-          DoubleN Realty is the data controller responsible for your personal data. You can contact
+          Mather is the data controller responsible for your personal data. You can contact
           us at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-            janjiranui@gmail.com
+          <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+            hello@mather.to
           </a>{' '}
           with any data-related requests or questions.
         </p>
@@ -268,8 +268,8 @@ export default async function PrivacyPage({
         </ul>
         <p className="mt-3">
           To exercise any of these rights, please contact us at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-            janjiranui@gmail.com
+          <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+            hello@mather.to
           </a>. We will respond within 30 days.
         </p>
 
@@ -323,13 +323,13 @@ export default async function PrivacyPage({
         </p>
         <div className="mt-3 bg-gray-50 rounded-lg p-4 text-sm space-y-1">
           <p>
-            <strong>DoubleN Realty</strong>
+            <strong>Mather</strong>
           </p>
           <p>Bangkok, Thailand</p>
           <p>
             Email:{' '}
-            <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-              janjiranui@gmail.com
+            <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+              hello@mather.to
             </a>
           </p>
         </div>

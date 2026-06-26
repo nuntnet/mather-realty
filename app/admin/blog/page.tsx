@@ -115,7 +115,7 @@ export default function AdminBlogPage() {
         <div>
           <h1 className="text-2xl font-bold text-[#131F3C]">Blog</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Manage realty blog posts for DoubleN tenants and investors
+            Manage realty blog posts for Mather tenants and investors
           </p>
         </div>
         <button

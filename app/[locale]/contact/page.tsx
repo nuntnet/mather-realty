@@ -39,8 +39,8 @@ const CONTACT_METHODS = [
   {
     icon: <Mail className="w-5 h-5" />,
     label: "Email",
-    value: "hello@doublen-realty.com",
-    href: "mailto:hello@doublen-realty.com",
+    value: "hello@mather.to",
+    href: "mailto:hello@mather.to",
     color: "bg-[#1E6B69]",
     description: "We reply within 1 business day",
   },

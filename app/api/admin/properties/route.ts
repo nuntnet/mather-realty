@@ -100,7 +100,7 @@ export async function PATCH(req: NextRequest) {
 
     // Fire n8n webhook when property becomes available (approved)
     if (data.status === "available" && process.env.N8N_WEBHOOK_URL) {
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://doublen-realty.com"
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://mather.to"
       fetch(process.env.N8N_WEBHOOK_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

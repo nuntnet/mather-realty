@@ -142,7 +142,7 @@ export default function AdminDashboard() {
         <div>
           <h1 className="text-2xl font-bold text-[#131F3C]">Dashboard</h1>
           <p className="text-sm text-gray-500 mt-1">
-            DoubleN Realty — property management overview
+            Mather — property management overview
           </p>
         </div>
         <button

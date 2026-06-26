@@ -1,6 +1,6 @@
 import { canonicalUrl, SITE_URL, SITE_NAME } from "@/lib/site";
 
-/** RealEstateAgent / LocalBusiness node for DoubleN Realty */
+/** RealEstateAgent / LocalBusiness node for Mather */
 export function localBusinessGraph() {
   return {
     "@context": "https://schema.org",
@@ -15,7 +15,7 @@ export function localBusinessGraph() {
           "@type": "PostalAddress",
           addressCountry: "TH",
         },
-        email: "hello@doublen-realty.com",
+        email: "hello@mather.to",
         url: canonicalUrl("/"),
       },
     ],

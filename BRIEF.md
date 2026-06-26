@@ -1,4 +1,4 @@
-# BRIEF.md — DoubleN Realty Platform
+# BRIEF.md — Mather Platform
 
 แพลตฟอร์มประกาศเช่าบ้านสำหรับชาวต่างชาติในประเทศไทย  
 CMS + Search + Rental Management + Multi-language SEO
@@ -361,7 +361,7 @@ POST   /api/ai/description          → Generate listing description (OpenAI)
 ```
 feature/* ──→ staging ──→ main (production)
                 ↓              ↓
-         staging.vercel   doublen-realty.com
+         staging.vercel   mather.to
 ```
 
 ---

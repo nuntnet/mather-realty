@@ -57,7 +57,7 @@ export default function NotFound() {
 
         {/* Subtle brand */}
         <p className="mt-12 text-xs text-gray-300 font-medium tracking-wide">
-          DoubleN Realty
+          Mather
         </p>
       </div>
     </div>

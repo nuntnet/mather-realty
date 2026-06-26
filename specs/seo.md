@@ -13,7 +13,7 @@
 ## Metadata per page type
 
 ### Property detail
-- `title`: `{property_title} | DoubleN Realty`
+- `title`: `{property_title} | Mather`
 - `description`: locale SEO description → locale description → EN fallback
 - `openGraph`: title, description, image (cover), url
 - `twitter`: `summary_large_image`, title, description, image
@@ -21,11 +21,11 @@
 - `canonical`: current locale URL
 
 ### Properties listing
-- `title`: `Properties in {City} | DoubleN Realty` (when city filter active)
+- `title`: `Properties in {City} | Mather` (when city filter active)
 - `description`: generated with count
 
 ### Homepage
-- `title`: `DoubleN Realty | Find Your Perfect Home in Thailand`
+- `title`: `Mather | Find Your Perfect Home in Thailand`
 - `description`: brand tagline
 
 ## sitemap.xml

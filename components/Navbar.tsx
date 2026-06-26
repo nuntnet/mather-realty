@@ -121,12 +121,11 @@ export default function Navbar({ locale }: NavbarProps) {
         <Link
           href="/"
           className="flex items-center shrink-0 hover:opacity-80 transition-opacity"
-          aria-label="DoubleN Realty — Home"
+          aria-label="Mather — Home"
         >
           <span className="font-serif font-semibold tracking-tight leading-none text-[1.5rem]">
-            <span className="text-[#1A2624]">Double</span>
-            <span className="text-[#C9935A]">N</span>
-            <span className="hidden sm:inline text-[#1A2624]"> Realty</span>
+            <span className="text-[#C9935A]">M</span>
+            <span className="text-[#1A2624]">ather</span>
           </span>
         </Link>
 

@@ -1,5 +1,5 @@
 /**
- * Currency utilities for DoubleN Realty
+ * Currency utilities for Mather
  * THB → USD conversion for foreign visitors
  */
 

@@ -28,7 +28,7 @@ async function callAI(prompt: string): Promise<string> {
   const openaiKey    = process.env.OPENAI_API_KEY
   const geminiKey    = process.env.GOOGLE_AI_API_KEY   // Gemini API key
 
-  const system = 'You are a professional real estate copywriter for DoubleN Realty, a premium rental platform for expats in Thailand. Return ONLY valid JSON — no markdown, no code blocks, no explanation.'
+  const system = 'You are a professional real estate copywriter for Mather, a premium rental platform for expats in Thailand. Return ONLY valid JSON — no markdown, no code blocks, no explanation.'
 
   // 1. Hermes local adapter (dev)
   if (hermesUrl) {

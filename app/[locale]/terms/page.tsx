@@ -3,9 +3,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | DoubleN Realty',
+  title: 'Terms of Service',
   description:
-    'Read the Terms of Service for DoubleN Realty — the rental property platform for expats and foreigners in Thailand.',
+    'Read the Terms of Service for Mather — the rental property platform for expats and foreigners in Thailand.',
 }
 
 export default async function TermsPage({
@@ -25,25 +25,25 @@ export default async function TermsPage({
 
         <p>
           Please read these Terms of Service (&quot;Terms&quot;) carefully before using{' '}
-          <strong>doublen-realty.com</strong> (the &quot;Platform&quot;) operated by{' '}
-          <strong>DoubleN Realty</strong> (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By
+          <strong>mather.to</strong> (the &quot;Platform&quot;) operated by{' '}
+          <strong>Mather</strong> (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;). By
           accessing or using our Platform, you agree to be bound by these Terms. If you do not
           agree, please do not use the Platform.
         </p>
 
         {/* 1 */}
         <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">
-          1. About DoubleN Realty
+          1. About Mather
         </h2>
         <p>
-          DoubleN Realty is an online rental property discovery marketplace designed specifically
+          Mather is an online rental property discovery marketplace designed specifically
           for expats, foreigners, and international residents seeking rental accommodation in
           Thailand. We aggregate property listings from third-party landlords and facilitate
           connections between prospective tenants and landlords.
         </p>
         <p className="mt-3">
           <strong>
-            DoubleN Realty is a marketplace platform only. We are not a landlord, property owner,
+            Mather is a marketplace platform only. We are not a landlord, property owner,
             real estate agent, or party to any rental agreement.
           </strong>{' '}
           All rental agreements are made directly between tenants and landlords.
@@ -86,12 +86,12 @@ export default async function TermsPage({
           4. No Fees for Tenants
         </h2>
         <p>
-          DoubleN Realty does <strong>not</strong> charge tenants any commission, referral fee, or
+          Mather does <strong>not</strong> charge tenants any commission, referral fee, or
           service fee for using our Platform or submitting inquiries. If anyone claims to be
-          representing DoubleN Realty and requests payment from you as a tenant, please report
+          representing Mather and requests payment from you as a tenant, please report
           this to us immediately at{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-            janjiranui@gmail.com
+          <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+            hello@mather.to
           </a>.
         </p>
 
@@ -143,7 +143,7 @@ export default async function TermsPage({
           7. Intellectual Property
         </h2>
         <p>
-          All content on the Platform produced by DoubleN Realty — including text, graphics,
+          All content on the Platform produced by Mather — including text, graphics,
           logos, and software — is our intellectual property and is protected under applicable Thai
           and international copyright law. You may not reproduce, distribute, or create derivative
           works without our prior written consent.
@@ -151,7 +151,7 @@ export default async function TermsPage({
         <p className="mt-3">
           Property photos, descriptions, and details provided by landlords remain the intellectual
           property of the respective landlord. By submitting content to us, landlords grant
-          DoubleN Realty a non-exclusive, royalty-free licence to display and promote that content
+          Mather a non-exclusive, royalty-free licence to display and promote that content
           on the Platform.
         </p>
 
@@ -175,7 +175,7 @@ export default async function TermsPage({
           9. Limitation of Liability
         </h2>
         <p>
-          To the fullest extent permitted by Thai law, DoubleN Realty and its team shall not be
+          To the fullest extent permitted by Thai law, Mather and its team shall not be
           liable for any indirect, incidental, special, consequential, or punitive damages arising
           from:
         </p>
@@ -243,13 +243,13 @@ export default async function TermsPage({
         </p>
         <div className="mt-3 bg-gray-50 rounded-lg p-4 text-sm space-y-1">
           <p>
-            <strong>DoubleN Realty</strong>
+            <strong>Mather</strong>
           </p>
           <p>Bangkok, Thailand</p>
           <p>
             Email:{' '}
-            <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-              janjiranui@gmail.com
+            <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+              hello@mather.to
             </a>
           </p>
         </div>

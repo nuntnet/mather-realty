@@ -17,7 +17,7 @@ import { getProperties } from '../lib/notion'
 import { bulkSyncPropertiesToAlgolia, PROPERTIES_INDEX } from '../lib/algolia'
 
 async function main() {
-  console.log('─── DoubleN Realty — Algolia full re-index ───')
+  console.log('─── Mather — Algolia full re-index ───')
 
   // Validate required env vars
   const required = [

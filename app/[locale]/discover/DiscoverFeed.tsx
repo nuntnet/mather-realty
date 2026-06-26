@@ -294,7 +294,7 @@ export default function DiscoverFeed({ properties, locale }: DiscoverFeedProps) 
             className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
             <ArrowLeft className="w-4 h-4 text-white" />
           </button>
-          <span className="text-white font-bold text-base">Double<span className="text-[#4DB5B2]">N</span> Realty</span>
+          <span className="font-serif font-semibold text-base"><span className="text-[#C9935A]">M</span><span className="text-white">ather</span></span>
         </div>
         <div className="flex-1 overflow-y-auto p-3 space-y-2">
           <p className="text-xs text-white/40 uppercase tracking-wider px-2 pb-1">Properties</p>

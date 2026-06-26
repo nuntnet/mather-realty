@@ -17,7 +17,7 @@ function buildCalendarHtml(
   blockedRanges: { start: string; end: string }[]
 ): string {
   const blockedJson = JSON.stringify(blockedRanges);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://doublen-realty.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mather.to";
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -117,7 +117,7 @@ function buildCalendarHtml(
     <div class="legend-item"><div class="legend-dot" style="background:#f3f4f6;"></div> Past</div>
   </div>
   <div class="footer">
-    Powered by <a href="${siteUrl}" target="_blank" rel="noopener">DoubleN Realty</a>
+    Powered by <a href="${siteUrl}" target="_blank" rel="noopener">Mather</a>
   </div>
   <script>
     const blockedRanges = ${blockedJson};

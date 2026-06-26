@@ -40,7 +40,7 @@ export default function Logo({
             variant === "light" ? "text-white" : "text-gray-900"
           )}
         >
-          DoubleN Realty
+          Mather
         </span>
       )}
     </span>

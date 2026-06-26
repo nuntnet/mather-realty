@@ -20,7 +20,7 @@ export {
   type HowToStep,
 } from "./how-to";
 
-// ── DoubleN Realty property-specific exports ──────────────────────────────────
+// ── Mather property-specific exports ──────────────────────────────────
 export {
   generatePropertyJsonLd,
   generateBreadcrumbJsonLd,

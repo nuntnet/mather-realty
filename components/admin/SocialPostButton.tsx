@@ -17,7 +17,7 @@ interface SocialPostButtonProps {
   gallery?: string[]   // all property photos
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://doublen-realty.com'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://mather.to'
 const THB_TO_USD = 34
 
 function buildCaption(data: SocialPostButtonProps, custom?: string): string {
@@ -29,12 +29,12 @@ function buildCaption(data: SocialPostButtonProps, custom?: string): string {
 
 💰 ฿${data.priceTHB.toLocaleString()}/month (~$${usd.toLocaleString()} USD)
 
-✅ Verified listing on DoubleN Realty — Thailand's expat rental platform.
+✅ Verified listing on Mather — Thailand's expat rental platform.
 🔗 ${url}${msg}
 
 📞 Contact us to arrange a viewing!
 
-#BangkokRental #ThailandExpat #ExpatLiving #ExpatThailand #DoubleNRealty${data.propertyCity ? ` #${data.propertyCity.replace(/\s/g, '')}` : ''}`
+#BangkokRental #ThailandExpat #ExpatLiving #ExpatThailand #Mather${data.propertyCity ? ` #${data.propertyCity.replace(/\s/g, '')}` : ''}`
 }
 
 export default function SocialPostButton(props: SocialPostButtonProps) {

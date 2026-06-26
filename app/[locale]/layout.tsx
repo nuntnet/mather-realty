@@ -19,7 +19,7 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: 'DoubleN Realty',
+  title: 'Mather',
 }
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {

@@ -177,7 +177,7 @@ export default async function BlogPage({ params, searchParams }: BlogPageProps) 
                 Subscribe to get notified when new articles drop.
               </p>
               <a
-                href="mailto:hello@doublen-realty.com?subject=Blog%20Updates"
+                href="mailto:hello@mather.to?subject=Blog%20Updates"
                 className="inline-flex items-center gap-2 bg-[#1E6B69] text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-[#18605E] transition-colors"
               >
                 <Bell className="w-4 h-4" />

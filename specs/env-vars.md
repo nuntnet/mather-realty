@@ -1,4 +1,4 @@
-# Environment Variables — DoubleN Realty
+# Environment Variables — Mather
 
 Copy `.env.local.example` → `.env.local` and fill in real values.
 
@@ -18,7 +18,7 @@ Copy `.env.local.example` → `.env.local` and fill in real values.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `BETTER_AUTH_SECRET` | yes | Random secret for signing sessions (`openssl rand -base64 32`) |
-| `BETTER_AUTH_URL` | yes (prod) | Site URL, e.g. `https://doublen-realty.com` (dev: `http://localhost:3002`) |
+| `BETTER_AUTH_URL` | yes (prod) | Site URL, e.g. `https://mather.to` (dev: `http://localhost:3002`) |
 | `TURSO_DATABASE_URL` | yes | `libsql://[db-name].aws-[region].turso.io` |
 | `TURSO_AUTH_TOKEN` | yes | Auth token from Turso dashboard |
 
@@ -89,7 +89,7 @@ Google Gemini is the primary provider (via its OpenAI-compatible endpoint
 | `REVALIDATE_SECRET` | yes | Secret token for triggering ISR revalidation |
 
 ```bash
-curl -X POST "https://doublen-realty.com/api/revalidate?secret=YOUR_SECRET"
+curl -X POST "https://mather.to/api/revalidate?secret=YOUR_SECRET"
 ```
 
 ## Site URL

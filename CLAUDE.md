@@ -1,13 +1,13 @@
-# CLAUDE.md — DoubleN Realty
+# CLAUDE.md — Mather
 
-**DoubleN Realty** — rental property platform for foreigners in Thailand.
+**Mather** — rental property platform for foreigners in Thailand.
 Multilingual (15 locales), Notion-backed CMS, Algolia search, Turso SQLite, Better Auth.
 
 ## Design System
 
 Always read `DESIGN.md` before making any visual or UI decision. Font choices, colors,
 spacing, icons, motion, and aesthetic direction are defined there. Key rules:
-- Display headings use **Instrument Serif** (`font-serif`); body/UI use **Plus Jakarta Sans** (`font-sans`).
+- Display headings use **Lora** (`font-serif`); body/UI use **Plus Jakarta Sans** (`font-sans`).
 - Palette: teal `#1E6B69` (brand), amber `#C9935A` (accent), cream `#F7F4EF` (background), ink `#1A2624` (text).
 - Icons: **Lucide at stroke-width 1.5**. Never use emoji as functional icons.
 - Motion: calm ease-out, tokens in `globals.css`; honor `prefers-reduced-motion`.
@@ -24,7 +24,7 @@ Do not deviate without explicit user approval.
 ```
 feature/* ──→ staging ──→ master (production)
                 ↓              ↓
-         staging.vercel.app   doublen-realty.com
+         staging.vercel.app   mather.to
          Staging Notion DBs   Production Notion DBs
          Staging Turso DB     Production Turso DB
 ```
@@ -139,7 +139,7 @@ bun run infra:setup -- --env staging     # provision new environment
 
 Trigger revalidation after Notion edits:
 ```bash
-curl -X POST "https://doublen-realty.com/api/revalidate?secret=YOUR_SECRET"
+curl -X POST "https://mather.to/api/revalidate?secret=YOUR_SECRET"
 ```
 
 ## DB Schema (Turso / Drizzle)

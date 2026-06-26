@@ -66,7 +66,7 @@ export default function AboutPage() {
             Founded by expats, for expats
           </div>
           <h1 className="text-5xl md:text-6xl font-serif font-medium text-white mb-5 leading-[1.05]">
-            About <span className="text-[#C9935A]">DoubleN</span> Realty
+            About <span className="text-[#C9935A]">Mather</span>
           </h1>
           <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
             Thailand&apos;s rental platform for expats and foreigners.
@@ -94,7 +94,7 @@ export default function AboutPage() {
           <div>
             <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-4">What We Do</h2>
             <p className="text-lg text-[#3a4543] leading-relaxed mb-4">
-              DoubleN Realty is a rental property platform built for foreigners living in Thailand.
+              Mather is a rental property platform built for foreigners living in Thailand.
               We list verified homes, condos, and apartments across Bangkok, Chiang Mai, Phuket,
               and beyond — with full listings in 15 languages so you can find your next home
               without the language barrier.
@@ -142,7 +142,7 @@ export default function AboutPage() {
               process frustrating.
             </p>
             <p>
-              <strong className="text-[#1A2624] font-semibold">DoubleN Realty was built to fix that.</strong>
+              <strong className="text-[#1A2624] font-semibold">Mather was built to fix that.</strong>
             </p>
             <p>
               We connect expats and international residents with trusted landlords across
@@ -226,11 +226,11 @@ export default function AboutPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="mailto:hello@doublen-realty.com"
+              href="mailto:hello@mather.to"
               className="inline-flex items-center gap-2 border border-white/30 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
             >
               <Mail className="w-4 h-4" />
-              hello@doublen-realty.com
+              hello@mather.to
             </a>
           </div>
         </div>
