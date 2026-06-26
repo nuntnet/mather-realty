@@ -10,9 +10,9 @@
     --primary-foreground: 0 0% 100%;
 
     /* ── Neutral backgrounds ── */
-    --background: 180 14% 99%;
-    --foreground: 181 15% 12%;          /* near-black with teal undertone */
-    --card: 180 14% 99%;
+    --background: 38 34% 95%;           /* #F7F4EF cream — magazine paper (see DESIGN.md) */
+    --foreground: 181 18% 12%;          /* #1A2624 ink */
+    --card: 0 0% 100%;                  /* white cards on cream */
     --card-foreground: 181 15% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 181 15% 12%;
@@ -63,6 +63,27 @@
     --orange-10: 16 87% 44%;            /* #D84C14 hover */
     --orange-11: 16 88% 36%;            /* #B43E10 text on light */
     --orange-12: 16 90% 22%;            /* #6E2508 darkest */
+
+    /* ── Amber — warm luxury accent (see DESIGN.md), replaces orange ── */
+    --amber-pale: 36 50% 95%;           /* #FBF6F0 */
+    --amber-9: 31 51% 57%;              /* #C9935A ← accent */
+    --amber-10: 30 47% 47%;             /* #B07840 hover */
+    --amber-11: 33 47% 37%;             /* #8A5E32 text on light */
+
+    /* ── Editorial neutrals ── */
+    --cream: 38 34% 95%;                /* #F7F4EF */
+    --ink: 181 18% 12%;                 /* #1A2624 */
+    --muted-ink: 175 10% 46%;           /* #6B8280 */
+    --faint: 176 12% 64%;               /* #9BAEAC */
+
+    /* ── Motion tokens (see DESIGN.md) ── */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);   /* entrances — strong then gentle */
+    --ease-move: cubic-bezier(0.65, 0, 0.35, 1); /* movement — in/out */
+    --t-micro: 120ms;
+    --t-short: 200ms;
+    --t-medium: 350ms;
+    --t-long: 500ms;
+    --t-reveal: 650ms;
 
     /* Legacy aliases for smooth migration */
     --olive-11: 181 5% 37%;
@@ -120,18 +141,28 @@
     line-height: 1.7;
   }
 
-  /* ── Heading colour system ──────────────────────────────────────────────── */
-  /* H1: teal — main brand authority. Override with text-white on dark BG.   */
-  h1:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
-    color: #1E6B69;
+  /* ── Heading system (see DESIGN.md) ───────────────────────────────────────
+     Editorial/luxury: display headings are Instrument Serif in ink.
+     Teal/amber are opt-in accents via .heading-teal / .heading-amber, not auto. */
+  h1, h2, h3 {
+    font-family: var(--font-lora), Georgia, serif;
+    font-weight: 500;           /* Lora 500 reads with presence at display sizes */
+    letter-spacing: 0;
   }
-  /* H2: teal — section identity */
-  h2:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
-    color: #1E6B69;
+  h1:not([class*="text-"]),
+  h2:not([class*="text-"]),
+  h3:not([class*="text-"]) {
+    color: hsl(var(--ink));
   }
-  /* H3: orange — subsection accent draws the eye */
-  h3:not([class*="text-white"]):not([class*="text-gray"]):not([class*="text-[#"]) {
-    color: #F4581A;
+  /* Thai headings keep the sans face — serif has no Thai glyphs */
+  :lang(th) h1, :lang(th) h2, :lang(th) h3 {
+    font-family: var(--font-ibm-plex-thai), var(--font-jakarta), system-ui, sans-serif;
+    letter-spacing: 0;
+  }
+
+  /* ── Lucide icons — stroke 1.5 for an editorial weight (see DESIGN.md) ── */
+  svg.lucide {
+    stroke-width: 1.5;
   }
 }
 
@@ -140,9 +171,10 @@
   .heading-display { @apply font-lexend font-bold tracking-tight; }
   .heading-hero { @apply font-lexend font-extrabold tracking-tight; }
 
-  /* Explicit teal heading (use when background is dark and auto-detect fails) */
+  /* Explicit accent headings (opt-in) */
   .heading-teal { color: #1E6B69; }
-  .heading-orange { color: #F4581A; }
+  .heading-amber { color: #C9935A; }
+  .heading-orange { color: #F4581A; } /* legacy */
 
   /* Teal-to-orange gradient text for hero H1 */
   .heading-gradient {
@@ -233,6 +265,35 @@
     from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
   }
+
+  /* ── Motion system (see DESIGN.md) ── */
+  /* Scroll reveal — add .reveal, then toggle .reveal-in when in viewport */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity var(--t-reveal) var(--ease-out),
+                transform var(--t-reveal) var(--ease-out);
+  }
+  .reveal-in { opacity: 1; transform: none; }
+
+  /* Save / favourite pop */
+  .animate-pop { animation: pop var(--t-medium) var(--ease-out); }
+  @keyframes pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal { opacity: 1; transform: none; }
 }
 
 /* Smooth scroll */

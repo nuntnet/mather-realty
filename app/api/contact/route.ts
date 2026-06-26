@@ -12,8 +12,8 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? "placeholder");
 }
 
-const FROM = "DoubleN Realty <noreply@doublen-realty.com>";
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://doublen-realty.com";
+const FROM = "Mather <noreply@mather.to>";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://mather.to";
 
 function emailHtml(name: string, email: string, message: string): string {
   return `<!DOCTYPE html>
@@ -29,7 +29,7 @@ function emailHtml(name: string, email: string, message: string): string {
         <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
           <tr>
             <td style="background:#1a3c5e;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">DoubleN Realty</h1>
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;">Mather</h1>
               <p style="margin:6px 0 0;color:#a8c4e0;font-size:13px;">New Contact Form Submission</p>
             </td>
           </tr>
@@ -65,8 +65,8 @@ function emailHtml(name: string, email: string, message: string): string {
           <tr>
             <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
               <p style="margin:0;color:#9ca3af;font-size:12px;">
-                &copy; ${new Date().getFullYear()} DoubleN Realty &bull;
-                <a href="${SITE_URL}" style="color:#1a3c5e;text-decoration:none;">doublen-realty.com</a>
+                &copy; ${new Date().getFullYear()} Mather &bull;
+                <a href="${SITE_URL}" style="color:#1a3c5e;text-decoration:none;">mather.to</a>
               </p>
             </td>
           </tr>
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     console.log("[contact] New message", { name, email, ts: new Date().toISOString() });
 
     // Send notification email to admin
-    const adminEmail = process.env.ADMIN_EMAIL || "admin@doublen-realty.com";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@mather.to";
     const resend = getResend();
 
     try {

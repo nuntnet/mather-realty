@@ -26,9 +26,13 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-ibm-plex-thai)", "var(--font-inter)", "system-ui", "sans-serif"],
+        // Body / UI — Thai falls back to IBM Plex Sans Thai, Latin to Plus Jakarta Sans
+        sans: ["var(--font-ibm-plex-thai)", "var(--font-jakarta)", "var(--font-inter)", "system-ui", "sans-serif"],
+        // Display / headings — editorial serif (Lora, see DESIGN.md)
+        serif: ["var(--font-lora)", "Georgia", "serif"],
         inter: ["var(--font-inter)", "system-ui", "sans-serif"],
         lexend: ["var(--font-lexend)", "system-ui", "sans-serif"],
+        jakarta: ["var(--font-jakarta)", "system-ui", "sans-serif"],
       },
       colors: {
         background: "hsl(var(--background))",
@@ -85,7 +89,17 @@ const config: Config = {
             9: '#898e87', 10: '#7e837c', 11: '#5e6360', 12: '#1d211c',
             DEFAULT: '#898e87',
           },
+          // Amber — warm luxury accent (see DESIGN.md). Replaces orange as the accent.
+          amber: {
+            1: '#FBF6F0', 2: '#F6E8D8', 3: '#EFD4B6', 4: '#E5BC8E',
+            5: '#D9A571', 6: '#C9935A', 7: '#B07840', 8: '#946232',
+            9: '#C9935A', 10: '#B07840', 11: '#8A5E32', 12: '#3D2A15',
+            DEFAULT: '#C9935A',
+          },
         },
+        // Editorial neutrals (see DESIGN.md)
+        cream: '#F7F4EF',
+        ink: '#1A2624',
       },
       borderRadius: {
         lg: 'var(--radius)',                      // 1rem = 16px

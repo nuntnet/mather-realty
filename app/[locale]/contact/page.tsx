@@ -39,9 +39,9 @@ const CONTACT_METHODS = [
   {
     icon: <Mail className="w-5 h-5" />,
     label: "Email",
-    value: "hello@doublen-realty.com",
-    href: "mailto:hello@doublen-realty.com",
-    color: "bg-blue-600",
+    value: "hello@mather.to",
+    href: "mailto:hello@mather.to",
+    color: "bg-[#1E6B69]",
     description: "We reply within 1 business day",
   },
   {
@@ -90,10 +90,10 @@ export default function ContactPage() {
     <div className="min-h-screen bg-slate-50">
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-16 px-4">
+      <div className="-mt-16 pt-16 bg-gradient-to-br from-[#0F1C1B] via-[#16302E] to-[#0F1C1B] text-white py-20 px-4">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl font-black tracking-tight mb-3">Get in Touch</h1>
-          <p className="text-slate-300 text-lg">
+          <h1 className="text-5xl font-serif font-medium text-white mb-3 leading-[1.08]">Get in Touch</h1>
+          <p className="text-white/70 text-lg">
             We&apos;d love to hear from you. Reach us via LINE, WhatsApp, email, or the form below.
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                   }}
                 />
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="w-8 h-8 rounded-full bg-blue-600 border-4 border-white shadow-lg mb-2" />
+                  <div className="w-8 h-8 rounded-full bg-[#1E6B69] border-4 border-white shadow-lg mb-2" />
                   <span className="text-xs font-semibold text-gray-700 bg-white/80 px-3 py-1 rounded-full shadow">
                     Bangkok, Thailand
                   </span>
@@ -154,7 +154,7 @@ export default function ContactPage() {
                   href="https://goo.gl/maps/bangkok"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline font-medium"
+                  className="text-xs text-[#1E6B69] hover:underline font-medium"
                 >
                   Open in Maps
                 </a>
@@ -167,7 +167,7 @@ export default function ContactPage() {
             {submitted ? (
               <div className="bg-green-50 border border-green-200 rounded-2xl p-12 text-center h-full flex flex-col items-center justify-center">
                 <CheckCircle className="w-14 h-14 text-green-500 mx-auto mb-4" />
-                <h3 className="text-2xl font-black text-green-800 mb-2">Message sent!</h3>
+                <h3 className="text-2xl font-serif font-medium text-green-800 mb-2">Message sent!</h3>
                 <p className="text-green-600 mb-6">We&apos;ll get back to you within 1 business day.</p>
                 <Button
                   onClick={() => {
@@ -182,11 +182,11 @@ export default function ContactPage() {
             ) : (
               <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
                 <div className="flex items-center gap-3 mb-7 pb-6 border-b border-gray-100">
-                  <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-xl bg-[#1E6B69] flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="font-black text-gray-900">Send us a message</h2>
+                    <h2 className="text-xl font-serif font-medium text-gray-900">Send us a message</h2>
                     <p className="text-sm text-gray-400">We reply within 1 business day</p>
                   </div>
                 </div>
@@ -245,7 +245,7 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl"
+                    className="w-full bg-[#1E6B69] hover:bg-[#18605E] text-white font-bold h-12 rounded-xl"
                   >
                     {loading ? (
                       <span className="flex items-center gap-2">

@@ -68,11 +68,10 @@ export default async function Footer() {
 
           {/* Col 1: Brand */}
           <div className="lg:col-span-1 space-y-5">
-            <Link href="/" aria-label="DoubleN Realty" className="inline-block hover:opacity-80 transition-opacity">
-              <span className="font-extrabold tracking-tight text-2xl leading-none">
-                <span className="text-white">Double</span>
-                <span className="text-[#F4581A]">N</span>
-                <span className="text-white"> Realty</span>
+            <Link href="/" aria-label="Mather" className="inline-block hover:opacity-80 transition-opacity">
+              <span className="font-serif font-semibold tracking-tight text-2xl leading-none">
+                <span className="text-[#C9935A]">M</span>
+                <span className="text-white">ather</span>
               </span>
             </Link>
             <p className="text-sm text-white/45 leading-relaxed">
@@ -165,12 +164,12 @@ export default async function Footer() {
       <div className="border-t border-white/8">
         <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-white/30">
-            © {year} DoubleN Realty · {t("rights")}
+            © {year} Mather · {t("rights")}
           </p>
           <div className="flex items-center gap-5">
             <Link href="/privacy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("privacy")}</Link>
             <Link href="/terms" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("terms")}</Link>
-            <a href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("cookies")}</a>
+            <Link href="/cookie-policy" className="text-xs text-white/30 hover:text-white/60 transition-colors">{t("cookies")}</Link>
           </div>
         </div>
       </div>

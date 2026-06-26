@@ -70,7 +70,7 @@ export default function DashboardListingsPage() {
               </span>
               My Listings
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5 ml-12">Manage your rental properties on DoubleN Realty</p>
+            <p className="text-sm text-gray-500 mt-0.5 ml-12">Manage your rental properties on Mather</p>
           </div>
           <Link href="/submit"
             className="flex items-center gap-2 bg-[#1E6B69] text-white text-sm font-semibold px-4 py-2.5 rounded-xl hover:bg-[#18605E] transition-colors shadow-sm">

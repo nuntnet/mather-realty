@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans_Thai, Inter, Lexend } from "next/font/google";
+import { getLocale } from "next-intl/server";
+import { IBM_Plex_Sans_Thai, Inter, Lexend, Lora, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
@@ -24,6 +25,23 @@ const lexend = Lexend({
   display: "swap",
 });
 
+// Display serif — editorial/luxury headings (see DESIGN.md)
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+// Body / UI sans (Latin locales)
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -39,18 +57,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const dir = locale === "ar" ? "rtl" : "ltr";
   return (
-    <html suppressHydrationWarning data-scroll-behavior="smooth" lang="en">
+    <html suppressHydrationWarning data-scroll-behavior="smooth" lang={locale} dir={dir}>
       <head>
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="dns-prefetch" href="https://res.cloudinary.com" />
       </head>
-      <body className={`${inter.variable} ${ibmPlexSansThai.variable} ${lexend.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${ibmPlexSansThai.variable} ${lexend.variable} ${lora.variable} ${jakarta.variable} font-sans antialiased`}>
         {children}
         <Toaster richColors position="top-right" />
       </body>

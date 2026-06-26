@@ -1,13 +1,13 @@
 /**
- * DoubleN Realty — Company constants
+ * Mather — Company constants
  *
  * Founded: 2024
  * Premium rental properties in Thailand for expats and foreigners
  */
 
-export const COMPANY_NAME = 'DoubleN Realty';
-export const COMPANY_EMAIL = 'hello@doublen-realty.com';
-export const COMPANY_WEBSITE = 'https://doublen-realty.com';
+export const COMPANY_NAME = 'Mather';
+export const COMPANY_EMAIL = 'hello@mather.to';
+export const COMPANY_WEBSITE = 'https://mather.to';
 
 export const FOUNDED_YEAR = 2024;
 

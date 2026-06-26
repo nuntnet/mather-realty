@@ -256,7 +256,7 @@ export default function InquiryForm({
                       {ct === 'line' && <MessageCircle className="size-3.5 text-[#06C755]" />}
                       {ct === 'whatsapp' && <MessageCircle className="size-3.5 text-[#25D366]" />}
                       {ct === 'wechat' && <MessageCircle className="size-3.5 text-[#07C160]" />}
-                      {ct === 'email' && <Send className="size-3.5 text-blue-500" />}
+                      {ct === 'email' && <Send className="size-3.5 text-[#2A8A88]" />}
                       {ct === 'phone' && <Phone className="size-3.5 text-gray-500" />}
                       {ct.charAt(0).toUpperCase() + ct.slice(1)}
                     </span>

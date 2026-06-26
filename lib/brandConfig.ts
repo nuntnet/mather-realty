@@ -1,7 +1,7 @@
 /**
  * brandConfig.ts — Legacy car dealership config.
  * Kept as a stub so old admin/component pages compile.
- * Not used in the DoubleN Realty public-facing app.
+ * Not used in the Mather public-facing app.
  */
 
 export interface BrandConfig {
@@ -15,7 +15,7 @@ export interface BrandConfig {
 
 export const BRANDS: BrandConfig[] = []
 
-/** Legacy redirect helper — no-op in DoubleN Realty */
+/** Legacy redirect helper — no-op in Mather */
 export function legacyBrandQueryToPath(_brand: string): string | null {
   return null
 }

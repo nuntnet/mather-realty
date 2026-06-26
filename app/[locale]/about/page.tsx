@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { Link } from "@/i18n/navigation";
-import { SITE_NAME, pageMetadata } from "@/lib/site";
-import { Mail, MessageCircle, ArrowRight, Shield, Zap, Globe, Handshake } from "lucide-react";
+import { SITE_NAME, site, pageMetadata } from "@/lib/site";
+import {
+  Mail, MessageCircle, ArrowRight, Shield, Zap, Globe, Handshake,
+  MapPin, Languages, CheckCircle2, Users,
+} from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return pageMetadata({
     title: `About Us | ${SITE_NAME}`,
-    description:
-      "DoubleN Realty connects expats and foreigners with the best rental homes in Thailand. Transparent, fast, no commissions.",
+    description: site.description,
     path: "/about",
   });
 }
@@ -39,6 +41,13 @@ const VALUES = [
   },
 ];
 
+const STATS = [
+  { icon: <MapPin className="w-5 h-5" />, value: "10+", label: "Cities in Thailand" },
+  { icon: <Languages className="w-5 h-5" />, value: "15", label: "Languages supported" },
+  { icon: <CheckCircle2 className="w-5 h-5" />, value: "100%", label: "Verified listings" },
+  { icon: <Users className="w-5 h-5" />, value: "24 hrs", label: "Response time" },
+];
+
 const TEAM = [
   { initials: "NN", name: "Nunt N.", role: "Co-founder & CEO" },
   { initials: "AP", name: "Alex P.", role: "Co-founder & Head of Operations" },
@@ -48,49 +57,70 @@ const TEAM = [
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F7F4EF]">
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white py-24 px-4">
+      <section className="-mt-16 pt-16 bg-gradient-to-br from-[#0F1C1B] via-[#16302E] to-[#0F1C1B] text-white py-28 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-blue-500/20 border border-blue-400/30 rounded-full px-4 py-1.5 text-sm text-blue-300 mb-6">
+          <div className="inline-flex items-center gap-2 bg-[#1E6B69]/25 border border-[#1E6B69]/40 rounded-full px-4 py-1.5 text-sm text-[#7FCECC] mb-6">
             Founded by expats, for expats
           </div>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-5">
-            About <span className="text-blue-400">DoubleN</span> Realty
+          <h1 className="text-5xl md:text-6xl font-serif font-medium text-white mb-5 leading-[1.05]">
+            About <span className="text-[#C9935A]">Mather</span>
           </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            We connect expats and foreigners with the best rental homes in Thailand.
-            Transparent, fast, no commissions.
+          <p className="text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+            Thailand&apos;s rental platform for expats and foreigners.
+            Verified properties. Multilingual support. No language barrier.
           </p>
         </div>
       </section>
 
-      {/* Mission */}
-      <section className="py-20 px-4 bg-white">
+      {/* Stats */}
+      <section className="bg-[#1E6B69] text-white py-10 px-4">
+        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          {STATS.map((s) => (
+            <div key={s.label} className="flex flex-col items-center gap-2">
+              <div className="text-[#A7D8D6]">{s.icon}</div>
+              <div className="text-4xl font-serif font-medium">{s.value}</div>
+              <div className="text-[#A7D8D6] text-sm">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* What We Do */}
+      <section className="py-24 px-4 bg-[#F7F4EF]">
         <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-black text-gray-900 mb-4">Our Mission</h2>
-            <p className="text-lg text-gray-600 leading-relaxed mb-4">
-              We believe finding a home should be exciting — not stressful. Our mission is to
-              make renting property in Thailand simple, transparent, and stress-free for
-              international residents.
+            <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-4">What We Do</h2>
+            <p className="text-lg text-[#3a4543] leading-relaxed mb-4">
+              Mather is a rental property platform built for foreigners living in Thailand.
+              We list verified homes, condos, and apartments across Bangkok, Chiang Mai, Phuket,
+              and beyond — with full listings in 15 languages so you can find your next home
+              without the language barrier.
             </p>
-            <p className="text-gray-500 leading-relaxed">
-              We curate only verified properties, surface real prices, and support you in 15
-              languages every step of the way.
+            <p className="text-[#6B8280] leading-relaxed">
+              Whether you&apos;re relocating for work, retiring in the tropics, or just exploring
+              long-term stays — we help you find the right home at the right price.
             </p>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-slate-100 rounded-3xl p-8">
+          <div className="bg-gradient-to-br from-[#E8F6F5] to-white rounded-2xl p-8 border border-[#E2DDD7]">
             <div className="space-y-4">
-              {["Verified listings only", "No hidden commissions", "Support in 15 languages", "Response within 24 hours"].map((point) => (
+              {[
+                "Verified listings only",
+                "No hidden commissions",
+                "Support in 15 languages",
+                "Response within 24 hours",
+                "Bangkok, Chiang Mai, Phuket & more",
+                "Prices shown in THB & USD",
+              ].map((point) => (
                 <div key={point} className="flex items-center gap-3">
-                  <div className="w-5 h-5 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-[#1E6B69] flex items-center justify-center shrink-0">
                     <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-gray-700 font-medium">{point}</span>
+                  <span className="text-[#1A2624] font-medium">{point}</span>
                 </div>
               ))}
             </div>
@@ -99,39 +129,57 @@ export default function AboutPage() {
       </section>
 
       {/* Story */}
-      <section className="py-20 px-4 bg-slate-50">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl font-black text-gray-900 mb-6">Our Story</h2>
-          <p className="text-xl text-gray-600 leading-relaxed mb-6">
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-6 text-center">Our Story</h2>
+          <p className="text-xl text-[#1E6B69] leading-relaxed mb-8 text-center font-serif italic">
             Founded by expats, for expats.
           </p>
-          <p className="text-gray-500 leading-relaxed text-lg max-w-2xl mx-auto">
-            We know how hard it is to find a good home in Thailand as a foreigner — language
-            barriers, unreliable listings, surprise fees. We built DoubleN to change that.
-            Every feature on this platform was designed from personal experience of arriving in
-            Bangkok with a suitcase and needing a home fast.
-          </p>
+          <div className="space-y-5 text-[#6B8280] leading-relaxed text-lg">
+            <p>
+              Finding a rental property in Thailand as a foreigner can be complicated —
+              language barriers, unverified listings, and confusing lease terms make the
+              process frustrating.
+            </p>
+            <p>
+              <strong className="text-[#1A2624] font-semibold">Mather was built to fix that.</strong>
+            </p>
+            <p>
+              We connect expats and international residents with trusted landlords across
+              Thailand&apos;s most popular cities — Bangkok, Chiang Mai, Phuket, Pattaya, and more.
+              Every listing is reviewed and verified by our team before it goes live.
+            </p>
+            <p>
+              Our platform supports 15 languages including English, Thai, Japanese, Korean,
+              Chinese, Russian, Arabic, and more — so wherever you&apos;re from, you can search,
+              compare, and inquire in your own language.
+            </p>
+            <p>
+              Every feature on this platform was designed from personal experience of arriving
+              in Bangkok with a suitcase and needing a home fast.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-24 px-4 bg-[#F7F4EF]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-black text-gray-900 mb-3">What We Stand For</h2>
-            <p className="text-gray-500">Four principles we never compromise on.</p>
+            <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-3">What We Stand For</h2>
+            <p className="text-[#6B8280]">Four principles we never compromise on.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {VALUES.map((v) => (
               <div
                 key={v.title}
-                className="bg-slate-50 rounded-2xl p-6 hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl p-6 border border-[#E2DDD7] hover:shadow-md transition-shadow"
               >
-                <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-xl bg-[#1E6B69] text-white flex items-center justify-center mb-4">
                   {v.icon}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{v.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{v.description}</p>
+                <h3 className="font-serif text-xl text-[#1A2624] mb-2">{v.title}</h3>
+                <p className="text-sm text-[#6B8280] leading-relaxed">{v.description}</p>
               </div>
             ))}
           </div>
@@ -139,22 +187,22 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="py-20 px-4 bg-slate-50">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-black text-gray-900 mb-3">Meet the Team</h2>
-            <p className="text-gray-500">
+            <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-3">Meet the Team</h2>
+            <p className="text-[#6B8280]">
               A small, passionate team of expats and Thailand lovers.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
             {TEAM.map((member) => (
-              <div key={member.initials} className="bg-white rounded-2xl p-6 text-center shadow-sm">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 text-white text-xl font-black flex items-center justify-center mx-auto mb-4">
+              <div key={member.initials} className="bg-[#F7F4EF] rounded-2xl p-6 text-center border border-[#E2DDD7]">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#1E6B69] to-[#0F1C1B] text-white text-xl font-serif font-medium flex items-center justify-center mx-auto mb-4">
                   {member.initials}
                 </div>
-                <div className="font-bold text-gray-900 text-sm">{member.name}</div>
-                <div className="text-xs text-gray-400 mt-1">{member.role}</div>
+                <div className="font-semibold text-[#1A2624] text-sm">{member.name}</div>
+                <div className="text-xs text-[#9BAEAC] mt-1">{member.role}</div>
               </div>
             ))}
           </div>
@@ -162,27 +210,27 @@ export default function AboutPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-20 px-4 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+      <section className="py-24 px-4 bg-gradient-to-br from-[#1E6B69] to-[#18605E] text-white">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-3xl font-black mb-4">Get in Touch</h2>
-          <p className="text-blue-100 mb-8 text-lg">
+          <h2 className="text-4xl font-serif font-medium text-white mb-4">Get in Touch</h2>
+          <p className="text-white/80 mb-8 text-lg">
             Questions? We&apos;re here to help — in your language, on your timeline.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 font-bold px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-[#1E6B69] font-semibold px-6 py-3 rounded-xl hover:bg-[#E8F6F5] transition-colors"
             >
               <MessageCircle className="w-4 h-4" />
               Contact Us
               <ArrowRight className="w-4 h-4" />
             </Link>
             <a
-              href="mailto:hello@doublen-realty.com"
+              href="mailto:hello@mather.to"
               className="inline-flex items-center gap-2 border border-white/30 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
             >
               <Mail className="w-4 h-4" />
-              hello@doublen-realty.com
+              hello@mather.to
             </a>
           </div>
         </div>

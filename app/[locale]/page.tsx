@@ -7,7 +7,7 @@ import { HERO_IMAGE } from '@/lib/images'
 import PropertyCard from '@/components/PropertyCard'
 import HomeSearchBar from './HomeSearchBar'
 import { Link } from '@/i18n/navigation'
-import { Building2, Search, MessageCircle, Home, ArrowRight, Compass } from 'lucide-react'
+import { Building2, Search, MessageCircle, Home, ArrowRight, Compass, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface HomePageProps {
@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
   }
 
   return {
-    title: 'Find Rental Properties in Thailand | DoubleN Realty',
+    title: 'Find Rental Properties in Thailand',
     description:
       'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
     keywords: ['rental properties Thailand', 'expat housing Thailand', 'Bangkok rent'],
@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
       languages: alternates,
     },
     openGraph: {
-      title: 'Find Rental Properties in Thailand | DoubleN Realty',
+      title: 'Find Rental Properties in Thailand | Mather',
       description:
         'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
       url: `${SITE_URL}/${locale}`,
@@ -43,13 +43,13 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
           url: HERO_IMAGE,
           width: 1920,
           height: 1080,
-          alt: 'Rental Properties in Thailand — DoubleN Realty',
+          alt: 'Rental Properties in Thailand — Mather',
         },
       ],
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Find Rental Properties in Thailand | DoubleN Realty',
+      title: 'Find Rental Properties in Thailand | Mather',
       description:
         'Browse 500+ verified rental properties in Thailand for expats. Bangkok, Chiang Mai, Phuket. Direct contact with landlords.',
       images: [HERO_IMAGE],
@@ -90,7 +90,7 @@ export default async function HomePage({ params }: HomePageProps) {
     '@graph': [
       {
         '@type': 'WebSite',
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         potentialAction: {
           '@type': 'SearchAction',
@@ -104,21 +104,21 @@ export default async function HomePage({ params }: HomePageProps) {
       {
         '@type': 'Organization',
         '@id': `${SITE_URL}/#organization`,
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         logo: { '@type': 'ImageObject', url: `${SITE_URL}/icon.svg` },
         description: 'Premium rental platform for expats and foreigners in Thailand',
-        email: 'hello@doublen-realty.com',
+        email: 'hello@mather.to',
         areaServed: { '@type': 'Country', name: 'Thailand' },
         sameAs: [],
       },
       {
         '@type': ['LocalBusiness', 'RealEstateAgent'],
         '@id': `${SITE_URL}/#localbusiness`,
-        name: 'DoubleN Realty',
+        name: 'Mather',
         url: SITE_URL,
         description: 'Rental property platform for expats in Thailand. Verified listings in Bangkok, Chiang Mai, Phuket and beyond.',
-        email: 'hello@doublen-realty.com',
+        email: 'hello@mather.to',
         areaServed: [
           { '@type': 'City', name: 'Bangkok' },
           { '@type': 'City', name: 'Chiang Mai' },
@@ -140,7 +140,7 @@ export default async function HomePage({ params }: HomePageProps) {
       />
       {/* Hero */}
       <section
-        className="relative min-h-[75vh] flex items-center text-white px-4"
+        className="relative -mt-16 min-h-[75vh] flex items-center text-white px-4"
         style={{
           backgroundImage:
             "url('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=1920&q=80')",
@@ -156,7 +156,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
         <div className="relative max-w-4xl mx-auto text-center w-full py-24">
           {/* text-white overrides the base h1 teal rule */}
-          <h1 className="text-white text-4xl md:text-6xl font-lexend font-extrabold tracking-tight mb-6 leading-tight drop-shadow-lg">
+          <h1 className="text-white text-5xl md:text-7xl font-serif font-medium mb-6 leading-[1.05] drop-shadow-lg">
             {t('hero_title')}
           </h1>
           <p className="text-xl md:text-2xl text-white/80 mb-10 drop-shadow">
@@ -175,7 +175,7 @@ export default async function HomePage({ params }: HomePageProps) {
               500+ Expats Helped
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#F4581A] inline-block" />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#C9935A] inline-block" />
               Bangkok · Chiang Mai · Phuket
             </span>
             <span className="flex items-center gap-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 py-1">
@@ -209,7 +209,7 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Stacked-cards visual — three depth layers with teal/orange accent */}
           <div className="relative shrink-0 w-36 h-52 sm:order-last">
             {/* Back card — orange accent */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#F4581A] to-[#B43E10] rounded-2xl shadow-lg rotate-6 opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#C9935A] to-[#8A5E32] rounded-2xl shadow-lg rotate-6 opacity-50" />
             {/* Mid card — muted teal */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#18605E] to-[#0C3837] rounded-2xl shadow-lg rotate-2 opacity-80" />
             {/* Front card — primary teal */}
@@ -227,9 +227,9 @@ export default async function HomePage({ params }: HomePageProps) {
           {/* Text + CTA */}
           <div className="flex-1 text-center sm:text-left">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-widest text-[#4DB5B2] bg-[#4DB5B2]/15 px-3 py-1 rounded-full mb-4">
-              ✨ New feature
+              <Sparkles className="size-3" strokeWidth={2} /> New feature
             </span>
-            <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">
+            <h2 className="text-3xl sm:text-4xl font-serif font-medium text-white leading-tight mb-3">
               Swipe to find<br className="hidden sm:block" /> your dream home
             </h2>
             <p className="text-white/50 text-sm sm:text-base mb-6 max-w-sm mx-auto sm:mx-0">
@@ -238,7 +238,7 @@ export default async function HomePage({ params }: HomePageProps) {
             </p>
             <Link
               href="/discover"
-              className="inline-flex items-center gap-2 bg-[#F4581A] hover:bg-[#D84C14] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#F4581A]/20"
+              className="inline-flex items-center gap-2 bg-[#C9935A] hover:bg-[#B07840] text-white font-semibold px-6 py-3 rounded-full transition-colors shadow-lg shadow-[#C9935A]/25"
             >
               <Compass className="w-5 h-5" />
               Try Discover Mode
@@ -251,7 +251,7 @@ export default async function HomePage({ params }: HomePageProps) {
       {/* Featured Properties */}
       <section className="max-w-7xl mx-auto px-4 py-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-lexend font-bold text-[#1E6B69]">{t('featured_title')}</h2>
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624]">{t('featured_title')}</h2>
           <Link href="/properties" className="flex items-center gap-1 text-[#124E4C] hover:text-[#1E6B69] font-medium">
             {t('view_all')}
             <ArrowRight className="w-4 h-4" />
@@ -272,24 +272,25 @@ export default async function HomePage({ params }: HomePageProps) {
         )}
       </section>
 
-      {/* How It Works */}
-      <section className="bg-gray-50 py-16 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-[#1E6B69] mb-4">How It Works</h2>
-          <p className="text-gray-500 mb-12">
-            Finding your next home in Thailand is easy with DoubleN Realty
+      {/* How It Works — editorial numbered steps */}
+      <section className="bg-[#F7F4EF] py-20 px-4">
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-4xl font-serif font-medium text-[#1A2624] mb-2">How It Works</h2>
+          <p className="text-[#6B8280] mb-14">
+            Finding your next home in Thailand is easy with Mather
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
             {steps.map((step, i) => (
-              <div key={i} className="flex flex-col items-center bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-                <div className="w-16 h-16 rounded-full bg-[#1E6B69]/10 flex items-center justify-center mb-4">
-                  {step.icon}
+              <div key={i}>
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="font-serif text-5xl leading-none text-[#C9935A]">
+                    0{i + 1}
+                  </span>
+                  <span className="h-px flex-1 bg-[#E2DDD7]" />
                 </div>
-                <div className="w-8 h-8 rounded-full bg-[#1E6B69] text-white text-sm font-bold flex items-center justify-center mb-3">
-                  {i + 1}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
-                <p className="text-gray-500 text-sm text-center">{step.description}</p>
+                <div className="text-[#1E6B69] mb-3">{step.icon}</div>
+                <h3 className="font-serif text-2xl text-[#1A2624] mb-2">{step.title}</h3>
+                <p className="text-[#6B8280] text-sm leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
@@ -300,7 +301,7 @@ export default async function HomePage({ params }: HomePageProps) {
       <section className="bg-gradient-to-r from-[#0C3837] to-[#1E6B69] text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <Building2 className="w-12 h-12 mx-auto mb-4 text-green-200" />
-          <h2 className="text-3xl font-bold text-white mb-4">Are you a landlord?</h2>
+          <h2 className="text-4xl font-serif font-medium text-white mb-4">Are you a landlord?</h2>
           <p className="text-green-100 text-lg mb-8">
             List your property and reach thousands of expats looking for rental homes in Thailand.
             It&apos;s free to get started.

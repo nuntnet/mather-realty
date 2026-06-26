@@ -24,7 +24,7 @@ export default function Logo({
       {/* 2N monogram */}
       <span
         className={cn(
-          "flex items-center justify-center bg-blue-600 text-white font-black select-none shrink-0",
+          "flex items-center justify-center bg-[#1E6B69] text-white font-black select-none shrink-0",
           cfg.monogram
         )}
       >
@@ -40,7 +40,7 @@ export default function Logo({
             variant === "light" ? "text-white" : "text-gray-900"
           )}
         >
-          DoubleN Realty
+          Mather
         </span>
       )}
     </span>

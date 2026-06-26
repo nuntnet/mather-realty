@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy | DoubleN Realty',
-  description: 'Learn how DoubleN Realty uses cookies and similar technologies on our platform.',
+  title: 'Cookie Policy',
+  description: 'Learn how Mather uses cookies and similar technologies on our platform.',
 }
 
 export default function CookiePolicyPage() {
@@ -15,8 +15,8 @@ export default function CookiePolicyPage() {
       <div className="prose prose-gray max-w-none text-gray-700 leading-relaxed">
 
         <p>
-          DoubleN Realty (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates the website at{' '}
-          <strong>doublen-realty.com</strong>. This Cookie Policy explains what cookies are, how
+          Mather (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) operates the website at{' '}
+          <strong>mather.to</strong>. This Cookie Policy explains what cookies are, how
           we use them, and how you can control them. By continuing to use our site, you consent to
           our use of cookies as described in this policy.
         </p>
@@ -172,8 +172,8 @@ export default function CookiePolicyPage() {
         <h2 className="text-xl font-semibold text-gray-900 mt-8 mb-3">6. Contact Us</h2>
         <p>
           If you have any questions about our use of cookies, please contact us at:{' '}
-          <a href="mailto:janjiranui@gmail.com" className="text-[#1E6B69] hover:underline">
-            janjiranui@gmail.com
+          <a href="mailto:hello@mather.to" className="text-[#1E6B69] hover:underline">
+            hello@mather.to
           </a>
         </p>
 

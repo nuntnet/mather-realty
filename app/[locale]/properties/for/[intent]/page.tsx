@@ -162,7 +162,7 @@ export default async function IntentPage({ params }: IntentPageProps) {
                 </h2>
                 <Link
                   href={`/${locale}/properties`}
-                  className="text-sm text-blue-600 hover:text-blue-700 transition-colors"
+                  className="text-sm text-[#1E6B69] hover:text-[#18605E] transition-colors"
                 >
                   Browse all properties
                 </Link>
@@ -183,7 +183,7 @@ export default async function IntentPage({ params }: IntentPageProps) {
               </p>
               <Link
                 href={`/${locale}/properties`}
-                className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-medium text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-full bg-[#1E6B69] px-6 py-3 text-sm font-medium text-white hover:bg-[#18605E] transition-colors"
               >
                 Browse all properties
               </Link>
@@ -201,7 +201,7 @@ export default async function IntentPage({ params }: IntentPageProps) {
                 <Link
                   key={p}
                   href={`/${locale}/properties/for/${p}`}
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition-colors shadow-sm"
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:border-[#7FCECC] hover:bg-[#E8F6F5] hover:text-[#18605E] transition-colors shadow-sm"
                 >
                   <span>{cfg.emoji}</span>
                   <span>{cfg.title.replace(/^(Homes for |Rentals for |Premium Rentals for |Family Homes for Rent in Bangkok$)/, '').trim() || cfg.title}</span>
@@ -212,19 +212,19 @@ export default async function IntentPage({ params }: IntentPageProps) {
         </section>
 
         {/* CTA */}
-        <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-14">
+        <section className="bg-gradient-to-r from-[#1E6B69] to-[#1E6B69] py-14">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
               Need help finding the right home?
             </h2>
-            <p className="text-blue-100 mb-8 max-w-xl mx-auto">
+            <p className="text-[#cde9e8] mb-8 max-w-xl mx-auto">
               Our team specialises in helping expats relocate to Thailand. Tell us what you need and
               we&apos;ll find the perfect match.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={`/${locale}/properties`}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50 transition-colors shadow-md"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#18605E] hover:bg-[#E8F6F5] transition-colors shadow-md"
               >
                 Browse All Listings
               </Link>

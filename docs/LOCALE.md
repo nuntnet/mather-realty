@@ -1,6 +1,6 @@
 # Locale / i18n Guide
 
-DoubleN Realty supports **15 locales**: `en th zh-CN zh-TW ja ko ru de fr es it nl sv ar hi`
+Mather supports **15 locales**: `en th zh-CN zh-TW ja ko ru de fr es it nl sv ar hi`
 
 ## Adding a new locale
 

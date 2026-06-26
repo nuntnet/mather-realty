@@ -19,7 +19,7 @@ export function generateStaticParams() {
 }
 
 export const metadata: Metadata = {
-  title: 'DoubleN Realty',
+  title: 'Mather',
 }
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
@@ -34,7 +34,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     <NextIntlClientProvider locale={locale} messages={messages}>
       <Navbar locale={locale} />
       {/* dir for RTL languages (Arabic) — applied to main content wrapper */}
-      <main lang={locale} dir={dir}>{children}</main>
+      {/* pt-16 clears the fixed h-16 navbar; full-bleed heroes opt out with -mt-16 */}
+      <main lang={locale} dir={dir} className="pt-16">{children}</main>
       <Footer />
       <Analytics />
       <SpeedInsights />

@@ -1,6 +1,6 @@
 /**
  * lib/notion.ts
- * Server-side Notion API client for DoubleN Realty
+ * Server-side Notion API client for Mather
  * All functions are async and server-side only.
  */
 

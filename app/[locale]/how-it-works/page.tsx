@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: HowItWorksPageProps): Promise
   return {
     title: `How It Works | ${SITE_NAME}`,
     description:
-      'Learn how DoubleN Realty works for expat tenants and landlords in Thailand. Find, inquire, and move into your rental home in 3 simple steps.',
+      'Learn how Mather works for expat tenants and landlords in Thailand. Find, inquire, and move into your rental home in 3 simple steps.',
     alternates: { canonical: `${SITE_URL}/${locale}/how-it-works` },
   }
 }
@@ -88,7 +88,7 @@ const LANDLORD_STEPS = [
 
 const FAQ_ITEMS = [
   {
-    question: 'Is DoubleN Realty free to use for tenants?',
+    question: 'Is Mather free to use for tenants?',
     answer: 'Yes, completely free. Tenants can browse, save listings, and contact landlords at no cost.',
   },
   {
@@ -120,24 +120,24 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-blue-900 text-white overflow-hidden">
+      <section className="relative -mt-16 pt-16 bg-gradient-to-br from-[#0F1C1B] via-[#16302E] to-[#0F1C1B] text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-indigo-400 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#2A8A88] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#C9935A] rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-4xl mx-auto px-4 py-24 text-center">
-          <span className="inline-block px-4 py-1.5 rounded-full bg-blue-500/20 text-blue-200 text-sm font-medium mb-6 border border-blue-500/30">
+          <span className="inline-block px-4 py-1.5 rounded-full bg-[#2A8A88]/20 text-[#A7D8D6] text-sm font-medium mb-6 border border-[#2A8A88]/30">
             Simple. Transparent. No Fees.
           </span>
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            How DoubleN Realty Works
+          <h1 className="text-5xl md:text-6xl font-serif font-medium text-white mb-6 leading-[1.08]">
+            How Mather Works
           </h1>
-          <p className="text-blue-200 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+          <p className="text-[#A7D8D6] text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Finding a rental home in Thailand as an expat has never been easier.
             Whether you&apos;re looking to rent or list a property, we&apos;ve made it simple in just 3 steps.
           </p>
           <div className="flex justify-center mt-10">
-            <ChevronDown className="w-6 h-6 text-blue-300 animate-bounce" />
+            <ChevronDown className="w-6 h-6 text-[#7FCECC] animate-bounce" />
           </div>
         </div>
       </section>
@@ -145,10 +145,10 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       {/* For Tenants */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-semibold mb-4 border border-blue-100">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8F6F5] text-[#18605E] text-sm font-semibold mb-4 border border-[#cde9e8]">
             <Search className="w-4 h-4" /> For Tenants
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Find your perfect home in 3 steps</h2>
+          <h2 className="text-4xl md:text-5xl font-serif font-medium text-[#1A2624]">Find your perfect home in 3 steps</h2>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto">
             Browse verified listings, connect with landlords directly, and move in — all without agency fees.
           </p>
@@ -170,18 +170,17 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-                <span className="absolute top-4 left-4 text-4xl">{step.emoji}</span>
-                <span className="absolute bottom-4 right-4 text-5xl font-black text-white/20 leading-none">
+                <span className="absolute bottom-4 right-4 font-serif text-6xl text-white/25 leading-none">
                   {step.number}
                 </span>
               </div>
               {/* Content */}
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
+                <h3 className="font-serif text-2xl text-[#1A2624] mb-2">{step.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
               </div>
               {/* Accent bar */}
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2A8A88] to-[#1E6B69] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </div>
           ))}
         </div>
@@ -195,10 +194,10 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       {/* For Landlords */}
       <section className="max-w-6xl mx-auto px-4 py-20">
         <div className="text-center mb-14">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-50 text-emerald-700 text-sm font-semibold mb-4 border border-emerald-100">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#E8F6F5] text-[#18605E] text-sm font-semibold mb-4 border border-[#cde9e8]">
             <ClipboardList className="w-4 h-4" /> For Landlords
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">List your property, reach expat tenants</h2>
+          <h2 className="text-4xl md:text-5xl font-serif font-medium text-[#1A2624]">List your property, reach expat tenants</h2>
           <p className="text-gray-500 mt-3 max-w-xl mx-auto">
             Get your property in front of thousands of qualified international tenants.
             No commissions, ever.
@@ -211,22 +210,21 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
             return (
               <div
                 key={step.number}
-                className="relative bg-gradient-to-br from-emerald-50 to-white rounded-3xl border border-emerald-100 p-8 hover:shadow-xl transition-all duration-300"
+                className="relative bg-gradient-to-br from-[#E8F6F5] to-white rounded-3xl border border-[#cde9e8] p-8 hover:shadow-xl transition-all duration-300"
               >
                 {/* Step number */}
-                <div className="absolute top-6 right-6 text-6xl font-black text-emerald-100 leading-none select-none">
+                <div className="absolute top-6 right-6 text-6xl font-black text-[#cde9e8] leading-none select-none">
                   {step.number}
                 </div>
                 {/* Icon */}
-                <div className="w-14 h-14 rounded-2xl bg-emerald-100 flex items-center justify-center mb-5">
-                  <Icon className="w-7 h-7 text-emerald-600" />
+                <div className="w-14 h-14 rounded-2xl bg-[#cde9e8] flex items-center justify-center mb-5">
+                  <Icon className="w-7 h-7 text-[#1E6B69]" />
                 </div>
-                <span className="text-2xl mb-3 block">{step.emoji}</span>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
+                <h3 className="font-serif text-2xl text-[#1A2624] mb-2">{step.title}</h3>
                 <p className="text-gray-500 text-sm leading-relaxed">{step.description}</p>
                 {/* Connector arrow */}
                 {i < LANDLORD_STEPS.length - 1 && (
-                  <div className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-emerald-500 items-center justify-center shadow-md">
+                  <div className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[#1E6B69] items-center justify-center shadow-md">
                     <svg viewBox="0 0 16 16" className="w-4 h-4 text-white fill-current">
                       <path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
@@ -242,7 +240,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       <section className="bg-gray-50 py-20">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
+            <h2 className="text-4xl md:text-5xl font-serif font-medium text-[#1A2624]">Frequently Asked Questions</h2>
             <p className="text-gray-500 mt-3">Everything you need to know before getting started.</p>
           </div>
           <div className="space-y-4">
@@ -252,7 +250,7 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
                 className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-200"
               >
                 <h3 className="font-semibold text-gray-900 mb-2 flex items-start gap-3">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs font-bold flex items-center justify-center mt-0.5">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#cde9e8] text-[#18605E] text-xs font-bold flex items-center justify-center mt-0.5">
                     {i + 1}
                   </span>
                   {item.question}
@@ -265,15 +263,15 @@ export default async function HowItWorksPage({ params }: HowItWorksPageProps) {
       </section>
 
       {/* CTA */}
-      <section className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-20">
+      <section className="bg-gradient-to-br from-[#1E6B69] to-[#18605E] text-white py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to find your home?</h2>
-          <p className="text-blue-200 text-lg mb-8">
+          <h2 className="text-4xl md:text-5xl font-serif font-medium text-white mb-4">Ready to find your home?</h2>
+          <p className="text-[#A7D8D6] text-lg mb-8">
             Join thousands of expats who have found their perfect rental in Thailand.
           </p>
           <Link
             href={`/${locale}/properties`}
-            className="inline-flex items-center gap-2 bg-white text-blue-700 font-semibold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
+            className="inline-flex items-center gap-2 bg-white text-[#18605E] font-semibold px-8 py-4 rounded-2xl hover:bg-[#E8F6F5] transition-colors duration-200 shadow-lg hover:shadow-xl text-lg"
           >
             Browse Properties
             <svg viewBox="0 0 16 16" className="w-5 h-5 fill-current">

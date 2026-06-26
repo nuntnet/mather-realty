@@ -170,7 +170,7 @@ async function createPropertyInNotion(data: {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 async function main() {
-  console.log('\n🏠 DoubleN Realty — Property Seeder\n')
+  console.log('\n🏠 Mather — Property Seeder\n')
 
   const PHOTOS_BASE = 'drive-download-20260602T190827Z-3-001'
 

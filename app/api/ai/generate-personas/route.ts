@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
     tags: property.tags.join(', '),
   }
 
-  const systemPrompt = `You are an expert real estate copywriter for DoubleN Realty, a premium rental platform for expats in Thailand. Write compelling, SEO-rich descriptions that naturally include location keywords and lifestyle context. Always respond with valid JSON only — no markdown, no explanation.`
+  const systemPrompt = `You are an expert real estate copywriter for Mather, a premium rental platform for expats in Thailand. Write compelling, SEO-rich descriptions that naturally include location keywords and lifestyle context. Always respond with valid JSON only — no markdown, no explanation.`
 
   const userPrompt = `Property data: ${JSON.stringify(ctx)}
 

@@ -60,7 +60,7 @@ export default function PropertyDetailLoading() {
             <div className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm flex flex-col gap-4">
               <div className="h-9 w-40 bg-gray-200 rounded" />
               <div className="h-4 w-24 bg-gray-100 rounded" />
-              <div className="h-11 w-full bg-blue-100 rounded-lg" />
+              <div className="h-11 w-full bg-[#cde9e8] rounded-lg" />
               <div className="h-11 w-full bg-gray-100 rounded-lg" />
             </div>
 

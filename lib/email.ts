@@ -4,8 +4,8 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? 'placeholder')
 }
 
-const FROM = 'DoubleN Realty <noreply@doublen-realty.com>'
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://doublen-realty.com'
+const FROM = 'Mather <noreply@mather.to>'
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://mather.to'
 
 function baseLayout(title: string, body: string): string {
   return `<!DOCTYPE html>
@@ -23,7 +23,7 @@ function baseLayout(title: string, body: string): string {
           <!-- Header -->
           <tr>
             <td style="background:#1a3c5e;padding:32px 40px;text-align:center;">
-              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.5px;">DoubleN Realty</h1>
+              <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:0.5px;">Mather</h1>
               <p style="margin:6px 0 0;color:#a8c4e0;font-size:13px;">Premium Rentals in Thailand</p>
             </td>
           </tr>
@@ -37,8 +37,8 @@ function baseLayout(title: string, body: string): string {
           <tr>
             <td style="background:#f9fafb;padding:20px 40px;text-align:center;border-top:1px solid #e5e7eb;">
               <p style="margin:0;color:#9ca3af;font-size:12px;">
-                &copy; ${new Date().getFullYear()} DoubleN Realty &bull;
-                <a href="${SITE_URL}" style="color:#1a3c5e;text-decoration:none;">doublen-realty.com</a>
+                &copy; ${new Date().getFullYear()} Mather &bull;
+                <a href="${SITE_URL}" style="color:#1a3c5e;text-decoration:none;">mather.to</a>
               </p>
             </td>
           </tr>
@@ -94,7 +94,7 @@ export async function sendInquiryNotification(params: {
 
   const body = `
     <h2 style="margin:0 0 8px;color:#1a3c5e;font-size:20px;">New Inquiry Received</h2>
-    <p style="margin:0 0 24px;color:#6b7280;font-size:14px;">Someone is interested in your property on DoubleN Realty.</p>
+    <p style="margin:0 0 24px;color:#6b7280;font-size:14px;">Someone is interested in your property on Mather.</p>
     <table cellpadding="0" cellspacing="0" style="width:100%;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;margin-bottom:28px;">
       <tbody>
         ${rows}
@@ -142,7 +142,7 @@ export async function sendInquiryConfirmation(params: {
     </a>
     <p style="margin:28px 0 0;color:#9ca3af;font-size:13px;">
       If you have any questions, reply to this email or contact us at
-      <a href="mailto:support@doublen-realty.com" style="color:#1a3c5e;">support@doublen-realty.com</a>.
+      <a href="mailto:support@mather.to" style="color:#1a3c5e;">support@mather.to</a>.
     </p>
   `
 

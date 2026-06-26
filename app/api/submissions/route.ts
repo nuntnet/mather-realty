@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
       // ignore parse errors
     }
 
-    const adminEmail = process.env.ADMIN_EMAIL || "admin@doublen-realty.com";
+    const adminEmail = process.env.ADMIN_EMAIL || "admin@mather.to";
 
     sendSubmissionNotification({
       adminEmail,

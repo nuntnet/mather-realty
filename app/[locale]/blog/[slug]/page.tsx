@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           {/* Back */}
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-blue-600 mb-6"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-[#1E6B69] mb-6"
           >
             <ArrowLeft className="w-4 h-4" />
             Expat Guide
@@ -130,7 +130,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
           {/* Meta */}
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="text-xs font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full flex items-center gap-1">
+            <span className="text-xs font-medium text-[#1E6B69] bg-[#E8F6F5] px-3 py-1 rounded-full flex items-center gap-1">
               <Tag className="w-3 h-3" />
               {CATEGORY_LABELS[post.category] ?? post.category}
             </span>
@@ -182,7 +182,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                       </div>
                     )}
                     <div className="p-3">
-                      <p className="text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                      <p className="text-sm font-medium text-gray-800 line-clamp-2 group-hover:text-[#1E6B69] transition-colors">
                         {getRelatedTitle(p)}
                       </p>
                       <p className="text-xs text-gray-400 mt-1">{formatDate(p.publishedAt)}</p>

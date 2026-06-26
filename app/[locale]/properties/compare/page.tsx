@@ -73,7 +73,7 @@ function ComparePageInner() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1E6B69] border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -122,12 +122,12 @@ function ComparePageInner() {
                         )}
                         <Link
                           href={`/properties/${p.slug}`}
-                          className="font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 text-center"
+                          className="font-semibold text-gray-900 hover:text-[#1E6B69] line-clamp-2 text-center"
                         >
                           {title}
                         </Link>
                         {p.verifiedAt && (
-                          <span className="flex items-center gap-1 text-xs text-blue-700">
+                          <span className="flex items-center gap-1 text-xs text-[#18605E]">
                             <CheckCircle2 className="w-3.5 h-3.5" /> Verified
                           </span>
                         )}
@@ -145,7 +145,7 @@ function ComparePageInner() {
                     <td key={p.id} className="p-4 text-center text-gray-700">
                       {key === 'verifiedAt' ? (
                         p.verifiedAt ? (
-                          <CheckCircle2 className="w-5 h-5 text-blue-600 mx-auto" />
+                          <CheckCircle2 className="w-5 h-5 text-[#1E6B69] mx-auto" />
                         ) : (
                           <X className="w-5 h-5 text-gray-300 mx-auto" />
                         )
@@ -161,7 +161,7 @@ function ComparePageInner() {
                 <td className="p-4 font-medium text-gray-600">Action</td>
                 {properties.map((p) => (
                   <td key={p.id} className="p-4 text-center">
-                    <Button asChild size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button asChild size="sm" className="bg-[#1E6B69] hover:bg-[#18605E] text-white">
                       <Link href={`/properties/${p.slug}`}>
                         <Calendar className="w-4 h-4 mr-1" />
                         Schedule Viewing
@@ -182,7 +182,7 @@ export default function ComparePage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-[#1E6B69] border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <ComparePageInner />

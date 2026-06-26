@@ -148,8 +148,8 @@ export default function ContactPage() {
 
         <div className="mt-10 text-center text-sm text-gray-500">
           Prefer email?{" "}
-          <a href="mailto:hello@doublen-realty.com" className="text-blue-600 hover:underline">
-            hello@doublen-realty.com
+          <a href="mailto:hello@mather.to" className="text-blue-600 hover:underline">
+            hello@mather.to
           </a>
         </div>
       </div>

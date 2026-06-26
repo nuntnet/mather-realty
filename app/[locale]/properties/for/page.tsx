@@ -96,7 +96,7 @@ export default async function ForIndexPage({ params }: ForIndexPageProps) {
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-indigo-50 to-purple-50 border-b border-gray-200">
+        <section className="bg-gradient-to-br from-[#E8F6F5] to-[#F7F4EF] border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-14 md:py-20">
             {/* Breadcrumb */}
             <nav className="mb-6 flex items-center gap-2 text-sm text-gray-500">
@@ -108,7 +108,7 @@ export default async function ForIndexPage({ params }: ForIndexPageProps) {
                 Properties
               </Link>
               <span>/</span>
-              <span className="font-medium text-indigo-700">Rentals For</span>
+              <span className="font-medium text-[#18605E]">Rentals For</span>
             </nav>
 
             <div className="max-w-2xl">
@@ -141,7 +141,7 @@ export default async function ForIndexPage({ params }: ForIndexPageProps) {
                   <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
                     {config.subtitle}
                   </p>
-                  <div className="mt-4 flex items-center gap-1 text-sm font-medium text-blue-600 group-hover:gap-2 transition-all">
+                  <div className="mt-4 flex items-center gap-1 text-sm font-medium text-[#1E6B69] group-hover:gap-2 transition-all">
                     <span>View properties</span>
                     <span aria-hidden>→</span>
                   </div>
@@ -152,19 +152,19 @@ export default async function ForIndexPage({ params }: ForIndexPageProps) {
         </section>
 
         {/* CTA */}
-        <section className="bg-gradient-to-r from-blue-600 to-indigo-600 py-14">
+        <section className="bg-gradient-to-r from-[#1E6B69] to-[#1E6B69] py-14">
           <div className="max-w-4xl mx-auto px-4 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-3">
               Not sure which category fits you?
             </h2>
-            <p className="text-blue-100 mb-8 max-w-xl mx-auto">
+            <p className="text-[#cde9e8] mb-8 max-w-xl mx-auto">
               Browse our full listings and use filters to find exactly what you need — or contact us
               and we&apos;ll match you personally.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
                 href={`/${locale}/properties`}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-blue-700 hover:bg-blue-50 transition-colors shadow-md"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3 text-sm font-semibold text-[#18605E] hover:bg-[#E8F6F5] transition-colors shadow-md"
               >
                 Browse All Properties
               </Link>

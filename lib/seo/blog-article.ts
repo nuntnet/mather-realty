@@ -12,7 +12,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 /**
- * Schema.org Article JSON-LD for DoubleN Realty blog posts.
+ * Schema.org Article JSON-LD for Mather blog posts.
  * BlogPost titles/excerpts are multi-locale maps; pass the desired locale.
  */
 export function generateArticleJsonLd(post: BlogPost, locale = "en") {

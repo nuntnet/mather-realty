@@ -360,7 +360,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               {/* 2. RENTAL TERMS */}
               {(property.minLeaseTerm || property.depositMonths) && (
                 <div className="rounded-2xl border border-[#e8ebe7] bg-[#f8faf8] px-5 py-4">
-                  <h3 className="flex items-center gap-2 text-sm font-bold text-[#1d211c] mb-3">
+                  <h3 className="font-sans flex items-center gap-2 text-sm font-bold text-[#1d211c] mb-3">
                     <ScrollText className="w-4 h-4 text-[#1E6B69]" />
                     {t('rental_terms')}
                   </h3>
