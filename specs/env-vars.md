@@ -61,11 +61,19 @@ Cloud name for this project: `dsteex5wz`
 bun run algolia:index   # bulk-index all approved properties
 ```
 
-## OpenAI (AI property description)
+## AI (property descriptions, personas, FAQ)
+
+`callAI()` selects a provider in order: Hermes → **Gemini** → Anthropic → OpenAI.
+Google Gemini is the primary provider (via its OpenAI-compatible endpoint
+`generativelanguage.googleapis.com/v1beta/openai/`).
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENAI_API_KEY` | optional | Used for AI-generated multilingual property descriptions |
+| `GOOGLE_AI_API_KEY` | **recommended** | Google Gemini key (primary AI provider). Get at https://aistudio.google.com/apikey |
+| `GEMINI_MODEL` | optional | Pin one model; else falls back `gemini-2.5-flash-lite → 2.5-flash → 2.0-flash-lite → 2.0-flash` on quota errors |
+| `OPENAI_API_KEY` | optional | Last-resort fallback only — not needed when `GOOGLE_AI_API_KEY` is set |
+| `ANTHROPIC_API_KEY` | optional | Fallback provider |
+| `HERMES_URL` / `HERMES_MODEL` | optional | Local dev proxy only — do NOT set in production (localhost unreachable from Vercel) |
 
 ## Email (Resend)
 
